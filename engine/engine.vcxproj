@@ -74,7 +74,18 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="client.cpp" />
+    <ClCompile Include="graphics.cpp" />
+    <ClCompile Include="inputtemp.cpp" />
     <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="client.h" />
+    <ClInclude Include="graphics.h" />
+    <ClInclude Include="inputbase.h" />
+    <ClInclude Include="inputdirect.h" />
+    <ClInclude Include="inputraw.h" />
+    <ClInclude Include="inputtemp.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
