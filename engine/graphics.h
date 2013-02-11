@@ -1,7 +1,10 @@
 #ifndef __GRAPHICS_H__
 #define __GRAPHICS_H__
 
+// Includes
 #include <Windows.h>
+// ---
+#include "directx.h"
 
 const bool FULL_SCREEN = false;
 const bool VSYNC_ENABLED = true;
@@ -21,6 +24,8 @@ public:
 
 private:
     bool Render();
+
+    CD3D* m_D3D;
 
 };
 

@@ -75,12 +75,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="directx.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="inputtemp.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h" />
+    <ClInclude Include="directx.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="inputbase.h" />
     <ClInclude Include="inputdirect.h" />
