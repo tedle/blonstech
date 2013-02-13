@@ -97,6 +97,7 @@ void CClient::InitWindow(int& screenWidth, int& screenHeight)
     WNDCLASSEX wc;
     DEVMODE dmScreenSettings;
     int posX, posY;
+    DWORD style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
     // TODO: Temporary until Direct & Raw input are setup
     ApplicationHandle = this;
@@ -122,7 +123,7 @@ void CClient::InitWindow(int& screenWidth, int& screenHeight)
     RegisterClassEx(&wc);
 
     // TODO: Do it in CGraphics later
-    if(FULL_SCREEN)
+    if(WINDOW_MODE == R_MODE_FULLSCREEN)
     {
         screenWidth  = GetSystemMetrics(SM_CXSCREEN);
         screenHeight = GetSystemMetrics(SM_CYSCREEN);
@@ -140,29 +141,29 @@ void CClient::InitWindow(int& screenWidth, int& screenHeight)
 
         posX = posY = 0;
     }
-    else
+    else if(WINDOW_MODE == R_MODE_WINDOW)
     {
         screenWidth = 800;
         screenHeight = 600;
 
         posX = (GetSystemMetrics(SM_CXSCREEN) - screenWidth) / 2;
         posY = (GetSystemMetrics(SM_CYSCREEN) - screenHeight) / 2;
+
+        style |= WS_BORDER | WS_SYSMENU;
+    }
+    else if(WINDOW_MODE == R_MODE_BORDERLESS_WINDOW)
+    {
+        screenWidth  = GetSystemMetrics(SM_CXSCREEN);
+        screenHeight = GetSystemMetrics(SM_CYSCREEN);
+
+        posX = posY = 0;
+
+        style |= WS_POPUP;
     }
 
     // Finally make the window, fuck win32
-    m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, m_appName, m_appName, WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_BORDER | WS_SYSMENU,
+    m_hwnd = CreateWindowEx(WS_EX_APPWINDOW, m_appName, m_appName, style,
                             posX, posY, screenWidth, screenHeight, NULL, NULL, m_hinstance, NULL);
-
-
-
-    /* FOR BORDERLESS WINDOW DO
-        m_hwnd = CreateWindowEx(WS_EX_APPWINDOW|WS_EX_TOPMOST, m_appName, m_appName, WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP,
-                            posX, posY, screenWidth, screenHeight, NULL, NULL, m_hinstance, NULL);
-        NOTE: YOU MUST MANUALLY DISABLE WS_EX_TOPMOST EVERYTIME YOU LOSE FOCUS, AND REENABLE WHENEVER FOCUS IS GAINED
-        SetWindowPos(m_hwnd, HWND_TOPMOST, 500, 500, 800, 600, NULL); // COVERS TASKBAR
-        SetWindowPos(m_hwnd, HWND_TOP, 500, 500, 800, 600, NULL); // DOESNT COVER TASKBAR
-        */
-            
 
     // Make it real
     ShowWindow(m_hwnd, SW_SHOW);
@@ -179,7 +180,7 @@ void CClient::FinishWindow()
     ShowCursor(true);
 
     // TODO: Temporary until Direct & Raw input are setup
-    if(FULL_SCREEN)
+    if(WINDOW_MODE == R_MODE_FULLSCREEN)
         ChangeDisplaySettings(NULL, 0);
     ApplicationHandle = NULL;
 

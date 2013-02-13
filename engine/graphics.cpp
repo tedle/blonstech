@@ -15,7 +15,7 @@ bool CGraphics::Init(int screenWidth, int screenHeight, HWND hwnd)
     if(!m_D3D)
         return false;
 
-    if(!m_D3D->Init(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, FULL_SCREEN, SCREEN_DEPTH, SCREEN_NEAR))
+    if(!m_D3D->Init(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, (WINDOW_MODE==R_MODE_FULLSCREEN), SCREEN_DEPTH, SCREEN_NEAR))
     {
         MessageBox(hwnd, L"DirectX die", L"help", MB_OK);
         return false;
