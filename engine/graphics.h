@@ -9,21 +9,21 @@
 #include "model.h"
 #include "shader.h"
 
-#define R_MODE_FULLSCREEN        1
-#define R_MODE_WINDOW            2
-#define R_MODE_BORDERLESS_WINDOW 3
+const int kRenderModeFullscreen       = 1;
+const int kRenderModeWindow           = 2;
+const int kRenderModeBorderlessWindow = 3;
 
-const int WINDOW_MODE = R_MODE_WINDOW;
-const bool VSYNC_ENABLED = false;
-const float SCREEN_DEPTH = 1000.0f;
-const float SCREEN_NEAR = 0.1f;
+const int   kRenderMode  = kRenderModeWindow;
+const bool  kEnableVsync = false;
+const float kScreenDepth = 1000.0f;
+const float kScreenNear  = 0.1f;
 
-class CGraphics
+class Graphics
 {
 
 public:
-    CGraphics();
-    ~CGraphics();
+    Graphics();
+    ~Graphics();
 
     bool Init(int, int, HWND);
     void Finish();
@@ -32,10 +32,10 @@ public:
 private:
     bool Render();
 
-    CD3D* m_D3D;
-    CCamera * m_Camera;
-    CModel * m_Model;
-    CShader * m_Shader;
+    D3D* d3d_;
+    Camera * camera_;
+    Model * model_;
+    Shader * shader_;
 
 };
 

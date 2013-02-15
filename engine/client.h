@@ -12,12 +12,12 @@
 
 // Client Class
 // Controls entirety of program
-class CClient{
+class Client{
 
 public:
     // Public functions
-    CClient();
-    ~CClient();
+    Client();
+    ~Client();
 
     bool Init();
     void Finish();
@@ -33,17 +33,17 @@ private:
     void FinishWindow();
 
     // Private members
-    LPCWSTR m_appName;
-    HINSTANCE m_hinstance;
-    HWND m_hwnd;
+    LPCWSTR app_name_;
+    HINSTANCE hinstance_;
+    HWND hwnd_;
 
-    CInput* m_Input;
-    CGraphics* m_Graphics;
+    Input* input_;
+    Graphics* graphics_;
 };
 
 // Message hooking helpers
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 // TODO: Temporary until Direct & Raw input are setup
-static CClient* ApplicationHandle = NULL;
+static Client* g_application_handle = NULL;
 
 #endif

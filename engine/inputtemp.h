@@ -1,12 +1,12 @@
 #ifndef __INPUTTEMP_H__
 #define __INPUTTEMP_H__
 
-class CInput
+class Input
 {
 
 public:
-    CInput();
-    ~CInput();
+    Input();
+    ~Input();
 
     bool Init();
 
@@ -19,7 +19,7 @@ public:
     void Finish();
 
 private:
-    bool m_keys[256];
+    bool keys_[256];
 };
 
 #endif

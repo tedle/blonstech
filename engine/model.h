@@ -8,7 +8,7 @@
 using namespace DirectX;
 
 // Class
-class CModel
+class Model
 {
 private:
     struct Vertex
@@ -18,22 +18,22 @@ private:
     };
 
 public:
-    CModel();
-    ~CModel();
+    Model();
+    ~Model();
 
     bool Init(ID3D11Device*);
     void Finish();
     void Render(ID3D11DeviceContext*);
 
-    int GetIndexCount();
+    int  GetIndexCount();
 
 private:
     bool InitBuffers(ID3D11Device*);
     void FinishBuffers();
     void RenderBuffers(ID3D11DeviceContext*);
 
-    ID3D11Buffer *m_vertexBuffer, *m_indexBuffer;
-    int m_vertexCount, m_indexCount;
+    ID3D11Buffer *vertex_buffer_, *index_buffer_;
+    int vertex_count_, index_count_;
 
 };
 

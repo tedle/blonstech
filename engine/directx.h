@@ -13,12 +13,12 @@
 
 using namespace DirectX;
 
-class CD3D
+class D3D
 {
     
 public:
-    CD3D();
-    ~CD3D();
+    D3D();
+    ~D3D();
 
     bool Init(int, int, bool, HWND, bool, float, float);
     void Finish();
@@ -36,20 +36,20 @@ public:
     void GetVideoCardInfo(char*, int&);
 
 private:
-    bool m_vsync;
-    int m_videoCardMemory;
-    char m_videoCardDescription[128];
-    IDXGISwapChain* m_swapChain;
-    ID3D11Device* m_device;
-    ID3D11DeviceContext* m_deviceContext;
-    ID3D11RenderTargetView* m_renderTargetView;
-    ID3D11Texture2D* m_depthStencilBuffer;
-    ID3D11DepthStencilState* m_depthStencilState;
-    ID3D11DepthStencilView* m_depthStencilView;
-    ID3D11RasterizerState* m_rasterState;
-    XMFLOAT4X4 m_projectionMatrix;
-    XMFLOAT4X4 m_worldMatrix;
-    XMFLOAT4X4 m_orthoMatrix;
+    bool vsync_;
+    int video_card_memory_;
+    char video_card_desc_[128];
+    IDXGISwapChain* swapchain_;
+    ID3D11Device* device_;
+    ID3D11DeviceContext* device_context_;
+    ID3D11RenderTargetView* render_target_view_;
+    ID3D11Texture2D* depth_stencil_buffer_;
+    ID3D11DepthStencilState* depth_stencil_state_;
+    ID3D11DepthStencilView* depth_stencil_view_;
+    ID3D11RasterizerState* raster_state_;
+    XMFLOAT4X4 projection_matrix_;
+    XMFLOAT4X4 world_matrix_;
+    XMFLOAT4X4 ortho_matrix_;
 };
     
 #endif

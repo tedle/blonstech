@@ -1,52 +1,52 @@
 #include "camera.h"
 
-CCamera::CCamera()
+Camera::Camera()
 {
-    m_pos.x = 0.0f;
-    m_pos.y = 0.0f;
-    m_pos.z = 0.0f;
+    pos_.x = 0.0f;
+    pos_.y = 0.0f;
+    pos_.z = 0.0f;
 
-    m_rot.x = 0.0f;
-    m_rot.y = 0.0f;
-    m_rot.z = 0.0f;
+    rot_.x = 0.0f;
+    rot_.y = 0.0f;
+    rot_.z = 0.0f;
 }
 
-CCamera::~CCamera()
+Camera::~Camera()
 {
 }
 
-void CCamera::SetPos(XMFLOAT3 pos)
+void Camera::SetPos(XMFLOAT3 pos)
 {
-    m_pos.x = pos.x;
-    m_pos.y = pos.y;
-    m_pos.z = pos.z;
+    pos_.x = pos.x;
+    pos_.y = pos.y;
+    pos_.z = pos.z;
 
     return;
 }
 
-void CCamera::SetRot(XMFLOAT3 rot)
+void Camera::SetRot(XMFLOAT3 rot)
 {
-    m_rot.x = rot.x;
-    m_rot.y = rot.y;
-    m_rot.z = rot.z;
+    rot_.x = rot.x;
+    rot_.y = rot.y;
+    rot_.z = rot.z;
 
     return;
 }
 
-XMFLOAT3 CCamera::GetPos()
+XMFLOAT3 Camera::GetPos()
 {
-    return m_pos;
+    return pos_;
 }
 
-XMFLOAT3 CCamera::GetRot()
+XMFLOAT3 Camera::GetRot()
 {
-    return m_rot;
+    return rot_;
 }
 
-void CCamera::Render()
+void Camera::Render()
 {
     XMFLOAT3 up, pos, look;
-    XMVECTOR upVec, posVec, lookVec;
+    XMVECTOR up_vector, pos_vector, look_vector;
     float yaw, pitch, roll;
     XMMATRIX rot;
 
@@ -55,36 +55,36 @@ void CCamera::Render()
     up.y = 1.0f;
     up.z = 0.0f;
 
-    pos.x = m_pos.x;
-    pos.y = m_pos.y;
-    pos.z = m_pos.z;
+    pos.x = pos_.x;
+    pos.y = pos_.y;
+    pos.z = pos_.z;
 
     look.x = 0.0f;
     look.y = 0.0f;
     look.z = 1.0f;
 
     // 0.017 = pi/180 , converts to radians BUT WE LIVE IN RADIANS
-    pitch = m_rot.x * 0.0174532925f;
-    yaw   = m_rot.y * 0.0174532925f;
-    roll  = m_rot.z * 0.0174532925f;
+    pitch = rot_.x * 0.0174532925f;
+    yaw   = rot_.y * 0.0174532925f;
+    roll  = rot_.z * 0.0174532925f;
 
     // WTF????
     rot = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
     // holey crap ms
-    lookVec = XMVector3TransformCoord(XMLoadFloat3(&look), rot);
-    upVec   = XMVector3TransformCoord(XMLoadFloat3(&up),   rot);
-    posVec  = XMLoadFloat3(&pos);
+    look_vector = XMVector3TransformCoord(XMLoadFloat3(&look), rot);
+    up_vector   = XMVector3TransformCoord(XMLoadFloat3(&up),   rot);
+    pos_vector  = XMLoadFloat3(&pos);
 
-    // Translate lookVec back to possey
-    lookVec = posVec + lookVec;
+    // Translate look_vector back to possey
+    look_vector = pos_vector + look_vector;
 
-    XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(posVec, lookVec, upVec));
+    XMStoreFloat4x4(&view_matrix_, XMMatrixLookAtLH(pos_vector, look_vector, up_vector));
 
     return;
 }
 
-XMFLOAT4X4 CCamera::GetViewMatrix()
+XMFLOAT4X4 Camera::GetViewMatrix()
 {
-    return m_viewMatrix;
+    return view_matrix_;
 }

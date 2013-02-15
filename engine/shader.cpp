@@ -1,227 +1,227 @@
 #include "shader.h"
 
-CShader::CShader()
+Shader::Shader()
 {
-    m_vertexShader = NULL;
-    m_pixelShader = NULL;
-    m_layout = NULL;
-    m_matrixBuffer = NULL;
+    vertex_shader_ = NULL;
+    pixel_shader_ = NULL;
+    layout_ = NULL;
+    matrix_buffer_ = NULL;
 }
 
-CShader::~CShader()
+Shader::~Shader()
 {
 }
 
-bool CShader::Init(ID3D11Device* device, HWND hwnd)
+bool Shader::Init(ID3D11Device* device, HWND hwnd)
 {
     return InitShader(device, hwnd, L"test.vert.fx", L"test.frag.fx");
 }
 
-void CShader::Finish()
+void Shader::Finish()
 {
     FinishShader();
 
     return;
 }
 
-bool CShader::Render(ID3D11DeviceContext* deviceContext, int indexCount,
-                     XMFLOAT4X4 worldMatrix, XMFLOAT4X4 viewMatrix, XMFLOAT4X4 projectionMatrix)
+bool Shader::Render(ID3D11DeviceContext* device_context, int index_count,
+                     XMFLOAT4X4 world_matrix, XMFLOAT4X4 view_matrix, XMFLOAT4X4 projection_matrix)
 {
-    if(!SetShaderParams(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
+    if(!SetShaderParams(device_context, world_matrix, view_matrix, projection_matrix))
         return false;
 
-    RenderShader(deviceContext, indexCount);
+    RenderShader(device_context, index_count);
 
     return true;
 }
 
-bool CShader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertFn, WCHAR* fragFn)
+bool Shader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertex_filename, WCHAR* pixel_filename)
 {
     HRESULT result;
-    ID3D10Blob* errorMessage;
-    ID3D10Blob* vertexShaderBuffer;
-    ID3D10Blob* pixelShaderBuffer;
-    D3D11_INPUT_ELEMENT_DESC polygonLayout[2];
-    unsigned int numElements;
-    D3D11_BUFFER_DESC matrixBufferDesc;
+    ID3D10Blob* error_message;
+    ID3D10Blob* vertex_shader_buffer;
+    ID3D10Blob* pixel_shader_buffer;
+    D3D11_INPUT_ELEMENT_DESC input_layout[2];
+    unsigned int num_elements;
+    D3D11_BUFFER_DESC matrix_buffer_desc;
 
-    errorMessage = NULL;
-    vertexShaderBuffer = NULL;
-    pixelShaderBuffer = NULL;
+    error_message = NULL;
+    vertex_shader_buffer = NULL;
+    pixel_shader_buffer = NULL;
 
     // Compile vertex and pixel shaders
-    result = D3DCompileFromFile(vertFn, NULL, NULL, "VertShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertexShaderBuffer, &errorMessage);
+    result = D3DCompileFromFile(vertex_filename, NULL, NULL, "VertShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertex_shader_buffer, &error_message);
     if(FAILED(result))
     {
-        if(errorMessage)
-            OutputShaderErrorMessage(errorMessage, hwnd, vertFn);
+        if(error_message)
+            OutputShaderErrorMessage(error_message, hwnd, vertex_filename);
         else
-            MessageBox(hwnd, vertFn, L"Missing vert shader", MB_OK);
+            MessageBox(hwnd, vertex_filename, L"Missing vert shader", MB_OK);
 
         return false;
     }
 
-    result = D3DCompileFromFile(fragFn, NULL, NULL, "FragShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixelShaderBuffer, &errorMessage);
+    result = D3DCompileFromFile(pixel_filename, NULL, NULL, "FragShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixel_shader_buffer, &error_message);
     if(FAILED(result))
     {
-        if(errorMessage)
-            OutputShaderErrorMessage(errorMessage, hwnd, fragFn);
+        if(error_message)
+            OutputShaderErrorMessage(error_message, hwnd, pixel_filename);
         else
-            MessageBox(hwnd, fragFn, L"Missing pixel shader", MB_OK);
+            MessageBox(hwnd, pixel_filename, L"Missing pixel shader", MB_OK);
 
         return false;
     }
 
-    result = device->CreateVertexShader(vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), NULL, &m_vertexShader);
+    result = device->CreateVertexShader(vertex_shader_buffer->GetBufferPointer(), vertex_shader_buffer->GetBufferSize(), NULL, &vertex_shader_);
     if(FAILED(result))
         return false;
 
-    result = device->CreatePixelShader(pixelShaderBuffer->GetBufferPointer(), pixelShaderBuffer->GetBufferSize(), NULL, &m_pixelShader);
+    result = device->CreatePixelShader(pixel_shader_buffer->GetBufferPointer(), pixel_shader_buffer->GetBufferSize(), NULL, &pixel_shader_);
     if(FAILED(result))
         return false;
 
     // Setup semantics
-    polygonLayout[0].SemanticName = "POSITION";
-    polygonLayout[0].SemanticIndex = 0;
-    polygonLayout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-    polygonLayout[0].InputSlot = 0;
-    polygonLayout[0].AlignedByteOffset = 0;
-    polygonLayout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-    polygonLayout[0].InstanceDataStepRate = 0;
+    input_layout[0].SemanticName = "POSITION";
+    input_layout[0].SemanticIndex = 0;
+    input_layout[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
+    input_layout[0].InputSlot = 0;
+    input_layout[0].AlignedByteOffset = 0;
+    input_layout[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+    input_layout[0].InstanceDataStepRate = 0;
 
-    polygonLayout[1].SemanticName = "COLOUR";
-    polygonLayout[1].SemanticIndex = 0;
-    polygonLayout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-    polygonLayout[1].InputSlot = 0;
-    polygonLayout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-    polygonLayout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-    polygonLayout[1].InstanceDataStepRate = 0;
+    input_layout[1].SemanticName = "COLOUR";
+    input_layout[1].SemanticIndex = 0;
+    input_layout[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
+    input_layout[1].InputSlot = 0;
+    input_layout[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
+    input_layout[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
+    input_layout[1].InstanceDataStepRate = 0;
 
-    numElements = sizeof(polygonLayout) / sizeof(polygonLayout[0]);
+    num_elements = sizeof(input_layout) / sizeof(input_layout[0]);
 
-    result = device->CreateInputLayout(polygonLayout, numElements, vertexShaderBuffer->GetBufferPointer(), vertexShaderBuffer->GetBufferSize(), &m_layout);
+    result = device->CreateInputLayout(input_layout, num_elements, vertex_shader_buffer->GetBufferPointer(), vertex_shader_buffer->GetBufferSize(), &layout_);
     if(FAILED(result))
         return false;
 
-    vertexShaderBuffer->Release();
-    pixelShaderBuffer->Release();
+    vertex_shader_buffer->Release();
+    pixel_shader_buffer->Release();
 
     // Setup constant buffers (sets vars yall)
-    matrixBufferDesc.Usage = D3D11_USAGE_DYNAMIC;
-    matrixBufferDesc.ByteWidth = sizeof(MatrixBuffer);
-    matrixBufferDesc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-    matrixBufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-    matrixBufferDesc.MiscFlags = 0;
-    matrixBufferDesc.StructureByteStride = 0;
+    matrix_buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
+    matrix_buffer_desc.ByteWidth = sizeof(MatrixBuffer);
+    matrix_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+    matrix_buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+    matrix_buffer_desc.MiscFlags = 0;
+    matrix_buffer_desc.StructureByteStride = 0;
 
-    result = device->CreateBuffer(&matrixBufferDesc, NULL, &m_matrixBuffer);
+    result = device->CreateBuffer(&matrix_buffer_desc, NULL, &matrix_buffer_);
     if(FAILED(result))
         return false;
 
     return true;
 }
 
-void CShader::FinishShader()
+void Shader::FinishShader()
 {
-    if(m_matrixBuffer)
+    if(matrix_buffer_)
     {
-        m_matrixBuffer->Release();
-        m_matrixBuffer = NULL;
+        matrix_buffer_->Release();
+        matrix_buffer_ = NULL;
     }
 
-    if(m_layout)
+    if(layout_)
     {
-        m_layout->Release();
-        m_layout = NULL;
+        layout_->Release();
+        layout_ = NULL;
     }
 
-    if(m_pixelShader)
+    if(pixel_shader_)
     {
-        m_pixelShader->Release();
-        m_pixelShader = NULL;
+        pixel_shader_->Release();
+        pixel_shader_ = NULL;
     }
 
-    if(m_vertexShader)
+    if(vertex_shader_)
     {
-        m_vertexShader->Release();
-        m_vertexShader = NULL;
+        vertex_shader_->Release();
+        vertex_shader_ = NULL;
     }
 
     return;
 }
 
-void CShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHAR* shaderFn)
+void Shader::OutputShaderErrorMessage(ID3D10Blob* error_message, HWND hwnd, WCHAR* shader_filename)
 {
-    char* compileErrors;
-    unsigned long bufferSize;
+    char* compile_errors;
+    unsigned long buffer_size;
     std::ofstream fout;
 
-    compileErrors = (char*)(errorMessage->GetBufferPointer());
-    bufferSize = errorMessage->GetBufferSize();
+    compile_errors = (char*)(error_message->GetBufferPointer());
+    buffer_size = error_message->GetBufferSize();
 
     fout.open("shader.log");
 
-    for(unsigned int i = 0; i < bufferSize; i++)
-        fout << compileErrors[i];
+    for(unsigned int i = 0; i < buffer_size; i++)
+        fout << compile_errors[i];
 
     fout.close();
 
-    errorMessage->Release();
+    error_message->Release();
 
-    MessageBox(hwnd, L"Failed to compile shader", shaderFn, MB_OK);
+    MessageBox(hwnd, L"Failed to compile shader", shader_filename, MB_OK);
     
     return;
 }
 
-bool CShader::SetShaderParams(ID3D11DeviceContext* deviceContext,
-                              XMFLOAT4X4 worldMatrix, XMFLOAT4X4 viewMatrix, XMFLOAT4X4 projectionMatrix)
+bool Shader::SetShaderParams(ID3D11DeviceContext* device_context,
+                              XMFLOAT4X4 world_matrix, XMFLOAT4X4 view_matrix, XMFLOAT4X4 projection_matrix)
 {
     HRESULT result;
-    D3D11_MAPPED_SUBRESOURCE mappedResource;
+    D3D11_MAPPED_SUBRESOURCE mapped_resource;
     MatrixBuffer* data;
-    unsigned int bufferNumber;
+    unsigned int num_buffers;
 
     // Transpose matrices, required in DX11
-    XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(XMLoadFloat4x4(&worldMatrix)));
-    XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(XMLoadFloat4x4(&viewMatrix)));
-    XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(XMLoadFloat4x4(&projectionMatrix)));
+    XMStoreFloat4x4(&world_matrix, XMMatrixTranspose(XMLoadFloat4x4(&world_matrix)));
+    XMStoreFloat4x4(&view_matrix, XMMatrixTranspose(XMLoadFloat4x4(&view_matrix)));
+    XMStoreFloat4x4(&projection_matrix, XMMatrixTranspose(XMLoadFloat4x4(&projection_matrix)));
 
     // Lock buffer to gain write access
-    result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
+    result = device_context->Map(matrix_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource);
     if(FAILED(result))
         return false;
 
     // Cast cbuffer to matrix
-    data = (MatrixBuffer*)mappedResource.pData;
+    data = (MatrixBuffer*)mapped_resource.pData;
 
     // Copy new matrix data
-    data->world = worldMatrix;
-    data->view = viewMatrix;
-    data->projection = projectionMatrix;
+    data->world = world_matrix;
+    data->view = view_matrix;
+    data->projection = projection_matrix;
 
     // Unmap we done writing
-    deviceContext->Unmap(m_matrixBuffer, 0);
+    device_context->Unmap(matrix_buffer_, 0);
 
     // Why is this necessary
-    bufferNumber = 0;
+    num_buffers = 0;
 
     // Push the updated matrices
-    deviceContext->VSSetConstantBuffers(bufferNumber, 1, &m_matrixBuffer);
+    device_context->VSSetConstantBuffers(num_buffers, 1, &matrix_buffer_);
 
     return true;
 }
 
-void CShader::RenderShader(ID3D11DeviceContext* deviceContext, int indexCount)
+void Shader::RenderShader(ID3D11DeviceContext* device_context, int index_count)
 {
     // Make sure we shove them verts in so they fit rite
-    deviceContext->IASetInputLayout(m_layout);
+    device_context->IASetInputLayout(layout_);
 
     // our shader!!!!
-    deviceContext->VSSetShader(m_vertexShader, NULL, 0);
-    deviceContext->PSSetShader(m_pixelShader, NULL, 0);
+    device_context->VSSetShader(vertex_shader_, NULL, 0);
+    device_context->PSSetShader(pixel_shader_, NULL, 0);
 
     // wow here it is. its so small. did you think itd be this small?
-    deviceContext->DrawIndexed(indexCount, 0, 0);
+    device_context->DrawIndexed(index_count, 0, 0);
 
     return;
 }

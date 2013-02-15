@@ -5,11 +5,11 @@
 
 using namespace DirectX;
 
-class CCamera
+class Camera
 {
 public:
-    CCamera();
-    ~CCamera();
+    Camera();
+    ~Camera();
 
     void SetPos(XMFLOAT3);
     void SetRot(XMFLOAT3);
@@ -21,9 +21,9 @@ public:
     XMFLOAT4X4 GetViewMatrix();
 
 private:
-    XMFLOAT3   m_pos;
-    XMFLOAT3   m_rot;
-    XMFLOAT4X4 m_viewMatrix;
+    XMFLOAT3   pos_;
+    XMFLOAT3   rot_;
+    XMFLOAT4X4 view_matrix_;
 };
 
 #endif

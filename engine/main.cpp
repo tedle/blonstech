@@ -2,17 +2,17 @@
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-    CClient* Client;
-    Client = new CClient;
+    Client* client;
+    client = new Client;
 
-    if(!Client)
+    if(!client)
         return 0;
 
-    if(Client->Init())
-        Client->Run();
+    if(client->Init())
+        client->Run();
 
-    Client->Finish();
-    delete Client;
+    client->Finish();
+    delete client;
 
     return 0;
 }

@@ -1,9 +1,9 @@
 // Globals
 cbuffer MatrixBuffer
 {
-    matrix worldMatrix;
-    matrix viewMatrix;
-    matrix projectionMatrix;
+    matrix world_matrix;
+    matrix view_matrix;
+    matrix projection_matrix;
 };
 
 // Typedefs
@@ -27,9 +27,9 @@ PixelInputType VertShader(VertexInputType input)
     input.pos.w = 1.0f;
 
     // Vertex on model -> model in world -> world to camera -> camera to 2D
-    output.pos = mul(input.pos, worldMatrix);
-    output.pos = mul(output.pos, viewMatrix);
-    output.pos = mul(output.pos, projectionMatrix);
+    output.pos = mul(input.pos, world_matrix);
+    output.pos = mul(output.pos, view_matrix);
+    output.pos = mul(output.pos, projection_matrix);
 
     // Whats a vertex care about colour IDK pass it on
     output.colour = input.colour;

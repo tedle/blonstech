@@ -1,54 +1,54 @@
 #include "graphics.h"
 
-CGraphics::CGraphics()
+Graphics::Graphics()
 {
-    m_D3D = NULL;
-    m_Camera = NULL;
-    m_Model = NULL;
-    m_Shader = NULL;
+    d3d_ = NULL;
+    camera_ = NULL;
+    model_ = NULL;
+    shader_ = NULL;
 }
 
-CGraphics::~CGraphics()
+Graphics::~Graphics()
 {
 }
 
-bool CGraphics::Init(int screenWidth, int screenHeight, HWND hwnd)
+bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
     // DirectX
-    m_D3D = new CD3D;
-    if(!m_D3D)
+    d3d_ = new D3D;
+    if(!d3d_)
         return false;
 
-    if(!m_D3D->Init(screenWidth, screenHeight, VSYNC_ENABLED, hwnd, (WINDOW_MODE==R_MODE_FULLSCREEN), SCREEN_DEPTH, SCREEN_NEAR))
+    if(!d3d_->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
     {
         MessageBox(hwnd, L"DirectX die", L"help", MB_OK);
         return false;
     }
 
     // Camera
-    m_Camera = new CCamera;
-    if(!m_Camera)
+    camera_ = new Camera;
+    if(!camera_)
         return false;
 
-    m_Camera->SetPos(XMFLOAT3(0.0f, 0.0f, -10.0f));
+    camera_->SetPos(XMFLOAT3(0.0f, 0.0f, -10.0f));
 
     // Model
-    m_Model = new CModel;
-    if(!m_Model)
+    model_ = new Model;
+    if(!model_)
         return false;
 
-    if(!m_Model->Init(m_D3D->GetDevice()))
+    if(!model_->Init(d3d_->GetDevice()))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
 
     // Shaders
-    m_Shader = new CShader;
-    if(!m_Shader)
+    shader_ = new Shader;
+    if(!shader_)
         return false;
 
-    if(!m_Shader->Init(m_D3D->GetDevice(), hwnd))
+    if(!shader_->Init(d3d_->GetDevice(), hwnd))
     {
         MessageBox(hwnd, L"Shaders die", L"help", MB_OK);
         return false;
@@ -57,39 +57,39 @@ bool CGraphics::Init(int screenWidth, int screenHeight, HWND hwnd)
     return true;
 }
 
-void CGraphics::Finish()
+void Graphics::Finish()
 {
-    if(m_D3D)
+    if(d3d_)
     {
-        m_D3D->Finish();
-        delete m_D3D;
-        m_D3D = NULL;
+        d3d_->Finish();
+        delete d3d_;
+        d3d_ = NULL;
     }
 
-    if(m_Camera)
+    if(camera_)
     {
-        delete m_Camera;
-        m_Camera = NULL;
+        delete camera_;
+        camera_ = NULL;
     }
 
-    if(m_Model)
+    if(model_)
     {
-        m_Model->Finish();
-        delete m_Model;
-        m_Model = NULL;
+        model_->Finish();
+        delete model_;
+        model_ = NULL;
     }
 
-    if(m_Shader)
+    if(shader_)
     {
-        m_Shader->Finish();
-        delete m_Shader;
-        m_Shader = NULL;
+        shader_->Finish();
+        delete shader_;
+        shader_ = NULL;
     }
 
     return;
 }
 
-bool CGraphics::Frame()
+bool Graphics::Frame()
 {
     if(!Render())
         return false;
@@ -97,30 +97,30 @@ bool CGraphics::Frame()
     return true;
 }
 
-bool CGraphics::Render()
+bool Graphics::Render()
 {
-    XMFLOAT4X4 viewMatrix, projectionMatrix, worldMatrix;
+    XMFLOAT4X4 view_matrix, projection_matrix, world_matrix;
 
     // Clear buffers
-    m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+    d3d_->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
 
     // Update camera matrix
-    m_Camera->Render();
+    camera_->Render();
 
     // Get matrices
-    viewMatrix       = m_Camera->GetViewMatrix();
-    worldMatrix      = m_D3D->GetWorldMatrix();
-    projectionMatrix = m_D3D->GetProjectionMatrix();
+    view_matrix       = camera_->GetViewMatrix();
+    world_matrix      = d3d_->GetWorldMatrix();
+    projection_matrix = d3d_->GetProjectionMatrix();
 
     // Prep the pipeline 4 drawering
-    m_Model->Render(m_D3D->GetDeviceContext());
+    model_->Render(d3d_->GetDeviceContext());
 
     // Finally do the render
-    if(!m_Shader->Render(m_D3D->GetDeviceContext(), m_Model->GetIndexCount(), worldMatrix, viewMatrix, projectionMatrix))
+    if(!shader_->Render(d3d_->GetDeviceContext(), model_->GetIndexCount(), world_matrix, view_matrix, projection_matrix))
         return false;
 
     // Swap buffers
-    m_D3D->EndScene();
+    d3d_->EndScene();
 
     return true;
 }

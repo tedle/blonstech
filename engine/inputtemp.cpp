@@ -1,44 +1,44 @@
 #include "inputtemp.h"
 
-CInput::CInput()
+Input::Input()
 {
 }
 
-CInput::~CInput()
+Input::~Input()
 {
 }
 
-bool CInput::Init()
+bool Input::Init()
 {
     for(int i=0; i<256; i++)
-        m_keys[i] = false;
+        keys_[i] = false;
 
     return true;
 }
 
-void CInput::KeyDown(unsigned int vk)
+void Input::KeyDown(unsigned int vk)
 {
-    m_keys[vk] = true;
+    keys_[vk] = true;
     return;
 }
 
-void CInput::KeyUp(unsigned int vk)
+void Input::KeyUp(unsigned int vk)
 {
-    m_keys[vk] = false;
+    keys_[vk] = false;
     return;
 }
 
-bool CInput::IsKeyDown(unsigned int vk)
+bool Input::IsKeyDown(unsigned int vk)
 {
-    return m_keys[vk];
+    return keys_[vk];
 }
 
-bool CInput::Frame()
+bool Input::Frame()
 {
     return true;
 }
 
-void CInput::Finish()
+void Input::Finish()
 {
     return;
 }
