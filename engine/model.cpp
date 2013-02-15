@@ -54,13 +54,13 @@ bool CModel::InitBuffers(ID3D11Device* device)
         return false;
 
     vertices[0].pos    = XMFLOAT3(-1.0f, -1.0f, 0.0f);
-    vertices[0].colour = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+    vertices[0].colour = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
 
     vertices[1].pos    = XMFLOAT3(0.0f, 1.0f, 0.0f);
     vertices[1].colour = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
 
     vertices[2].pos    = XMFLOAT3(1.0f, -1.0f, 0.0f);
-    vertices[2].colour = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+    vertices[2].colour = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
 
     for(int i = 0; i < m_indexCount; i++)
         indices[i] = i;

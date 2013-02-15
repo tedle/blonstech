@@ -216,12 +216,12 @@ bool CD3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool f
 
     // Setup personal rasterizer state for tinkering mayb...
     rasterDesc.AntialiasedLineEnable = false;
-    // TODO: reenable backface culling D3d11_CULL_BACK
-    rasterDesc.CullMode = D3D11_CULL_NONE; // Backface culling SO ftw...
+    rasterDesc.CullMode = D3D11_CULL_BACK; // Backface culling SO ftw...
     rasterDesc.DepthBias = 0;
     rasterDesc.DepthBiasClamp = 0.0f;
     rasterDesc.DepthClipEnable = true;
     rasterDesc.FillMode = D3D11_FILL_SOLID;
+    rasterDesc.FrontCounterClockwise = false;
     rasterDesc.MultisampleEnable = false;
     rasterDesc.ScissorEnable = false;
     rasterDesc.SlopeScaledDepthBias = 0.0f;
@@ -249,7 +249,8 @@ bool CD3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool f
 
     XMStoreFloat4x4(&m_projectionMatrix, XMMatrixPerspectiveFovLH(fov, screenAspect, screenNear, screenDepth));
 
-    // World matrix (models->3D space)
+    // World matrix (models->3D space) shouldnt this be in model class??
+    // TODO: Make this part of model class, maybe separate world/view+proj matrix cbuffers, and update world matrix for each model rendered
     XMStoreFloat4x4(&m_worldMatrix, XMMatrixIdentity());
 
     // Ortho projection matrix (for 2d stuff)
