@@ -79,8 +79,30 @@ void CClient::Run()
     }
 }
 
+
+// TODO: DELETE THIS TURD FUNCTION
+DWORD last_time = 0;
+int fps_count = 0;
+void FPS()
+{
+    DWORD st = GetTickCount();
+
+    if(st > last_time+1000)
+    {
+        char msg[64];
+        sprintf(msg, "FPS: %i\n", fps_count);
+        OutputDebugStringA(msg);
+        last_time = st;
+        fps_count = 0;
+    }
+    else
+        fps_count++;
+}
+// TODO: ^^^GET RID OF THAT^^^
+
 bool CClient::Frame()
 {
+    FPS();
     // Esc = exit
     if(!m_Input->Frame() || m_Input->IsKeyDown(VK_ESCAPE))
         return false;

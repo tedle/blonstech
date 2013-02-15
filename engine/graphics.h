@@ -14,7 +14,7 @@
 #define R_MODE_BORDERLESS_WINDOW 3
 
 const int WINDOW_MODE = R_MODE_WINDOW;
-const bool VSYNC_ENABLED = true;
+const bool VSYNC_ENABLED = false;
 const float SCREEN_DEPTH = 1000.0f;
 const float SCREEN_NEAR = 0.1f;
 
