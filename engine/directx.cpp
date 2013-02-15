@@ -246,13 +246,13 @@ bool CD3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool f
     fov = (float)XM_PI / 4.0f;
     screenAspect = (float)screenWidth / (float)screenHeight;
 
-    m_projectionMatrix = XMMatrixPerspectiveFovLH(fov, screenAspect, screenNear, screenDepth);
+    XMStoreFloat4x4(&m_projectionMatrix, XMMatrixPerspectiveFovLH(fov, screenAspect, screenNear, screenDepth));
 
     // World matrix (models->3D space)
-    m_worldMatrix = XMMatrixIdentity();
+    XMStoreFloat4x4(&m_worldMatrix, XMMatrixIdentity());
 
     // Ortho projection matrix (for 2d stuff)
-    m_orthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+    XMStoreFloat4x4(&m_orthoMatrix, XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth));
 
     return true;
 }
@@ -348,17 +348,17 @@ ID3D11DeviceContext* CD3D::GetDeviceContext()
 }
 
 // Copy helpers
-XMMATRIX CD3D::GetProjectionMatrix()
+XMFLOAT4X4 CD3D::GetProjectionMatrix()
 {
     return m_projectionMatrix;
 }
 
-XMMATRIX CD3D::GetWorldMatrix()
+XMFLOAT4X4 CD3D::GetWorldMatrix()
 {
     return m_worldMatrix;
 }
 
-XMMATRIX CD3D::GetOrthoMatrix()
+XMFLOAT4X4 CD3D::GetOrthoMatrix()
 {
     return m_orthoMatrix;
 }

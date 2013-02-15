@@ -5,7 +5,7 @@ struct PixelInputType
     float4 colour : COLOUR;
 };
 
-float4 PixelShader(PixelInputType input) : SV_TARGET
+float4 FragShader(PixelInputType input) : SV_TARGET
 {
     return input.colour;
 }

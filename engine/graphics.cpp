@@ -30,7 +30,7 @@ bool CGraphics::Init(int screenWidth, int screenHeight, HWND hwnd)
     if(!m_Camera)
         return false;
 
-    m_Camera->SetPos(XMFLOAT3(0.0f, 0.0f, -10.0f * 0.017f));
+    m_Camera->SetPos(XMFLOAT3(0.0f, 0.0f, -10.0f));
 
     // Model
     m_Model = new CModel;
@@ -99,7 +99,7 @@ bool CGraphics::Frame()
 
 bool CGraphics::Render()
 {
-    XMMATRIX viewMatrix, projectionMatrix, worldMatrix;
+    XMFLOAT4X4 viewMatrix, projectionMatrix, worldMatrix;
 
     // Clear buffers
     m_D3D->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);

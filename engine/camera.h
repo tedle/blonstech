@@ -18,12 +18,12 @@ public:
     XMFLOAT3 GetRot();
 
     void Render();
-    XMMATRIX GetViewMatrix();
+    XMFLOAT4X4 GetViewMatrix();
 
 private:
-    XMFLOAT3 m_pos;
-    XMFLOAT3 m_rot;
-    XMMATRIX m_viewMatrix;
+    XMFLOAT3   m_pos;
+    XMFLOAT3   m_rot;
+    XMFLOAT4X4 m_viewMatrix;
 };
 
 #endif

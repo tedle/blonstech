@@ -48,7 +48,7 @@ void CCamera::Render()
     XMFLOAT3 up, pos, look;
     XMVECTOR upVec, posVec, lookVec;
     float yaw, pitch, roll;
-    XMMATRIX rotationMatrix;
+    XMMATRIX rot;
 
     // Up points uhh... yea
     up.x = 0.0f;
@@ -64,27 +64,27 @@ void CCamera::Render()
     look.z = 1.0f;
 
     // 0.017 = pi/180 , converts to radians BUT WE LIVE IN RADIANS
-    pitch = m_rot.x;// * 0.0174532925f;
-    yaw   = m_rot.y;// * 0.0174532925f;
-    roll  = m_rot.z;// * 0.0174532925f;
+    pitch = m_rot.x * 0.0174532925f;
+    yaw   = m_rot.y * 0.0174532925f;
+    roll  = m_rot.z * 0.0174532925f;
 
     // WTF????
-    rotationMatrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
+    rot = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
     // holey crap ms
-    lookVec = XMVector3TransformCoord(XMLoadFloat3(&look), rotationMatrix);
-    upVec   = XMVector3TransformCoord(XMLoadFloat3(&up),   rotationMatrix);
+    lookVec = XMVector3TransformCoord(XMLoadFloat3(&look), rot);
+    upVec   = XMVector3TransformCoord(XMLoadFloat3(&up),   rot);
     posVec  = XMLoadFloat3(&pos);
 
     // Translate lookVec back to possey
     lookVec = posVec + lookVec;
 
-    m_viewMatrix = DirectX::XMMatrixLookAtLH(posVec, lookVec, upVec);
+    XMStoreFloat4x4(&m_viewMatrix, XMMatrixLookAtLH(posVec, lookVec, upVec));
 
     return;
 }
 
-XMMATRIX CCamera::GetViewMatrix()
+XMFLOAT4X4 CCamera::GetViewMatrix()
 {
     return m_viewMatrix;
 }

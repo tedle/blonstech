@@ -25,7 +25,7 @@ void CShader::Finish()
 }
 
 bool CShader::Render(ID3D11DeviceContext* deviceContext, int indexCount,
-                     XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
+                     XMFLOAT4X4 worldMatrix, XMFLOAT4X4 viewMatrix, XMFLOAT4X4 projectionMatrix)
 {
     if(!SetShaderParams(deviceContext, worldMatrix, viewMatrix, projectionMatrix))
         return false;
@@ -50,7 +50,7 @@ bool CShader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertFn, WCHAR* 
     pixelShaderBuffer = NULL;
 
     // Compile vertex and pixel shaders
-    result = D3DCompileFromFile(vertFn, NULL, NULL, "VertexShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertexShaderBuffer, &errorMessage);
+    result = D3DCompileFromFile(vertFn, NULL, NULL, "VertShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertexShaderBuffer, &errorMessage);
     if(FAILED(result))
     {
         if(errorMessage)
@@ -61,7 +61,7 @@ bool CShader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertFn, WCHAR* 
         return false;
     }
 
-    result = D3DCompileFromFile(fragFn, NULL, NULL, "PixelShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixelShaderBuffer, &errorMessage);
+    result = D3DCompileFromFile(fragFn, NULL, NULL, "FragShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixelShaderBuffer, &errorMessage);
     if(FAILED(result))
     {
         if(errorMessage)
@@ -174,17 +174,18 @@ void CShader::OutputShaderErrorMessage(ID3D10Blob* errorMessage, HWND hwnd, WCHA
 }
 
 bool CShader::SetShaderParams(ID3D11DeviceContext* deviceContext,
-                              XMMATRIX worldMatrix, XMMATRIX viewMatrix, XMMATRIX projectionMatrix)
+                              XMFLOAT4X4 worldMatrix, XMFLOAT4X4 viewMatrix, XMFLOAT4X4 projectionMatrix)
 {
     HRESULT result;
+    XMMATRIX world, view, proj;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     MatrixBuffer* data;
     unsigned int bufferNumber;
 
     // Transpose matrices, required in DX11
-    worldMatrix      = XMMatrixTranspose(worldMatrix);
-    viewMatrix       = XMMatrixTranspose(viewMatrix);
-    projectionMatrix = XMMatrixTranspose(projectionMatrix);
+    world = XMMatrixTranspose(XMLoadFloat4x4(&worldMatrix));
+    view  = XMMatrixTranspose(XMLoadFloat4x4(&viewMatrix));
+    proj  = XMMatrixTranspose(XMLoadFloat4x4(&projectionMatrix));
 
     // Lock buffer to gain write access
     result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
