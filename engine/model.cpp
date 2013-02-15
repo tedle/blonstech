@@ -46,11 +46,11 @@ bool Model::InitBuffers(ID3D11Device* device)
     // TODO: temp tri gen
     vertex_count_ = index_count_ = 3;
     vertices = new Vertex[vertex_count_];
-    if(!vertices)
+    if (!vertices)
         return false;
 
     indices = new unsigned long[index_count_];
-    if(!indices)
+    if (!indices)
         return false;
 
     vertices[0].pos    = XMFLOAT3(-1.0f, -1.0f, 0.0f);
@@ -79,7 +79,7 @@ bool Model::InitBuffers(ID3D11Device* device)
     vertex_data.SysMemSlicePitch = 0;
 
     result = device->CreateBuffer(&vertex_buffer_desc, &vertex_data, &vertex_buffer_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Index buffer desc :(
@@ -96,7 +96,7 @@ bool Model::InitBuffers(ID3D11Device* device)
     index_data.SysMemSlicePitch = 0;
 
     result = device->CreateBuffer(&index_buffer_desc, &index_data, &index_buffer_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     delete [] vertices;
@@ -107,13 +107,13 @@ bool Model::InitBuffers(ID3D11Device* device)
 
 void Model::FinishBuffers()
 {
-    if(index_buffer_)
+    if (index_buffer_)
     {
         index_buffer_->Release();
         index_buffer_ = NULL;
     }
     
-    if(vertex_buffer_)
+    if (vertex_buffer_)
     {
         vertex_buffer_->Release();
         vertex_buffer_ = NULL;

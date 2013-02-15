@@ -39,38 +39,38 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
 
     // Get a interface
     result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Get a video card
     result = factory->EnumAdapters(0, &adapter);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Sort thru viddy cards
     result = adapter->EnumOutputs(0, &adapter_out);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Get only the best of the display modess
     result = adapter_out->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, NULL);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Allocate a sucker to find what modes we g0t
     display_modes = new DXGI_MODE_DESC[num_modes];
-    if(!display_modes)
+    if (!display_modes)
         return false;
 
     // Stuff that sucker up!!!
     result = adapter_out->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, display_modes);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Now to actually find one compatible w/ what i got
     for(unsigned int i = 0; i < num_modes; i++)
     {
-        if(display_modes[i].Width  == (unsigned int)screen_width
+        if (display_modes[i].Width  == (unsigned int)screen_width
         && display_modes[i].Height == (unsigned int)screen_height)
         {
             numerator = display_modes[i].RefreshRate.Numerator;
@@ -80,12 +80,12 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
 
     // Tell me bout vid card
     result = adapter->GetDesc(&adapter_desc);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     video_card_memory_ = (int)(adapter_desc.DedicatedVideoMemory / 1024 / 1024);
 
-    if(wcstombs_s(&string_len, video_card_desc_, 128, adapter_desc.Description, 128))
+    if (wcstombs_s(&string_len, video_card_desc_, 128, adapter_desc.Description, 128))
         return false;
 
     // Clean up some mamorie
@@ -138,16 +138,16 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
     // FINALLY initialize directx holey shit
     result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &feature_level, 1, D3D11_SDK_VERSION,
                                            &swapchain_desc, &swapchain_, &device_, NULL, &device_context_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     result = swapchain_->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Init the render view
     result = device_->CreateRenderTargetView(back_buffer, NULL, &render_target_view_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     back_buffer->Release();
@@ -169,7 +169,7 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
     depth_buffer_desc.MiscFlags = 0;
 
     result = device_->CreateTexture2D(&depth_buffer_desc, NULL, &depth_stencil_buffer_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // How thhe stencil work
@@ -194,7 +194,7 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
     depth_stencil_desc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
     result = device_->CreateDepthStencilState(&depth_stencil_desc, &depth_stencil_state_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Finally plug it in
@@ -208,7 +208,7 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
     depth_stencil_view_desc.Texture2D.MipSlice = 0;
 
     result = device_->CreateDepthStencilView(depth_stencil_buffer_, &depth_stencil_view_desc, &depth_stencil_view_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // attach 2 pipeline
@@ -227,7 +227,7 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
     raster_desc.SlopeScaledDepthBias = 0.0f;
 
     result = device_->CreateRasterizerState(&raster_desc, &raster_state_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // and apply!
@@ -262,52 +262,52 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
 void D3D::Finish()
 {
     // Always shut down a swapchain in windowed mode or problems happen
-    if(swapchain_)
+    if (swapchain_)
         swapchain_->SetFullscreenState(false, NULL);
 
-    if(raster_state_)
+    if (raster_state_)
     {
         raster_state_->Release();
         raster_state_ = NULL;
     }
 
-    if(depth_stencil_view_)
+    if (depth_stencil_view_)
     {
         depth_stencil_view_->Release();
         depth_stencil_view_ = NULL;
     }
 
-    if(depth_stencil_state_)
+    if (depth_stencil_state_)
     {
         depth_stencil_state_->Release();
         depth_stencil_state_ = NULL;
     }
 
-    if(depth_stencil_buffer_)
+    if (depth_stencil_buffer_)
     {
         depth_stencil_buffer_->Release();
         depth_stencil_buffer_ = NULL;
     }
 
-    if(render_target_view_)
+    if (render_target_view_)
     {
         render_target_view_->Release();
         render_target_view_ = NULL;
     }
 
-    if(device_context_)
+    if (device_context_)
     {
         device_context_->Release();
         device_context_ = NULL;
     }
 
-    if(device_)
+    if (device_)
     {
         device_->Release();
         device_ = NULL;
     }
 
-    if(swapchain_)
+    if (swapchain_)
     {
         swapchain_->Release();
         swapchain_ = 0;

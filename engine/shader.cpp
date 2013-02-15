@@ -27,7 +27,7 @@ void Shader::Finish()
 bool Shader::Render(ID3D11DeviceContext* device_context, int index_count,
                      XMFLOAT4X4 world_matrix, XMFLOAT4X4 view_matrix, XMFLOAT4X4 projection_matrix)
 {
-    if(!SetShaderParams(device_context, world_matrix, view_matrix, projection_matrix))
+    if (!SetShaderParams(device_context, world_matrix, view_matrix, projection_matrix))
         return false;
 
     RenderShader(device_context, index_count);
@@ -51,9 +51,9 @@ bool Shader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertex_filename,
 
     // Compile vertex and pixel shaders
     result = D3DCompileFromFile(vertex_filename, NULL, NULL, "VertShader", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &vertex_shader_buffer, &error_message);
-    if(FAILED(result))
+    if (FAILED(result))
     {
-        if(error_message)
+        if (error_message)
             OutputShaderErrorMessage(error_message, hwnd, vertex_filename);
         else
             MessageBox(hwnd, vertex_filename, L"Missing vert shader", MB_OK);
@@ -62,9 +62,9 @@ bool Shader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertex_filename,
     }
 
     result = D3DCompileFromFile(pixel_filename, NULL, NULL, "FragShader", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixel_shader_buffer, &error_message);
-    if(FAILED(result))
+    if (FAILED(result))
     {
-        if(error_message)
+        if (error_message)
             OutputShaderErrorMessage(error_message, hwnd, pixel_filename);
         else
             MessageBox(hwnd, pixel_filename, L"Missing pixel shader", MB_OK);
@@ -73,11 +73,11 @@ bool Shader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertex_filename,
     }
 
     result = device->CreateVertexShader(vertex_shader_buffer->GetBufferPointer(), vertex_shader_buffer->GetBufferSize(), NULL, &vertex_shader_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     result = device->CreatePixelShader(pixel_shader_buffer->GetBufferPointer(), pixel_shader_buffer->GetBufferSize(), NULL, &pixel_shader_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Setup semantics
@@ -100,7 +100,7 @@ bool Shader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertex_filename,
     num_elements = sizeof(input_layout) / sizeof(input_layout[0]);
 
     result = device->CreateInputLayout(input_layout, num_elements, vertex_shader_buffer->GetBufferPointer(), vertex_shader_buffer->GetBufferSize(), &layout_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     vertex_shader_buffer->Release();
@@ -115,7 +115,7 @@ bool Shader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertex_filename,
     matrix_buffer_desc.StructureByteStride = 0;
 
     result = device->CreateBuffer(&matrix_buffer_desc, NULL, &matrix_buffer_);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     return true;
@@ -123,25 +123,25 @@ bool Shader::InitShader(ID3D11Device* device, HWND hwnd, WCHAR* vertex_filename,
 
 void Shader::FinishShader()
 {
-    if(matrix_buffer_)
+    if (matrix_buffer_)
     {
         matrix_buffer_->Release();
         matrix_buffer_ = NULL;
     }
 
-    if(layout_)
+    if (layout_)
     {
         layout_->Release();
         layout_ = NULL;
     }
 
-    if(pixel_shader_)
+    if (pixel_shader_)
     {
         pixel_shader_->Release();
         pixel_shader_ = NULL;
     }
 
-    if(vertex_shader_)
+    if (vertex_shader_)
     {
         vertex_shader_->Release();
         vertex_shader_ = NULL;
@@ -188,7 +188,7 @@ bool Shader::SetShaderParams(ID3D11DeviceContext* device_context,
 
     // Lock buffer to gain write access
     result = device_context->Map(matrix_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource);
-    if(FAILED(result))
+    if (FAILED(result))
         return false;
 
     // Cast cbuffer to matrix

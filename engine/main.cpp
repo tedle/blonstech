@@ -5,10 +5,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     Client* client;
     client = new Client;
 
-    if(!client)
+    if (!client)
         return 0;
 
-    if(client->Init())
+    if (client->Init())
         client->Run();
 
     client->Finish();

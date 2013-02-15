@@ -19,19 +19,19 @@ bool Client::Init()
     InitWindow(screen_width, screen_height);
 
     input_ = new Input;
-    if(!input_)
+    if (!input_)
         return false;
 
     // Do what the implementation needs to get started
-    if(!input_->Init())
+    if (!input_->Init())
         return false;
 
     graphics_ = new Graphics;
-    if(!graphics_)
+    if (!graphics_)
         return false;
 
     // Figure out all that directy stuff
-    if(!graphics_->Init(screen_width, screen_height, hwnd_))
+    if (!graphics_->Init(screen_width, screen_height, hwnd_))
         return false;
 
     return true;
@@ -39,13 +39,13 @@ bool Client::Init()
 
 void Client::Finish()
 {
-    if(graphics_)
+    if (graphics_)
     {
         graphics_->Finish();
         delete graphics_;
     }
 
-    if(input_)
+    if (input_)
     {
         input_->Finish();
         delete input_;
@@ -64,17 +64,17 @@ void Client::Run()
     quit = false;
     while(!quit)
     {
-        if(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
 
         // Is someone trying to X out
-        if(msg.message == WM_QUIT)
+        if (msg.message == WM_QUIT)
             quit = true;
         else
-            if(!Frame())
+            if (!Frame())
                 quit = true;
     }
 }
@@ -87,7 +87,7 @@ void FPS()
 {
     DWORD st = GetTickCount();
 
-    if(st > last_time+1000)
+    if (st > last_time+1000)
     {
         char msg[64];
         sprintf(msg, "FPS: %i\n", fps_count);
@@ -104,11 +104,11 @@ bool Client::Frame()
 {
     FPS();
     // Esc = exit
-    if(!input_->Frame() || input_->IsKeyDown(VK_ESCAPE))
+    if (!input_->Frame() || input_->IsKeyDown(VK_ESCAPE))
         return false;
 
     // Render scene
-    if(!graphics_->Frame())
+    if (!graphics_->Frame())
         return false;
 
     return true;
@@ -145,7 +145,7 @@ void Client::InitWindow(int& screen_width, int& screen_height)
     RegisterClassEx(&wc);
 
     // TODO: Do it in Graphics later
-    if(kRenderMode == kRenderModeFullscreen)
+    if (kRenderMode == kRenderModeFullscreen)
     {
         screen_width  = GetSystemMetrics(SM_CXSCREEN);
         screen_height = GetSystemMetrics(SM_CYSCREEN);
@@ -163,7 +163,7 @@ void Client::InitWindow(int& screen_width, int& screen_height)
 
         pos_x = pos_y = 0;
     }
-    else if(kRenderMode == kRenderModeWindow)
+    else if (kRenderMode == kRenderModeWindow)
     {
         screen_width = 800;
         screen_height = 600;
@@ -173,7 +173,7 @@ void Client::InitWindow(int& screen_width, int& screen_height)
 
         style |= WS_BORDER | WS_SYSMENU;
     }
-    else if(kRenderMode == kRenderModeBorderlessWindow)
+    else if (kRenderMode == kRenderModeBorderlessWindow)
     {
         screen_width  = GetSystemMetrics(SM_CXSCREEN);
         screen_height = GetSystemMetrics(SM_CYSCREEN);
@@ -202,7 +202,7 @@ void Client::FinishWindow()
     ShowCursor(true);
 
     // TODO: Temporary until Direct & Raw input are setup
-    if(kRenderMode == kRenderModeFullscreen)
+    if (kRenderMode == kRenderModeFullscreen)
         ChangeDisplaySettings(NULL, 0);
     g_application_handle = NULL;
 

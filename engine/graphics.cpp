@@ -16,10 +16,10 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
     // DirectX
     d3d_ = new D3D;
-    if(!d3d_)
+    if (!d3d_)
         return false;
 
-    if(!d3d_->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
+    if (!d3d_->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
     {
         MessageBox(hwnd, L"DirectX die", L"help", MB_OK);
         return false;
@@ -27,17 +27,17 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
     // Camera
     camera_ = new Camera;
-    if(!camera_)
+    if (!camera_)
         return false;
 
     camera_->SetPos(XMFLOAT3(0.0f, 0.0f, -10.0f));
 
     // Model
     model_ = new Model;
-    if(!model_)
+    if (!model_)
         return false;
 
-    if(!model_->Init(d3d_->GetDevice()))
+    if (!model_->Init(d3d_->GetDevice()))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
@@ -45,10 +45,10 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
     // Shaders
     shader_ = new Shader;
-    if(!shader_)
+    if (!shader_)
         return false;
 
-    if(!shader_->Init(d3d_->GetDevice(), hwnd))
+    if (!shader_->Init(d3d_->GetDevice(), hwnd))
     {
         MessageBox(hwnd, L"Shaders die", L"help", MB_OK);
         return false;
@@ -59,27 +59,27 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
 void Graphics::Finish()
 {
-    if(d3d_)
+    if (d3d_)
     {
         d3d_->Finish();
         delete d3d_;
         d3d_ = NULL;
     }
 
-    if(camera_)
+    if (camera_)
     {
         delete camera_;
         camera_ = NULL;
     }
 
-    if(model_)
+    if (model_)
     {
         model_->Finish();
         delete model_;
         model_ = NULL;
     }
 
-    if(shader_)
+    if (shader_)
     {
         shader_->Finish();
         delete shader_;
@@ -91,7 +91,7 @@ void Graphics::Finish()
 
 bool Graphics::Frame()
 {
-    if(!Render())
+    if (!Render())
         return false;
 
     return true;
@@ -116,7 +116,7 @@ bool Graphics::Render()
     model_->Render(d3d_->GetDeviceContext());
 
     // Finally do the render
-    if(!shader_->Render(d3d_->GetDeviceContext(), model_->GetIndexCount(), world_matrix, view_matrix, projection_matrix))
+    if (!shader_->Render(d3d_->GetDeviceContext(), model_->GetIndexCount(), world_matrix, view_matrix, projection_matrix))
         return false;
 
     // Swap buffers
