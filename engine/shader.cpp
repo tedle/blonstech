@@ -177,15 +177,14 @@ bool CShader::SetShaderParams(ID3D11DeviceContext* deviceContext,
                               XMFLOAT4X4 worldMatrix, XMFLOAT4X4 viewMatrix, XMFLOAT4X4 projectionMatrix)
 {
     HRESULT result;
-    XMMATRIX world, view, proj;
     D3D11_MAPPED_SUBRESOURCE mappedResource;
     MatrixBuffer* data;
     unsigned int bufferNumber;
 
     // Transpose matrices, required in DX11
-    world = XMMatrixTranspose(XMLoadFloat4x4(&worldMatrix));
-    view  = XMMatrixTranspose(XMLoadFloat4x4(&viewMatrix));
-    proj  = XMMatrixTranspose(XMLoadFloat4x4(&projectionMatrix));
+    XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(XMLoadFloat4x4(&worldMatrix)));
+    XMStoreFloat4x4(&viewMatrix, XMMatrixTranspose(XMLoadFloat4x4(&viewMatrix)));
+    XMStoreFloat4x4(&projectionMatrix, XMMatrixTranspose(XMLoadFloat4x4(&projectionMatrix)));
 
     // Lock buffer to gain write access
     result = deviceContext->Map(m_matrixBuffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mappedResource);
