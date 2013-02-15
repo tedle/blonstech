@@ -5,6 +5,9 @@
 #include <Windows.h>
 // ---
 #include "directx.h"
+#include "camera.h"
+#include "model.h"
+#include "shader.h"
 
 #define R_MODE_FULLSCREEN        1
 #define R_MODE_WINDOW            2
@@ -30,6 +33,9 @@ private:
     bool Render();
 
     CD3D* m_D3D;
+    CCamera * m_Camera;
+    CModel * m_Model;
+    CShader * m_Shader;
 
 };
 

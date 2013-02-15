@@ -74,13 +74,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="directx.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="inputtemp.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="model.cpp" />
+    <ClCompile Include="shader.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="client.h" />
     <ClInclude Include="directx.h" />
     <ClInclude Include="graphics.h" />
@@ -88,6 +92,12 @@
     <ClInclude Include="inputdirect.h" />
     <ClInclude Include="inputraw.h" />
     <ClInclude Include="inputtemp.h" />
+    <ClInclude Include="model.h" />
+    <ClInclude Include="shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test.frag.fx" />
+    <None Include="test.vert.fx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -68,7 +68,7 @@ bool CD3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool f
         return false;
 
     // Now to actually find one compatible w/ what i got
-    for(int i = 0; i < numModes; i++)
+    for(unsigned int i = 0; i < numModes; i++)
     {
         if(displayModeList[i].Width  == (unsigned int)screenWidth
         && displayModeList[i].Height == (unsigned int)screenHeight)
@@ -243,16 +243,16 @@ bool CD3D::Init(int screenWidth, int screenHeight, bool vsync, HWND hwnd, bool f
     m_deviceContext->RSSetViewports(1, &viewport);
 
     // Projection matrix (3D space->2D screen)
-    fov = (float)DirectX::XM_PI / 4.0f;
+    fov = (float)XM_PI / 4.0f;
     screenAspect = (float)screenWidth / (float)screenHeight;
 
-    m_projectionMatrix = DirectX::XMMatrixPerspectiveFovLH(fov, screenAspect, screenNear, screenDepth);
+    m_projectionMatrix = XMMatrixPerspectiveFovLH(fov, screenAspect, screenNear, screenDepth);
 
     // World matrix (models->3D space)
-    m_worldMatrix = DirectX::XMMatrixIdentity();
+    m_worldMatrix = XMMatrixIdentity();
 
     // Ortho projection matrix (for 2d stuff)
-    m_orthoMatrix = DirectX::XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
+    m_orthoMatrix = XMMatrixOrthographicLH((float)screenWidth, (float)screenHeight, screenNear, screenDepth);
 
     return true;
 }
@@ -348,22 +348,19 @@ ID3D11DeviceContext* CD3D::GetDeviceContext()
 }
 
 // Copy helpers
-void CD3D::GetProjectionMatrix(DirectX::XMMATRIX& projMatrix)
+XMMATRIX CD3D::GetProjectionMatrix()
 {
-    projMatrix = m_projectionMatrix;
-    return;
+    return m_projectionMatrix;
 }
 
-void CD3D::GetWorldMatrix(DirectX::XMMATRIX& worldMatrix)
+XMMATRIX CD3D::GetWorldMatrix()
 {
-    worldMatrix = m_worldMatrix;
-    return;
+    return m_worldMatrix;
 }
 
-void CD3D::GetOrthoMatrix(DirectX::XMMATRIX& orthoMatrix)
+XMMATRIX CD3D::GetOrthoMatrix()
 {
-    orthoMatrix = m_orthoMatrix;
-    return;
+    return m_orthoMatrix;
 }
 
 void CD3D::GetVideoCardInfo(char* name, int& memory)

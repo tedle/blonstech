@@ -2,7 +2,7 @@
 #define __DIRECTX_H__
 
 // Globals
-#define _XM_NO_INTRINSICS_ // Allows unaligned matrices (matrix doesnt freak out when class member)
+//#define _XM_NO_INTRINSICS_ // Allows unaligned matrices (matrix doesnt freak out when class member)
 
 // Linking
 #pragma comment(lib, "dxgi.lib")
@@ -15,6 +15,8 @@
 #include <d3dcommon.h>
 #include <d3d11.h>
 #include <DirectXMath.h>
+
+using namespace DirectX;
 
 class CD3D
 {
@@ -32,9 +34,9 @@ public:
     ID3D11Device* GetDevice();
     ID3D11DeviceContext* GetDeviceContext();
 
-    void GetProjectionMatrix(DirectX::XMMATRIX&);
-    void GetWorldMatrix(DirectX::XMMATRIX&);
-    void GetOrthoMatrix(DirectX::XMMATRIX&);
+    XMMATRIX GetProjectionMatrix();
+    XMMATRIX GetWorldMatrix();
+    XMMATRIX GetOrthoMatrix();
 
     void GetVideoCardInfo(char*, int&);
 
@@ -50,9 +52,9 @@ private:
     ID3D11DepthStencilState* m_depthStencilState;
     ID3D11DepthStencilView* m_depthStencilView;
     ID3D11RasterizerState* m_rasterState;
-    DirectX::XMMATRIX m_projectionMatrix;
-    DirectX::XMMATRIX m_worldMatrix;
-    DirectX::XMMATRIX m_orthoMatrix;
+    XMMATRIX m_projectionMatrix;
+    XMMATRIX m_worldMatrix;
+    XMMATRIX m_orthoMatrix;
 };
     
 #endif
