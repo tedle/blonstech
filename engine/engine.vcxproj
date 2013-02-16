@@ -50,6 +50,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalOptions>/D_WIN32_WINNT=0x0600 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -77,16 +78,19 @@
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="directx.cpp" />
+    <ClCompile Include="external\DDSTextureLoader.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="inputtemp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="client.h" />
     <ClInclude Include="directx.h" />
+    <ClInclude Include="external\DDSTextureLoader.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="inputbase.h" />
     <ClInclude Include="inputdirect.h" />
@@ -94,6 +98,7 @@
     <ClInclude Include="inputtemp.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="test.frag.fx" />

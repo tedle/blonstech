@@ -2,21 +2,29 @@
 
 Model::Model()
 {
-    vertex_buffer_ = NULL;
-    index_buffer_ = NULL;
+    vertex_buffer_ = nullptr;
+    index_buffer_ = nullptr;
+    texture_ = nullptr;
 }
 
 Model::~Model()
 {
 }
 
-bool Model::Init(ID3D11Device * device)
+bool Model::Init(ID3D11Device * device, WCHAR* texture_filename)
 {
-    return InitBuffers(device);
+    if (!InitBuffers(device))
+        return false;
+
+    if (!LoadTexture(device, texture_filename))
+        return false;
+
+    return true;
 }
 
 void Model::Finish()
 {
+    ReleaseTexture();
     FinishBuffers();
 
     return;
@@ -32,6 +40,11 @@ void Model::Render(ID3D11DeviceContext* device_context)
 int Model::GetIndexCount()
 {
     return index_count_;
+}
+
+ID3D11ShaderResourceView* Model::GetTexture()
+{
+    return texture_->GetTexture();
 }
 
 bool Model::InitBuffers(ID3D11Device* device)
@@ -53,16 +66,16 @@ bool Model::InitBuffers(ID3D11Device* device)
     if (!indices)
         return false;
 
-    vertices[0].pos    = XMFLOAT3(-1.0f, -1.0f, 0.0f);
-    vertices[0].colour = XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f);
+    vertices[0].pos = XMFLOAT3(-1.0f, -1.0f, 0.0f);
+    vertices[0].tex = XMFLOAT2(0.0f, 1.0f);
 
-    vertices[1].pos    = XMFLOAT3(0.0f, 1.0f, 0.0f);
-    vertices[1].colour = XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f);
+    vertices[1].pos = XMFLOAT3(0.0f, 1.0f, 0.0f);
+    vertices[1].tex = XMFLOAT2(0.5f, 0.0f);
 
-    vertices[2].pos    = XMFLOAT3(1.0f, -1.0f, 0.0f);
-    vertices[2].colour = XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f);
+    vertices[2].pos = XMFLOAT3(1.0f, -1.0f, 0.0f);
+    vertices[2].tex = XMFLOAT2(1.0f, 1.0f);
 
-    for(int i = 0; i < index_count_; i++)
+    for (int i = 0; i < index_count_; i++)
         indices[i] = i;
 
     // Vertex buffer desc
@@ -110,13 +123,13 @@ void Model::FinishBuffers()
     if (index_buffer_)
     {
         index_buffer_->Release();
-        index_buffer_ = NULL;
+        index_buffer_ = nullptr;
     }
     
     if (vertex_buffer_)
     {
         vertex_buffer_->Release();
-        vertex_buffer_ = NULL;
+        vertex_buffer_ = nullptr;
     }
 
     return;
@@ -138,5 +151,29 @@ void Model::RenderBuffers(ID3D11DeviceContext* device_context)
     // We do tris here
     device_context->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
+    return;
+}
+
+bool Model::LoadTexture(ID3D11Device* device, WCHAR* filename)
+{
+    texture_ = new Texture;
+
+    if (!texture_)
+        return false;
+
+    if (!texture_->Init(device, filename))
+        return false;
+
+    return true;
+}
+
+void Model::ReleaseTexture()
+{
+    if (texture_)
+    {
+        texture_->Finish();
+        delete texture_;
+        texture_ = nullptr;
+    }
     return;
 }

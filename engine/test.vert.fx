@@ -7,21 +7,21 @@ cbuffer MatrixBuffer
 };
 
 // Typedefs
-struct VertexInputType
+struct VertexInput
 {
     float4 pos : POSITION;
-    float4 colour : COLOUR;
+    float2 tex : TEXCOORD0;
 };
 
-struct PixelInputType
+struct PixelInput
 {
     float4 pos : SV_POSITION;
-    float4 colour : COLOUR;
+    float2 tex : TEXCOORD0;
 };
 
-PixelInputType VertShader(VertexInputType input)
+PixelInput VertShader(VertexInput input)
 {
-    PixelInputType output;
+    PixelInput output;
 
     // Dont even know what this is for
     input.pos.w = 1.0f;
@@ -32,7 +32,7 @@ PixelInputType VertShader(VertexInputType input)
     output.pos = mul(output.pos, projection_matrix);
 
     // Whats a vertex care about colour IDK pass it on
-    output.colour = input.colour;
+    output.tex = input.tex;
 
     return output;
 }

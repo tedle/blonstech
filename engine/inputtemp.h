@@ -1,5 +1,5 @@
-#ifndef __INPUTTEMP_H__
-#define __INPUTTEMP_H__
+#ifndef BLONSTECH_INPUTTEMP_H_
+#define BLONSTECH_INPUTTEMP_H_
 
 class Input
 {

@@ -2,10 +2,10 @@
 
 Graphics::Graphics()
 {
-    d3d_ = NULL;
-    camera_ = NULL;
-    model_ = NULL;
-    shader_ = NULL;
+    d3d_ = nullptr;
+    camera_ = nullptr;
+    model_ = nullptr;
+    shader_ = nullptr;
 }
 
 Graphics::~Graphics()
@@ -37,7 +37,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     if (!model_)
         return false;
 
-    if (!model_->Init(d3d_->GetDevice()))
+    if (!model_->Init(d3d_->GetDevice(), L"../.notes/me.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
@@ -63,27 +63,27 @@ void Graphics::Finish()
     {
         d3d_->Finish();
         delete d3d_;
-        d3d_ = NULL;
+        d3d_ = nullptr;
     }
 
     if (camera_)
     {
         delete camera_;
-        camera_ = NULL;
+        camera_ = nullptr;
     }
 
     if (model_)
     {
         model_->Finish();
         delete model_;
-        model_ = NULL;
+        model_ = nullptr;
     }
 
     if (shader_)
     {
         shader_->Finish();
         delete shader_;
-        shader_ = NULL;
+        shader_ = nullptr;
     }
 
     return;
@@ -116,7 +116,9 @@ bool Graphics::Render()
     model_->Render(d3d_->GetDeviceContext());
 
     // Finally do the render
-    if (!shader_->Render(d3d_->GetDeviceContext(), model_->GetIndexCount(), world_matrix, view_matrix, projection_matrix))
+    if (!shader_->Render(d3d_->GetDeviceContext(), model_->GetIndexCount(),
+                         world_matrix, view_matrix, projection_matrix,
+                         model_->GetTexture()))
         return false;
 
     // Swap buffers

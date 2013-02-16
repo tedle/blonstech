@@ -1,5 +1,5 @@
-#ifndef __DIRECTX_H__
-#define __DIRECTX_H__
+#ifndef BLONSTECH_DIRECTX_H_
+#define BLONSTECH_DIRECTX_H_
 
 // Linking
 #pragma comment(lib, "dxgi.lib")

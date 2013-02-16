@@ -1,5 +1,5 @@
-#ifndef __CAMERA_H__
-#define __CAMERA_H__
+#ifndef BLONSTECH_CAMERA_H_
+#define BLONSTECH_CAMERA_H_
 
 #include <DirectXMath.h>
 

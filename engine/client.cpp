@@ -2,8 +2,8 @@
 
 Client::Client()
 {
-    input_ = NULL;
-    graphics_ = NULL;
+    input_ = nullptr;
+    graphics_ = nullptr;
 }
 
 Client::~Client()
@@ -64,7 +64,7 @@ void Client::Run()
     quit = false;
     while(!quit)
     {
-        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             TranslateMessage(&msg);
             DispatchMessage(&msg);
@@ -90,7 +90,7 @@ void FPS()
     if (st > last_time+1000)
     {
         char msg[64];
-        sprintf(msg, "FPS: %i\n", fps_count);
+        sprintf_s(msg, "FPS: %i\n", fps_count);
         OutputDebugStringA(msg);
         last_time = st;
         fps_count = 0;
@@ -125,7 +125,7 @@ void Client::InitWindow(int& screen_width, int& screen_height)
     g_application_handle = this;
 
     // Initialize some win32 stuff
-    hinstance_ = GetModuleHandle(NULL);
+    hinstance_ = GetModuleHandle(nullptr);
     app_name_ = L"blonstech 0.6.9b420";
 
     // Init window class
@@ -134,11 +134,11 @@ void Client::InitWindow(int& screen_width, int& screen_height)
     wc.cbClsExtra = 0;
     wc.cbWndExtra = 0;
     wc.hInstance = hinstance_;
-    wc.hIcon = LoadIcon(NULL, IDI_WINLOGO);
+    wc.hIcon = LoadIcon(nullptr, IDI_WINLOGO);
     wc.hIconSm = wc.hIcon;
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
+    wc.hCursor = LoadCursor(nullptr, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
-    wc.lpszMenuName = NULL;
+    wc.lpszMenuName = nullptr;
     wc.lpszClassName = app_name_;
     wc.cbSize = sizeof(WNDCLASSEX);
 
@@ -185,7 +185,7 @@ void Client::InitWindow(int& screen_width, int& screen_height)
 
     // Finally make the window, fuck win32
     hwnd_ = CreateWindowEx(WS_EX_APPWINDOW, app_name_, app_name_, style,
-                            pos_x, pos_y, screen_width, screen_height, NULL, NULL, hinstance_, NULL);
+                            pos_x, pos_y, screen_width, screen_height, nullptr, nullptr, hinstance_, nullptr);
 
     // Make it real
     ShowWindow(hwnd_, SW_SHOW);
@@ -203,14 +203,14 @@ void Client::FinishWindow()
 
     // TODO: Temporary until Direct & Raw input are setup
     if (kRenderMode == kRenderModeFullscreen)
-        ChangeDisplaySettings(NULL, 0);
-    g_application_handle = NULL;
+        ChangeDisplaySettings(nullptr, 0);
+    g_application_handle = nullptr;
 
     DestroyWindow(hwnd_);
-    hwnd_ = NULL;
+    hwnd_ = nullptr;
 
     UnregisterClass(app_name_, hinstance_);
-    hinstance_ = NULL;
+    hinstance_ = nullptr;
 
     return;
 }

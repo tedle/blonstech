@@ -10,7 +10,7 @@ Input::~Input()
 
 bool Input::Init()
 {
-    for(int i=0; i<256; i++)
+    for (int i=0; i<256; i++)
         keys_[i] = false;
 
     return true;

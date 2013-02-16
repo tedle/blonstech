@@ -2,14 +2,14 @@
 
 D3D::D3D()
 {
-    swapchain_ = NULL;
-    device_ = NULL;
-    device_context_ = NULL;
-    render_target_view_ = NULL;
-    depth_stencil_buffer_ = NULL;
-    depth_stencil_state_ = NULL;
-    depth_stencil_view_ = NULL;
-    raster_state_ = NULL;
+    swapchain_ = nullptr;
+    device_ = nullptr;
+    device_context_ = nullptr;
+    render_target_view_ = nullptr;
+    depth_stencil_buffer_ = nullptr;
+    depth_stencil_state_ = nullptr;
+    depth_stencil_view_ = nullptr;
+    raster_state_ = nullptr;
 }
 
 D3D::~D3D()
@@ -53,7 +53,7 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
         return false;
 
     // Get only the best of the display modess
-    result = adapter_out->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, NULL);
+    result = adapter_out->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, nullptr);
     if (FAILED(result))
         return false;
 
@@ -68,7 +68,7 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
         return false;
 
     // Now to actually find one compatible w/ what i got
-    for(unsigned int i = 0; i < num_modes; i++)
+    for (unsigned int i = 0; i < num_modes; i++)
     {
         if (display_modes[i].Width  == (unsigned int)screen_width
         && display_modes[i].Height == (unsigned int)screen_height)
@@ -90,16 +90,16 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
 
     // Clean up some mamorie
     delete [] display_modes;
-    display_modes = NULL;
+    display_modes = nullptr;
 
     adapter_out->Release();
-    adapter_out = NULL;
+    adapter_out = nullptr;
 
     adapter->Release();
-    adapter = NULL;
+    adapter = nullptr;
 
     factory->Release();
-    factory = NULL;
+    factory = nullptr;
 
     // Init swap chain
     ZeroMemory(&swapchain_desc, sizeof(swapchain_desc));
@@ -136,8 +136,8 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
     feature_level = D3D_FEATURE_LEVEL_11_0;
 
     // FINALLY initialize directx holey shit
-    result = D3D11CreateDeviceAndSwapChain(NULL, D3D_DRIVER_TYPE_HARDWARE, NULL, 0, &feature_level, 1, D3D11_SDK_VERSION,
-                                           &swapchain_desc, &swapchain_, &device_, NULL, &device_context_);
+    result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, &feature_level, 1, D3D11_SDK_VERSION,
+                                           &swapchain_desc, &swapchain_, &device_, nullptr, &device_context_);
     if (FAILED(result))
         return false;
 
@@ -146,12 +146,12 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
         return false;
 
     // Init the render view
-    result = device_->CreateRenderTargetView(back_buffer, NULL, &render_target_view_);
+    result = device_->CreateRenderTargetView(back_buffer, nullptr, &render_target_view_);
     if (FAILED(result))
         return false;
 
     back_buffer->Release();
-    back_buffer = NULL;
+    back_buffer = nullptr;
 
     // Init depth + stencil buffer
     ZeroMemory(&depth_buffer_desc, sizeof(depth_buffer_desc));
@@ -168,7 +168,7 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
     depth_buffer_desc.CPUAccessFlags = 0;
     depth_buffer_desc.MiscFlags = 0;
 
-    result = device_->CreateTexture2D(&depth_buffer_desc, NULL, &depth_stencil_buffer_);
+    result = device_->CreateTexture2D(&depth_buffer_desc, nullptr, &depth_stencil_buffer_);
     if (FAILED(result))
         return false;
 
@@ -263,48 +263,48 @@ void D3D::Finish()
 {
     // Always shut down a swapchain in windowed mode or problems happen
     if (swapchain_)
-        swapchain_->SetFullscreenState(false, NULL);
+        swapchain_->SetFullscreenState(false, nullptr);
 
     if (raster_state_)
     {
         raster_state_->Release();
-        raster_state_ = NULL;
+        raster_state_ = nullptr;
     }
 
     if (depth_stencil_view_)
     {
         depth_stencil_view_->Release();
-        depth_stencil_view_ = NULL;
+        depth_stencil_view_ = nullptr;
     }
 
     if (depth_stencil_state_)
     {
         depth_stencil_state_->Release();
-        depth_stencil_state_ = NULL;
+        depth_stencil_state_ = nullptr;
     }
 
     if (depth_stencil_buffer_)
     {
         depth_stencil_buffer_->Release();
-        depth_stencil_buffer_ = NULL;
+        depth_stencil_buffer_ = nullptr;
     }
 
     if (render_target_view_)
     {
         render_target_view_->Release();
-        render_target_view_ = NULL;
+        render_target_view_ = nullptr;
     }
 
     if (device_context_)
     {
         device_context_->Release();
-        device_context_ = NULL;
+        device_context_ = nullptr;
     }
 
     if (device_)
     {
         device_->Release();
-        device_ = NULL;
+        device_ = nullptr;
     }
 
     if (swapchain_)

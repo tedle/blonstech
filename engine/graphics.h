@@ -1,9 +1,9 @@
-#ifndef __GRAPHICS_H__
-#define __GRAPHICS_H__
+#ifndef BLONSTECH_GRAPHICS_H_
+#define BLONSTECH_GRAPHICS_H_
 
 // Includes
 #include <Windows.h>
-// ---
+// Local Includes
 #include "directx.h"
 #include "camera.h"
 #include "model.h"
@@ -13,7 +13,7 @@ const int kRenderModeFullscreen       = 1;
 const int kRenderModeWindow           = 2;
 const int kRenderModeBorderlessWindow = 3;
 
-const int   kRenderMode  = kRenderModeWindow;
+const int   kRenderMode  = kRenderModeBorderlessWindow;
 const bool  kEnableVsync = false;
 const float kScreenDepth = 1000.0f;
 const float kScreenNear  = 0.1f;
@@ -32,10 +32,10 @@ public:
 private:
     bool Render();
 
-    D3D* d3d_;
-    Camera * camera_;
-    Model * model_;
-    Shader * shader_;
+    D3D*    d3d_;
+    Camera* camera_;
+    Model*  model_;
+    Shader* shader_;
 
 };
 

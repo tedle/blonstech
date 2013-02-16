@@ -1,12 +1,12 @@
-#ifndef __CLIENT_H__
-#define __CLIENT_H__
+#ifndef BLONSTECH_CLIENT_H_
+#define BLONSTECH_CLIENT_H_
 
 // Strips less used APIs from inclusion
 #define WIN32_LEAN_AND_MEAN
 
 // Includes
 #include <Windows.h>
-// ---
+// Local Includes
 #include "inputtemp.h"
 #include "graphics.h"
 
@@ -44,6 +44,6 @@ private:
 // Message hooking helpers
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 // TODO: Temporary until Direct & Raw input are setup
-static Client* g_application_handle = NULL;
+static Client* g_application_handle = nullptr;
 
 #endif
