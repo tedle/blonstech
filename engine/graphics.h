@@ -13,7 +13,7 @@ const int kRenderModeFullscreen       = 1;
 const int kRenderModeWindow           = 2;
 const int kRenderModeBorderlessWindow = 3;
 
-const int   kRenderMode  = kRenderModeBorderlessWindow;
+const int   kRenderMode  = kRenderModeWindow;
 const bool  kEnableVsync = false;
 const float kScreenDepth = 1000.0f;
 const float kScreenNear  = 0.1f;

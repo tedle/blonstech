@@ -57,7 +57,7 @@ bool Model::InitBuffers(ID3D11Device* device)
     HRESULT result;
 
     // TODO: temp tri gen
-    vertex_count_ = index_count_ = 3;
+    vertex_count_ = index_count_ = 6;
     vertices = new Vertex[vertex_count_];
     if (!vertices)
         return false;
@@ -69,11 +69,20 @@ bool Model::InitBuffers(ID3D11Device* device)
     vertices[0].pos = XMFLOAT3(-1.0f, -1.0f, 0.0f);
     vertices[0].tex = XMFLOAT2(0.0f, 1.0f);
 
-    vertices[1].pos = XMFLOAT3(0.0f, 1.0f, 0.0f);
-    vertices[1].tex = XMFLOAT2(0.5f, 0.0f);
+    vertices[1].pos = XMFLOAT3(-1.0f, 1.0f, 0.0f);
+    vertices[1].tex = XMFLOAT2(0.0f, 0.0f);
 
-    vertices[2].pos = XMFLOAT3(1.0f, -1.0f, 0.0f);
-    vertices[2].tex = XMFLOAT2(1.0f, 1.0f);
+    vertices[2].pos = XMFLOAT3(1.0f, 1.0f, 0.0f);
+    vertices[2].tex = XMFLOAT2(1.0f, 0.0f);
+
+    vertices[3].pos = XMFLOAT3(1.0f, -1.0f, 0.0f);
+    vertices[3].tex = XMFLOAT2(1.0f, 1.0f);
+    
+    vertices[4].pos = vertices[0].pos;
+    vertices[4].tex = vertices[0].tex;
+    
+    vertices[5].pos = vertices[2].pos;
+    vertices[5].tex = vertices[2].tex;
 
     for (int i = 0; i < index_count_; i++)
         indices[i] = i;
