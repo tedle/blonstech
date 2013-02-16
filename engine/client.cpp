@@ -235,7 +235,6 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
     switch(umsg)
     {
     case WM_KEYDOWN:
-        OutputDebugString(L"HELLO!\n");
         input_->KeyDown((unsigned int)wparam);
         return 0;
     case WM_KEYUP:
