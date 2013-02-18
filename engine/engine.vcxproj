@@ -84,6 +84,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="temphelpers.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -98,6 +99,7 @@
     <ClInclude Include="inputtemp.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="temphelpers.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
   <ItemGroup>

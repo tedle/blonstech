@@ -215,8 +215,8 @@ bool Shader::SetShaderParams(ID3D11DeviceContext* device_context,
     unsigned int num_buffers;
 
     // Transpose matrices, required in DX11
-    XMStoreFloat4x4(&world_matrix, XMMatrixTranspose(XMLoadFloat4x4(&world_matrix)));
-    XMStoreFloat4x4(&view_matrix, XMMatrixTranspose(XMLoadFloat4x4(&view_matrix)));
+    XMStoreFloat4x4(&world_matrix,      XMMatrixTranspose(XMLoadFloat4x4(&world_matrix)));
+    XMStoreFloat4x4(&view_matrix,       XMMatrixTranspose(XMLoadFloat4x4(&view_matrix)));
     XMStoreFloat4x4(&projection_matrix, XMMatrixTranspose(XMLoadFloat4x4(&projection_matrix)));
 
     // Lock buffer to gain write access

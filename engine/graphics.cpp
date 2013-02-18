@@ -97,6 +97,11 @@ bool Graphics::Frame()
     return true;
 }
 
+Camera* Graphics::GetCamera()
+{
+    return camera_;
+}
+
 bool Graphics::Render()
 {
     XMFLOAT4X4 view_matrix, projection_matrix, world_matrix;

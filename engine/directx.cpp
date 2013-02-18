@@ -216,7 +216,8 @@ bool D3D::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool 
 
     // Setup personal rasterizer state for tinkering mayb...
     raster_desc.AntialiasedLineEnable = false;
-    raster_desc.CullMode = D3D11_CULL_BACK; // Backface culling SO ftw...
+    // TODO: REENABLE BACKFACE CULLING
+    raster_desc.CullMode = D3D11_CULL_NONE; // Backface culling SO ftw...
     raster_desc.DepthBias = 0;
     raster_desc.DepthBiasClamp = 0.0f;
     raster_desc.DepthClipEnable = true;

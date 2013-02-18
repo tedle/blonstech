@@ -51,6 +51,9 @@
     <ClCompile Include="texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="temphelpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h">
@@ -88,6 +91,9 @@
     </ClInclude>
     <ClInclude Include="external\DDSTextureLoader.h">
       <Filter>External Files</Filter>
+    </ClInclude>
+    <ClInclude Include="temphelpers.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

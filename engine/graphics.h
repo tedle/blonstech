@@ -29,6 +29,8 @@ public:
     void Finish();
     bool Frame();
 
+    Camera* GetCamera();
+
 private:
     bool Render();
 

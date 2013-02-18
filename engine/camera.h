@@ -13,6 +13,7 @@ public:
 
     void SetPos(XMFLOAT3);
     void SetRot(XMFLOAT3);
+    void LookAt(XMFLOAT3);
 
     XMFLOAT3 GetPos();
     XMFLOAT3 GetRot();

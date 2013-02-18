@@ -79,33 +79,20 @@ void Client::Run()
     }
 }
 
-
-// TODO: DELETE THIS TURD FUNCTION
-DWORD last_time = 0;
-int fps_count = 0;
-void FPS()
-{
-    DWORD st = GetTickCount();
-
-    if (st > last_time+1000)
-    {
-        char msg[64];
-        sprintf_s(msg, "FPS: %i\n", fps_count);
-        OutputDebugStringA(msg);
-        last_time = st;
-        fps_count = 0;
-    }
-    else
-        fps_count++;
-}
-// TODO: ^^^GET RID OF THAT^^^
-
 bool Client::Frame()
 {
     FPS();
     // Esc = exit
     if (!input_->Frame() || input_->IsKeyDown(VK_ESCAPE))
         return false;
+
+    // TODO: THIS IS TEMP DELETE LATER
+    //move_camera_around_origin(1.0f, graphics_->GetCamera());
+    if (input_->IsKeyDown('A'))
+        move_camera_around_origin(-1.0f, graphics_->GetCamera());
+    if (input_->IsKeyDown('D'))
+        move_camera_around_origin(1.0f, graphics_->GetCamera());
+    // END TEMP
 
     // Render scene
     if (!graphics_->Frame())

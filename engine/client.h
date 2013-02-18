@@ -7,6 +7,7 @@
 // Includes
 #include <Windows.h>
 // Local Includes
+#include "temphelpers.h"
 #include "inputtemp.h"
 #include "graphics.h"
 

@@ -33,6 +33,19 @@ void Camera::SetRot(XMFLOAT3 rot)
     return;
 }
 
+void Camera::LookAt(XMFLOAT3 look)
+{
+    XMStoreFloat4x4(&view_matrix_, XMMatrixLookAtLH(XMLoadFloat3(&pos_),
+                                                    XMLoadFloat3(&look),
+                                                    XMLoadFloat3(&XMFLOAT3(0.0f, 1.0f, 0.0f))));
+    float pitch = atan2(-view_matrix_._23,
+                        sqrt(view_matrix_._13*view_matrix_._13 +
+                             view_matrix_._33*view_matrix_._33));
+    float yaw   = atan2(-view_matrix_._31, view_matrix_._11);
+    
+    SetRot(XMFLOAT3(pitch, yaw, 0.0f));
+}
+
 XMFLOAT3 Camera::GetPos()
 {
     return pos_;
@@ -59,14 +72,15 @@ void Camera::Render()
     pos.y = pos_.y;
     pos.z = pos_.z;
 
+    // Look only has 1.0f on the Z so the Rotation transform doesnt crash, DONT set it to 1 otherwise!!
     look.x = 0.0f;
     look.y = 0.0f;
     look.z = 1.0f;
 
     // 0.017 = pi/180 , converts to radians BUT WE LIVE IN RADIANS
-    pitch = rot_.x * 0.0174532925f;
-    yaw   = rot_.y * 0.0174532925f;
-    roll  = rot_.z * 0.0174532925f;
+    pitch = rot_.x; // * 0.0174532925f;
+    yaw   = rot_.y; // * 0.0174532925f;
+    roll  = rot_.z; // * 0.0174532925f;
 
     // WTF????
     rot = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
