@@ -2,32 +2,36 @@
 
 import struct
 
-# Stores vertex and normal data
+
 class Vec3:
+    """Stores vertex and normal data"""
     def __init__(self, x, y, z):
-        self.x = x;
-        self.y = y;
-        self.z = z;
+        self.x = x
+        self.y = y
+        self.z = z
 
-# Stores UV data
+
 class Vec2:
+    """Stores UV data"""
     def __init__(self, u, v):
-        self.u = u;
-        self.v = v;
+        self.u = u
+        self.v = v
 
-# This is basically a 3x3 matrix
+
 class Face:
+    """Basically a 3x3 matrix"""
     def __init__(self, vert, tex, norm):
         self.vert = vert
-        self.tex  = tex
+        self.tex = tex
         self.norm = norm
+
 
 class Model:
     def __init__(self):
-        self.vertices  = list();
-        self.texcoords = list();
-        self.normals   = list();
-        self.faces     = list();
+        self.vertices = list()
+        self.texcoords = list()
+        self.normals = list()
+        self.faces = list()
         return
 
     def LoadOBJ(self, filename):
@@ -50,7 +54,7 @@ class Model:
                 self.normals.append(norm)
             elif head == "f":
                 vert = list()
-                tex  = list()
+                tex = list()
                 norm = list()
 
                 if len(data) < 4:
@@ -85,7 +89,7 @@ class Model:
             print "Could not open save file"
             return
         mod_ui = "=I"
-        mod_f  = "=f"
+        mod_f = "=f"
         mod_2f = "=ff"
         mod_3f = "=fff"
 
@@ -97,7 +101,7 @@ class Model:
 
         # Output vertex data
         for vert in self.vertices:
-            f.write(struct.pack(mod_3f, vert.x, vert.y, vert.z)) 
+            f.write(struct.pack(mod_3f, vert.x, vert.y, vert.z))
 
         # Output UV data
         for texel in self.texcoords:
@@ -117,12 +121,11 @@ class Model:
                     f.write(struct.pack(mod_f, face.norm[i]))
 
         f.close()
-        
         return
 
 if __name__ == "__main__":
     m = Model()
-    m.LoadOBJ("../.notes/teapot.obj")
+    m.LoadOBJ("../notes/teapot.obj")
     # print "Verts:"
     # for vert in m.vertices:
     #     print [vert.x, vert.y, vert.z]
@@ -135,9 +138,9 @@ if __name__ == "__main__":
     # print "Faces:"
     # for face in m.faces:
     #     print [face.vert, face.tex, face.norm]
-    print "Size:\n\tVerts:{0}\n\tUVs:{1}\n\tNormals:{2}\n\tPolys:{3}\n".format(len(m.vertices),
-                                                                               len(m.texcoords),
-                                                                               len(m.normals),
-                                                                               len(m.faces))
-    m.SaveMesh("../.notes/test2.mesh")
-
+    print ("Size:\n\tVerts:{0}\n\tUVs:{1}\n\t"
+           "Normals:{2}\n\tPolys:{3}\n").format(len(m.vertices),
+                                                len(m.texcoords),
+                                                len(m.normals),
+                                                len(m.faces))
+    m.SaveMesh("../notes/test2.mesh")

@@ -37,7 +37,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     if (!model_)
         return false;
 
-    if (!model_->Init(d3d_->GetDevice(), L"../.notes/me.dds"))
+    if (!model_->Init(d3d_->GetDevice(), L"../notes/me.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
