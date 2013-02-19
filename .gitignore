@@ -1,6 +1,9 @@
 #My stuff
 .notes/
 
+#Vim
+*.swp
+
 # Compiled Object files
 *.slo
 *.lo
