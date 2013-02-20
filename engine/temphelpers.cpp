@@ -16,8 +16,8 @@ void move_camera_around_origin(float delta, Camera* camera)
         float y = 5.0f;
         float z = r * sin(orientation);
 
-        camera->SetPos(XMFLOAT3(x, y, z));
-        camera->LookAt(XMFLOAT3(0.0f, 0.0f, 0.0f));
+        camera->SetPos(x, y, z);
+        camera->LookAt(0.0f, 0.0f, 0.0f);
     }
 }
 
@@ -31,7 +31,7 @@ void FPS()
     {
         char msg[64];
         sprintf_s(msg, "FPS: %i\n", fps_count);
-        //OutputDebugStringA(msg);
+        OutputDebugStringA(msg);
         last_time = st;
         fps_count = 0;
     }

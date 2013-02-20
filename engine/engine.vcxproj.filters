@@ -33,9 +33,6 @@
     <ClCompile Include="graphics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="directx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="model.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -52,6 +49,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="temphelpers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="renderd3d11.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="math.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -74,9 +77,6 @@
     <ClInclude Include="graphics.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="directx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="model.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -93,6 +93,15 @@
       <Filter>External Files</Filter>
     </ClInclude>
     <ClInclude Include="temphelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="renderd3d11.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="render.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="math.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,9 +1,7 @@
 #ifndef BLONSTECH_CAMERA_H_
 #define BLONSTECH_CAMERA_H_
 
-#include <DirectXMath.h>
-
-using namespace DirectX;
+#include "math.h"
 
 class Camera
 {
@@ -11,20 +9,20 @@ public:
     Camera();
     ~Camera();
 
-    void SetPos(XMFLOAT3);
-    void SetRot(XMFLOAT3);
-    void LookAt(XMFLOAT3);
+    void SetPos(float x, float y, float z);
+    void SetRot(float pitch, float yaw, float roll);
+    void LookAt(float x, float y, float z);
 
-    XMFLOAT3 GetPos();
-    XMFLOAT3 GetRot();
+    Vector3 GetPos();
+    Vector3 GetRot();
 
     void Render();
-    XMFLOAT4X4 GetViewMatrix();
+    Matrix GetViewMatrix();
 
 private:
-    XMFLOAT3   pos_;
-    XMFLOAT3   rot_;
-    XMFLOAT4X4 view_matrix_;
+    Vector3 pos_;
+    Vector3 rot_;
+    Matrix view_matrix_;
 };
 
 #endif

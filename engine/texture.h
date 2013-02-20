@@ -1,8 +1,7 @@
 #ifndef BLONSTECH_TEXTURE_H_
 #define BLONSTECH_TEXTURE_H_
 
-#include <d3d11.h>
-#include "external\DDSTextureLoader.h"
+#include "render.h"
 
 class Texture
 {
@@ -10,13 +9,13 @@ public:
     Texture();
     ~Texture();
 
-    bool Init(ID3D11Device*, WCHAR*);
+    bool Init(WCHAR*);
     void Finish();
 
-    ID3D11ShaderResourceView* GetTexture();
+    TextureResource* GetTexture();
 
 private:
-    ID3D11ShaderResourceView* texture_;
+    TextureResource* texture_;
 };
 
 #endif

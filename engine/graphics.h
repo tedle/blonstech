@@ -4,7 +4,8 @@
 // Includes
 #include <Windows.h>
 // Local Includes
-#include "directx.h"
+#include "renderd3d11.h"
+#include "math.h"
 #include "camera.h"
 #include "model.h"
 #include "shader.h"
@@ -34,10 +35,9 @@ public:
 private:
     bool Render();
 
-    D3D*    d3d_;
-    Camera* camera_;
-    Model*  model_;
-    Shader* shader_;
+    Camera*    camera_;
+    Model*     model_;
+    Shader*    shader_;
 
 };
 

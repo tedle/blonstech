@@ -4,7 +4,10 @@
 #include <Windows.h>
 #include <stdio.h>
 #include <math.h>
+#include <DirectXMath.h>
 #include "camera.h"
+
+using namespace DirectX;
 
 void move_camera_around_origin(float, Camera*);
 void FPS();

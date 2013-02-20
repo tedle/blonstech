@@ -77,7 +77,8 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
-    <ClCompile Include="directx.cpp" />
+    <ClCompile Include="math.cpp" />
+    <ClCompile Include="renderd3d11.cpp" />
     <ClCompile Include="external\DDSTextureLoader.cpp" />
     <ClCompile Include="graphics.cpp" />
     <ClCompile Include="inputtemp.cpp" />
@@ -90,7 +91,9 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="client.h" />
-    <ClInclude Include="directx.h" />
+    <ClInclude Include="math.h" />
+    <ClInclude Include="render.h" />
+    <ClInclude Include="renderd3d11.h" />
     <ClInclude Include="external\DDSTextureLoader.h" />
     <ClInclude Include="graphics.h" />
     <ClInclude Include="inputbase.h" />

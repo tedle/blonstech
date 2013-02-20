@@ -9,12 +9,11 @@ Texture::~Texture()
 {
 }
 
-bool Texture::Init(ID3D11Device* device, WCHAR* filename)
+bool Texture::Init(WCHAR* filename)
 {
-    HRESULT result;
+    texture_ = g_render->LoadDDSFile(filename);
 
-    result = DirectX::CreateDDSTextureFromFile(device, filename, nullptr, &texture_, 0);
-    if(FAILED(result))
+    if(texture_ == nullptr)
         return false;
 
     return true;
@@ -22,16 +21,12 @@ bool Texture::Init(ID3D11Device* device, WCHAR* filename)
 
 void Texture::Finish()
 {
-    if(texture_)
-    {
-        texture_->Release();
-        texture_ = nullptr;
-    }
+    g_render->DestroyTextureResource(texture_);
 
     return;
 }
 
-ID3D11ShaderResourceView* Texture::GetTexture()
+TextureResource* Texture::GetTexture()
 {
     return texture_;
 }

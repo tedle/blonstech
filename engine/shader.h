@@ -1,49 +1,28 @@
 #ifndef BLONSTECH_SHADER_H_
 #define BLONSTECH_SHADER_H_
 
-// TODO: get rid of this dependancy eventually
-#pragma comment(lib, "d3dcompiler.lib")
 
 // Includes
-#include <d3d11.h>
-#include <DirectXMath.h>
-#include <d3dcompiler.h>
-#include <fstream>
-
-using namespace DirectX;
+#include "render.h"
 
 class Shader
 {
-private:
-    struct MatrixBuffer
-    {
-        XMFLOAT4X4 world;
-        XMFLOAT4X4 view;
-        XMFLOAT4X4 projection;
-    };
-
 public:
     Shader();
     ~Shader();
 
-    bool Init(ID3D11Device*, HWND);
+    bool Init(HWND);
     void Finish();
-    bool Render(ID3D11DeviceContext*, int, XMFLOAT4X4, XMFLOAT4X4, XMFLOAT4X4, ID3D11ShaderResourceView*);
+    bool Render(int, TextureResource*, Matrix, Matrix, Matrix);
 
 private:
-    bool InitShader(ID3D11Device*, HWND, WCHAR*, WCHAR*);
+    bool InitShader(HWND, WCHAR*, WCHAR*);
     void FinishShader();
-    void OutputShaderErrorMessage(ID3D10Blob*, HWND, WCHAR*);
 
-    bool SetShaderParams(ID3D11DeviceContext*, XMFLOAT4X4, XMFLOAT4X4, XMFLOAT4X4, ID3D11ShaderResourceView*);
-    void RenderShader(ID3D11DeviceContext*, int);
+    bool SetShaderParams(Matrix, Matrix, Matrix, TextureResource*);
 
 private:
-    ID3D11VertexShader* vertex_shader_;
-    ID3D11PixelShader* pixel_shader_;
-    ID3D11InputLayout* layout_;
-    ID3D11Buffer* matrix_buffer_;
-    ID3D11SamplerState* sampler_state_;
+    ShaderResource* program_;
 };
 
 #endif

@@ -1,0 +1,106 @@
+#ifndef BLONSTECH_RENDERD3D11_H_
+#define BLONSTECH_RENDERD3D11_H_
+
+// Linking
+#pragma comment(lib, "dxgi.lib")
+#pragma comment(lib, "d3d11.lib")
+// TODO: get rid of this dependancy eventually
+#pragma comment(lib, "d3dcompiler.lib")
+
+// Includes
+#include <dxgi.h>
+#include <d3dcommon.h>
+#include <d3d11.h>
+// TODO: get rid of this w/ the other one
+#include <d3dcompiler.h>
+#include <fstream>
+
+#include "math.h"
+#include "render.h"
+
+class BufferResourceD3D11 : public BufferResource
+{
+public:
+    ID3D11Buffer* p;
+};
+
+class TextureResourceD3D11 : public TextureResource
+{
+public:
+    ID3D11ShaderResourceView* p;
+};
+
+class ShaderResourceD3D11 : public ShaderResource
+{
+public:
+    ID3D11VertexShader* vertex_shader_;
+    ID3D11PixelShader* pixel_shader_;
+    ID3D11InputLayout* layout_;
+    ID3D11Buffer* matrix_buffer_;
+    ID3D11SamplerState* sampler_state_;
+};
+
+
+class RenderD3D11 : public RenderAPI
+{
+    
+public:
+    RenderD3D11();
+    ~RenderD3D11();
+
+    bool Init(int screen_width, int screen_height, bool vsync,
+              HWND hwnd, bool fullscreen, float depth, float near);
+    void Finish();
+
+    void BeginScene();
+    void EndScene();
+
+    void* CreateBufferResource();
+    void* CreateTextureResource();
+    void* CreateShaderResource();
+    void DestroyBufferResource(BufferResource* buffer);
+    void DestroyTextureResource(TextureResource* texture);
+    void DestroyShaderResource(ShaderResource* shader);
+
+    bool RegisterModel(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                       Vertex* vertices, unsigned int vert_count,
+                       unsigned long* indices, unsigned int index_count);
+    void RegisterTexture();
+    bool RegisterShader(ShaderResource* program,
+                        WCHAR* vertex_filename, WCHAR* pixel_filename);
+
+    void SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
+    void SetShader(ShaderResource* program, int index_count);
+    bool SetShaderInputs(ShaderResource* program, TextureResource* texture,
+                         Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix);
+
+    Matrix GetProjectionMatrix();
+    Matrix GetWorldMatrix();
+    Matrix GetOrthoMatrix();
+
+    void GetVideoCardInfo(char* buffer, int& len_buffer);
+
+    // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
+    TextureResource* LoadDDSFile(WCHAR* filename);
+
+private:
+    void OutputShaderErrorMessage(ID3D10Blob*);
+    bool vsync_;
+    int video_card_memory_;
+    char video_card_desc_[128];
+    Matrix proj_matrix_;
+    Matrix world_matrix_;
+    Matrix ortho_matrix_;
+
+    // API specific
+    IDXGISwapChain* swapchain_;
+    ID3D11Device* device_;
+    ID3D11DeviceContext* device_context_;
+    ID3D11RenderTargetView* render_target_view_;
+    ID3D11Texture2D* depth_stencil_buffer_;
+    ID3D11DepthStencilState* depth_stencil_state_;
+    ID3D11DepthStencilView* depth_stencil_view_;
+    ID3D11RasterizerState* raster_state_;
+};
+    
+#endif

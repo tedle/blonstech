@@ -1,8 +1,11 @@
 #include "graphics.h"
 
+RenderAPI* g_render = nullptr;
+
 Graphics::Graphics()
 {
-    d3d_ = nullptr;
+    g_render = nullptr;
+
     camera_ = nullptr;
     model_ = nullptr;
     shader_ = nullptr;
@@ -15,29 +18,29 @@ Graphics::~Graphics()
 bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
     // DirectX
-    d3d_ = new D3D;
-    if (!d3d_)
+    g_render = new RenderD3D11;
+    if (!g_render)
         return false;
 
-    if (!d3d_->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
+    if (!g_render->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
     {
         MessageBox(hwnd, L"DirectX die", L"help", MB_OK);
         return false;
     }
 
     // Camera
-    camera_ = new Camera;
+    camera_ = new Camera();
     if (!camera_)
         return false;
 
-    camera_->SetPos(XMFLOAT3(0.0f, 0.0f, -10.0f));
+    camera_->SetPos(0.0f, 0.0f, -10.0f);
 
     // Model
     model_ = new Model;
     if (!model_)
         return false;
 
-    if (!model_->Init(d3d_->GetDevice(), L"../notes/me.dds"))
+    if (!model_->Init(L"../notes/me.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
@@ -48,7 +51,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     if (!shader_)
         return false;
 
-    if (!shader_->Init(d3d_->GetDevice(), hwnd))
+    if (!shader_->Init(hwnd))
     {
         MessageBox(hwnd, L"Shaders die", L"help", MB_OK);
         return false;
@@ -59,13 +62,6 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
 void Graphics::Finish()
 {
-    if (d3d_)
-    {
-        d3d_->Finish();
-        delete d3d_;
-        d3d_ = nullptr;
-    }
-
     if (camera_)
     {
         delete camera_;
@@ -86,6 +82,13 @@ void Graphics::Finish()
         shader_ = nullptr;
     }
 
+    if (g_render)
+    {
+        g_render->Finish();
+        delete g_render;
+        g_render = nullptr;
+    }
+
     return;
 }
 
@@ -104,30 +107,29 @@ Camera* Graphics::GetCamera()
 
 bool Graphics::Render()
 {
-    XMFLOAT4X4 view_matrix, projection_matrix, world_matrix;
+    Matrix view_matrix, projection_matrix, world_matrix;
 
     // Clear buffers
-    d3d_->BeginScene(0.0f, 0.0f, 0.0f, 1.0f);
+    g_render->BeginScene();
 
     // Update camera matrix
     camera_->Render();
 
     // Get matrices
     view_matrix       = camera_->GetViewMatrix();
-    world_matrix      = d3d_->GetWorldMatrix();
-    projection_matrix = d3d_->GetProjectionMatrix();
+    world_matrix      = g_render->GetWorldMatrix();
+    projection_matrix = g_render->GetProjectionMatrix();
 
     // Prep the pipeline 4 drawering
-    model_->Render(d3d_->GetDeviceContext());
+    model_->Render();
 
     // Finally do the render
-    if (!shader_->Render(d3d_->GetDeviceContext(), model_->GetIndexCount(),
-                         world_matrix, view_matrix, projection_matrix,
-                         model_->GetTexture()))
+    if (!shader_->Render(model_->GetIndexCount(), model_->GetTexture(),
+                         world_matrix, view_matrix, projection_matrix))
         return false;
 
     // Swap buffers
-    d3d_->EndScene();
+    g_render->EndScene();
 
     return true;
 }
