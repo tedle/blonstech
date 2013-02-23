@@ -3,6 +3,7 @@
 
 // Local Includes
 #include "math.h"
+#include "mesh.h"
 #include "render.h"
 #include "texture.h"
 
@@ -12,23 +13,21 @@ public:
     Model();
     ~Model();
 
-    bool Init(WCHAR*);
+    bool Init(WCHAR* mesh_filename, WCHAR* texture_filename);
     void Finish();
     void Render();
 
-    int  GetIndexCount();
-
+    int GetIndexCount();
     TextureResource* GetTexture();
 
 private:
-    bool InitBuffers();
-    void FinishBuffers();
+    bool InitMesh(WCHAR* filename);
+    void FinishMesh();
 
-    bool LoadTexture(WCHAR*);
-    void ReleaseTexture();
+    bool InitTexture(WCHAR* filename);
+    void FinishTexture();
 
-    BufferResource *vertex_buffer_, *index_buffer_;
-    int vertex_count_, index_count_;
+    Mesh* mesh_;
     Texture* texture_;
 };
 

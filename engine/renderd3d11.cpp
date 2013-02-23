@@ -255,7 +255,7 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
     world_matrix_ = MatrixIdentity();
 
     // Ortho projection matrix (for 2d stuff)
-    ortho_matrix_ = MatrixOrthographic(screen_width, screen_height, screen_near, screen_depth);
+    ortho_matrix_ = MatrixOrthographic((float)screen_width, (float)screen_height, screen_near, screen_depth);
 
     return true;
 }
@@ -408,9 +408,9 @@ void RenderD3D11::DestroyShaderResource(ShaderResource* shader)
     return;
 }
 
-bool RenderD3D11::RegisterModel(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                                Vertex* vertices, unsigned int vert_count,
-                                unsigned long* indices, unsigned int index_count)
+bool RenderD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                               Vertex* vertices, unsigned int vert_count,
+                               unsigned long* indices, unsigned int index_count)
 {
     BufferResourceD3D11* vert_buf  = static_cast<BufferResourceD3D11*>(vertex_buffer);
     BufferResourceD3D11* index_buf = static_cast<BufferResourceD3D11*>(index_buffer);
@@ -570,6 +570,25 @@ bool RenderD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename
     return true;
 }
 
+void RenderD3D11::RenderShader(ShaderResource* program, int index_count)
+{
+    ShaderResourceD3D11* shader = static_cast<ShaderResourceD3D11*>(program);
+    // Make sure we shove them verts in so they fit rite
+    device_context_->IASetInputLayout(shader->layout_);
+
+    // our shader!!!!
+    device_context_->VSSetShader(shader->vertex_shader_, nullptr, 0);
+    device_context_->PSSetShader(shader->pixel_shader_, nullptr, 0);
+
+    // make sure we render the pixels how i like
+    device_context_->PSSetSamplers(0, 1, &shader->sampler_state_);
+
+    // wow here it is. its so small. did you think itd be this small?
+    device_context_->DrawIndexed(index_count, 0, 0);
+
+    return;
+}
+
 void RenderD3D11::SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
     BufferResourceD3D11* vertex_buf = static_cast<BufferResourceD3D11*>(vertex_buffer);
@@ -588,25 +607,6 @@ void RenderD3D11::SetModelBuffer(BufferResource* vertex_buffer, BufferResource* 
 
     // We do tris here
     device_context_->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-    return;
-}
-
-void RenderD3D11::SetShader(ShaderResource* program, int index_count)
-{
-    ShaderResourceD3D11* shader = static_cast<ShaderResourceD3D11*>(program);
-    // Make sure we shove them verts in so they fit rite
-    device_context_->IASetInputLayout(shader->layout_);
-
-    // our shader!!!!
-    device_context_->VSSetShader(shader->vertex_shader_, nullptr, 0);
-    device_context_->PSSetShader(shader->pixel_shader_, nullptr, 0);
-
-    // make sure we render the pixels how i like
-    device_context_->PSSetSamplers(0, 1, &shader->sampler_state_);
-
-    // wow here it is. its so small. did you think itd be this small?
-    device_context_->DrawIndexed(index_count, 0, 0);
 
     return;
 }

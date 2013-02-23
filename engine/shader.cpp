@@ -28,7 +28,7 @@ bool Shader::Render(int index_count, TextureResource* texture,
     if (!g_render->SetShaderInputs(program_, texture, world_matrix, view_matrix, proj_matrix))
         return false;
 
-    g_render->SetShader(program_, index_count);
+    g_render->RenderShader(program_, index_count);
 
     return true;
 }
@@ -48,10 +48,4 @@ void Shader::FinishShader()
 {
     g_render->DestroyShaderResource(program_);
     return;
-}
-
-bool Shader::SetShaderParams(Matrix world, Matrix view, Matrix proj,
-                             TextureResource* texture)
-{
-    return g_render->SetShaderInputs(program_, texture, world, view, proj);
 }

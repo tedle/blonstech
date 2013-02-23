@@ -12,7 +12,6 @@ struct Vertex
     Vector2 tex;
 };
 
-
 struct MatrixBuffer
 {
     Matrix world;
@@ -43,15 +42,16 @@ public:
     virtual void DestroyTextureResource(TextureResource* texture)=0;
     virtual void DestroyShaderResource(ShaderResource* shader)=0;
 
-    virtual bool RegisterModel(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                               Vertex* vertices, unsigned int vert_count,
-                               unsigned long* indices, unsigned int index_count)=0;
+    virtual bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                              Vertex* vertices, unsigned int vert_count,
+                              unsigned long* indices, unsigned int index_count)=0;
     virtual void RegisterTexture()=0;
     virtual bool RegisterShader(ShaderResource* program,
                                 WCHAR* vertex_filename, WCHAR* pixel_filename)=0;
 
+    virtual void RenderShader(ShaderResource* program, int index_count)=0;
+
     virtual void SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)=0;
-    virtual void SetShader(ShaderResource* program, int index_count)=0;
     virtual bool SetShaderInputs(ShaderResource* program, TextureResource* texture,
                                  Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix)=0;
 

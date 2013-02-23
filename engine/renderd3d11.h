@@ -62,15 +62,16 @@ public:
     void DestroyTextureResource(TextureResource* texture);
     void DestroyShaderResource(ShaderResource* shader);
 
-    bool RegisterModel(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                       Vertex* vertices, unsigned int vert_count,
-                       unsigned long* indices, unsigned int index_count);
+    bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                      Vertex* vertices, unsigned int vert_count,
+                      unsigned long* indices, unsigned int index_count);
     void RegisterTexture();
     bool RegisterShader(ShaderResource* program,
                         WCHAR* vertex_filename, WCHAR* pixel_filename);
 
+    void RenderShader(ShaderResource* program, int index_count);
+
     void SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
-    void SetShader(ShaderResource* program, int index_count);
     bool SetShaderInputs(ShaderResource* program, TextureResource* texture,
                          Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix);
 

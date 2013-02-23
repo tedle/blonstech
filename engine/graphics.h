@@ -16,7 +16,7 @@ const int kRenderModeBorderlessWindow = 3;
 
 const int   kRenderMode  = kRenderModeWindow;
 const bool  kEnableVsync = false;
-const float kScreenDepth = 1000.0f;
+const float kScreenDepth = 10000.0f;
 const float kScreenNear  = 0.1f;
 
 class Graphics

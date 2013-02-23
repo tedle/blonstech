@@ -19,8 +19,6 @@ private:
     bool InitShader(HWND, WCHAR*, WCHAR*);
     void FinishShader();
 
-    bool SetShaderParams(Matrix, Matrix, Matrix, TextureResource*);
-
 private:
     ShaderResource* program_;
 };

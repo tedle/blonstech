@@ -114,18 +114,18 @@ class Model:
         # Output face data
         for face in self.faces:
             for i in xrange(3):
-                f.write(struct.pack(mod_f, face.vert[i]))
+                f.write(struct.pack(mod_ui, face.vert[i]))
                 if len(self.texcoords):
-                    f.write(struct.pack(mod_f, face.tex[i]))
+                    f.write(struct.pack(mod_ui, face.tex[i]))
                 if len(self.normals):
-                    f.write(struct.pack(mod_f, face.norm[i]))
+                    f.write(struct.pack(mod_ui, face.norm[i]))
 
         f.close()
         return
 
 if __name__ == "__main__":
     m = Model()
-    m.LoadOBJ("../notes/teapot.obj")
+    m.LoadOBJ("../notes/teapot_highpoly.obj")
     # print "Verts:"
     # for vert in m.vertices:
     #     print [vert.x, vert.y, vert.z]
@@ -143,4 +143,4 @@ if __name__ == "__main__":
                                                 len(m.texcoords),
                                                 len(m.normals),
                                                 len(m.faces))
-    m.SaveMesh("../notes/test2.mesh")
+    m.SaveMesh("../notes/teapot_highpoly.mesh")
