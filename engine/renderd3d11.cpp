@@ -250,10 +250,6 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
 
     proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, screen_near, screen_depth);
 
-    // World matrix (models->3D space) shouldnt this be in model class??
-    // TODO: Make this part of model class, maybe separate world/view+proj matrix cbuffers, and update world matrix for each model rendered
-    world_matrix_ = MatrixIdentity();
-
     // Ortho projection matrix (for 2d stuff)
     ortho_matrix_ = MatrixOrthographic((float)screen_width, (float)screen_height, screen_near, screen_depth);
 
@@ -659,11 +655,6 @@ bool RenderD3D11::SetShaderInputs(ShaderResource* program, TextureResource* text
 Matrix RenderD3D11::GetProjectionMatrix()
 {
     return proj_matrix_;
-}
-
-Matrix RenderD3D11::GetWorldMatrix()
-{
-    return world_matrix_;
 }
 
 Matrix RenderD3D11::GetOrthoMatrix()

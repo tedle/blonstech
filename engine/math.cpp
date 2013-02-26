@@ -35,6 +35,19 @@ Matrix MatrixLookAt(Vector3 pos, Vector3 look, Vector3 up)
     return view_matrix;
 }
 
+Matrix MatrixMultiply(Matrix first, Matrix second)
+{
+    Matrix mul;
+    XMFLOAT4X4 xm1, xm2, xmret;
+    memcpy(xm1.m, first.m, sizeof(float)*4*4);
+    memcpy(xm2.m, second.m, sizeof(float)*4*4);
+
+    XMStoreFloat4x4(&xmret,
+                    XMMatrixMultiply(XMLoadFloat4x4(&xm1), XMLoadFloat4x4(&xm2)));
+    mul = xmret;
+    return mul;
+}
+
 Matrix MatrixOrthographic(float screen_width, float screen_height,
                           float screen_near, float screen_depth)
 {
@@ -55,6 +68,15 @@ Matrix MatrixPerspectiveFov(float fov, float screen_aspect,
                                                   screen_near, screen_depth));
     proj_matrix = xm;
     return proj_matrix;
+}
+
+Matrix MatrixTranslation(float x, float y, float z)
+{
+    Matrix trans;
+    XMFLOAT4X4 xmt;
+    XMStoreFloat4x4(&xmt, XMMatrixTranslation(x, y, z));
+    trans = xmt;
+    return trans;
 }
 
 Matrix MatrixTranspose(Matrix in)

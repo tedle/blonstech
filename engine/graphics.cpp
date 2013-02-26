@@ -117,11 +117,11 @@ bool Graphics::Render()
 
     // Get matrices
     view_matrix       = camera_->GetViewMatrix();
-    world_matrix      = g_render->GetWorldMatrix();
     projection_matrix = g_render->GetProjectionMatrix();
 
     // Prep the pipeline 4 drawering
     model_->Render();
+    world_matrix = model_->GetWorldMatrix();
 
     // Finally do the render
     if (!shader_->Render(model_->GetIndexCount(), model_->GetTexture(),

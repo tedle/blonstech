@@ -1,6 +1,6 @@
 #include "temphelpers.h"
 
-float orientation = XM_PI*1.5;
+float orientation = static_cast<float>(XM_PI)*1.5f;
 DWORD last_call = 0;
 void move_camera_around_origin(float delta, Camera* camera)
 {

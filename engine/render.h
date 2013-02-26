@@ -56,7 +56,6 @@ public:
                                  Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix)=0;
 
     virtual Matrix GetProjectionMatrix()=0;
-    virtual Matrix GetWorldMatrix()=0;
     virtual Matrix GetOrthoMatrix()=0;
 
     virtual void GetVideoCardInfo(char* buffer, int& len_buffer)=0;
@@ -69,7 +68,6 @@ private:
     int video_card_memory_;
     char video_card_desc_[128];
     Matrix proj_matrix_;
-    Matrix world_matrix_;
     Matrix ortho_matrix_;
 };
 

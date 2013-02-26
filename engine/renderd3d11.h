@@ -76,7 +76,6 @@ public:
                          Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix);
 
     Matrix GetProjectionMatrix();
-    Matrix GetWorldMatrix();
     Matrix GetOrthoMatrix();
 
     void GetVideoCardInfo(char* buffer, int& len_buffer);
@@ -90,7 +89,6 @@ private:
     int video_card_memory_;
     char video_card_desc_[128];
     Matrix proj_matrix_;
-    Matrix world_matrix_;
     Matrix ortho_matrix_;
 
     // API specific

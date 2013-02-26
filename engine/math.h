@@ -30,6 +30,7 @@ struct Matrix
 {
     float m[4][4];
 
+    // TODO: add overloaded * for muls
     // TODO: get rid of this lmao
     Matrix& operator=(const XMFLOAT4X4 & xm)
     {
@@ -40,10 +41,12 @@ struct Matrix
 
 Matrix MatrixIdentity();
 Matrix MatrixLookAt(Vector3 pos, Vector3 look, Vector3 up);
+Matrix MatrixMultiply(Matrix first, Matrix second);
 Matrix MatrixOrthographic(float screen_width, float screen_height,
                           float screen_near, float screen_depth);
 Matrix MatrixPerspectiveFov(float fov, float screen_aspect,
                             float screen_near, float screen_depth);
+Matrix MatrixTranslation(float x, float y, float z);
 Matrix MatrixTranspose(Matrix in);
 Matrix MatrixView(Vector3 pos, Vector3 rot);
 

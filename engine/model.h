@@ -19,6 +19,10 @@ public:
 
     int GetIndexCount();
     TextureResource* GetTexture();
+    Vector3 GetPos();
+    Matrix GetWorldMatrix();
+
+    void SetPos(float x, float y, float z);
 
 private:
     bool InitMesh(WCHAR* filename);
@@ -29,6 +33,8 @@ private:
 
     Mesh* mesh_;
     Texture* texture_;
+    Matrix world_matrix_;
+    Vector3 pos_;
 };
 
 #endif
