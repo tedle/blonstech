@@ -18,6 +18,7 @@ RenderD3D11::~RenderD3D11()
 
 bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool fullscreen, float screen_depth, float screen_near)
 {
+    // DX uses lots of weird pointer magic and manual release functions, so maybe unique_ptrs arent a huge gain here...
     HRESULT result;
     IDXGIFactory* factory;
     IDXGIAdapter* adapter;
@@ -40,32 +41,44 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
     // Get a interface
     result = CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&factory);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Get a video card
     result = factory->EnumAdapters(0, &adapter);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Sort thru viddy cards
     result = adapter->EnumOutputs(0, &adapter_out);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Get only the best of the display modess
     result = adapter_out->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, nullptr);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Allocate a sucker to find what modes we g0t
     display_modes = new DXGI_MODE_DESC[num_modes];
     if (!display_modes)
+    {
         return false;
+    }
 
     // Stuff that sucker up!!!
     result = adapter_out->GetDisplayModeList(DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_ENUM_MODES_INTERLACED, &num_modes, display_modes);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Now to actually find one compatible w/ what i got
     for (unsigned int i = 0; i < num_modes; i++)
@@ -81,12 +94,16 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
     // Tell me bout vid card
     result = adapter->GetDesc(&adapter_desc);
     if (FAILED(result))
+    {
         return false;
+    }
 
     video_card_memory_ = (int)(adapter_desc.DedicatedVideoMemory / 1024 / 1024);
 
     if (wcstombs_s(&string_len, video_card_desc_, 128, adapter_desc.Description, 128))
+    {
         return false;
+    }
 
     // Clean up some mamorie
     delete [] display_modes;
@@ -139,16 +156,22 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
     result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, &feature_level, 1, D3D11_SDK_VERSION,
                                            &swapchain_desc, &swapchain_, &device_, nullptr, &device_context_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     result = swapchain_->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&back_buffer);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Init the render view
     result = device_->CreateRenderTargetView(back_buffer, nullptr, &render_target_view_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     back_buffer->Release();
     back_buffer = nullptr;
@@ -170,7 +193,9 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
 
     result = device_->CreateTexture2D(&depth_buffer_desc, nullptr, &depth_stencil_buffer_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // How thhe stencil work
     ZeroMemory(&depth_stencil_desc, sizeof(depth_stencil_desc));
@@ -195,7 +220,9 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
 
     result = device_->CreateDepthStencilState(&depth_stencil_desc, &depth_stencil_state_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Finally plug it in
     device_context_->OMSetDepthStencilState(depth_stencil_state_, 1);
@@ -209,7 +236,9 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
 
     result = device_->CreateDepthStencilView(depth_stencil_buffer_, &depth_stencil_view_desc, &depth_stencil_view_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // attach 2 pipeline
     device_context_->OMSetRenderTargets(1, &render_target_view_, depth_stencil_view_);
@@ -229,7 +258,9 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
 
     result = device_->CreateRasterizerState(&raster_desc, &raster_state_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // and apply!
     device_context_->RSSetState(raster_state_);
@@ -260,7 +291,9 @@ void RenderD3D11::Finish()
 {
     // Always shut down a swapchain in windowed mode or problems happen
     if (swapchain_)
+    {
         swapchain_->SetFullscreenState(false, nullptr);
+    }
 
     if (raster_state_)
     {
@@ -430,7 +463,9 @@ bool RenderD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* in
 
     result = device_->CreateBuffer(&vertex_buffer_desc, &vertex_data, &vert_buf->p);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Index buffer desc :(
     index_buffer_desc.Usage = D3D11_USAGE_DEFAULT;
@@ -447,7 +482,9 @@ bool RenderD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* in
 
     result = device_->CreateBuffer(&index_buffer_desc, &index_data, &index_buf->p);
     if (FAILED(result))
+    {
         return false;
+    }
 
     return true;
 }
@@ -488,14 +525,18 @@ bool RenderD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename
     result = device_->CreateVertexShader(vertex_shader_buffer->GetBufferPointer(),
                                          vertex_shader_buffer->GetBufferSize(), nullptr, &shader->vertex_shader_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     result = D3DCompileFromFile(pixel_filename, nullptr, nullptr, "FragShader", "ps_5_0",
                                 D3D10_SHADER_ENABLE_STRICTNESS, 0, &pixel_shader_buffer, &error_message);
     if (FAILED(result))
     {
         if (error_message)
+        {
             OutputShaderErrorMessage(error_message);
+        }
 
         return false;
     }
@@ -503,7 +544,9 @@ bool RenderD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename
     result = device_->CreatePixelShader(pixel_shader_buffer->GetBufferPointer(),
                                         pixel_shader_buffer->GetBufferSize(), nullptr, &shader->pixel_shader_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Setup semantics
     input_layout[0].SemanticName = "POSITION";
@@ -529,7 +572,9 @@ bool RenderD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename
                                        vertex_shader_buffer->GetBufferSize(),
                                        &shader->layout_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     vertex_shader_buffer->Release();
     pixel_shader_buffer->Release();
@@ -544,7 +589,9 @@ bool RenderD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename
 
     result = device_->CreateBuffer(&matrix_buffer_desc, nullptr, &shader->matrix_buffer_);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Setup the sampler methods
     sample_desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR; // Most expensive, but pretty
@@ -557,11 +604,15 @@ bool RenderD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename
     sample_desc.MinLOD = 0;
     sample_desc.MaxLOD = D3D11_FLOAT32_MAX;
     for (int i = 0; i < 4; i++)
+    {
         sample_desc.BorderColor[i] = 0;
+    }
 
     result = device_->CreateSamplerState(&sample_desc, &shader->sampler_state_);
-    if(FAILED(result))
+    if (FAILED(result))
+    {
         return false;
+    }
 
     return true;
 }
@@ -626,7 +677,9 @@ bool RenderD3D11::SetShaderInputs(ShaderResource* program, TextureResource* text
     // Lock buffer to gain write access
     result = device_context_->Map(shader->matrix_buffer_, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_resource);
     if (FAILED(result))
+    {
         return false;
+    }
 
     // Cast cbuffer to matrix
     data = (MatrixBuffer*)mapped_resource.pData;
@@ -676,8 +729,10 @@ TextureResource* RenderD3D11::LoadDDSFile(WCHAR* filename)
     TextureResourceD3D11* texture = static_cast<TextureResourceD3D11*>(CreateTextureResource());
 
     result = DirectX::CreateDDSTextureFromFile(device_, filename, nullptr, &texture->p, 0);
-    if(FAILED(result))
+    if (FAILED(result))
+    {
         return nullptr;
+    }
 
     return texture;
 }

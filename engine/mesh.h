@@ -2,16 +2,18 @@
 #define BLONSTECH_MESH_H_
 
 // Includes
+#include <memory>
 #include <stdio.h>
-
+#include <vector>
+// Local Includes
 #include "render.h"
 
 // Holds mesh info in memory while being reorganized to renderable format
 struct RawMesh
 {
     unsigned int vertex_count, uv_count, normal_count, face_count;
-    Vector3* vertices, *normals;
-    Vector2* uvs;
+    std::vector<Vector3> vertices, normals;
+    std::vector<Vector2> uvs;
     unsigned int* faces;
 };
 
@@ -30,7 +32,7 @@ public:
     int GetIndexCount();
 
 private:
-    BufferResource *vertex_buffer_, *index_buffer_;
+    std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
     int vertex_count_, index_count_;
 };
 

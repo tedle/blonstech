@@ -1,6 +1,6 @@
 #include "graphics.h"
 
-RenderAPI* g_render = nullptr;
+std::unique_ptr<RenderAPI> g_render = nullptr;
 
 Graphics::Graphics()
 {
@@ -18,9 +18,11 @@ Graphics::~Graphics()
 bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
     // DirectX
-    g_render = new RenderD3D11;
+    g_render = std::unique_ptr<RenderAPI>(new RenderD3D11);
     if (!g_render)
+    {
         return false;
+    }
 
     if (!g_render->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
     {
@@ -29,16 +31,20 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     }
 
     // Camera
-    camera_ = new Camera();
-    if (!camera_)
+    camera_ = std::unique_ptr<Camera>(new Camera);
+    if (camera_ == nullptr)
+    {
         return false;
+    }
 
     camera_->SetPos(0.0f, 0.0f, -10.0f);
 
     // Model
-    model_ = new Model;
-    if (!model_)
+    model_ = std::unique_ptr<Model>(new Model);
+    if (model_ == nullptr)
+    {
         return false;
+    }
 
     if (!model_->Init(L"../notes/teapot_highpoly.mesh", L"../notes/me.dds"))
     {
@@ -47,9 +53,11 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     }
 
     // Shaders
-    shader_ = new Shader;
-    if (!shader_)
+    shader_ = std::unique_ptr<Shader>(new Shader);
+    if (shader_ == nullptr)
+    {
         return false;
+    }
 
     if (!shader_->Init(hwnd))
     {
@@ -62,31 +70,19 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
 void Graphics::Finish()
 {
-    if (camera_)
-    {
-        delete camera_;
-        camera_ = nullptr;
-    }
-
     if (model_)
     {
         model_->Finish();
-        delete model_;
-        model_ = nullptr;
     }
 
     if (shader_)
     {
         shader_->Finish();
-        delete shader_;
-        shader_ = nullptr;
     }
 
     if (g_render)
     {
         g_render->Finish();
-        delete g_render;
-        g_render = nullptr;
     }
 
     return;
@@ -95,14 +91,16 @@ void Graphics::Finish()
 bool Graphics::Frame()
 {
     if (!Render())
+    {
         return false;
+    }
 
     return true;
 }
 
 Camera* Graphics::GetCamera()
 {
-    return camera_;
+    return camera_.get();
 }
 
 bool Graphics::Render()
@@ -126,7 +124,9 @@ bool Graphics::Render()
     // Finally do the render
     if (!shader_->Render(model_->GetIndexCount(), model_->GetTexture(),
                          world_matrix, view_matrix, projection_matrix))
+    {
         return false;
+    }
 
     // Swap buffers
     g_render->EndScene();

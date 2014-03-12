@@ -2,6 +2,7 @@
 #define BLONSTECH_GRAPHICS_H_
 
 // Includes
+#include <memory>
 #include <Windows.h>
 // Local Includes
 #include "renderd3d11.h"
@@ -35,9 +36,9 @@ public:
 private:
     bool Render();
 
-    Camera*    camera_;
-    Model*     model_;
-    Shader*    shader_;
+    std::unique_ptr<Camera> camera_;
+    std::unique_ptr<Model>  model_;
+    std::unique_ptr<Shader> shader_;
 
 };
 

@@ -1,6 +1,8 @@
 #ifndef BLONSTECH_MODEL_H_
 #define BLONSTECH_MODEL_H_
 
+// Includes
+#include <memory>
 // Local Includes
 #include "math.h"
 #include "mesh.h"
@@ -31,8 +33,8 @@ private:
     bool InitTexture(WCHAR* filename);
     void FinishTexture();
 
-    Mesh* mesh_;
-    Texture* texture_;
+    std::unique_ptr<Mesh> mesh_;
+    std::unique_ptr<Texture> texture_;
     Matrix world_matrix_;
     Vector3 pos_;
 };

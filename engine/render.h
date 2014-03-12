@@ -1,8 +1,10 @@
 #ifndef BLONSTECH_RENDER_H_
 #define BLONSTECH_RENDER_H_
 
+// Includes
+#include <memory>
 #include <Windows.h>
-
+// Local Includes
 #include "external\DDSTextureLoader.h"
 #include "math.h"
 
@@ -71,7 +73,7 @@ private:
     Matrix ortho_matrix_;
 };
 
-extern RenderAPI* g_render;
+extern std::unique_ptr<RenderAPI> g_render;
 
 // TODO: make sure these are destroyed properly
 class BufferResource {public: void* operator new(size_t s){return g_render->CreateBufferResource();}};

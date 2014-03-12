@@ -5,6 +5,7 @@
 #define WIN32_LEAN_AND_MEAN
 
 // Includes
+#include <memory>
 #include <Windows.h>
 // Local Includes
 #include "temphelpers.h"
@@ -38,8 +39,8 @@ private:
     HINSTANCE hinstance_;
     HWND hwnd_;
 
-    Input* input_;
-    Graphics* graphics_;
+    std::unique_ptr<Input> input_;
+    std::unique_ptr<Graphics> graphics_;
 };
 
 // Message hooking helpers

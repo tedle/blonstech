@@ -13,7 +13,9 @@ bool Mesh::Init(WCHAR* filename)
     FILE* file;
     _wfopen_s(&file, filename, L"rb");
     if (file == nullptr)
+    {
         return false;
+    }
 
     RawMesh mesh_info;
     size_t vertices_read, uvs_read, normals_read, faces_read;
@@ -34,20 +36,26 @@ bool Mesh::Init(WCHAR* filename)
         mesh_info.uv_count * sizeof(Vector2) > file_size ||
         mesh_info.normal_count * sizeof(Vector3) > file_size ||
         mesh_info.face_count * sizeof(unsigned int) > file_size)
+    {
         return false;
+    }
 
     // TODO: support non-textured objects (need shader layouts, settings n shit)
     if (!mesh_info.uv_count)
+    {
         return false;
+    }
 
-    mesh_info.vertices = new Vector3 [mesh_info.vertex_count];
-    vertices_read = fread(mesh_info.vertices, sizeof(Vector3), mesh_info.vertex_count, file);
+    // The seems like the most efficient way to read a lot of data straight into a vector...
+    // Kinda gross really
+    mesh_info.vertices.resize(mesh_info.vertex_count);
+    vertices_read = fread(&mesh_info.vertices[0], sizeof(Vector3), mesh_info.vertex_count, file);
 
-    mesh_info.uvs = new Vector2 [mesh_info.uv_count];
-    uvs_read = fread(mesh_info.uvs, sizeof(Vector2), mesh_info.uv_count, file);
+    mesh_info.uvs.resize(mesh_info.uv_count);
+    uvs_read = fread(&mesh_info.uvs[0], sizeof(Vector2), mesh_info.uv_count, file);
 
-    mesh_info.normals = new Vector3 [mesh_info.normal_count];
-    normals_read = fread(mesh_info.normals, sizeof(Vector3), mesh_info.normal_count, file);
+    mesh_info.normals.resize(mesh_info.normal_count);
+    normals_read = fread(&mesh_info.normals[0], sizeof(Vector3), mesh_info.normal_count, file);
 
     // Allocate 3 uints per face for each type of mesh data supplied
     unsigned int face_size = 3 * (mesh_info.vertex_count > 0) +
@@ -64,28 +72,29 @@ bool Mesh::Init(WCHAR* filename)
     if (vertices_read != mesh_info.vertex_count || uvs_read != mesh_info.uv_count ||
         normals_read != mesh_info.normal_count || faces_read != mesh_info.face_count || !eof)
     {
-        delete [] mesh_info.vertices;
-        delete [] mesh_info.uvs;
-        delete [] mesh_info.normals;
         return false;
     }
 
     Vertex* vertices;
     unsigned long* indices;
 
-    vertex_buffer_ = static_cast<BufferResource*>(g_render->CreateBufferResource());
-    index_buffer_  = static_cast<BufferResource*>(g_render->CreateBufferResource());
+    vertex_buffer_ = std::unique_ptr<BufferResource>(new BufferResource);
+    index_buffer_  = std::unique_ptr<BufferResource>(new BufferResource);
 
     // 3 vertices for every tri
     vertex_count_ = index_count_ = mesh_info.face_count * 3;
 
     vertices = new Vertex[vertex_count_];
     if (!vertices)
+    {
         return false;
+    }
 
     indices = new unsigned long[index_count_];
     if (!indices)
+    {
         return false;
+    }
 
     for(int i = 0; i < vertex_count_; i++)
     {
@@ -97,16 +106,16 @@ bool Mesh::Init(WCHAR* filename)
         Vector3 test = vertices[i].pos;
     }
 
-    delete [] mesh_info.vertices;
-    delete [] mesh_info.uvs;
-    delete [] mesh_info.normals;
-
     for (int i = 0; i < index_count_; i++)
+    {
         indices[i] = i;
+    }
 
-    if (!g_render->RegisterMesh(vertex_buffer_, index_buffer_, vertices, vertex_count_,
+    if (!g_render->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), vertices, vertex_count_,
                                 indices, index_count_))
+    {
         return false;
+    }
 
     delete [] vertices;
     delete [] indices;
@@ -118,14 +127,12 @@ void Mesh::Finish()
 {
     if (index_buffer_)
     {
-        g_render->DestroyBufferResource(index_buffer_);
-        index_buffer_ = nullptr;
+        g_render->DestroyBufferResource(index_buffer_.release());
     }
     
     if (vertex_buffer_)
     {
-        g_render->DestroyBufferResource(vertex_buffer_);
-        vertex_buffer_ = nullptr;
+        g_render->DestroyBufferResource(vertex_buffer_.release());
     }
 
     return;
@@ -133,12 +140,12 @@ void Mesh::Finish()
 
 BufferResource* Mesh::GetVertexBuffer()
 {
-    return vertex_buffer_;
+    return vertex_buffer_.get();
 }
 
 BufferResource* Mesh::GetIndexBuffer()
 {
-    return index_buffer_;
+    return index_buffer_.get();
 }
 
 int Mesh::GetVertexCount()

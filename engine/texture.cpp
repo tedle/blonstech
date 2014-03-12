@@ -11,22 +11,24 @@ Texture::~Texture()
 
 bool Texture::Init(WCHAR* filename)
 {
-    texture_ = g_render->LoadDDSFile(filename);
+    texture_ = std::unique_ptr<TextureResource>(g_render->LoadDDSFile(filename));
 
-    if(texture_ == nullptr)
+    if (texture_ == nullptr)
+    {
         return false;
+    }
 
     return true;
 }
 
 void Texture::Finish()
 {
-    g_render->DestroyTextureResource(texture_);
+    g_render->DestroyTextureResource(texture_.release());
 
     return;
 }
 
 TextureResource* Texture::GetTexture()
 {
-    return texture_;
+    return texture_.get();
 }

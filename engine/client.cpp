@@ -18,16 +18,16 @@ bool Client::Init()
     // Open window and get w+h
     InitWindow(screen_width, screen_height);
 
-    input_ = new Input;
-    if (!input_)
+    input_ = std::unique_ptr<Input>(new Input);
+    if (input_ == nullptr)
         return false;
 
     // Do what the implementation needs to get started
     if (!input_->Init())
         return false;
 
-    graphics_ = new Graphics;
-    if (!graphics_)
+    graphics_ = std::unique_ptr<Graphics>(new Graphics);
+    if (graphics_ == nullptr)
         return false;
 
     // Figure out all that directy stuff
@@ -39,16 +39,14 @@ bool Client::Init()
 
 void Client::Finish()
 {
-    if (graphics_)
+    if (graphics_ != nullptr)
     {
         graphics_->Finish();
-        delete graphics_;
     }
 
-    if (input_)
+    if (input_ != nullptr)
     {
         input_->Finish();
-        delete input_;
     }
 
     FinishWindow();
@@ -84,19 +82,27 @@ bool Client::Frame()
     FPS();
     // Esc = exit
     if (!input_->Frame() || input_->IsKeyDown(VK_ESCAPE))
+    {
         return false;
+    }
 
     // TODO: THIS IS TEMP DELETE LATER
     //move_camera_around_origin(1.0f, graphics_->GetCamera());
     if (input_->IsKeyDown('A'))
+    {
         move_camera_around_origin(-1.0f, graphics_->GetCamera());
+    }
     if (input_->IsKeyDown('D'))
+    {
         move_camera_around_origin(1.0f, graphics_->GetCamera());
+    }
     // END TEMP
 
     // Render scene
     if (!graphics_->Frame())
+    {
         return false;
+    }
 
     return true;
 }
@@ -190,7 +196,9 @@ void Client::FinishWindow()
 
     // TODO: Temporary until Direct & Raw input are setup
     if (kRenderMode == kRenderModeFullscreen)
+    {
         ChangeDisplaySettings(nullptr, 0);
+    }
     g_application_handle = nullptr;
 
     DestroyWindow(hwnd_);

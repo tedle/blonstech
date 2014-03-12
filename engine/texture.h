@@ -1,6 +1,9 @@
 #ifndef BLONSTECH_TEXTURE_H_
 #define BLONSTECH_TEXTURE_H_
 
+// Includes
+#include <memory>
+// Local Includes
 #include "render.h"
 
 class Texture
@@ -15,7 +18,7 @@ public:
     TextureResource* GetTexture();
 
 private:
-    TextureResource* texture_;
+    std::unique_ptr<TextureResource> texture_;
 };
 
 #endif

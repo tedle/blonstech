@@ -20,7 +20,7 @@ private:
     void FinishShader();
 
 private:
-    ShaderResource* program_;
+    std::unique_ptr<ShaderResource> program_;
 };
 
 #endif
