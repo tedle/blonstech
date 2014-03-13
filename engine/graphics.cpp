@@ -18,7 +18,10 @@ Graphics::~Graphics()
 bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
     // DirectX
-    g_render = std::unique_ptr<RenderAPI>(new RenderD3D11);
+    // g_render = std::unique_ptr<RenderAPI>(new RenderD3D11);
+
+    // OpenGL
+    g_render = std::unique_ptr<RenderAPI>(new RenderGL40);
     if (!g_render)
     {
         return false;
@@ -26,7 +29,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
     if (!g_render->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
     {
-        MessageBox(hwnd, L"DirectX die", L"help", MB_OK);
+        MessageBox(hwnd, L"Render die", L"help", MB_OK);
         return false;
     }
 

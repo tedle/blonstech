@@ -6,6 +6,7 @@
 #include <Windows.h>
 // Local Includes
 #include "renderd3d11.h"
+#include "rendergl40.h"
 #include "math.h"
 #include "camera.h"
 #include "model.h"

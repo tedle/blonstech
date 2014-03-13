@@ -109,7 +109,7 @@ bool Client::Frame()
 
 void Client::InitWindow(int& screen_width, int& screen_height)
 {
-    WNDCLASSEX wc;
+    WNDCLASSEX wc = {};
     DEVMODE screen_settings;
     int pos_x, pos_y;
     DWORD style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;

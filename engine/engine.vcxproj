@@ -79,6 +79,7 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="glfuncloader.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="renderd3d11.cpp" />
@@ -87,6 +88,7 @@
     <ClCompile Include="inputtemp.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="model.cpp" />
+    <ClCompile Include="rendergl40.cpp" />
     <ClCompile Include="shader.cpp" />
     <ClCompile Include="temphelpers.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -94,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="glfuncloader.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="render.h" />
@@ -105,6 +108,7 @@
     <ClInclude Include="inputraw.h" />
     <ClInclude Include="inputtemp.h" />
     <ClInclude Include="model.h" />
+    <ClInclude Include="rendergl40.h" />
     <ClInclude Include="shader.h" />
     <ClInclude Include="temphelpers.h" />
     <ClInclude Include="texture.h" />
