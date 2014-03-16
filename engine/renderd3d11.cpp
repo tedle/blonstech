@@ -248,7 +248,7 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
     // Setup personal rasterizer state for tinkering mayb...
     raster_desc.AntialiasedLineEnable = false;
     // TODO: REENABLE BACKFACE CULLING
-    raster_desc.CullMode = D3D11_CULL_NONE; // Backface culling SO ftw...
+    raster_desc.CullMode = D3D11_CULL_BACK; // Backface culling SO ftw...
     raster_desc.DepthBias = 0;
     raster_desc.DepthBiasClamp = 0.0f;
     raster_desc.DepthClipEnable = true;
@@ -441,7 +441,7 @@ void RenderD3D11::DestroyShaderResource(ShaderResource* shader)
 
 bool RenderD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                Vertex* vertices, unsigned int vert_count,
-                               unsigned long* indices, unsigned int index_count)
+                               unsigned int* indices, unsigned int index_count)
 {
     BufferResourceD3D11* vert_buf  = static_cast<BufferResourceD3D11*>(vertex_buffer);
     BufferResourceD3D11* index_buf = static_cast<BufferResourceD3D11*>(index_buffer);

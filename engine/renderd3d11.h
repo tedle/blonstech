@@ -14,7 +14,8 @@
 // TODO: get rid of this w/ the other one
 #include <d3dcompiler.h>
 #include <fstream>
-
+// Local Includes
+#include "external\DDSTextureLoader.h"
 #include "math.h"
 #include "render.h"
 
@@ -64,7 +65,7 @@ public:
 
     bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                       Vertex* vertices, unsigned int vert_count,
-                      unsigned long* indices, unsigned int index_count);
+                      unsigned int* indices, unsigned int index_count);
     void RegisterTexture();
     bool RegisterShader(ShaderResource* program,
                         WCHAR* vertex_filename, WCHAR* pixel_filename);

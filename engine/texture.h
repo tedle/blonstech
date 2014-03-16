@@ -19,6 +19,7 @@ public:
 
 private:
     std::unique_ptr<TextureResource> texture_;
+    enum Format {NONE, DXT5, TGA} format_;
 };
 
 #endif

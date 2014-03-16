@@ -13,7 +13,7 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
 {
 
     // Defining the pixel format we want OpenGL to use
-    const int color_depth = 32;
+    const int color_depth = 24;
     const int depth_bits = 24;
     const int stencil_bits = 8;
     const int aux_buffers = 0;
@@ -81,6 +81,11 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
         return false;
     }
 
+    // Clean up dummy context
+    wglDeleteContext(dummy_render_context);
+    ReleaseDC(dummy_hwnd, dummy_device_context);
+    DestroyWindow(dummy_hwnd);
+
     // Get the real device context handle
     device_context_ = GetDC(hwnd);
 
@@ -88,8 +93,9 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
     unsigned int num_formats;
     const int pixel_attributes[] =
     {
-        WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
         WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+        WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+        WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
         WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
         WGL_SWAP_METHOD_ARB, WGL_SWAP_EXCHANGE_ARB,
         WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
@@ -98,8 +104,8 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
         WGL_STENCIL_BITS_ARB, stencil_bits,
         0
     };
-    pixel_format = wglChoosePixelFormatARB(device_context_, pixel_attributes, nullptr, 1, &pixel_format, &num_formats);
-    if (!pixel_format || !SetPixelFormat(device_context_, pixel_format, &pfd))
+    int result = wglChoosePixelFormatARB(device_context_, pixel_attributes, nullptr, 1, &pixel_format, &num_formats);
+    if (!result || !SetPixelFormat(device_context_, pixel_format, &pfd))
     {
         return false;
     }
@@ -118,10 +124,11 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
         return false;
     }
 
-    wglMakeCurrent(device_context_, render_context_);
-    wglDeleteContext(dummy_render_context);
-    ReleaseDC(dummy_hwnd, dummy_device_context);
-    DestroyWindow(dummy_hwnd);
+    // Clean up the dummy context
+    if (!wglMakeCurrent(device_context_, render_context_))
+    {
+        return false;
+    }
 
     // Finally load the rest of our functions
     if (LoadGLFunctions().size() > 0)
@@ -199,7 +206,19 @@ void* RenderGL40::CreateShaderResource()
 
 void RenderGL40::DestroyBufferResource(BufferResource* buffer)
 {
+    BufferResourceGL40* buf = static_cast<BufferResourceGL40*>(buffer);
+    if (buf->type_ == BufferResourceGL40::VERTEX_BUFFER)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    else if (buf->type_ == BufferResourceGL40::INDEX_BUFFER)
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+    glDeleteBuffers(1, &buf->buffer_);
 
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &buf->vertex_array_id_);
 }
 
 void RenderGL40::DestroyTextureResource(TextureResource* texture)
@@ -209,19 +228,61 @@ void RenderGL40::DestroyTextureResource(TextureResource* texture)
 
 void RenderGL40::DestroyShaderResource(ShaderResource* shader)
 {
+    ShaderResourceGL40* program = static_cast<ShaderResourceGL40*>(shader);
+    glDetachShader(program->program_, program->vertex_shader_);
+    glDetachShader(program->program_, program->frag_shader_);
 
+    glDeleteShader(program->vertex_shader_);
+    glDeleteShader(program->frag_shader_);
+
+    glDeleteProgram(program->program_);
 }
 
 bool RenderGL40::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                               Vertex* vertices, unsigned int vert_count,
-                              unsigned long* indices, unsigned int index_count)
+                              unsigned int* indices, unsigned int index_count)
 {
-    return false;
+    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
+    BufferResourceGL40* index_buf = static_cast<BufferResourceGL40*>(index_buffer);
+
+    // Set the buffer types
+    vertex_buf->type_ = BufferResourceGL40::VERTEX_BUFFER;
+    index_buf->type_ = BufferResourceGL40::INDEX_BUFFER;
+
+    // Generate a vertex array and set it
+    GLuint vertex_array_id;
+    glGenVertexArrays(1, &vertex_array_id);
+    vertex_buf->vertex_array_id_ = index_buf->vertex_array_id_ = vertex_array_id;
+    glBindVertexArray(vertex_array_id);
+
+    // Attach vertex buffer data to VAO
+    glGenBuffers(1, &vertex_buf->buffer_);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+
+    // Enable pos and uv inputs ??
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+    // Layout the Vertex struct type to gpu vertex attributes
+    // Position declaration
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    // UV declaration
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
+
+    // Setup the index buffer
+    glGenBuffers(1, &index_buf->buffer_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
+    return true;
 }
 
 void RenderGL40::RegisterTexture()
 {
-
+    return;
 }
 
 bool RenderGL40::RegisterShader(ShaderResource* program,
@@ -275,7 +336,7 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
     glAttachShader(shader->program_, shader->vertex_shader_);
     glAttachShader(shader->program_, shader->frag_shader_);
     glBindAttribLocation(shader->program_, 0, "input_pos");
-    glBindAttribLocation(shader->program_, 1, "input_col");
+    glBindAttribLocation(shader->program_, 1, "input_uv");
     glLinkProgram(shader->program_);
 
     // Check that everything went OK
@@ -291,18 +352,56 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
 
 void RenderGL40::RenderShader(ShaderResource* program, int index_count)
 {
+    ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
 
+    // Bind our shader then do the draw call
+    glUseProgram(shader->program_);
+    glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
 }
 
 void RenderGL40::SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
-
+    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
+    glBindVertexArray(vertex_buf->vertex_array_id_);
 }
 
 bool RenderGL40::SetShaderInputs(ShaderResource* program, TextureResource* texture,
                                  Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix)
 {
-    return false;
+    TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
+    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
+    GLuint loc;
+
+    // Bind our uniform variables to the shader
+    loc = glGetUniformLocation(prog->program_, "world_matrix");
+    if (loc < 0)
+    {
+        return false;
+    }
+    glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)world_matrix.m);
+
+    loc = glGetUniformLocation(prog->program_, "view_matrix");
+    if (loc < 0)
+    {
+        return false;
+    }
+    glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)view_matrix.m);
+
+    loc = glGetUniformLocation(prog->program_, "proj_matrix");
+    if (loc < 0)
+    {
+        return false;
+    }
+    glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)proj_matrix.m);
+
+    loc = glGetUniformLocation(prog->program_, "shader_texture");
+    if (loc < 0)
+    {
+        return false;
+    }
+    glUniform1i(loc, tex->texture_unit_);
+
+    return true;
 }
 
 Matrix RenderGL40::GetProjectionMatrix()
@@ -324,7 +423,38 @@ void RenderGL40::GetVideoCardInfo(char* name, int& memory)
 
 TextureResource* RenderGL40::LoadDDSFile(WCHAR* filename)
 {
-    return nullptr;
+    TextureResourceGL40* texture = new TextureResourceGL40;
+    texture->texture_unit_ = 0;
+
+    // Convert WCHAR filename to sane format
+    char fn[256];
+    unsigned int string_len;
+    wcstombs_s(&string_len, fn, 256, filename, 256);
+
+	// Set the texture unit in which to store the data.
+	glActiveTexture(GL_TEXTURE0 + texture->texture_unit_);
+
+	// Generate an ID for the texture.
+	glGenTextures(1, &texture->texture_);
+
+	// Bind the texture as a 2D texture.
+	glBindTexture(GL_TEXTURE_2D, texture->texture_);
+
+	// Set the texture to repeat when sampled outside UV range
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	// Set the texture filtering
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    // Load the texture onto GPU
+    texture->texture_ = SOIL_load_OGL_texture(fn, 0, texture->texture_, SOIL_FLAG_DDS_LOAD_DIRECT);
+
+    // Re enable this for non-dds textures
+	// glGenerateMipmap(GL_TEXTURE_2D);
+
+	return texture;
 }
 
 void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)

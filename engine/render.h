@@ -6,7 +6,6 @@
 #include <string>
 #include <Windows.h>
 // Local Includes
-#include "external\DDSTextureLoader.h"
 #include "math.h"
 
 struct Vertex
@@ -47,7 +46,7 @@ public:
 
     virtual bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                               Vertex* vertices, unsigned int vert_count,
-                              unsigned long* indices, unsigned int index_count)=0;
+                              unsigned int* indices, unsigned int index_count)=0;
     virtual void RegisterTexture()=0;
     virtual bool RegisterShader(ShaderResource* program,
                                 WCHAR* vertex_filename, WCHAR* pixel_filename)=0;

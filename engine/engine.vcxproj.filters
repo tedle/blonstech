@@ -19,6 +19,9 @@
     <Filter Include="External Files">
       <UniqueIdentifier>{9e210979-2666-42ca-bb58-861ec5f6b0f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External Files\SOIL2">
+      <UniqueIdentifier>{023ca721-3dab-4870-974a-66be026948d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -65,6 +68,24 @@
     </ClCompile>
     <ClCompile Include="glfuncloader.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="external\SOIL2\etc1_utils.c">
+      <Filter>External Files\SOIL2</Filter>
+    </ClCompile>
+    <ClCompile Include="external\SOIL2\image_DXT.c">
+      <Filter>External Files\SOIL2</Filter>
+    </ClCompile>
+    <ClCompile Include="external\SOIL2\image_helper.c">
+      <Filter>External Files\SOIL2</Filter>
+    </ClCompile>
+    <ClCompile Include="external\SOIL2\SOIL2.c">
+      <Filter>External Files\SOIL2</Filter>
+    </ClCompile>
+    <ClCompile Include="external\SOIL2\stb_image.c">
+      <Filter>External Files\SOIL2</Filter>
+    </ClCompile>
+    <ClCompile Include="external\SOIL2\stb_image_write.c">
+      <Filter>External Files\SOIL2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +142,54 @@
     </ClInclude>
     <ClInclude Include="glfuncloader.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\etc1_utils.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\image_DXT.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\image_helper.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\pkm_helper.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\pvr_helper.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\SOIL2.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stb_image.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stb_image_write.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stbi_DDS.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stbi_DDS_c.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stbi_ext.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stbi_ext_c.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stbi_pkm.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stbi_pkm_c.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stbi_pvr.h">
+      <Filter>External Files\SOIL2</Filter>
+    </ClInclude>
+    <ClInclude Include="external\SOIL2\stbi_pvr_c.h">
+      <Filter>External Files\SOIL2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

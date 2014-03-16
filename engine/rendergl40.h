@@ -11,18 +11,22 @@
 #include <fstream>
 // Local Includes
 #include "glfuncloader.h"
+// OpenGL image loader
+#include "external\SOIL2\SOIL2.h"
 #include "math.h"
 #include "render.h"
 
 class BufferResourceGL40 : public BufferResource
 {
 public:
-    //ID3D11Buffer* p;
+    GLuint buffer_, vertex_array_id_;
+    enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
 };
 
 class TextureResourceGL40 : public TextureResource
 {
 public:
+    GLuint texture_, texture_unit_;
     //ID3D11ShaderResourceView* p;
 };
 
@@ -32,12 +36,6 @@ public:
     GLuint program_;
     GLuint vertex_shader_;
     GLuint frag_shader_;
-    /*
-    ID3D11VertexShader* vertex_shader_;
-    ID3D11PixelShader* pixel_shader_;
-    ID3D11InputLayout* layout_;
-    ID3D11Buffer* matrix_buffer_;
-    ID3D11SamplerState* sampler_state_;*/
 };
 
 
@@ -64,7 +62,7 @@ public:
 
     bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                       Vertex* vertices, unsigned int vert_count,
-                      unsigned long* indices, unsigned int index_count);
+                      unsigned int* indices, unsigned int index_count);
     void RegisterTexture();
     bool RegisterShader(ShaderResource* program,
                         WCHAR* vertex_filename, WCHAR* pixel_filename);

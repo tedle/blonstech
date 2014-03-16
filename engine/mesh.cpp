@@ -75,22 +75,19 @@ bool Mesh::Init(WCHAR* filename)
         return false;
     }
 
-    Vertex* vertices;
-    unsigned long* indices;
-
     vertex_buffer_ = std::unique_ptr<BufferResource>(new BufferResource);
     index_buffer_  = std::unique_ptr<BufferResource>(new BufferResource);
 
     // 3 vertices for every tri
     vertex_count_ = index_count_ = mesh_info.face_count * 3;
 
-    vertices = new Vertex[vertex_count_];
+    std::unique_ptr<Vertex[]> vertices(new Vertex[vertex_count_]);
     if (!vertices)
     {
         return false;
     }
 
-    indices = new unsigned long[index_count_];
+    std::unique_ptr<unsigned int[]>indices(new unsigned int[index_count_]);
     if (!indices)
     {
         return false;
@@ -111,14 +108,11 @@ bool Mesh::Init(WCHAR* filename)
         indices[i] = i;
     }
 
-    if (!g_render->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), vertices, vertex_count_,
-                                indices, index_count_))
+    if (!g_render->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), vertices.get(), vertex_count_,
+                                indices.get(), index_count_))
     {
         return false;
     }
-
-    delete [] vertices;
-    delete [] indices;
 
     return true;
 }

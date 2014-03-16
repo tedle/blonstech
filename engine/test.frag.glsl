@@ -1,11 +1,16 @@
 #version 400
 
 // Ins n outs
-in vec3 colour;
+in vec2 tex_coord;
 
-out vec4 output_col;
+out vec4 frag_colour;
+
+// Globals
+uniform sampler2D shader_texture;
 
 void main(void)
 {
-    output_col = vec4(colour, 1.0f);
+    vec4 texture_col = texture(shader_texture, tex_coord);
+    frag_colour = texture_col;
+    //frag_colour = vec4(0.0, 1.0, 0.0, 1.0);
 }

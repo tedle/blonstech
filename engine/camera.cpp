@@ -19,6 +19,7 @@ void Camera::SetPos(float x, float y, float z)
 
 void Camera::SetRot(float pitch, float yaw, float roll)
 {
+    // TODO: rot_ % 2pi
     rot_ = Vector3(pitch, yaw, roll);
 
     return;

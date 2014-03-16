@@ -20,19 +20,27 @@ bool Client::Init()
 
     input_ = std::unique_ptr<Input>(new Input);
     if (input_ == nullptr)
+    {
         return false;
+    }
 
     // Do what the implementation needs to get started
     if (!input_->Init())
+    {
         return false;
+    }
 
     graphics_ = std::unique_ptr<Graphics>(new Graphics);
     if (graphics_ == nullptr)
+    {
         return false;
+    }
 
     // Figure out all that directy stuff
     if (!graphics_->Init(screen_width, screen_height, hwnd_))
+    {
         return false;
+    }
 
     return true;
 }
@@ -70,10 +78,16 @@ void Client::Run()
 
         // Is someone trying to X out
         if (msg.message == WM_QUIT)
+        {
             quit = true;
+        }
         else
+        {
             if (!Frame())
+            {
                 quit = true;
+            }
+        }
     }
 }
 

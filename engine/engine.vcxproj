@@ -79,6 +79,12 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="external\SOIL2\etc1_utils.c" />
+    <ClCompile Include="external\SOIL2\image_DXT.c" />
+    <ClCompile Include="external\SOIL2\image_helper.c" />
+    <ClCompile Include="external\SOIL2\SOIL2.c" />
+    <ClCompile Include="external\SOIL2\stb_image.c" />
+    <ClCompile Include="external\SOIL2\stb_image_write.c" />
     <ClCompile Include="glfuncloader.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="mesh.cpp" />
@@ -96,6 +102,22 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="external\SOIL2\etc1_utils.h" />
+    <ClInclude Include="external\SOIL2\image_DXT.h" />
+    <ClInclude Include="external\SOIL2\image_helper.h" />
+    <ClInclude Include="external\SOIL2\pkm_helper.h" />
+    <ClInclude Include="external\SOIL2\pvr_helper.h" />
+    <ClInclude Include="external\SOIL2\SOIL2.h" />
+    <ClInclude Include="external\SOIL2\stbi_DDS.h" />
+    <ClInclude Include="external\SOIL2\stbi_DDS_c.h" />
+    <ClInclude Include="external\SOIL2\stbi_ext.h" />
+    <ClInclude Include="external\SOIL2\stbi_ext_c.h" />
+    <ClInclude Include="external\SOIL2\stbi_pkm.h" />
+    <ClInclude Include="external\SOIL2\stbi_pkm_c.h" />
+    <ClInclude Include="external\SOIL2\stbi_pvr.h" />
+    <ClInclude Include="external\SOIL2\stbi_pvr_c.h" />
+    <ClInclude Include="external\SOIL2\stb_image.h" />
+    <ClInclude Include="external\SOIL2\stb_image_write.h" />
     <ClInclude Include="glfuncloader.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="mesh.h" />
