@@ -115,7 +115,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="test.frag.fx" />
+    <None Include="test.frag.glsl" />
     <None Include="test.vert.fx" />
+    <None Include="test.vert.glsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -100,10 +100,12 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
 
     video_card_memory_ = (int)(adapter_desc.DedicatedVideoMemory / 1024 / 1024);
 
-    if (wcstombs_s(&string_len, video_card_desc_, 128, adapter_desc.Description, 128))
+    char temp_desc[128];
+    if (wcstombs_s(&string_len, temp_desc, 128, adapter_desc.Description, 128))
     {
         return false;
     }
+    video_card_desc_ = temp_desc;
 
     // Clean up some mamorie
     delete [] display_modes;
@@ -717,7 +719,7 @@ Matrix RenderD3D11::GetOrthoMatrix()
 
 void RenderD3D11::GetVideoCardInfo(char* name, int& memory)
 {
-    strcpy_s(name, 128, video_card_desc_);
+    strcpy_s(name, 128, video_card_desc_.c_str());
     memory = video_card_memory_;
     return;
 }
@@ -749,7 +751,9 @@ void RenderD3D11::OutputShaderErrorMessage(ID3D10Blob* error_message)
     fout.open("shader.log");
 
     for (unsigned int i = 0; i < buffer_size; i++)
+    {
         fout << compile_errors[i];
+    }
 
     fout.close();
 

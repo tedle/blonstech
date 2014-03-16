@@ -12,7 +12,7 @@ Shader::~Shader()
 bool Shader::Init(HWND hwnd)
 {
     program_ = std::unique_ptr<ShaderResource>(new ShaderResource);
-    return InitShader(hwnd, L"test.vert.fx", L"test.frag.fx");
+    return InitShader(hwnd, L"test.vert.glsl", L"test.frag.glsl");
 }
 
 void Shader::Finish()

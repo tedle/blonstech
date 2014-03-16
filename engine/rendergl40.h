@@ -5,6 +5,7 @@
 #pragma comment(lib, "opengl32.lib")
 
 // Includes
+#include <memory>
 #include <Windows.h>
 #include <gl/GL.h>
 #include <fstream>
@@ -28,6 +29,9 @@ public:
 class ShaderResourceGL40 : public ShaderResource
 {
 public:
+    GLuint program_;
+    GLuint vertex_shader_;
+    GLuint frag_shader_;
     /*
     ID3D11VertexShader* vertex_shader_;
     ID3D11PixelShader* pixel_shader_;
@@ -80,9 +84,10 @@ public:
     TextureResource* LoadDDSFile(WCHAR* filename);
 
 private:
+    void LogCompileErrors(GLuint resource, bool is_shader);
     bool vsync_;
     int video_card_memory_;
-    char video_card_desc_[128];
+    std::string video_card_desc_;
     Matrix proj_matrix_;
     Matrix ortho_matrix_;
 

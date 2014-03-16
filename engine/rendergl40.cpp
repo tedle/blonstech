@@ -9,7 +9,7 @@ RenderGL40::~RenderGL40()
 }
 
 bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd,
-                      bool fullscreen, float depth, float near)
+                      bool fullscreen, float screen_depth, float screen_near)
 {
 
     // Defining the pixel format we want OpenGL to use
@@ -120,10 +120,43 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
 
     wglMakeCurrent(device_context_, render_context_);
     wglDeleteContext(dummy_render_context);
+    ReleaseDC(dummy_hwnd, dummy_device_context);
     DestroyWindow(dummy_hwnd);
 
     // Finally load the rest of our functions
     if (LoadGLFunctions().size() > 0)
+    {
+        return false;
+    }
+
+    // Projection matrix (3D space->2D screen)
+    float fov = kPi / 4.0f;
+    float screen_aspect = (float)screen_width / (float)screen_height;
+
+    proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, screen_near, screen_depth);
+
+    // Ortho projection matrix (for 2d stuff, shadow maps, etc)
+    ortho_matrix_ = MatrixOrthographic((float)screen_width, (float)screen_height, screen_near, screen_depth);
+
+    // Grab video card info
+    video_card_desc_ = (char*)glGetString(GL_VENDOR);
+    video_card_desc_ += " ";
+    video_card_desc_ += (char*)glGetString(GL_RENDERER);
+    // This isn't supported in OpenGL
+    video_card_memory_ = 0;
+
+    // Enable depth testing, with a default of 1.0
+    glClearDepth(1.0);
+    glEnable(GL_DEPTH_TEST);
+
+    // Configure how we render tris
+    glEnable(GL_CULL_FACE);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+
+    // Configure vsync (please be false)
+    vsync_ = vsync;
+    if (!wglSwapIntervalEXT(vsync))
     {
         return false;
     }
@@ -140,12 +173,13 @@ void RenderGL40::Finish()
 
 void RenderGL40::BeginScene()
 {
-
+    glClearColor(1.0, 0.0, 1.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void RenderGL40::EndScene()
 {
-
+    SwapBuffers(device_context_);
 }
 
 void* RenderGL40::CreateBufferResource()
@@ -193,7 +227,66 @@ void RenderGL40::RegisterTexture()
 bool RenderGL40::RegisterShader(ShaderResource* program,
                                 WCHAR* vertex_filename, WCHAR* pixel_filename)
 {
-    return false;
+    ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
+
+    // Load the shader files into memory
+    std::ifstream vert_file(vertex_filename, std::ios::binary);
+    vert_file.imbue(std::locale("C"));
+    std::string vert_bytes((std::istreambuf_iterator<char>(vert_file)), 
+                            std::istreambuf_iterator<char>());
+    vert_file.close();
+    std::ifstream frag_file(pixel_filename, std::ios::binary);
+    frag_file.imbue(std::locale("C"));
+    std::string frag_bytes((std::istreambuf_iterator<char>(frag_file)), 
+                            std::istreambuf_iterator<char>());
+    frag_file.close();
+    if (!vert_bytes.size() || !frag_bytes.size())
+    {
+        return false;
+    }
+
+    // Initialize and compile the shaders
+    shader->vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
+    shader->frag_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
+    const char* vb = vert_bytes.data();
+    const char* fb = frag_bytes.data();
+    glShaderSource(shader->vertex_shader_, 1, &vb, nullptr);
+    glShaderSource(shader->frag_shader_, 1, &fb, nullptr);
+    glCompileShader(shader->vertex_shader_);
+    glCompileShader(shader->frag_shader_);
+
+    // Check that everything went OK
+    int vert_result, frag_result;
+    glGetShaderiv(shader->vertex_shader_, GL_COMPILE_STATUS, &vert_result);
+    if (!vert_result)
+    {
+        LogCompileErrors(shader->vertex_shader_, true);
+        return false;
+    }
+    glGetShaderiv(shader->frag_shader_, GL_COMPILE_STATUS, &frag_result);
+    if (!frag_result)
+    {
+        LogCompileErrors(shader->frag_shader_, true);
+        return false;
+    }
+
+    // Take our shaders and turn it into a render pipeline
+    shader->program_ = glCreateProgram();
+    glAttachShader(shader->program_, shader->vertex_shader_);
+    glAttachShader(shader->program_, shader->frag_shader_);
+    glBindAttribLocation(shader->program_, 0, "input_pos");
+    glBindAttribLocation(shader->program_, 1, "input_col");
+    glLinkProgram(shader->program_);
+
+    // Check that everything went OK
+    int link_result;
+    glGetProgramiv(shader->program_, GL_LINK_STATUS, &link_result);
+    if (!link_result)
+    {
+        LogCompileErrors(shader->program_, true);
+    }
+
+    return true;
 }
 
 void RenderGL40::RenderShader(ShaderResource* program, int index_count)
@@ -222,12 +315,44 @@ Matrix RenderGL40::GetOrthoMatrix()
     return ortho_matrix_;
 }
 
-void RenderGL40::GetVideoCardInfo(char* buffer, int& len_buffer)
+void RenderGL40::GetVideoCardInfo(char* name, int& memory)
 {
-
+    strcpy_s(name, 128, video_card_desc_.c_str());
+    memory = video_card_memory_;
+    return;
 }
 
 TextureResource* RenderGL40::LoadDDSFile(WCHAR* filename)
 {
     return nullptr;
+}
+
+void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
+{
+    // Grab the compile errors
+    int buffer_size;
+    if (is_shader)
+    {
+        glGetShaderiv(resource, GL_INFO_LOG_LENGTH, &buffer_size);
+    }
+    else
+    {
+        glGetProgramiv(resource, GL_INFO_LOG_LENGTH, &buffer_size);
+    }
+    buffer_size++;
+    std::unique_ptr<char[]> compile_errors(new char[buffer_size]);
+    if (is_shader)
+    {
+        glGetShaderInfoLog(resource, buffer_size, nullptr, compile_errors.get());
+    }
+    else
+    {
+        glGetProgramInfoLog(resource, buffer_size, nullptr, compile_errors.get());
+    }
+    // Write 'em to disk
+    std::ofstream fout("shader.log");
+    fout.write(compile_errors.get(), buffer_size);
+    fout.close();
+
+    return;
 }

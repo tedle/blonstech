@@ -130,5 +130,11 @@
     <None Include="test.frag.fx">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="test.vert.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="test.frag.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

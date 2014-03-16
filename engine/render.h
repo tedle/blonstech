@@ -3,6 +3,7 @@
 
 // Includes
 #include <memory>
+#include <string>
 #include <Windows.h>
 // Local Includes
 #include "external\DDSTextureLoader.h"
@@ -68,7 +69,7 @@ public:
 private:
     bool vsync_;
     int video_card_memory_;
-    char video_card_desc_[128];
+    std::string video_card_desc_;
     Matrix proj_matrix_;
     Matrix ortho_matrix_;
 };

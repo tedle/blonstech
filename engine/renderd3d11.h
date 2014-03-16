@@ -87,7 +87,7 @@ private:
     void OutputShaderErrorMessage(ID3D10Blob*);
     bool vsync_;
     int video_card_memory_;
-    char video_card_desc_[128];
+    std::string video_card_desc_;
     Matrix proj_matrix_;
     Matrix ortho_matrix_;
 
