@@ -19,8 +19,12 @@ void Camera::SetPos(float x, float y, float z)
 
 void Camera::SetRot(float pitch, float yaw, float roll)
 {
-    // TODO: rot_ % 2pi
     rot_ = Vector3(pitch, yaw, roll);
+
+    // Prevent the impossible scenario of the rotational vector overflowing someday
+    rot_.x = fmod(rot_.x, kPi*100.0);
+    rot_.y = fmod(rot_.y, kPi*100.0);
+    rot_.z = fmod(rot_.z, kPi*100.0);
 
     return;
 }

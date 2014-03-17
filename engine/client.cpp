@@ -101,15 +101,17 @@ bool Client::Frame()
     }
 
     // TODO: THIS IS TEMP DELETE LATER
+    // Handles mouselook and wasd movement
+    noclip(input_.get(), graphics_->GetCamera());
     //move_camera_around_origin(1.0f, graphics_->GetCamera());
-    if (input_->IsKeyDown('A'))
+    /*if (input_->IsKeyDown('A'))
     {
         move_camera_around_origin(-1.0f, graphics_->GetCamera());
     }
     if (input_->IsKeyDown('D'))
     {
         move_camera_around_origin(1.0f, graphics_->GetCamera());
-    }
+    }*/
     // END TEMP
 
     // Render scene
@@ -249,6 +251,29 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
     case WM_KEYUP:
         input_->KeyUp((unsigned int)wparam);
         return 0;
+    case WM_MOUSEMOVE:
+        if (wparam & MK_LBUTTON)
+        {
+            input_->MouseDown(0);
+        }
+        else
+        {
+            input_->MouseUp(0);
+        }
+        if (wparam & MK_RBUTTON)
+        {
+            input_->MouseDown(1);
+        }
+        else
+        {
+            input_->MouseUp(1);
+        }
+        input_->MouseMove(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+        /*char msg[256];
+        sprintf_s(msg, "pos(%i,%i), delta(%i,%i), down(%i, %i)\n",
+                  input_->MouseX(), input_->MouseY(), input_->MouseDeltaX(), input_->MouseDeltaY(),
+                  input_->IsMouseDown(0), input_->IsMouseDown(1));
+        OutputDebugStringA(msg);*/
     default:
         return DefWindowProc(hwnd, umsg, wparam, lparam);
     }
