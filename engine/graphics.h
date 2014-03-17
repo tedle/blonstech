@@ -3,6 +3,7 @@
 
 // Includes
 #include <memory>
+#include <vector>
 #include <Windows.h>
 // Local Includes
 #include "renderd3d11.h"
@@ -38,8 +39,8 @@ private:
     bool Render();
 
     std::unique_ptr<Camera> camera_;
-    std::unique_ptr<Model>  model_;
     std::unique_ptr<Shader> shader_;
+    std::vector<std::unique_ptr<Model>>  models_;
 
 };
 

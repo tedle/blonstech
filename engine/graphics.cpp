@@ -7,7 +7,6 @@ Graphics::Graphics()
     g_render = nullptr;
 
     camera_ = nullptr;
-    model_ = nullptr;
     shader_ = nullptr;
 }
 
@@ -42,18 +41,31 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
     camera_->SetPos(0.0f, 0.0f, -10.0f);
 
-    // Model
-    model_ = std::unique_ptr<Model>(new Model);
-    if (model_ == nullptr)
+    // Model 1
+    models_.push_back(std::unique_ptr<Model>(new Model));
+    if (models_[0] == nullptr)
     {
         return false;
     }
 
-    if (!model_->Init(L"../notes/teapot_highpoly.mesh", L"../notes/me.dds"))
+    if (!models_[0]->Init(L"../notes/teapot_highpoly.mesh", L"../notes/me.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
+    // Model 2
+    models_.push_back(std::unique_ptr<Model>(new Model));
+    if (models_[1] == nullptr)
+    {
+        return false;
+    }
+
+    if (!models_[1]->Init(L"../notes/teapot_highpoly.mesh", L"../notes/me.dds"))
+    {
+        MessageBox(hwnd, L"Model die", L"help", MB_OK);
+        return false;
+    }
+    models_[1]->SetPos(10.0, 0.0, 10.0);
 
     // Shaders
     shader_ = std::unique_ptr<Shader>(new Shader);
@@ -73,9 +85,9 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
 void Graphics::Finish()
 {
-    if (model_)
+    for (auto const& model : models_)
     {
-        model_->Finish();
+        model->Finish();
     }
 
     if (shader_)
@@ -120,15 +132,18 @@ bool Graphics::Render()
     view_matrix       = camera_->GetViewMatrix();
     projection_matrix = g_render->GetProjectionMatrix();
 
-    // Prep the pipeline 4 drawering
-    model_->Render();
-    world_matrix = model_->GetWorldMatrix();
-
-    // Finally do the render
-    if (!shader_->Render(model_->GetIndexCount(), model_->GetTexture(),
-                         world_matrix, view_matrix, projection_matrix))
+    for (auto const& model : models_)
     {
-        return false;
+        // Prep the pipeline 4 drawering
+        model->Render();
+        world_matrix = model->GetWorldMatrix();
+
+        // Finally do the render
+        if (!shader_->Render(model->GetIndexCount(), model->GetTexture(),
+            world_matrix, view_matrix, projection_matrix))
+        {
+            return false;
+        }
     }
 
     // Swap buffers

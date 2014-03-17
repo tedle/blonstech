@@ -22,9 +22,9 @@ void Camera::SetRot(float pitch, float yaw, float roll)
     rot_ = Vector3(pitch, yaw, roll);
 
     // Prevent the impossible scenario of the rotational vector overflowing someday
-    rot_.x = fmod(rot_.x, kPi*100.0);
-    rot_.y = fmod(rot_.y, kPi*100.0);
-    rot_.z = fmod(rot_.z, kPi*100.0);
+    rot_.x = static_cast<float>(fmod(rot_.x, kPi*100.0));
+    rot_.y = static_cast<float>(fmod(rot_.y, kPi*100.0));
+    rot_.z = static_cast<float>(fmod(rot_.z, kPi*100.0));
 
     return;
 }
