@@ -49,13 +49,13 @@ bool Mesh::Init(WCHAR* filename)
     // The seems like the most efficient way to read a lot of data straight into a vector...
     // Kinda gross really
     mesh_info.vertices.resize(mesh_info.vertex_count);
-    vertices_read = fread(&mesh_info.vertices[0], sizeof(Vector3), mesh_info.vertex_count, file);
+    vertices_read = fread(mesh_info.vertices.data(), sizeof(Vector3), mesh_info.vertex_count, file);
 
     mesh_info.uvs.resize(mesh_info.uv_count);
-    uvs_read = fread(&mesh_info.uvs[0], sizeof(Vector2), mesh_info.uv_count, file);
+    uvs_read = fread(mesh_info.uvs.data(), sizeof(Vector2), mesh_info.uv_count, file);
 
     mesh_info.normals.resize(mesh_info.normal_count);
-    normals_read = fread(&mesh_info.normals[0], sizeof(Vector3), mesh_info.normal_count, file);
+    normals_read = fread(mesh_info.normals.data(), sizeof(Vector3), mesh_info.normal_count, file);
 
     // Allocate 3 uints per face for each type of mesh data supplied
     unsigned int face_size = 3 * (mesh_info.vertex_count > 0) +
@@ -100,7 +100,6 @@ bool Mesh::Init(WCHAR* filename)
         unsigned int face_offset = i * (face_size / 3);
         vertices[i].pos = mesh_info.vertices[mesh_info.faces[face_offset]  -1];
         vertices[i].tex = mesh_info.uvs     [mesh_info.faces[face_offset+1]-1];
-        Vector3 test = vertices[i].pos;
     }
 
     for (int i = 0; i < index_count_; i++)
