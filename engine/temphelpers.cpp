@@ -16,7 +16,7 @@ void noclip(Input* input, Camera* camera)
     // Welcome to the hackiest no clip wasd movement u ever see
     if (GetTickCount() > last_move + 10)
     {
-        float velocity = 0.2f;
+        float velocity = 0.5f;
         if (input->IsKeyDown(VK_SHIFT))
         {
             velocity *= 0.25f;
@@ -68,11 +68,11 @@ void noclip(Input* input, Camera* camera)
         new_z += velocity * cos(yaw) * hacky * (float)(lr!=0);
 
         // in case we wanna go up/down w/o flailing mouse around
-        if (input->IsKeyDown('Q'))
+        if (input->IsKeyDown('E'))
         {
             new_y += velocity;
         }
-        if (input->IsKeyDown('E'))
+        if (input->IsKeyDown('Q'))
         {
             new_y -= velocity;
         }

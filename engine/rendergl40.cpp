@@ -157,9 +157,10 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
     glEnable(GL_DEPTH_TEST);
 
     // Configure how we render tris
-    glEnable(GL_CULL_FACE);
+    // TODO: re enable back face cullin
+    /*glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
+    glCullFace(GL_BACK);*/
 
     // Configure vsync (please be false)
     vsync_ = vsync;

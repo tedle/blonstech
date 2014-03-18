@@ -56,7 +56,7 @@ class Model:
         for line in f.readlines()+["o"]:
             data = line.split()
             head = data[0] if len(data) > 0 else ""
-            if head == "o" and split_mesh is True:
+            if (head == "o" or head == "g") and split_mesh is True:
                 if len(self.faces) > 0:
                     save_name = "{}_{}.mesh".format(obj_name, mesh_count)
                     with open(obj_name + ".csv", "a") as csv:
@@ -168,7 +168,7 @@ class Model:
 
 if __name__ == "__main__":
     m = Model()
-    m.LoadOBJ("../notes/codtest/codmap.obj", True)
+    m.LoadOBJ("../notes/sponza/sponza.obj", False)
     # print "Verts:"
     # for vert in m.vertices:
     #     print [vert.x, vert.y, vert.z]
@@ -186,4 +186,4 @@ if __name__ == "__main__":
                                                 len(m.texcoords),
                                                 len(m.normals),
                                                 len(m.faces))
-    #m.SaveMesh("../notes/codtest/codmap_whole.mesh")
+    m.SaveMesh("../notes/sponza/sponza.mesh")

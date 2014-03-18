@@ -48,26 +48,26 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[0]->Init("../notes/teapot_highpoly.mesh", "../notes/me.dds"))
+    if (!models_[0]->Init("../notes/teapot_highpoly.mesh", "../notes/white.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
     models_[0]->SetPos(0.0, 0.0, 20.0);
-    /* Model 2
+    // Model 2
     models_.push_back(std::unique_ptr<Model>(new Model));
     if (models_[1] == nullptr)
     {
         return false;
     }
 
-    if (!models_[1]->Init(L"../notes/codmap.mesh", L"../notes/me.dds"))
+    if (!models_[1]->Init("../notes/sponza/sponza.mesh", "../notes/white.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
-    models_[1]->SetPos(0.0, 0.0, 0.0);*/
-    models_ = load_codmap("../notes/codtest", std::move(models_));
+    models_[1]->SetPos(0.0, 0.0, 0.0);
+    //models_ = load_codmap("../notes/castletest", std::move(models_));
 
     // Shaders
     shader_ = std::unique_ptr<Shader>(new Shader);
