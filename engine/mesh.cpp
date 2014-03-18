@@ -8,7 +8,7 @@ Mesh::~Mesh()
 {
 }
 
-bool Mesh::Init(const char* filename)
+bool Mesh::Init(const char* filename, bool invert_y)
 {
     FILE* file;
     fopen_s(&file, filename, "rb");
@@ -100,6 +100,10 @@ bool Mesh::Init(const char* filename)
         unsigned int face_offset = i * (face_size / 3);
         vertices[i].pos = mesh_info.vertices[mesh_info.faces[face_offset]  -1];
         vertices[i].tex = mesh_info.uvs     [mesh_info.faces[face_offset+1]-1];
+        if (invert_y)
+        {
+            vertices[i].tex.y = 1.0f - vertices[i].tex.y;
+        }
     }
 
     for (int i = 0; i < index_count_; i++)

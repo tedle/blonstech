@@ -78,7 +78,7 @@ bool Model::InitMesh(const char* filename)
         return false;
     }
 
-    if (!mesh_->Init(filename))
+    if (!mesh_->Init(filename, true))
     {
         return false;
     }

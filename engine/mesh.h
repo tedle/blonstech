@@ -23,7 +23,7 @@ public:
     Mesh();
     ~Mesh();
 
-    bool Init(const char* filename);
+    bool Init(const char* filename, bool invert_y);
     void Finish();
 
     BufferResource* GetVertexBuffer();
