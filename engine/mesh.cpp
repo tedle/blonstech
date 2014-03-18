@@ -98,7 +98,7 @@ bool Mesh::Init(const char* filename, bool invert_y)
     std::map<Vertex, unsigned int> vert_lookup;
 
     // Loads about 20x slower, but +10%~ perf and -50%~ memory
-    bool vbo_indexing = false;
+    bool vbo_indexing = true;
 
     for (int i = 0; i < vertex_count_; i++)
     {

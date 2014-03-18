@@ -83,7 +83,7 @@ class Model:
                 if len(data) < 4:
                     raise ValueError("Missing face value")
 
-                for i in data[1:]:
+                for i in data[1:4]:
                     i = i.split('/')
                     l = len(i)
 
@@ -100,6 +100,35 @@ class Model:
                     if len(self.normals):
                         norm.append(int(i[2]))
                 self.faces.append(Face(vert, tex, norm))
+                # Check if it's a rude quad
+                if len(data) > 4:
+                    # Build another tri
+                    i = data[4].split('/')
+                    l = len(i)
+
+                    if l < 1 or i[0] == "":
+                        raise ValueError("Face missing vertices")
+                    if l < 2 or i[1] == "":
+                        self.texcoords = list()
+                    if l < 3 or i[2] == "":
+                        self.normals = list()
+
+                    # Getting copies is a pain
+                    old = self.faces[-1]
+                    new_tri = Face(old.vert[:], old.tex[:], old.norm[:])
+
+                    # Replace vert[1] with new vert
+                    # Swap to fix winding
+                    new_tri.vert[0], new_tri.vert[1] = \
+                        int(i[0]), new_tri.vert[0]
+                    if len(self.texcoords):
+                        new_tri.tex[0], new_tri.tex[1] = \
+                            int(i[1]), new_tri.tex[0]
+                    if len(self.normals):
+                        new_tri.norm[0], new_tri.norm[1] = \
+                            int(i[2]), new_tri.norm[0]
+                    self.faces.append(new_tri)
+
         return
 
     def LoadCollada(self, filename):
