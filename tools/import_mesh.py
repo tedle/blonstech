@@ -1,6 +1,6 @@
 # TODO: Resolve duplicate data
 
-import struct
+import os, struct
 
 
 class Vec3:
@@ -32,18 +32,41 @@ class Model:
         self.texcoords = list()
         self.normals = list()
         self.faces = list()
+        # Expected texture, if found
+        self.material = ""
+        # Used for splitting objects into separate meshes
+        self.offset = Face(0, 0, 0)
         return
 
-    def LoadOBJ(self, filename):
+    def LoadOBJ(self, filename, split_mesh=False):
         try:
             f = open(filename, 'r')
         except:
             print "Object file not found"
             return
-        for line in f.readlines():
+        # For split mesh mode
+        mesh_count = 1
+        obj_name = filename.rsplit(".", 1)[0]
+        if split_mesh is True:
+            try:
+                os.remove(obj_name + ".csv")
+            except:
+                pass
+        # Append "o" to ensure all objects are written out in mesh split mode
+        for line in f.readlines()+["o"]:
             data = line.split()
             head = data[0] if len(data) > 0 else ""
-            if head == "v":
+            if head == "o" and split_mesh is True:
+                if len(self.faces) > 0:
+                    save_name = "{}_{}.mesh".format(obj_name, mesh_count)
+                    with open(obj_name + ".csv", "a") as csv:
+                        csv.write("{},{}\n".format(save_name.split("/")[-1],
+                                                   self.material))
+                    self.SaveMesh(save_name)
+                    mesh_count += 1
+            elif head == "usemtl":
+                self.material = data[1]
+            elif head == "v":
                 vert = Vec3(*map(float, data[1:4]))
                 self.vertices.append(vert)
             elif head == "vt":
@@ -93,6 +116,15 @@ class Model:
         mod_2f = "=ff"
         mod_3f = "=fff"
 
+        # Adjust for offset in file
+        for face in self.faces:
+            for i in xrange(3):
+                face.vert[i] = face.vert[i] - self.offset.vert
+                if len(self.texcoords):
+                    face.tex[i] = face.tex[i] - self.offset.tex
+                if len(self.normals):
+                    face.norm[i] = face.norm[i] - self.offset.norm
+
         # Output vert, uv, normal, and face counts
         f.write(struct.pack(mod_ui, len(self.vertices)))
         f.write(struct.pack(mod_ui, len(self.texcoords)))
@@ -121,11 +153,22 @@ class Model:
                     f.write(struct.pack(mod_ui, face.norm[i]))
 
         f.close()
+
+        # Record new offset
+        self.offset.vert = self.offset.vert + len(self.vertices)
+        self.offset.tex = self.offset.tex + len(self.texcoords)
+        self.offset.norm = self.offset.norm + len(self.normals)
+        # Reset our mesh data
+        del self.vertices[:]
+        del self.texcoords[:]
+        del self.normals[:]
+        del self.faces[:]
+        self.material = ""
         return
 
 if __name__ == "__main__":
     m = Model()
-    m.LoadOBJ("../notes/teapot_highpoly.obj")
+    m.LoadOBJ("../notes/codtest/codmap.obj", True)
     # print "Verts:"
     # for vert in m.vertices:
     #     print [vert.x, vert.y, vert.z]
@@ -143,4 +186,4 @@ if __name__ == "__main__":
                                                 len(m.texcoords),
                                                 len(m.normals),
                                                 len(m.faces))
-    m.SaveMesh("../notes/teapot_highpoly.mesh")
+    #m.SaveMesh("../notes/codtest/codmap_whole.mesh")
