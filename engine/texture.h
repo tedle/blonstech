@@ -12,7 +12,7 @@ public:
     Texture();
     ~Texture();
 
-    bool Init(WCHAR*);
+    bool Init(const char* filename);
     void Finish();
 
     TextureResource* GetTexture();

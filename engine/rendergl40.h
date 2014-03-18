@@ -79,7 +79,7 @@ public:
     void GetVideoCardInfo(char* buffer, int& len_buffer);
 
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
-    TextureResource* LoadDDSFile(WCHAR* filename);
+    TextureResource* LoadDDSFile(const char* filename);
 
 private:
     void LogCompileErrors(GLuint resource, bool is_shader);

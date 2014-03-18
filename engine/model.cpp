@@ -12,7 +12,7 @@ Model::~Model()
 {
 }
 
-bool Model::Init(WCHAR* mesh_filename, WCHAR* texture_filename)
+bool Model::Init(const char* mesh_filename, const char* texture_filename)
 {
     if (!InitMesh(mesh_filename))
     {
@@ -69,7 +69,7 @@ void Model::SetPos(float x, float y, float z)
     pos_ = Vector3(x, y, z);
 }
 
-bool Model::InitMesh(WCHAR* filename)
+bool Model::InitMesh(const char* filename)
 {
     mesh_ = std::unique_ptr<Mesh>(new Mesh);
 
@@ -95,7 +95,7 @@ void Model::FinishMesh()
     return;
 }
 
-bool Model::InitTexture(WCHAR* filename)
+bool Model::InitTexture(const char* filename)
 {
     texture_ = std::unique_ptr<Texture>(new Texture);
 

@@ -9,7 +9,7 @@ Texture::~Texture()
 {
 }
 
-bool Texture::Init(WCHAR* filename)
+bool Texture::Init(const char* filename)
 {
     texture_ = std::unique_ptr<TextureResource>(g_render->LoadDDSFile(filename));
 

@@ -48,13 +48,13 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[0]->Init(L"../notes/teapot_highpoly.mesh", L"../notes/me.dds"))
+    if (!models_[0]->Init("../notes/teapot_highpoly.mesh", "../notes/me.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
     models_[0]->SetPos(0.0, 0.0, 20.0);
-    // Model 2
+    /* Model 2
     models_.push_back(std::unique_ptr<Model>(new Model));
     if (models_[1] == nullptr)
     {
@@ -66,7 +66,8 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
-    models_[1]->SetPos(0.0, 0.0, 0.0);
+    models_[1]->SetPos(0.0, 0.0, 0.0);*/
+    models_ = load_codmap("../notes/codtest", std::move(models_));
 
     // Shaders
     shader_ = std::unique_ptr<Shader>(new Shader);

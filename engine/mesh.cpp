@@ -8,10 +8,10 @@ Mesh::~Mesh()
 {
 }
 
-bool Mesh::Init(WCHAR* filename)
+bool Mesh::Init(const char* filename)
 {
     FILE* file;
-    _wfopen_s(&file, filename, L"rb");
+    fopen_s(&file, filename, "rb");
     if (file == nullptr)
     {
         return false;

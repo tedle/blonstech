@@ -12,6 +12,7 @@
 #include "camera.h"
 #include "model.h"
 #include "shader.h"
+#include "temphelpers.h"
 
 const int kRenderModeFullscreen       = 1;
 const int kRenderModeWindow           = 2;

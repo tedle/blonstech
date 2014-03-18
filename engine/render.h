@@ -63,7 +63,7 @@ public:
     virtual void GetVideoCardInfo(char* buffer, int& len_buffer)=0;
 
     // TODO: do this MANULLY in texture class later
-    virtual TextureResource* LoadDDSFile(WCHAR* filename)=0;
+    virtual TextureResource* LoadDDSFile(const char* filename)=0;
 
 private:
     bool vsync_;

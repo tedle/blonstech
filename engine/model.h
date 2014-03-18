@@ -15,7 +15,7 @@ public:
     Model();
     ~Model();
 
-    bool Init(WCHAR* mesh_filename, WCHAR* texture_filename);
+    bool Init(const char* mesh_filename, const char* texture_filename);
     void Finish();
     void Render();
 
@@ -27,10 +27,10 @@ public:
     void SetPos(float x, float y, float z);
 
 private:
-    bool InitMesh(WCHAR* filename);
+    bool InitMesh(const char* filename);
     void FinishMesh();
 
-    bool InitTexture(WCHAR* filename);
+    bool InitTexture(const char* filename);
     void FinishTexture();
 
     std::unique_ptr<Mesh> mesh_;

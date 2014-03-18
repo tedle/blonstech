@@ -7,8 +7,8 @@ void noclip(Input* input, Camera* camera)
     if (input->IsMouseDown(0))
     {
         Vector3 rot = camera->GetRot();
-        rot.x += input->MouseDeltaY() * 0.003;
-        rot.y += input->MouseDeltaX() * 0.003;
+        rot.x += input->MouseDeltaY() * 0.003f;
+        rot.y += input->MouseDeltaX() * 0.003f;
         camera->SetRot(rot.x, rot.y, 0.0);
     }
 
@@ -16,14 +16,14 @@ void noclip(Input* input, Camera* camera)
     // Welcome to the hackiest no clip wasd movement u ever see
     if (GetTickCount() > last_move + 10)
     {
-        float velocity = 0.2;
+        float velocity = 0.2f;
         if (input->IsKeyDown(VK_SHIFT))
         {
-            velocity *= 0.25;
+            velocity *= 0.25f;
         }
         if (input->IsKeyDown(VK_CONTROL))
         {
-            velocity *= 4.0;
+            velocity *= 4.0f;
         }
         last_move = GetTickCount();
         Vector3 pos = camera->GetPos();
@@ -49,20 +49,20 @@ void noclip(Input* input, Camera* camera)
         }
 
         // We do ud and lr separately because lr is NOT affected by pitch, but ud is
-        float yaw = atan2(0, ud) + rot.y;
+        float yaw = static_cast<float>(atan2(0, ud) + rot.y);
         float pitch = rot.x;
 
         // since im awful with math, this is how i make us not move faster when u/d + l/r are held together
-        float hacky = (lr == 0 ? 1.0 : 1.0 / sqrt(2));
+        float hacky = static_cast<float>(lr == 0 ? 1.0 : 1.0 / sqrt(2));
         // ud!=0 to make sure we dont move forward/back if only A/D are held
         float new_x = velocity * sin(yaw) * cos(pitch) * hacky * (float)(ud!=0);
-        float new_y = velocity * -1.0 * (float)ud * hacky * sin(pitch);
+        float new_y = velocity * -1.0f * (float)ud * hacky * sin(pitch);
         float new_z = velocity * cos(yaw) * cos(pitch) * hacky * (float)(ud!=0);
 
-        yaw = atan2(lr, 0) + rot.y;
+        yaw = static_cast<float>(atan2(lr, 0) + rot.y);
 
         // sorry, still bad at match
-        hacky = (ud == 0 ? 1.0 : 1.0 / sqrt(2));
+        hacky = static_cast<float>(ud == 0 ? 1.0 : 1.0 / sqrt(2));
         // lr!=0 to make sure we dont move left/right if only W/S are held
         new_x += velocity * sin(yaw) * hacky * (float)(lr!=0);
         new_z += velocity * cos(yaw) * hacky * (float)(lr!=0);
@@ -121,4 +121,57 @@ void FPS()
     }
     else
         fps_count++;
+}
+
+
+std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<std::unique_ptr<Model>> models)
+{
+    std::string csv_file = folder;
+    if (csv_file.back() != '/' && csv_file.back() != '\\')
+    {
+        csv_file += "/";
+    }
+    std::string mesh_folder = csv_file + "mesh/";
+    std::string tex_folder = csv_file + "tex/";
+    csv_file += "list.csv";
+    std::ifstream csv(csv_file.c_str(), std::ios::in);
+    if (!csv.is_open())
+    {
+        throw "csv open problem";
+    }
+    std::string line;
+    while (std::getline(csv, line))
+    {
+        std::string mesh_file = mesh_folder + line.substr(0, line.find(','));
+        std::string tex_file = tex_folder + line.substr(line.find(',')+1);
+        
+        if (mesh_file.size() == 0 || tex_file.size() == 0)
+        {
+            throw "csv read problem";
+        }
+
+        models.push_back(std::unique_ptr<Model>(new Model));
+        if (models.back() == nullptr)
+        {
+            throw "model problem";
+        }
+
+        if (!models.back()->Init(mesh_file.c_str(), tex_file.c_str()))
+        {
+            throw "other model problem";
+        }
+        models.back()->SetPos(0.0, 0.0, 0.0);
+    }
+    /*models.push_back(std::unique_ptr<Model>(new Model));
+    if (models[1] == nullptr)
+    {
+        throw "model problem";
+    }
+
+    if (!models[1]->Init(L"../notes/codmap.mesh", L"../notes/me.dds"))
+    {
+        throw "other model problem";
+    }
+    models[1]->SetPos(0.0, 0.0, 0.0);*/
+    return models;
 }

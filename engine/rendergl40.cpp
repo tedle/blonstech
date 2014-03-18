@@ -400,6 +400,7 @@ bool RenderGL40::SetShaderInputs(ShaderResource* program, TextureResource* textu
         return false;
     }
     glUniform1i(loc, tex->texture_unit_);
+    glBindTexture(GL_TEXTURE_2D, tex->texture_);
 
     return true;
 }
@@ -421,15 +422,10 @@ void RenderGL40::GetVideoCardInfo(char* name, int& memory)
     return;
 }
 
-TextureResource* RenderGL40::LoadDDSFile(WCHAR* filename)
+TextureResource* RenderGL40::LoadDDSFile(const char* filename)
 {
     TextureResourceGL40* texture = new TextureResourceGL40;
     texture->texture_unit_ = 0;
-
-    // Convert WCHAR filename to sane format
-    char fn[256];
-    unsigned int string_len;
-    wcstombs_s(&string_len, fn, 256, filename, 256);
 
 	// Set the texture unit in which to store the data.
 	glActiveTexture(GL_TEXTURE0 + texture->texture_unit_);
@@ -449,7 +445,7 @@ TextureResource* RenderGL40::LoadDDSFile(WCHAR* filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
     // Load the texture onto GPU
-    texture->texture_ = SOIL_load_OGL_texture(fn, 0, texture->texture_, SOIL_FLAG_DDS_LOAD_DIRECT);
+    texture->texture_ = SOIL_load_OGL_texture(filename, 0, texture->texture_, SOIL_FLAG_DDS_LOAD_DIRECT);
 
     // Re enable this for non-dds textures
 	// glGenerateMipmap(GL_TEXTURE_2D);
