@@ -2,6 +2,7 @@
 #define BLONSTECH_MESH_H_
 
 // Includes
+#include <map>
 #include <memory>
 #include <stdio.h>
 #include <vector>

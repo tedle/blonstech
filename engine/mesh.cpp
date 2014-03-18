@@ -81,8 +81,10 @@ bool Mesh::Init(const char* filename, bool invert_y)
     // 3 vertices for every tri
     vertex_count_ = index_count_ = mesh_info.face_count * 3;
 
-    std::unique_ptr<Vertex[]> vertices(new Vertex[vertex_count_]);
-    if (!vertices)
+    std::vector<Vertex> vertices;
+    vertices.reserve(vertex_count_);
+
+    if (vertices.max_size() < vertex_count_)
     {
         return false;
     }
@@ -93,25 +95,49 @@ bool Mesh::Init(const char* filename, bool invert_y)
         return false;
     }
 
-    for(int i = 0; i < vertex_count_; i++)
+    std::map<Vertex, unsigned int> vert_lookup;
+
+    // Loads about 20x slower, but +10%~ perf and -50%~ memory
+    bool vbo_indexing = false;
+
+    for (int i = 0; i < vertex_count_; i++)
     {
         // TODO: store normals
         // Each face_size is vert*uv*norm*3, we wanna loop once for each vert*uv*norm
         unsigned int face_offset = i * (face_size / 3);
-        vertices[i].pos = mesh_info.vertices[mesh_info.faces[face_offset]  -1];
-        vertices[i].tex = mesh_info.uvs     [mesh_info.faces[face_offset+1]-1];
+
+        Vertex new_vert;
+        new_vert.pos = mesh_info.vertices[mesh_info.faces[face_offset]  -1];
+        new_vert.tex = mesh_info.uvs     [mesh_info.faces[face_offset+1]-1];
         if (invert_y)
         {
-            vertices[i].tex.y = 1.0f - vertices[i].tex.y;
+            new_vert.tex.y = 1.0f - new_vert.tex.y;
+        }
+
+        if (vbo_indexing)
+        {
+            auto index_match = vert_lookup.find(new_vert);
+            if (index_match != vert_lookup.end())
+            {
+                indices[i] = index_match->second;
+            }
+            else
+            {
+                vertices.push_back(new_vert);
+                indices[i] = vertices.size() - 1;
+                vert_lookup[new_vert] = indices[i];
+            }
+        }
+        else
+        {
+            vertices.push_back(new_vert);
+            indices[i] = vertices.size()-1;
         }
     }
+    // Update vertex count to account for removed duplicates
+    vertex_count_ = vertices.size();
 
-    for (int i = 0; i < index_count_; i++)
-    {
-        indices[i] = i;
-    }
-
-    if (!g_render->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), vertices.get(), vertex_count_,
+    if (!g_render->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), vertices.data(), vertex_count_,
                                 indices.get(), index_count_))
     {
         return false;

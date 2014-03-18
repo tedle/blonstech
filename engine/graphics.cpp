@@ -48,7 +48,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[0]->Init("../notes/teapot_highpoly.mesh", "../notes/white.dds"))
+    if (!models_[0]->Init("../notes/teapot_highpoly.mesh", "../notes/me.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
@@ -61,7 +61,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[1]->Init("../notes/sponza/sponza.mesh", "../notes/white.dds"))
+    if (!models_[1]->Init("../notes/sponza/sponza.mesh", "../notes/me.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
