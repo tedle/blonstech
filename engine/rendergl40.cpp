@@ -447,7 +447,8 @@ TextureResource* RenderGL40::LoadDDSFile(const char* filename)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
     // Load the texture onto GPU
-    texture->texture_ = SOIL_load_OGL_texture(filename, 0, texture->texture_, SOIL_FLAG_DDS_LOAD_DIRECT);
+    texture->texture_ = SOIL_load_OGL_texture(filename, 0, texture->texture_,
+                                              SOIL_FLAG_DDS_LOAD_DIRECT | SOIL_FLAG_TEXTURE_REPEATS);
 
     // Re enable this for non-dds textures
 	// glGenerateMipmap(GL_TEXTURE_2D);

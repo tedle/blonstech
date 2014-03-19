@@ -1,6 +1,7 @@
 # TODO: Resolve duplicate data
 
-import os, struct
+import os
+import struct
 
 
 class Vec3:
@@ -45,6 +46,7 @@ class Model:
             print "Object file not found"
             return
         # For split mesh mode
+        prev_f = False
         mesh_count = 1
         obj_name = filename.rsplit(".", 1)[0]
         if split_mesh is True:
@@ -52,11 +54,12 @@ class Model:
                 os.remove(obj_name + ".csv")
             except:
                 pass
-        # Append "o" to ensure all objects are written out in mesh split mode
-        for line in f.readlines()+["o"]:
+        for line in f.readlines():
             data = line.split()
             head = data[0] if len(data) > 0 else ""
-            if (head == "o" or head == "g") and split_mesh is True:
+            if (head != "f" and head != "usemtl") \
+                    and prev_f is True and split_mesh is True:
+                prev_f = False
                 if len(self.faces) > 0:
                     save_name = "{}_{}.mesh".format(obj_name, mesh_count)
                     with open(obj_name + ".csv", "a") as csv:
@@ -76,6 +79,8 @@ class Model:
                 norm = Vec3(*map(float, data[1:4]))
                 self.normals.append(norm)
             elif head == "f":
+                prev_f = True
+
                 vert = list()
                 tex = list()
                 norm = list()
@@ -184,9 +189,9 @@ class Model:
         f.close()
 
         # Record new offset
-        self.offset.vert = self.offset.vert + len(self.vertices)
-        self.offset.tex = self.offset.tex + len(self.texcoords)
-        self.offset.norm = self.offset.norm + len(self.normals)
+        self.offset.vert += len(self.vertices)
+        self.offset.tex += len(self.texcoords)
+        self.offset.norm += len(self.normals)
         # Reset our mesh data
         del self.vertices[:]
         del self.texcoords[:]
@@ -197,7 +202,7 @@ class Model:
 
 if __name__ == "__main__":
     m = Model()
-    m.LoadOBJ("../notes/sponza/sponza.obj", False)
+    m.LoadOBJ("../notes/sponza/mesh/sponza.obj", True)
     # print "Verts:"
     # for vert in m.vertices:
     #     print [vert.x, vert.y, vert.z]
@@ -215,4 +220,4 @@ if __name__ == "__main__":
                                                 len(m.texcoords),
                                                 len(m.normals),
                                                 len(m.faces))
-    m.SaveMesh("../notes/sponza/sponza.mesh")
+    #m.SaveMesh("../notes/sponza/sponza.mesh")
