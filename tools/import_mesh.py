@@ -202,7 +202,7 @@ class Model:
 
 if __name__ == "__main__":
     m = Model()
-    m.LoadOBJ("../notes/sponza/mesh/sponza.obj", True)
+    m.LoadOBJ("cube2.obj", False)
     # print "Verts:"
     # for vert in m.vertices:
     #     print [vert.x, vert.y, vert.z]
@@ -220,4 +220,4 @@ if __name__ == "__main__":
                                                 len(m.texcoords),
                                                 len(m.normals),
                                                 len(m.faces))
-    #m.SaveMesh("../notes/sponza/sponza.mesh")
+    m.SaveMesh("cube_reference.mesh")

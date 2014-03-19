@@ -15,7 +15,7 @@ struct RawMesh
     unsigned int vertex_count, uv_count, normal_count, face_count;
     std::vector<Vector3> vertices, normals;
     std::vector<Vector2> uvs;
-    unsigned int* faces;
+    std::vector<unsigned int> faces;
 };
 
 class Mesh
@@ -34,7 +34,7 @@ public:
 
 private:
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
-    int vertex_count_, index_count_;
+    unsigned int vertex_count_, index_count_;
 };
 
 #endif

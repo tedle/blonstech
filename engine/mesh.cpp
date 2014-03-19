@@ -21,7 +21,7 @@ bool Mesh::Init(const char* filename, bool invert_y)
     size_t vertices_read, uvs_read, normals_read, faces_read;
 
     fseek(file, 0, SEEK_END);
-    unsigned int file_size = ftell(file);
+    size_t file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     // Get the header info
@@ -61,8 +61,8 @@ bool Mesh::Init(const char* filename, bool invert_y)
     unsigned int face_size = 3 * (mesh_info.vertex_count > 0) +
                              3 * (mesh_info.uv_count > 0) +
                              3 * (mesh_info.normal_count > 0);
-    mesh_info.faces = new unsigned int [mesh_info.face_count * face_size];
-    faces_read = fread(mesh_info.faces, sizeof(unsigned int)*face_size, mesh_info.face_count, file);
+    mesh_info.faces.resize(mesh_info.face_count * face_size);
+    faces_read = fread(mesh_info.faces.data(), sizeof(unsigned int)*face_size, mesh_info.face_count, file);
 
     // Trigger EOF
     fgetc(file);
@@ -100,7 +100,7 @@ bool Mesh::Init(const char* filename, bool invert_y)
     // Loads about 20x slower, but +10%~ perf and -50%~ memory
     bool vbo_indexing = true;
 
-    for (int i = 0; i < vertex_count_; i++)
+    for (unsigned int i = 0; i < vertex_count_; i++)
     {
         // TODO: store normals
         // Each face_size is vert*uv*norm*3, we wanna loop once for each vert*uv*norm

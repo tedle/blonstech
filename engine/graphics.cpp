@@ -48,7 +48,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[0]->Init("../notes/teapot_highpoly.mesh", "../notes/me.dds"))
+    if (!models_[0]->Init("../notes/cube_test.mesh", "../notes/me.dds"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
@@ -67,7 +67,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
     models_[1]->SetPos(0.0, 0.0, 0.0);*/
-    models_ = load_codmap("../notes/sponza", std::move(models_));
+    models_ = load_codmap("../notes/bms_test", std::move(models_));
 
     // Shaders
     shader_ = std::unique_ptr<Shader>(new Shader);

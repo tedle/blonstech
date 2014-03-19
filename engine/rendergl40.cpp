@@ -158,10 +158,10 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
 
     // Configure how we render tris
     // TODO: re enable back face cullin
-    //glDisable(GL_CULL_FACE);
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
+    //glDisable(GL_CULL_FACE);
 
     // Configure vsync (please be false)
     vsync_ = vsync;
@@ -438,17 +438,33 @@ TextureResource* RenderGL40::LoadDDSFile(const char* filename)
 	// Bind the texture as a 2D texture.
 	glBindTexture(GL_TEXTURE_2D, texture->texture_);
 
+    // Load the texture onto GPU
+    std::string filetype(filename);
+    filetype = filetype.substr(filetype.size() - 4);
+    unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
+    if (filetype == ".dds")
+    {
+        soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
+    }
+    else
+    {
+        soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_GL_MIPMAPS;
+    }
+    texture->texture_ = SOIL_load_OGL_texture(filename, SOIL_LOAD_AUTO, texture->texture_,
+                                              soil_flags);
+
+    // Apply our texture settings (we do this after to override SOIL settings)
 	// Set the texture to repeat when sampled outside UV range
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	// Set the texture filtering
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	// Set the texture filtering (SOIL handles this currently)
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 
-    // Load the texture onto GPU
-    texture->texture_ = SOIL_load_OGL_texture(filename, 0, texture->texture_,
-                                              SOIL_FLAG_DDS_LOAD_DIRECT | SOIL_FLAG_TEXTURE_REPEATS);
+    // TODO: attach this to a setting + safety check for max
+    // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &float);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
 
     // Re enable this for non-dds textures
 	// glGenerateMipmap(GL_TEXTURE_2D);
