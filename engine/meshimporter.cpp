@@ -116,10 +116,15 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
 
     indices_.resize(index_count_);
 
-    std::map<Vertex, unsigned int> vert_lookup;
+    // If there's no UVs, normals immediately follow vertex
+    const int norm_offset = (uv_count_ > 0 ? 2 : 1);
+    // In case we need to manually calculate normals, need some way
+    // to cache normal value as its updated once every 3 iterations (once per tri)
+    Vector3 current_normal(0.0, 0.0, 0.0);
 
     // Loads about 20x slower, but +10%~ perf and -50%~ memory
-    bool vbo_indexing = true;
+    const bool vbo_indexing = true;
+    std::map<Vertex, unsigned int> vert_lookup;
 
     for (unsigned int i = 0; i < vertex_count_; i++)
     {
@@ -128,12 +133,58 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
         unsigned int face_offset = i * (face_size / 3);
 
         Vertex new_vert;
+        // Get vertex data
         new_vert.pos = vertices[faces[face_offset]  -1];
+        // Get and correct UV data
         new_vert.tex = uvs     [faces[face_offset+1]-1];
         if (invert_y)
         {
             new_vert.tex.y = 1.0f - new_vert.tex.y;
         }
+        // Get normal data
+        if (normal_count_ > 0)
+        {
+            current_normal = normals[faces[face_offset+norm_offset]-1];
+            // Normals range from -1, 1 be we need to store as 0, 1
+            current_normal.x = (current_normal.x + 1) / 2;
+            current_normal.y = (current_normal.y + 1) / 2;
+            current_normal.z = (current_normal.z + 1) / 2;
+        }
+        // Normal data isn't baked in, calculate defaults
+        // We only do this once per tri since we need 3 vertices to calculate
+        else if (i % 3 == 0)
+        {
+            Vector3 v1, v2, v3;
+            size_t face_index_size = face_size / 3;
+            v1 = vertices[faces[face_offset+(face_index_size*0)]-1];
+            v2 = vertices[faces[face_offset+(face_index_size*1)]-1];
+            v3 = vertices[faces[face_offset+(face_index_size*2)]-1];
+            // (v2-v1) * (v3-v1)
+            Vector3 v21, v31;
+            v21.x = v2.x - v1.x;
+            v21.y = v2.y - v1.y;
+            v21.z = v2.z - v1.z;
+            v31.x = v3.x - v1.x;
+            v31.y = v3.y - v1.y;
+            v31.z = v3.z - v1.z;
+            // Cross product
+            current_normal.x = v21.y * v31.z - v21.z * v31.y;
+            current_normal.y = v21.z * v31.x - v21.x * v31.z;
+            current_normal.z = v21.x * v31.y - v21.y * v31.x;
+            // Normal x+y+z must be 1
+            float normalize_factor = sqrtf(current_normal.x * current_normal.x +
+                                           current_normal.y * current_normal.y +
+                                           current_normal.z * current_normal.z);
+            current_normal.x = current_normal.x / normalize_factor;
+            current_normal.y = current_normal.y / normalize_factor;
+            current_normal.z = current_normal.z / normalize_factor;
+            // Normals range from -1, 1 but we need to store as 0, 1
+            current_normal.x = (current_normal.x + 1) / 2;
+            current_normal.y = (current_normal.y + 1) / 2;
+            current_normal.z = (current_normal.z + 1) / 2;
+        }
+        new_vert.norm = current_normal;
+
 
         if (vbo_indexing)
         {

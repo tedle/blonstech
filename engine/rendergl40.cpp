@@ -265,6 +265,7 @@ bool RenderGL40::RegisterMesh(BufferResource* vertex_buffer, BufferResource* ind
     // Enable pos and uv inputs ??
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     // Layout the Vertex struct type to gpu vertex attributes
     // Position declaration
@@ -273,6 +274,9 @@ bool RenderGL40::RegisterMesh(BufferResource* vertex_buffer, BufferResource* ind
     // UV declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
+    // Normal declaration
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(5*sizeof(float)));
 
     // Setup the index buffer
     glGenBuffers(1, &index_buf->buffer_);
@@ -339,6 +343,7 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
     glAttachShader(shader->program_, shader->frag_shader_);
     glBindAttribLocation(shader->program_, 0, "input_pos");
     glBindAttribLocation(shader->program_, 1, "input_uv");
+    glBindAttribLocation(shader->program_, 2, "input_norm");
     glLinkProgram(shader->program_);
 
     // Check that everything went OK

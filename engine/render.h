@@ -12,6 +12,7 @@ struct Vertex
 {
     Vector3 pos;
     Vector2 tex;
+    Vector3 norm;
     // needed for efficient std::map lookups
     bool operator< (const Vertex vert) const {return memcmp(this, &vert, sizeof(Vertex))>0;}
 };

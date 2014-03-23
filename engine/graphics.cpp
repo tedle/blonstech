@@ -42,31 +42,31 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     camera_->SetPos(0.0f, 0.0f, -10.0f);
 
     // Model 1
-    /*models_.push_back(std::unique_ptr<Model>(new Model));
+    models_.push_back(std::unique_ptr<Model>(new Model));
     if (models_[0] == nullptr)
     {
         return false;
     }
 
-    if (!models_[0]->Init("../notes/cube_test.mesh"))
+    if (!models_[0]->Init("../notes/teapot_highpoly.bms"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
-    models_[0]->SetPos(0.0, 0.0, 20.0);*/
+    models_[0]->SetPos(0.0, 0.0, 20.0);
     // Model 2
-    /*models_.push_back(std::unique_ptr<Model>(new Model));
+    models_.push_back(std::unique_ptr<Model>(new Model));
     if (models_[1] == nullptr)
     {
         return false;
     }
 
-    if (!models_[1]->Init("../notes/sponza/sponza.mesh", "../notes/me.dds"))
+    if (!models_[1]->Init("../notes/cube.bms"))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
-    models_[1]->SetPos(0.0, 0.0, 0.0);*/
+    models_[1]->SetPos(10.0, 0.0, 20.0);
     models_ = load_codmap("../notes/bms_test", std::move(models_));
 
     // Shaders
