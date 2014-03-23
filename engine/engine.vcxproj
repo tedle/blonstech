@@ -88,6 +88,7 @@
     <ClCompile Include="glfuncloader.cpp" />
     <ClCompile Include="math.cpp" />
     <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="meshimporter.cpp" />
     <ClCompile Include="renderd3d11.cpp" />
     <ClCompile Include="external\DDSTextureLoader.cpp" />
     <ClCompile Include="graphics.cpp" />
@@ -121,6 +122,7 @@
     <ClInclude Include="glfuncloader.h" />
     <ClInclude Include="math.h" />
     <ClInclude Include="mesh.h" />
+    <ClInclude Include="meshimporter.h" />
     <ClInclude Include="render.h" />
     <ClInclude Include="renderd3d11.h" />
     <ClInclude Include="external\DDSTextureLoader.h" />

@@ -6,6 +6,7 @@
 // Local Includes
 #include "math.h"
 #include "mesh.h"
+#include "meshimporter.h"
 #include "render.h"
 #include "texture.h"
 
@@ -15,7 +16,7 @@ public:
     Model();
     ~Model();
 
-    bool Init(const char* mesh_filename, const char* texture_filename);
+    bool Init(const char* mesh_filename);
     void Finish();
     void Render();
 
@@ -30,11 +31,13 @@ private:
     bool InitMesh(const char* filename);
     void FinishMesh();
 
-    bool InitTexture(const char* filename);
+    bool InitTexture(const char* filename, Texture::Type type);
     void FinishTexture();
 
     std::unique_ptr<Mesh> mesh_;
-    std::unique_ptr<Texture> texture_;
+    std::unique_ptr<Texture> diffuse_texture_;
+    std::unique_ptr<Texture> normal_texture_;
+    std::unique_ptr<Texture> light_texture_;
     Matrix world_matrix_;
     Vector3 pos_;
 };

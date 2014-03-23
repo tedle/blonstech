@@ -3,7 +3,9 @@
 Model::Model()
 {
     mesh_ = nullptr;
-    texture_ = nullptr;
+    diffuse_texture_ = nullptr;
+    normal_texture_ = nullptr;
+    light_texture_ = nullptr;
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
     world_matrix_ = MatrixIdentity();
 }
@@ -12,16 +14,71 @@ Model::~Model()
 {
 }
 
-bool Model::Init(const char* mesh_filename, const char* texture_filename)
+bool Model::Init(const char* mesh_filename)
 {
-    if (!InitMesh(mesh_filename))
+    MeshImporter mesh_data;
+    if (!mesh_data.Load(mesh_filename, true))
+    {
+        return false;
+    }
+    mesh_ = std::unique_ptr<Mesh>(new Mesh);
+
+    if (mesh_ == nullptr)
     {
         return false;
     }
 
-    if (!InitTexture(texture_filename))
+    if (!mesh_->Init(&mesh_data))
     {
         return false;
+    }
+
+    // TODO: replace this with proper filesystem class
+    std::string tex_folder(mesh_filename);
+    // Go from folder/mesh/ to folder/
+    tex_folder = tex_folder.substr(0, tex_folder.find_last_of('/'));
+    tex_folder = tex_folder.substr(0, tex_folder.find_last_of('/'));
+    tex_folder += "/tex/";
+    for (const auto& tex : mesh_data.textures())
+    {
+        auto texture = std::unique_ptr<Texture>(new Texture);
+
+        if (texture == nullptr)
+        {
+            return false;
+        }
+
+        std::string tex_file;
+        tex_file = tex_folder + tex.filename;
+        if (!texture->Init(tex_file.c_str(), tex.type))
+        {
+            return false;
+        }
+
+        // Transfer new texture to aproppriate member
+        if (tex.type == Texture::DIFFUSE)
+        {
+            diffuse_texture_ = std::move(texture);
+        }
+
+        else if (tex.type == Texture::NORMAL)
+        {
+            normal_texture_ = std::move(texture);
+        }
+
+        else if (tex.type == Texture::LIGHT)
+        {
+            light_texture_ = std::move(texture);
+        }
+    }
+    // TODO: make a proper solution for no diffuse texture
+    if (diffuse_texture_ == nullptr)
+    {
+        diffuse_texture_ = std::unique_ptr<Texture>(new Texture);
+        if (!diffuse_texture_->Init("../notes/me.dds", Texture::DIFFUSE))
+        {
+            return false;
+        }
     }
 
     return true;
@@ -51,7 +108,8 @@ int Model::GetIndexCount()
 
 TextureResource* Model::GetTexture()
 {
-    return texture_->GetTexture();
+    // TODO: getters for all types of textures
+    return diffuse_texture_->GetTexture();
 }
 
 Vector3 Model::GetPos()
@@ -71,17 +129,6 @@ void Model::SetPos(float x, float y, float z)
 
 bool Model::InitMesh(const char* filename)
 {
-    mesh_ = std::unique_ptr<Mesh>(new Mesh);
-
-    if (mesh_ == nullptr)
-    {
-        return false;
-    }
-
-    if (!mesh_->Init(filename, true))
-    {
-        return false;
-    }
 
     return true;
 }
@@ -95,28 +142,16 @@ void Model::FinishMesh()
     return;
 }
 
-bool Model::InitTexture(const char* filename)
+bool Model::InitTexture(const char* filename, Texture::Type type)
 {
-    texture_ = std::unique_ptr<Texture>(new Texture);
-
-    if (!texture_)
-    {
-        return false;
-    }
-
-    if (!texture_->Init(filename))
-    {
-        return false;
-    }
-
     return true;
 }
 
 void Model::FinishTexture()
 {
-    if (texture_)
+    if (diffuse_texture_)
     {
-        texture_->Finish();
+        diffuse_texture_->Finish();
     }
     return;
 }

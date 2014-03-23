@@ -9,7 +9,7 @@ Texture::~Texture()
 {
 }
 
-bool Texture::Init(const char* filename)
+bool Texture::Init(const char* filename, Type type)
 {
     texture_ = std::unique_ptr<TextureResource>(g_render->LoadDDSFile(filename));
 
@@ -17,6 +17,8 @@ bool Texture::Init(const char* filename)
     {
         return false;
     }
+
+    type_ = type;
 
     return true;
 }

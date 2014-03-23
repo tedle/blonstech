@@ -156,7 +156,7 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
             throw "model problem";
         }
 
-        if (!models.back()->Init(mesh_file.c_str(), tex_file.c_str()))
+        if (!models.back()->Init(mesh_file.c_str()))
         {
             throw "other model problem";
         }

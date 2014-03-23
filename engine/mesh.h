@@ -7,16 +7,9 @@
 #include <stdio.h>
 #include <vector>
 // Local Includes
+#include "meshimporter.h"
 #include "render.h"
 
-// Holds mesh info in memory while being reorganized to renderable format
-struct RawMesh
-{
-    unsigned int vertex_count, uv_count, normal_count, face_count;
-    std::vector<Vector3> vertices, normals;
-    std::vector<Vector2> uvs;
-    std::vector<unsigned int> faces;
-};
 
 class Mesh
 {
@@ -24,7 +17,7 @@ public:
     Mesh();
     ~Mesh();
 
-    bool Init(const char* filename, bool invert_y);
+    bool Init(MeshImporter* mesh_data);
     void Finish();
 
     BufferResource* GetVertexBuffer();
