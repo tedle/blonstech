@@ -65,13 +65,14 @@ public:
                       unsigned int* indices, unsigned int index_count);
     void RegisterTexture();
     bool RegisterShader(ShaderResource* program,
-                        WCHAR* vertex_filename, WCHAR* pixel_filename);
+                        WCHAR* vertex_filename, WCHAR* pixel_filename,
+                        ShaderAttributeList inputs);
 
     void RenderShader(ShaderResource* program, int index_count);
 
     void SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
-    bool SetShaderInputs(ShaderResource* program, TextureResource* texture,
-                         Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix);
+    bool SetShaderInput(ShaderResource* program, const char* name, Matrix value);
+    bool SetShaderInput(ShaderResource* program, const char* name, TextureResource* value);
 
     Matrix GetProjectionMatrix();
     Matrix GetOrthoMatrix();

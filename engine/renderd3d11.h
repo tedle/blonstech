@@ -1,6 +1,8 @@
 #ifndef BLONSTECH_RENDERD3D11_H_
 #define BLONSTECH_RENDERD3D11_H_
 
+// NOTE: D3D11 PIPELINE HAS FALLEN DECENTLY FAR BEHIND OPENGL PIPELINE AND WILL NOT COMPILE ATM
+
 // Linking
 #pragma comment(lib, "dxgi.lib")
 #pragma comment(lib, "d3d11.lib")

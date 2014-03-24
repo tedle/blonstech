@@ -7,11 +7,11 @@ in vec3 norm;
 out vec4 frag_colour;
 
 // Globals
-uniform sampler2D shader_texture;
+uniform sampler2D diffuse;
 
 void main(void)
 {
-    vec4 texture_col = texture(shader_texture, tex_coord);
-    //frag_colour = texture_col;
+    vec4 texture_col = texture(diffuse, tex_coord);
     frag_colour = vec4(norm, 1.0);
+    frag_colour = texture_col;
 }

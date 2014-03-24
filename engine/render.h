@@ -4,6 +4,7 @@
 // Includes
 #include <memory>
 #include <string>
+#include <vector>
 #include <Windows.h>
 // Local Includes
 #include "math.h"
@@ -27,6 +28,9 @@ struct MatrixBuffer
 class BufferResource;
 class ShaderResource;
 class TextureResource;
+
+typedef std::pair<unsigned int, std::string> ShaderAttribute;
+typedef std::vector<ShaderAttribute> ShaderAttributeList;
 
 class RenderAPI {
 
@@ -52,13 +56,14 @@ public:
                               unsigned int* indices, unsigned int index_count)=0;
     virtual void RegisterTexture()=0;
     virtual bool RegisterShader(ShaderResource* program,
-                                WCHAR* vertex_filename, WCHAR* pixel_filename)=0;
+                                WCHAR* vertex_filename, WCHAR* pixel_filename,
+                                ShaderAttributeList inputs)=0;
 
     virtual void RenderShader(ShaderResource* program, int index_count)=0;
 
     virtual void SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)=0;
-    virtual bool SetShaderInputs(ShaderResource* program, TextureResource* texture,
-                                 Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, Matrix value)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, TextureResource* value)=0;
 
     virtual Matrix GetProjectionMatrix()=0;
     virtual Matrix GetOrthoMatrix()=0;

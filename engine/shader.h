@@ -16,7 +16,7 @@ public:
     bool Render(int, TextureResource*, Matrix, Matrix, Matrix);
 
 private:
-    bool InitShader(HWND, WCHAR*, WCHAR*);
+    bool InitShader(HWND, WCHAR*, WCHAR*, ShaderAttributeList);
     void FinishShader();
 
 private:
