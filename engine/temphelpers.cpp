@@ -1,5 +1,6 @@
 #include "temphelpers.h"
 
+Vector3 cur_pos(0.0, 0.0, 0.0);
 
 void noclip(Input* input, Camera* camera)
 {
@@ -78,6 +79,7 @@ void noclip(Input* input, Camera* camera)
         }
 
         camera->SetPos(pos.x+new_x, pos.y+new_y, pos.z+new_z);
+        cur_pos = camera->GetPos();
     }
 }
 
@@ -114,7 +116,7 @@ void FPS()
     if (st > last_time+1000)
     {
         char msg[64];
-        sprintf_s(msg, "FPS: %i\n", fps_count);
+        sprintf_s(msg, "FPS: %i, (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, cur_pos.x, cur_pos.y, cur_pos.z);
         OutputDebugStringA(msg);
         last_time = st;
         fps_count = 0;

@@ -161,23 +161,11 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
             v3 = vertices[faces[face_offset+(face_index_size*2)]-1];
             // (v2-v1) * (v3-v1)
             Vector3 v21, v31;
-            v21.x = v2.x - v1.x;
-            v21.y = v2.y - v1.y;
-            v21.z = v2.z - v1.z;
-            v31.x = v3.x - v1.x;
-            v31.y = v3.y - v1.y;
-            v31.z = v3.z - v1.z;
-            // Cross product
-            current_normal.x = v21.y * v31.z - v21.z * v31.y;
-            current_normal.y = v21.z * v31.x - v21.x * v31.z;
-            current_normal.z = v21.x * v31.y - v21.y * v31.x;
+            v21 = v2 - v1;
+            v31 = v3 - v1;
+            current_normal = Vector3Cross(v21, v31);
             // Normal x+y+z must be 1
-            float normalize_factor = sqrtf(current_normal.x * current_normal.x +
-                                           current_normal.y * current_normal.y +
-                                           current_normal.z * current_normal.z);
-            current_normal.x = current_normal.x / normalize_factor;
-            current_normal.y = current_normal.y / normalize_factor;
-            current_normal.z = current_normal.z / normalize_factor;
+            current_normal = Vector3Normalize(current_normal);
             // Normals range from -1, 1 but we need to store as 0, 1
             current_normal.x = (current_normal.x + 1) / 2;
             current_normal.y = (current_normal.y + 1) / 2;

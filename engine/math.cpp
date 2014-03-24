@@ -135,6 +135,23 @@ Matrix MatrixView(Vector3 pos, Vector3 rot)
     return view_matrix;
 }
 
+Vector3 Vector3Cross(Vector3 a, Vector3 b)
+{
+    Vector3 product;
+    product.x = a.y * b.z - a.z * b.y;
+    product.y = a.z * b.x - a.x * b.z;
+    product.z = a.x * b.y - a.y * b.x;
+    return product;
+}
+
+Vector3 Vector3Normalize(Vector3 n)
+{
+    float dist = sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+    n.x /= dist;
+    n.y /= dist;
+    n.z /= dist;
+    return n;
+}
 Vector3 Vector3PitchYawRoll(Matrix view_matrix)
 {
     Vector3 rot;
