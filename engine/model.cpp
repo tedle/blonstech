@@ -16,11 +16,20 @@ Model::~Model()
 
 bool Model::Init(const char* mesh_filename)
 {
+    char dbg[1024];
+    sprintf_s(dbg, "Loading %s... ", mesh_filename);
+    OutputDebugStringA(dbg);
+    DWORD start = GetTickCount();
+
     MeshImporter mesh_data;
     if (!mesh_data.Load(mesh_filename, true))
     {
+        OutputDebugStringA("[FAILED]\n");
         return false;
     }
+    DWORD end = GetTickCount();
+    sprintf_s(dbg, "[%ims]\n", end - start);
+    OutputDebugStringA(dbg);
     mesh_ = std::unique_ptr<Mesh>(new Mesh);
 
     if (mesh_ == nullptr)
@@ -33,6 +42,8 @@ bool Model::Init(const char* mesh_filename)
         return false;
     }
 
+    start = GetTickCount();
+    OutputDebugStringA("Loading textures... ");
     // TODO: replace this with proper filesystem class
     std::string tex_folder(mesh_filename);
     // Go from folder/mesh/ to folder/
@@ -80,6 +91,9 @@ bool Model::Init(const char* mesh_filename)
             return false;
         }
     }
+    end = GetTickCount();
+    sprintf_s(dbg, "[%ims]\n", end - start);
+    OutputDebugStringA(dbg);
 
     return true;
 }
