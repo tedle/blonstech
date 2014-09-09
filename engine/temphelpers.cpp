@@ -115,9 +115,7 @@ void FPS()
 
     if (st > last_time+1000)
     {
-        char msg[64];
-        sprintf_s(msg, "FPS: %i, (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, cur_pos.x, cur_pos.y, cur_pos.z);
-        OutputDebugStringA(msg);
+        g_log->Debug("FPS: %i, (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, cur_pos.x, cur_pos.y, cur_pos.z);
         last_time = st;
         fps_count = 0;
     }

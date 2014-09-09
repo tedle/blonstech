@@ -8,6 +8,7 @@
 #include <Windows.h>
 // Local Includes
 #include "math.h"
+#include "loggeride.h"
 
 struct Vertex
 {

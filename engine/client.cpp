@@ -17,7 +17,7 @@ Client::~Client()
 bool Client::Init()
 {
     // Initialize logger
-    std::unique_ptr<LoggerAPI> g_log(new LoggerIDE(LoggerAPI::Level::DEBUG));
+    g_log = std::unique_ptr<LoggerAPI>(new LoggerIDE(LoggerAPI::Level::DEBUG));
 
     int screen_width, screen_height;
     screen_width = screen_height = 0;
@@ -276,11 +276,9 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
             input_->MouseUp(1);
         }
         input_->MouseMove(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-        /*char msg[256];
-        sprintf_s(msg, "pos(%i,%i), delta(%i,%i), down(%i, %i)\n",
-                  input_->MouseX(), input_->MouseY(), input_->MouseDeltaX(), input_->MouseDeltaY(),
-                  input_->IsMouseDown(0), input_->IsMouseDown(1));
-        OutputDebugStringA(msg);*/
+        /* g_log->Debug("pos(%i,%i), delta(%i,%i), down(%i, %i)\n",
+                     input_->MouseX(), input_->MouseY(), input_->MouseDeltaX(), input_->MouseDeltaY(),
+                     input_->IsMouseDown(0), input_->IsMouseDown(1)); */
     default:
         return DefWindowProc(hwnd, umsg, wparam, lparam);
     }
