@@ -39,6 +39,7 @@ public:
 private:
     bool Render();
 
+    RenderContext context_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<Shader> shader_;
     std::vector<std::unique_ptr<Model>>  models_;

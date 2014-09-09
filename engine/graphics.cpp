@@ -1,11 +1,8 @@
 #include "graphics.h"
 
-std::unique_ptr<RenderAPI> g_render = nullptr;
-
 Graphics::Graphics()
 {
-    g_render = nullptr;
-
+    context_ = nullptr;
     camera_ = nullptr;
     shader_ = nullptr;
 }
@@ -17,16 +14,16 @@ Graphics::~Graphics()
 bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 {
     // DirectX
-    //g_render = std::unique_ptr<RenderAPI>(new RenderD3D11);
+    //context_ = RenderContext(new RenderD3D11);
 
     // OpenGL
-    g_render = std::unique_ptr<RenderAPI>(new RenderGL40);
-    if (!g_render)
+    context_ = RenderContext(new RenderGL40);
+    if (!context_)
     {
         return false;
     }
 
-    if (!g_render->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
+    if (!context_->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
     {
         MessageBox(hwnd, L"Render die", L"help", MB_OK);
         return false;
@@ -48,7 +45,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[0]->Init("../notes/teapot_highpoly.bms"))
+    if (!models_[0]->Init("../notes/teapot_highpoly.bms", context_))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
@@ -61,13 +58,13 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[1]->Init("../notes/cube.bms"))
+    if (!models_[1]->Init("../notes/cube.bms", context_))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
     models_[1]->SetPos(10.0, 0.0, 20.0);
-    models_ = load_codmap("../notes/bms_test", std::move(models_));
+    models_ = load_codmap("../notes/bms_test", std::move(models_), context_);
 
     // Shaders
     shader_ = std::unique_ptr<Shader>(new Shader);
@@ -76,7 +73,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!shader_->Init(hwnd))
+    if (!shader_->Init(hwnd, context_))
     {
         MessageBox(hwnd, L"Shaders die", L"help", MB_OK);
         return false;
@@ -89,17 +86,17 @@ void Graphics::Finish()
 {
     for (auto const& model : models_)
     {
-        model->Finish();
+        model->Finish(context_);
     }
 
     if (shader_)
     {
-        shader_->Finish();
+        shader_->Finish(context_);
     }
 
-    if (g_render)
+    if (context_)
     {
-        g_render->Finish();
+        context_->Finish();
     }
 
     return;
@@ -125,31 +122,31 @@ bool Graphics::Render()
     Matrix view_matrix, projection_matrix, world_matrix;
 
     // Clear buffers
-    g_render->BeginScene();
+    context_->BeginScene();
 
     // Update camera matrix
     camera_->Render();
 
     // Get matrices
     view_matrix       = camera_->GetViewMatrix();
-    projection_matrix = g_render->GetProjectionMatrix();
+    projection_matrix = context_->GetProjectionMatrix();
 
     for (auto const& model : models_)
     {
         // Prep the pipeline 4 drawering
-        model->Render();
+        model->Render(context_);
         world_matrix = model->GetWorldMatrix();
 
         // Finally do the render
         if (!shader_->Render(model->GetIndexCount(), model->GetTexture(),
-            world_matrix, view_matrix, projection_matrix))
+            world_matrix, view_matrix, projection_matrix, context_))
         {
             return false;
         }
     }
 
     // Swap buffers
-    g_render->EndScene();
+    context_->EndScene();
 
     return true;
 }

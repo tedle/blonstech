@@ -58,9 +58,9 @@ public:
     void BeginScene();
     void EndScene();
 
-    void* CreateBufferResource();
-    void* CreateTextureResource();
-    void* CreateShaderResource();
+    BufferResource* CreateBufferResource();
+    TextureResource* CreateTextureResource();
+    ShaderResource* CreateShaderResource();
     void DestroyBufferResource(BufferResource* buffer);
     void DestroyTextureResource(TextureResource* texture);
     void DestroyShaderResource(ShaderResource* shader);

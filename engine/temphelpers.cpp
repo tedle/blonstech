@@ -124,7 +124,7 @@ void FPS()
 }
 
 
-std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<std::unique_ptr<Model>> models)
+std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<std::unique_ptr<Model>> models, RenderContext& context)
 {
     std::string csv_file = folder;
     if (csv_file.back() != '/' && csv_file.back() != '\\')
@@ -156,7 +156,7 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
             throw "model problem";
         }
 
-        if (!models.back()->Init(mesh_file.c_str()))
+        if (!models.back()->Init(mesh_file.c_str(), context))
         {
             throw "other model problem";
         }

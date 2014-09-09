@@ -191,19 +191,19 @@ void RenderGL40::EndScene()
     SwapBuffers(device_context_);
 }
 
-void* RenderGL40::CreateBufferResource()
+BufferResource* RenderGL40::CreateBufferResource()
 {
-    return malloc(sizeof(BufferResourceGL40));
+    return new BufferResourceGL40;
 }
 
-void* RenderGL40::CreateTextureResource()
+TextureResource* RenderGL40::CreateTextureResource()
 {
-    return malloc(sizeof(TextureResourceGL40));
+    return new TextureResourceGL40;
 }
 
-void* RenderGL40::CreateShaderResource()
+ShaderResource* RenderGL40::CreateShaderResource()
 {
-    return malloc(sizeof(ShaderResourceGL40));
+    return new ShaderResourceGL40;
 }
 
 void RenderGL40::DestroyBufferResource(BufferResource* buffer)

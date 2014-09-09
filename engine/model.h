@@ -16,9 +16,9 @@ public:
     Model();
     ~Model();
 
-    bool Init(const char* mesh_filename);
-    void Finish();
-    void Render();
+    bool Init(const char* mesh_filename, RenderContext& context);
+    void Finish(RenderContext& context);
+    void Render(RenderContext& context);
 
     int GetIndexCount();
     TextureResource* GetTexture();
@@ -29,10 +29,10 @@ public:
 
 private:
     bool InitMesh(const char* filename);
-    void FinishMesh();
+    void FinishMesh(RenderContext& context);
 
     bool InitTexture(const char* filename, Texture::Type type);
-    void FinishTexture();
+    void FinishTexture(RenderContext& context);
 
     std::unique_ptr<Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;

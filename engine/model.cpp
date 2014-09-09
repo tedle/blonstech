@@ -14,7 +14,7 @@ Model::~Model()
 {
 }
 
-bool Model::Init(const char* mesh_filename)
+bool Model::Init(const char* mesh_filename, RenderContext& context)
 {
     g_log->Debug("Loading %s... ", mesh_filename);
     DWORD start = GetTickCount();
@@ -35,7 +35,7 @@ bool Model::Init(const char* mesh_filename)
         return false;
     }
 
-    if (!mesh_->Init(&mesh_data))
+    if (!mesh_->Init(&mesh_data, context))
     {
         return false;
     }
@@ -59,7 +59,7 @@ bool Model::Init(const char* mesh_filename)
 
         std::string tex_file;
         tex_file = tex_folder + tex.filename;
-        if (!texture->Init(tex_file.c_str(), tex.type))
+        if (!texture->Init(tex_file.c_str(), tex.type, context))
         {
             return false;
         }
@@ -84,7 +84,7 @@ bool Model::Init(const char* mesh_filename)
     if (diffuse_texture_ == nullptr)
     {
         diffuse_texture_ = std::unique_ptr<Texture>(new Texture);
-        if (!diffuse_texture_->Init("../notes/me.dds", Texture::DIFFUSE))
+        if (!diffuse_texture_->Init("../notes/me.dds", Texture::DIFFUSE, context))
         {
             return false;
         }
@@ -95,19 +95,19 @@ bool Model::Init(const char* mesh_filename)
     return true;
 }
 
-void Model::Finish()
+void Model::Finish(RenderContext& context)
 {
-    FinishMesh();
-    FinishTexture();
+    FinishMesh(context);
+    FinishTexture(context);
 
     return;
 }
 
-void Model::Render()
+void Model::Render(RenderContext& context)
 {
     // TODO: Clean this up with operator overloads
     world_matrix_ = MatrixMultiply(MatrixIdentity(), MatrixTranslation(pos_.x, pos_.y, pos_.z));
-    g_render->SetModelBuffer(mesh_->GetVertexBuffer(), mesh_->GetIndexBuffer());
+    context->SetModelBuffer(mesh_->GetVertexBuffer(), mesh_->GetIndexBuffer());
 
     return;
 }
@@ -144,11 +144,11 @@ bool Model::InitMesh(const char* filename)
     return true;
 }
 
-void Model::FinishMesh()
+void Model::FinishMesh(RenderContext& context)
 {
     if (mesh_)
     {
-        mesh_->Finish();
+        mesh_->Finish(context);
     }
     return;
 }
@@ -158,11 +158,11 @@ bool Model::InitTexture(const char* filename, Texture::Type type)
     return true;
 }
 
-void Model::FinishTexture()
+void Model::FinishTexture(RenderContext& context)
 {
     if (diffuse_texture_)
     {
-        diffuse_texture_->Finish();
+        diffuse_texture_->Finish(context);
     }
     return;
 }

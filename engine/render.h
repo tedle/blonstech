@@ -26,9 +26,9 @@ struct MatrixBuffer
     Matrix projection;
 };
 
-class BufferResource;
-class ShaderResource;
-class TextureResource;
+class BufferResource {};
+class ShaderResource {};
+class TextureResource {};
 
 typedef std::pair<unsigned int, std::string> ShaderAttribute;
 typedef std::vector<ShaderAttribute> ShaderAttributeList;
@@ -45,9 +45,9 @@ public:
     virtual void BeginScene()=0;
     virtual void EndScene()=0;
 
-    virtual void* CreateBufferResource()=0;
-    virtual void* CreateTextureResource()=0;
-    virtual void* CreateShaderResource()=0;
+    virtual BufferResource* CreateBufferResource()=0;
+    virtual TextureResource* CreateTextureResource()=0;
+    virtual ShaderResource* CreateShaderResource()=0;
     virtual void DestroyBufferResource(BufferResource* buffer)=0;
     virtual void DestroyTextureResource(TextureResource* texture)=0;
     virtual void DestroyShaderResource(ShaderResource* shader)=0;
@@ -82,11 +82,7 @@ protected:
     Matrix ortho_matrix_;
 };
 
-extern std::unique_ptr<RenderAPI> g_render;
-
-// TODO: make sure these are destroyed properly
-class BufferResource {public: void* operator new(size_t s){return g_render->CreateBufferResource();}};
-class TextureResource{public: void* operator new(size_t s){return g_render->CreateTextureResource();}};
-class ShaderResource {public: void* operator new(size_t s){return g_render->CreateShaderResource();}};
+// To help readbility
+typedef std::unique_ptr<RenderAPI> RenderContext;
 
 #endif

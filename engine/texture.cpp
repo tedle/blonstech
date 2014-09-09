@@ -9,9 +9,9 @@ Texture::~Texture()
 {
 }
 
-bool Texture::Init(const char* filename, Type type)
+bool Texture::Init(const char* filename, Type type, RenderContext& context)
 {
-    texture_ = std::unique_ptr<TextureResource>(g_render->LoadDDSFile(filename));
+    texture_ = std::unique_ptr<TextureResource>(context->LoadDDSFile(filename));
 
     if (texture_ == nullptr)
     {
@@ -23,9 +23,9 @@ bool Texture::Init(const char* filename, Type type)
     return true;
 }
 
-void Texture::Finish()
+void Texture::Finish(RenderContext& context)
 {
-    g_render->DestroyTextureResource(texture_.release());
+    context->DestroyTextureResource(texture_.release());
 
     return;
 }

@@ -42,10 +42,9 @@ void LoggerAPI::Fatal(const char* fmt, ...)
 
 std::string LoggerAPI::format(const char* fmt, va_list args)
 {
-    // Find the amount of memory we need to allocate for formatted string
-    size_t size = vsnprintf(nullptr, 0, fmt, args) + 1;
+    size_t size = _vscprintf(fmt, args) + 1;
     std::unique_ptr<char> buffer(new char[size]);
-    vsnprintf(buffer.get(), size, fmt, args);
+    vsnprintf_s(buffer.get(), size, size, fmt, args);
     std::string formatted_string(buffer.get());
 
     return formatted_string;

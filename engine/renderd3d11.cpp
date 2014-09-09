@@ -371,19 +371,19 @@ void RenderD3D11::EndScene()
     return;
 }
 
-void* RenderD3D11::CreateBufferResource()
+BufferResource* RenderD3D11::CreateBufferResource()
 {
-    return malloc(sizeof(BufferResourceD3D11));
+    return new BufferResourceD3D11;
 }
 
-void* RenderD3D11::CreateTextureResource()
+TextureResource* RenderD3D11::CreateTextureResource()
 {
-    return malloc(sizeof(TextureResourceD3D11));
+    return new TextureResourceD3D11;
 }
 
-void* RenderD3D11::CreateShaderResource()
+ShaderResource* RenderD3D11::CreateShaderResource()
 {
-    return malloc(sizeof(ShaderResourceD3D11));
+    return new ShaderResourceD3D11;
 }
 
 void RenderD3D11::DestroyBufferResource(BufferResource* buffer)
