@@ -1,7 +1,11 @@
 #include "client.h"
 
+std::unique_ptr<LoggerAPI> g_log = nullptr;
+
 Client::Client()
 {
+    g_log = nullptr;
+
     input_ = nullptr;
     graphics_ = nullptr;
 }
@@ -12,6 +16,9 @@ Client::~Client()
 
 bool Client::Init()
 {
+    // Initialize logger
+    std::unique_ptr<LoggerAPI> g_log(new LoggerIDE(LoggerAPI::Level::DEBUG));
+
     int screen_width, screen_height;
     screen_width = screen_height = 0;
 

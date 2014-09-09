@@ -73,7 +73,7 @@ public:
     // TODO: do this MANULLY in texture class later
     virtual TextureResource* LoadDDSFile(const char* filename)=0;
 
-private:
+protected:
     bool vsync_;
     int video_card_memory_;
     std::string video_card_desc_;

@@ -90,6 +90,12 @@
     <ClCompile Include="meshimporter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="loggeride.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="client.h">
@@ -195,6 +201,12 @@
       <Filter>External Files\SOIL2</Filter>
     </ClInclude>
     <ClInclude Include="meshimporter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="loggeride.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

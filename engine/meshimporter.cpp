@@ -123,7 +123,7 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     Vector3 current_normal(0.0, 0.0, 0.0);
 
     // Loads about 20x slower, but +10%~ perf and -50%~ memory
-    const bool vbo_indexing = true;
+    const bool vbo_indexing = false;
     std::map<Vertex, unsigned int> vert_lookup;
 
     for (unsigned int i = 0; i < vertex_count_; i++)
