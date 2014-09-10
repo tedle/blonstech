@@ -12,7 +12,7 @@
 // Local Includes
 #include "glfuncloader.h"
 // OpenGL image loader
-#include "external\SOIL2\SOIL2.h"
+#include <SOIL2\SOIL2.h>
 #include "math.h"
 #include "render.h"
 

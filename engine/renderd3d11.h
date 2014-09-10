@@ -17,7 +17,7 @@
 #include <d3dcompiler.h>
 #include <fstream>
 // Local Includes
-#include "external\DDSTextureLoader.h"
+// #include <DDSTextureLoader\DDSTextureLoader.h>
 #include "math.h"
 #include "render.h"
 

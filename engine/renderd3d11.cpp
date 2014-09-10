@@ -730,7 +730,7 @@ TextureResource* RenderD3D11::LoadDDSFile(WCHAR* filename)
 
     TextureResourceD3D11* texture = static_cast<TextureResourceD3D11*>(CreateTextureResource());
 
-    result = DirectX::CreateDDSTextureFromFile(device_, filename, nullptr, &texture->p, 0);
+    result = -1;// DirectX::CreateDDSTextureFromFile(device_, filename, nullptr, &texture->p, 0);
     if (FAILED(result))
     {
         return nullptr;

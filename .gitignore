@@ -1,7 +1,7 @@
-#My stuff
+# My stuff
 notes/
 
-#Vim
+# Vim
 *.swp
 
 # Compiled Object files
