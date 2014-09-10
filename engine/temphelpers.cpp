@@ -7,10 +7,10 @@ void noclip(Input* input, Camera* camera)
     // Always handle mouse look before wasd movement!
     if (input->IsMouseDown(0))
     {
-        Vector3 rot = camera->GetRot();
+        Vector3 rot = camera->rot();
         rot.x += input->MouseDeltaY() * 0.003f;
         rot.y += input->MouseDeltaX() * 0.003f;
-        camera->SetRot(rot.x, rot.y, 0.0);
+        camera->set_rot(rot.x, rot.y, 0.0);
     }
 
     static DWORD last_move = 0;
@@ -27,8 +27,8 @@ void noclip(Input* input, Camera* camera)
             velocity *= 4.0f;
         }
         last_move = GetTickCount();
-        Vector3 pos = camera->GetPos();
-        Vector3 rot = camera->GetRot();
+        Vector3 pos = camera->pos();
+        Vector3 rot = camera->rot();
         int ud = 0, lr = 0;
 
         // Figure out which way we wanna move, to be plugged into atan2
@@ -78,8 +78,8 @@ void noclip(Input* input, Camera* camera)
             new_y -= velocity;
         }
 
-        camera->SetPos(pos.x+new_x, pos.y+new_y, pos.z+new_z);
-        cur_pos = camera->GetPos();
+        camera->set_pos(pos.x+new_x, pos.y+new_y, pos.z+new_z);
+        cur_pos = camera->pos();
     }
 }
 
@@ -100,9 +100,9 @@ void move_camera_around_origin(float delta, Camera* camera)
         float y = 10.0f;
         float z = r * sin(orientation);
 
-        camera->SetPos(x, y, z);
+        camera->set_pos(x, y, z);
         camera->LookAt(0.0f, 2.0f, 0.0f);
-        //camera->SetPos(0.0f, -2000.0f, 500.0f);
+        //camera->set_pos(0.0f, -2000.0f, 500.0f);
         //camera->LookAt(0.0f, 0.0f, 0.0f);
     }
 }
@@ -160,7 +160,7 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
         {
             throw "other model problem";
         }
-        models.back()->SetPos(0.0, 0.0, 0.0);
+        models.back()->set_pos(0.0, 0.0, 0.0);
     }
     /*models.push_back(std::unique_ptr<Model>(new Model));
     if (models[1] == nullptr)
@@ -172,6 +172,6 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
     {
         throw "other model problem";
     }
-    models[1]->SetPos(0.0, 0.0, 0.0);*/
+    models[1]->set_pos(0.0, 0.0, 0.0);*/
     return models;
 }

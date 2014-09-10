@@ -30,7 +30,7 @@ void Texture::Finish(RenderContext& context)
     return;
 }
 
-TextureResource* Texture::GetTexture()
+TextureResource* Texture::texture()
 {
     return texture_.get();
 }

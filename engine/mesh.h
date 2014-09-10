@@ -20,10 +20,10 @@ public:
     bool Init(MeshImporter* mesh_data, RenderContext& context);
     void Finish(RenderContext& context);
 
-    BufferResource* GetVertexBuffer();
-    BufferResource* GetIndexBuffer();
-    int GetVertexCount();
-    int GetIndexCount();
+    BufferResource* vertex_buffer();
+    BufferResource* index_buffer();
+    int vertex_count();
+    int index_count();
 
 private:
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;

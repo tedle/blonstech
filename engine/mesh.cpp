@@ -39,22 +39,22 @@ void Mesh::Finish(RenderContext& context)
     return;
 }
 
-BufferResource* Mesh::GetVertexBuffer()
+BufferResource* Mesh::vertex_buffer()
 {
     return vertex_buffer_.get();
 }
 
-BufferResource* Mesh::GetIndexBuffer()
+BufferResource* Mesh::index_buffer()
 {
     return index_buffer_.get();
 }
 
-int Mesh::GetVertexCount()
+int Mesh::vertex_count()
 {
     return vertex_count_;
 }
 
-int Mesh::GetIndexCount()
+int Mesh::index_count()
 {
     return index_count_;
 }

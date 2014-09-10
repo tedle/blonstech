@@ -10,14 +10,14 @@ Camera::~Camera()
 {
 }
 
-void Camera::SetPos(float x, float y, float z)
+void Camera::set_pos(float x, float y, float z)
 {
     pos_ = Vector3(x, y, z);
 
     return;
 }
 
-void Camera::SetRot(float pitch, float yaw, float roll)
+void Camera::set_rot(float pitch, float yaw, float roll)
 {
     rot_ = Vector3(pitch, yaw, roll);
 
@@ -38,15 +38,15 @@ void Camera::LookAt(float x, float y, float z)
     view_matrix_ = MatrixLookAt(pos_, look, up);
     rotation = Vector3PitchYawRoll(view_matrix_);
     
-    SetRot(rotation.x, rotation.y, rotation.z);
+    set_rot(rotation.x, rotation.y, rotation.z);
 }
 
-Vector3 Camera::GetPos()
+Vector3 Camera::pos()
 {
     return pos_;
 }
 
-Vector3 Camera::GetRot()
+Vector3 Camera::rot()
 {
     return rot_;
 }
@@ -58,7 +58,7 @@ void Camera::Render()
     return;
 }
 
-Matrix Camera::GetViewMatrix()
+Matrix Camera::view_matrix()
 {
     return view_matrix_;
 }

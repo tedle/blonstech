@@ -107,33 +107,33 @@ void Model::Render(RenderContext& context)
 {
     // TODO: Clean this up with operator overloads
     world_matrix_ = MatrixMultiply(MatrixIdentity(), MatrixTranslation(pos_.x, pos_.y, pos_.z));
-    context->SetModelBuffer(mesh_->GetVertexBuffer(), mesh_->GetIndexBuffer());
+    context->SetModelBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
 
     return;
 }
 
-int Model::GetIndexCount()
+int Model::index_count()
 {
-    return mesh_->GetIndexCount();
+    return mesh_->index_count();
 }
 
-TextureResource* Model::GetTexture()
+TextureResource* Model::texture()
 {
     // TODO: getters for all types of textures
-    return diffuse_texture_->GetTexture();
+    return diffuse_texture_->texture();
 }
 
-Vector3 Model::GetPos()
+Vector3 Model::pos()
 {
     return pos_;
 }
 
-Matrix Model::GetWorldMatrix()
+Matrix Model::world_matrix()
 {
     return world_matrix_;
 }
 
-void Model::SetPos(float x, float y, float z)
+void Model::set_pos(float x, float y, float z)
 {
     pos_ = Vector3(x, y, z);
 }

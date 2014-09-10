@@ -36,7 +36,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    camera_->SetPos(0.0f, 0.0f, -10.0f);
+    camera_->set_pos(0.0f, 0.0f, -10.0f);
 
     // Model 1
     models_.push_back(std::unique_ptr<Model>(new Model));
@@ -50,7 +50,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
-    models_[0]->SetPos(0.0, 0.0, 20.0);
+    models_[0]->set_pos(0.0, 0.0, 20.0);
     // Model 2
     models_.push_back(std::unique_ptr<Model>(new Model));
     if (models_[1] == nullptr)
@@ -63,7 +63,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
     }
-    models_[1]->SetPos(10.0, 0.0, 20.0);
+    models_[1]->set_pos(10.0, 0.0, 20.0);
     models_ = load_codmap("../notes/bms_test", std::move(models_), context_);
 
     // Shaders
@@ -112,7 +112,7 @@ bool Graphics::Frame()
     return true;
 }
 
-Camera* Graphics::GetCamera()
+Camera* Graphics::camera()
 {
     return camera_.get();
 }
@@ -128,17 +128,17 @@ bool Graphics::Render()
     camera_->Render();
 
     // Get matrices
-    view_matrix       = camera_->GetViewMatrix();
-    projection_matrix = context_->GetProjectionMatrix();
+    view_matrix       = camera_->view_matrix();
+    projection_matrix = context_->projection_matrix();
 
     for (auto const& model : models_)
     {
         // Prep the pipeline 4 drawering
         model->Render(context_);
-        world_matrix = model->GetWorldMatrix();
+        world_matrix = model->world_matrix();
 
         // Finally do the render
-        if (!shader_->Render(model->GetIndexCount(), model->GetTexture(),
+        if (!shader_->Render(model->index_count(), model->texture(),
             world_matrix, view_matrix, projection_matrix, context_))
         {
             return false;

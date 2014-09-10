@@ -78,8 +78,8 @@ public:
     bool SetShaderInputs(ShaderResource* program, TextureResource* texture,
                          Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix);
 
-    Matrix GetProjectionMatrix();
-    Matrix GetOrthoMatrix();
+    Matrix projection_matrix();
+    Matrix ortho_matrix();
 
     void GetVideoCardInfo(char* buffer, int& len_buffer);
 

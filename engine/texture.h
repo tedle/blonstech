@@ -18,7 +18,7 @@ public:
     bool Init(const char* filename, Type type, RenderContext& context);
     void Finish(RenderContext& context);
 
-    TextureResource* GetTexture();
+    TextureResource* texture();
 
 private:
     std::unique_ptr<TextureResource> texture_;

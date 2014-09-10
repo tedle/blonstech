@@ -34,7 +34,7 @@ public:
     void Finish();
     bool Frame();
 
-    Camera* GetCamera();
+    Camera* camera();
 
 private:
     bool Render();

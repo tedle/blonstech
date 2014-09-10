@@ -409,12 +409,12 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matri
     return true;
 }
 
-Matrix RenderGL40::GetProjectionMatrix()
+Matrix RenderGL40::projection_matrix()
 {
     return proj_matrix_;
 }
 
-Matrix RenderGL40::GetOrthoMatrix()
+Matrix RenderGL40::ortho_matrix()
 {
     return ortho_matrix_;
 }

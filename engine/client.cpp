@@ -109,15 +109,15 @@ bool Client::Frame()
 
     // TODO: THIS IS TEMP DELETE LATER
     // Handles mouselook and wasd movement
-    noclip(input_.get(), graphics_->GetCamera());
-    //move_camera_around_origin(1.0f, graphics_->GetCamera());
+    noclip(input_.get(), graphics_->camera());
+    //move_camera_around_origin(1.0f, graphics_->camera());
     /*if (input_->IsKeyDown('A'))
     {
-        move_camera_around_origin(-1.0f, graphics_->GetCamera());
+        move_camera_around_origin(-1.0f, graphics_->camera());
     }
     if (input_->IsKeyDown('D'))
     {
-        move_camera_around_origin(1.0f, graphics_->GetCamera());
+        move_camera_around_origin(1.0f, graphics_->camera());
     }*/
     // END TEMP
 

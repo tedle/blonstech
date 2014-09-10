@@ -707,12 +707,12 @@ bool RenderD3D11::SetShaderInputs(ShaderResource* program, TextureResource* text
 }
 
 // Copy helpers
-Matrix RenderD3D11::GetProjectionMatrix()
+Matrix RenderD3D11::projection_matrix()
 {
     return proj_matrix_;
 }
 
-Matrix RenderD3D11::GetOrthoMatrix()
+Matrix RenderD3D11::ortho_matrix()
 {
     return ortho_matrix_;
 }

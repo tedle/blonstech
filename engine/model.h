@@ -20,12 +20,12 @@ public:
     void Finish(RenderContext& context);
     void Render(RenderContext& context);
 
-    int GetIndexCount();
-    TextureResource* GetTexture();
-    Vector3 GetPos();
-    Matrix GetWorldMatrix();
+    int index_count();
+    TextureResource* texture();
+    Vector3 pos();
+    Matrix world_matrix();
 
-    void SetPos(float x, float y, float z);
+    void set_pos(float x, float y, float z);
 
 private:
     bool InitMesh(const char* filename);
