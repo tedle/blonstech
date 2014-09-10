@@ -9,14 +9,14 @@ Shader::~Shader()
 {
 }
 
-bool Shader::Init(HWND hwnd, RenderContext& context)
+bool Shader::Load(HWND hwnd, RenderContext& context)
 {
     program_ = std::unique_ptr<ShaderResource>(new ShaderResource);
     ShaderAttributeList inputs;
     inputs.push_back(ShaderAttribute(0, "input_pos"));
     inputs.push_back(ShaderAttribute(1, "input_uv"));
     inputs.push_back(ShaderAttribute(2, "input_norm"));
-    return InitShader(hwnd, L"test.vert.glsl", L"test.frag.glsl", inputs, context);
+    return LoadShader(hwnd, L"test.vert.glsl", L"test.frag.glsl", inputs, context);
 }
 
 void Shader::Finish(RenderContext& context)
@@ -45,7 +45,7 @@ bool Shader::Render(int index_count, TextureResource* texture,
     return true;
 }
 
-bool Shader::InitShader(HWND hwnd, WCHAR* vertex_filename, WCHAR* pixel_filename,
+bool Shader::LoadShader(HWND hwnd, WCHAR* vertex_filename, WCHAR* pixel_filename,
                         ShaderAttributeList inputs, RenderContext& context)
 {
     if (!context->RegisterShader(program_.get(), vertex_filename, pixel_filename, inputs))

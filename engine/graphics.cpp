@@ -45,7 +45,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[0]->Init("../notes/teapot_highpoly.bms", context_))
+    if (!models_[0]->Load("../notes/teapot_highpoly.bms", context_))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
@@ -58,7 +58,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[1]->Init("../notes/cube.bms", context_))
+    if (!models_[1]->Load("../notes/cube.bms", context_))
     {
         MessageBox(hwnd, L"Model die", L"help", MB_OK);
         return false;
@@ -73,7 +73,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!shader_->Init(hwnd, context_))
+    if (!shader_->Load(hwnd, context_))
     {
         MessageBox(hwnd, L"Shaders die", L"help", MB_OK);
         return false;

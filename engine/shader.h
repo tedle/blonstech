@@ -11,12 +11,12 @@ public:
     Shader();
     ~Shader();
 
-    bool Init(HWND, RenderContext& context);
+    bool Load(HWND, RenderContext& context);
     void Finish(RenderContext& context);
     bool Render(int, TextureResource*, Matrix, Matrix, Matrix, RenderContext& context);
 
 private:
-    bool InitShader(HWND, WCHAR*, WCHAR*, ShaderAttributeList, RenderContext& context);
+    bool LoadShader(HWND, WCHAR*, WCHAR*, ShaderAttributeList, RenderContext& context);
     void FinishShader(RenderContext& context);
 
 private:

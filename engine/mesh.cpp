@@ -8,7 +8,7 @@ Mesh::~Mesh()
 {
 }
 
-bool Mesh::Init(MeshImporter* mesh_data, RenderContext& context)
+bool Mesh::Load(MeshImporter* mesh_data, RenderContext& context)
 {
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_  = std::unique_ptr<BufferResource>(context->CreateBufferResource());

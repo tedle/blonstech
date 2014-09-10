@@ -15,7 +15,7 @@ public:
     enum Format {NONE, DXT5, TGA};
     enum Type {DIFFUSE, NORMAL, LIGHT};
 
-    bool Init(const char* filename, Type type, RenderContext& context);
+    bool Load(const char* filename, Type type, RenderContext& context);
     void Finish(RenderContext& context);
 
     TextureResource* texture();

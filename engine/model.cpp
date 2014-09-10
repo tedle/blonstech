@@ -14,7 +14,7 @@ Model::~Model()
 {
 }
 
-bool Model::Init(const char* mesh_filename, RenderContext& context)
+bool Model::Load(const char* mesh_filename, RenderContext& context)
 {
     g_log->Debug("Loading %s... ", mesh_filename);
     DWORD start = GetTickCount();
@@ -35,7 +35,7 @@ bool Model::Init(const char* mesh_filename, RenderContext& context)
         return false;
     }
 
-    if (!mesh_->Init(&mesh_data, context))
+    if (!mesh_->Load(&mesh_data, context))
     {
         return false;
     }
@@ -59,7 +59,7 @@ bool Model::Init(const char* mesh_filename, RenderContext& context)
 
         std::string tex_file;
         tex_file = tex_folder + tex.filename;
-        if (!texture->Init(tex_file.c_str(), tex.type, context))
+        if (!texture->Load(tex_file.c_str(), tex.type, context))
         {
             return false;
         }
@@ -84,7 +84,7 @@ bool Model::Init(const char* mesh_filename, RenderContext& context)
     if (diffuse_texture_ == nullptr)
     {
         diffuse_texture_ = std::unique_ptr<Texture>(new Texture);
-        if (!diffuse_texture_->Init("../notes/me.dds", Texture::DIFFUSE, context))
+        if (!diffuse_texture_->Load("../notes/me.dds", Texture::DIFFUSE, context))
         {
             return false;
         }
@@ -138,7 +138,7 @@ void Model::set_pos(float x, float y, float z)
     pos_ = Vector3(x, y, z);
 }
 
-bool Model::InitMesh(const char* filename)
+bool Model::LoadMesh(const char* filename)
 {
 
     return true;
@@ -153,7 +153,7 @@ void Model::FinishMesh(RenderContext& context)
     return;
 }
 
-bool Model::InitTexture(const char* filename, Texture::Type type)
+bool Model::LoadTexture(const char* filename, Texture::Type type)
 {
     return true;
 }

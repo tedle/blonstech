@@ -16,7 +16,7 @@ public:
     Model();
     ~Model();
 
-    bool Init(const char* mesh_filename, RenderContext& context);
+    bool Load(const char* mesh_filename, RenderContext& context);
     void Finish(RenderContext& context);
     void Render(RenderContext& context);
 
@@ -28,10 +28,10 @@ public:
     void set_pos(float x, float y, float z);
 
 private:
-    bool InitMesh(const char* filename);
+    bool LoadMesh(const char* filename);
     void FinishMesh(RenderContext& context);
 
-    bool InitTexture(const char* filename, Texture::Type type);
+    bool LoadTexture(const char* filename, Texture::Type type);
     void FinishTexture(RenderContext& context);
 
     std::unique_ptr<Mesh> mesh_;
