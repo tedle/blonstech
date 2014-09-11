@@ -50,7 +50,7 @@ bool Shader::LoadShader(HWND hwnd, WCHAR* vertex_filename, WCHAR* pixel_filename
 {
     if (!context->RegisterShader(program_.get(), vertex_filename, pixel_filename, inputs))
     {
-        MessageBox(hwnd, L"Failed to compile shaders\nSee shader.log", vertex_filename, MB_OK);
+        g_log->Fatal("Shaders failed to compile\n");
         return false;
     }
 

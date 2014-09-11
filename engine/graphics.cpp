@@ -25,7 +25,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
     if (!context_->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
     {
-        MessageBox(hwnd, L"Render die", L"help", MB_OK);
+        g_log->Fatal("Renderer failed to initailize\n");
         return false;
     }
 
@@ -47,7 +47,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
     if (!models_[0]->Load("../notes/teapot_highpoly.bms", context_))
     {
-        MessageBox(hwnd, L"Model die", L"help", MB_OK);
+        g_log->Fatal("FATAL: Teapot initialization procedures were unsuccessful\n");
         return false;
     }
     models_[0]->set_pos(0.0, 0.0, 20.0);
@@ -60,7 +60,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
     if (!models_[1]->Load("../notes/cube.bms", context_))
     {
-        MessageBox(hwnd, L"Model die", L"help", MB_OK);
+        g_log->Fatal("no cube :(\n");
         return false;
     }
     models_[1]->set_pos(10.0, 0.0, 20.0);
@@ -75,7 +75,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
 
     if (!shader_->Load(hwnd, context_))
     {
-        MessageBox(hwnd, L"Shaders die", L"help", MB_OK);
+        g_log->Fatal("Shaders failed to initialize\n");
         return false;
     }
 

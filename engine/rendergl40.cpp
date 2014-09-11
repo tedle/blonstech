@@ -496,10 +496,9 @@ void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
     {
         glGetProgramInfoLog(resource, buffer_size, nullptr, compile_errors.get());
     }
-    // Write 'em to disk
-    std::ofstream fout("shader.log");
-    fout.write(compile_errors.get(), buffer_size);
-    fout.close();
+    g_log->Debug("----- SHADER COMPILATION LOG -------------------------\n");
+    g_log->Debug(compile_errors.get());
+    g_log->Debug("------------------------------------------------------\n");
 
     return;
 }
