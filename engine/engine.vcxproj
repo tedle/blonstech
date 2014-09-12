@@ -42,6 +42,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <IncludePath>$(SolutionDir)\external;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\external;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -59,6 +60,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>FreeType2/lib/freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -100,6 +102,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="font.h" />
     <ClInclude Include="glfuncloader.h" />
     <ClInclude Include="logger.h" />
     <ClInclude Include="loggeride.h" />
