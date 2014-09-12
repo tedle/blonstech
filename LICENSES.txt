@@ -1,0 +1,9 @@
+---------------------- FreeType --------------------------
+Portions of this software are copyright 2014 The FreeType
+Project (www.freetype.org).  All rights reserved.
+----------------------------------------------------------
+
+---------------------- SOIL2 -----------------------------
+Simple OpenGL Image Library 2. It's in the public domain.
+Check it out: https://bitbucket.org/SpartanJ/soil2
+----------------------------------------------------------
