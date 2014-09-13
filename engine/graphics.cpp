@@ -1,39 +1,29 @@
 #include "graphics.h"
 
-Graphics::Graphics()
+Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 {
     context_ = nullptr;
     camera_ = nullptr;
     shader_ = nullptr;
-}
 
-Graphics::~Graphics()
-{
-}
-
-bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
-{
     // DirectX
     //context_ = RenderContext(new RenderD3D11);
 
     // OpenGL
-    context_ = RenderContext(new RenderGL40);
+    context_ = RenderContext(new RenderGL40(screen_width, screen_height, kEnableVsync, hwnd,
+                                            (kRenderMode==kRenderModeFullscreen),
+                                            kScreenDepth, kScreenNear));
     if (!context_)
     {
-        return false;
-    }
-
-    if (!context_->Init(screen_width, screen_height, kEnableVsync, hwnd, (kRenderMode==kRenderModeFullscreen), kScreenDepth, kScreenNear))
-    {
         g_log->Fatal("Renderer failed to initailize\n");
-        return false;
+        throw "Failed to initialize rendering context";
     }
 
     // Camera
     camera_ = std::unique_ptr<Camera>(new Camera);
     if (camera_ == nullptr)
     {
-        return false;
+        throw "Failed to initialize camera";
     }
 
     camera_->set_pos(0.0f, 0.0f, -10.0f);
@@ -42,26 +32,26 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     models_.push_back(std::unique_ptr<Model>(new Model));
     if (models_[0] == nullptr)
     {
-        return false;
+        throw "Failed to initialize model";
     }
 
     if (!models_[0]->Load("../notes/teapot_highpoly.bms", context_))
     {
         g_log->Fatal("FATAL: Teapot initialization procedures were unsuccessful\n");
-        return false;
+        throw "Failed to initialize model";
     }
     models_[0]->set_pos(0.0, 0.0, 20.0);
     // Model 2
     models_.push_back(std::unique_ptr<Model>(new Model));
     if (models_[1] == nullptr)
     {
-        return false;
+        throw "Failed to initialize model";
     }
 
     if (!models_[1]->Load("../notes/cube.bms", context_))
     {
         g_log->Fatal("no cube :(\n");
-        return false;
+        throw "Failed to initialize model";
     }
     models_[1]->set_pos(10.0, 0.0, 20.0);
     models_ = load_codmap("../notes/bms_test", std::move(models_), context_);
@@ -70,16 +60,18 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     shader_ = std::unique_ptr<Shader>(new Shader);
     if (shader_ == nullptr)
     {
-        return false;
+        throw "Failed to initialize shader";
     }
 
     if (!shader_->Load(hwnd, context_))
     {
         g_log->Fatal("Shaders failed to initialize\n");
-        return false;
+        throw "Failed to initialize shader";
     }
+}
 
-    return true;
+Graphics::~Graphics()
+{
 }
 
 bool Graphics::Frame()

@@ -8,6 +8,27 @@ Client::Client()
 
     input_ = nullptr;
     graphics_ = nullptr;
+
+    // Initialize logger
+    g_log = std::unique_ptr<LoggerAPI>(new LoggerIDE(LoggerAPI::Level::DEBUG));
+
+    int screen_width, screen_height;
+    screen_width = screen_height = 0;
+
+    // Open window and get w+h
+    InitWindow(screen_width, screen_height);
+
+    input_ = std::unique_ptr<Input>(new Input);
+    if (input_ == nullptr)
+    {
+        throw "Failed input initilization";
+    }
+
+    graphics_ = std::unique_ptr<Graphics>(new Graphics(screen_width, screen_height, hwnd_));
+    if (graphics_ == nullptr)
+    {
+        throw "Failed graphics initialization";
+    }
 }
 
 Client::~Client()
@@ -28,44 +49,6 @@ Client::~Client()
     hinstance_ = nullptr;
 
     return;
-}
-
-bool Client::Init()
-{
-    // Initialize logger
-    g_log = std::unique_ptr<LoggerAPI>(new LoggerIDE(LoggerAPI::Level::DEBUG));
-
-    int screen_width, screen_height;
-    screen_width = screen_height = 0;
-
-    // Open window and get w+h
-    InitWindow(screen_width, screen_height);
-
-    input_ = std::unique_ptr<Input>(new Input);
-    if (input_ == nullptr)
-    {
-        return false;
-    }
-
-    // Do what the implementation needs to get started
-    if (!input_->Init())
-    {
-        return false;
-    }
-
-    graphics_ = std::unique_ptr<Graphics>(new Graphics);
-    if (graphics_ == nullptr)
-    {
-        return false;
-    }
-
-    // Figure out all that directy stuff
-    if (!graphics_->Init(screen_width, screen_height, hwnd_))
-    {
-        return false;
-    }
-
-    return true;
 }
 
 void Client::Run()

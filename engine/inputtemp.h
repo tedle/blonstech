@@ -9,8 +9,6 @@ public:
     Input();
     ~Input();
 
-    bool Init();
-
     void KeyDown(unsigned int);
     void KeyUp(unsigned int);
 

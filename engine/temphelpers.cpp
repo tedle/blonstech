@@ -168,7 +168,7 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
         throw "model problem";
     }
 
-    if (!models[1]->Init(L"../notes/codmap.mesh", L"../notes/me.dds"))
+    if (!models[1]->Load(L"../notes/codmap.mesh", L"../notes/me.dds"))
     {
         throw "other model problem";
     }

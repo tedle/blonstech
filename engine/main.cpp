@@ -8,8 +8,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     if (!client)
         return 0;
 
-    if (client->Init())
-        client->Run();
+    client->Run();
 
     delete client;
 

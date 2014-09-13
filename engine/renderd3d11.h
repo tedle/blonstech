@@ -54,11 +54,9 @@ class RenderD3D11 : public RenderAPI
 {
     
 public:
-    RenderD3D11();
+    RenderD3D11(int screen_width, int screen_height, bool vsync,
+                HWND hwnd, bool fullscreen, float depth, float near);
     ~RenderD3D11();
-
-    bool Init(int screen_width, int screen_height, bool vsync,
-              HWND hwnd, bool fullscreen, float depth, float near);
 
     void BeginScene();
     void EndScene();

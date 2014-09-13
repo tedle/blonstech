@@ -49,11 +49,9 @@ class RenderGL40 : public RenderAPI
 {
     
 public:
-    RenderGL40();
+    RenderGL40(int screen_width, int screen_height, bool vsync,
+               HWND hwnd, bool fullscreen, float depth, float near);
     ~RenderGL40();
-
-    bool Init(int screen_width, int screen_height, bool vsync,
-              HWND hwnd, bool fullscreen, float depth, float near);
 
     void BeginScene();
     void EndScene();

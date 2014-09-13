@@ -32,21 +32,9 @@ ShaderResourceGL40::~ShaderResourceGL40()
     glDeleteProgram(program_);
 }
 
-RenderGL40::RenderGL40()
+RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwnd,
+                       bool fullscreen, float screen_depth, float screen_near)
 {
-}
-
-RenderGL40::~RenderGL40()
-{
-    // Reset the current context before deleting it
-    wglMakeCurrent(device_context_, nullptr);
-    wglDeleteContext(render_context_);
-}
-
-bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd,
-                      bool fullscreen, float screen_depth, float screen_near)
-{
-
     // Defining the pixel format we want OpenGL to use
     const int color_depth = 24;
     const int depth_bits = 24;
@@ -78,7 +66,7 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
                                      0, 0, 640, 480, nullptr, nullptr, hinstance, nullptr);
     if (dummy_hwnd == nullptr)
     {
-        return false;
+        throw "Failed dummy initialization";
     }
 
     // We dont want the world to see us like this
@@ -103,7 +91,7 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
     int pixel_format = ChoosePixelFormat(dummy_device_context, &pfd);
     if (!pixel_format || !SetPixelFormat(dummy_device_context, pixel_format, &pfd))
     {
-        return false;
+        throw "Failed dummy pixel format initialization";
     }
 
     // Creating a false context, to get gl functions, to create a better context...
@@ -113,7 +101,7 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
     // TODO: actually check we get the needed functions
     if (LoadWGLFunctions().size() > 0)
     {
-        return false;
+        throw "Failed to load OpenGL proc addresses";
     }
 
     // Clean up dummy context
@@ -142,7 +130,7 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
     int result = wglChoosePixelFormatARB(device_context_, pixel_attributes, nullptr, 1, &pixel_format, &num_formats);
     if (!result || !SetPixelFormat(device_context_, pixel_format, &pfd))
     {
-        return false;
+        throw "Failed to set pixel format";
     }
 
     // Create the real context
@@ -156,19 +144,19 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
 
     if (render_context_ == nullptr)
     {
-        return false;
+        throw "Failed to create context";
     }
 
     // Clean up the dummy context
     if (!wglMakeCurrent(device_context_, render_context_))
     {
-        return false;
+        throw "Failed to set context as current";
     }
 
     // Finally load the rest of our functions
     if (LoadGLFunctions().size() > 0)
     {
-        return false;
+        throw "Failed to load OpenGL proc addresses";
     }
 
     // Projection matrix (3D space->2D screen)
@@ -202,10 +190,15 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
     vsync_ = vsync;
     if (!wglSwapIntervalEXT(vsync))
     {
-        return false;
+        throw "Failed to configure vertical sync";
     }
+}
 
-    return true;
+RenderGL40::~RenderGL40()
+{
+    // Reset the current context before deleting it
+    wglMakeCurrent(device_context_, nullptr);
+    wglDeleteContext(render_context_);
 }
 
 void RenderGL40::BeginScene()

@@ -27,10 +27,9 @@ class Graphics
 {
 
 public:
-    Graphics();
+    Graphics(int screen_width, int screen_height, HWND hwnd);
     ~Graphics();
 
-    bool Init(int, int, HWND);
     bool Frame();
 
     Camera* camera();

@@ -2,22 +2,16 @@
 
 Input::Input()
 {
-}
-
-Input::~Input()
-{
-}
-
-bool Input::Init()
-{
     for (int i=0; i<256; i++)
         keys_[i] = false;
     for (int i=0; i<2; i++)
         buttons_[i] = false;
 
     mouse_x_ = mouse_y_ = old_mouse_x_ = old_mouse_y_ = delta_mouse_x_ = delta_mouse_y_ = 0;
+}
 
-    return true;
+Input::~Input()
+{
 }
 
 void Input::KeyDown(unsigned int vk)

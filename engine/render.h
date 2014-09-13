@@ -48,9 +48,6 @@ class RenderAPI {
 public:
     virtual ~RenderAPI() {};
 
-    virtual bool Init(int screen_width, int screen_height, bool vsync,
-                      HWND hwnd, bool fullscreen, float depth, float near)=0;
-
     virtual void BeginScene()=0;
     virtual void EndScene()=0;
 
