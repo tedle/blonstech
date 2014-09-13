@@ -14,10 +14,8 @@
 class Mesh
 {
 public:
-    Mesh();
+    Mesh(MeshImporter* mesh_data, RenderContext& context);
     ~Mesh();
-
-    bool Load(MeshImporter* mesh_data, RenderContext& context);
 
     BufferResource* vertex_buffer();
     BufferResource* index_buffer();

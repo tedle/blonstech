@@ -1,26 +1,19 @@
 #include "texture.h"
 
-Texture::Texture()
-{
-    texture_ = nullptr;
-}
-
-Texture::~Texture()
-{
-}
-
-bool Texture::Load(const char* filename, Type type, RenderContext& context)
+Texture::Texture(const char* filename, Type type, RenderContext& context)
 {
     texture_ = std::unique_ptr<TextureResource>(context->LoadDDSFile(filename));
 
     if (texture_ == nullptr)
     {
-        return false;
+        throw "Failed to load texture";
     }
 
     type_ = type;
+}
 
-    return true;
+Texture::~Texture()
+{
 }
 
 TextureResource* Texture::texture()

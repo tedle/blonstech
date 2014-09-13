@@ -9,13 +9,11 @@
 class Texture
 {
 public:
-    Texture();
-    ~Texture();
-
     enum Format {NONE, DXT5, TGA};
     enum Type {DIFFUSE, NORMAL, LIGHT};
 
-    bool Load(const char* filename, Type type, RenderContext& context);
+    Texture(const char* filename, Type type, RenderContext& context);
+    ~Texture();
 
     TextureResource* texture();
 

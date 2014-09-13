@@ -29,26 +29,17 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     camera_->set_pos(0.0f, 0.0f, -10.0f);
 
     // Model 1
-    models_.push_back(std::unique_ptr<Model>(new Model));
+    models_.push_back(std::unique_ptr<Model>(new Model("../notes/teapot_highpoly.bms", context_)));
     if (models_[0] == nullptr)
-    {
-        throw "Failed to initialize model";
-    }
-
-    if (!models_[0]->Load("../notes/teapot_highpoly.bms", context_))
     {
         g_log->Fatal("FATAL: Teapot initialization procedures were unsuccessful\n");
         throw "Failed to initialize model";
     }
     models_[0]->set_pos(0.0, 0.0, 20.0);
-    // Model 2
-    models_.push_back(std::unique_ptr<Model>(new Model));
-    if (models_[1] == nullptr)
-    {
-        throw "Failed to initialize model";
-    }
 
-    if (!models_[1]->Load("../notes/cube.bms", context_))
+    // Model 2
+    models_.push_back(std::unique_ptr<Model>(new Model("../notes/cube.bms", context_)));
+    if (models_[1] == nullptr)
     {
         g_log->Fatal("no cube :(\n");
         throw "Failed to initialize model";
@@ -57,13 +48,8 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     models_ = load_codmap("../notes/bms_test", std::move(models_), context_);
 
     // Shaders
-    shader_ = std::unique_ptr<Shader>(new Shader);
+    shader_ = std::unique_ptr<Shader>(new Shader(hwnd, context_));
     if (shader_ == nullptr)
-    {
-        throw "Failed to initialize shader";
-    }
-
-    if (!shader_->Load(hwnd, context_))
     {
         g_log->Fatal("Shaders failed to initialize\n");
         throw "Failed to initialize shader";

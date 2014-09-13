@@ -1,22 +1,35 @@
 #include "meshimporter.h"
 
-MeshImporter::MeshImporter()
+MeshImporter::MeshImporter(const char* filename)
 {
     vertex_count_ = 0;
     index_count_ = 0;
     uv_count_ = 0;
     normal_count_ = 0;
     face_count_ = 0;
+
+    if (!Load(filename, false))
+    {
+        throw "Failed to import mesh";
+    }
+}
+
+MeshImporter::MeshImporter(const char* filename, bool invert_y)
+{
+    vertex_count_ = 0;
+    index_count_ = 0;
+    uv_count_ = 0;
+    normal_count_ = 0;
+    face_count_ = 0;
+
+    if (!Load(filename, invert_y))
+    {
+        throw "Failed to import mesh";
+    }
 }
 
 MeshImporter::~MeshImporter()
 {
-
-}
-
-bool MeshImporter::Load(const char* filename)
-{
-    return Load(filename, false);
 }
 
 bool MeshImporter::Load(const char* filename, bool invert_y)

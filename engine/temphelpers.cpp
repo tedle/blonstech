@@ -150,27 +150,17 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
             throw "csv read problem";
         }
 
-        models.push_back(std::unique_ptr<Model>(new Model));
+        models.push_back(std::unique_ptr<Model>(new Model(mesh_file.c_str(), context)));
         if (models.back() == nullptr)
         {
             throw "model problem";
         }
-
-        if (!models.back()->Load(mesh_file.c_str(), context))
-        {
-            throw "other model problem";
-        }
         models.back()->set_pos(0.0, 0.0, 0.0);
     }
-    /*models.push_back(std::unique_ptr<Model>(new Model));
+    /*models.push_back(std::unique_ptr<Model>(new Model(L"../notes/codmap.mesh", L"../notes/me.dds")));
     if (models[1] == nullptr)
     {
         throw "model problem";
-    }
-
-    if (!models[1]->Load(L"../notes/codmap.mesh", L"../notes/me.dds"))
-    {
-        throw "other model problem";
     }
     models[1]->set_pos(0.0, 0.0, 0.0);*/
     return models;

@@ -13,10 +13,9 @@
 class Model
 {
 public:
-    Model();
+    Model(const char* mesh_filename, RenderContext& context);
     ~Model();
 
-    bool Load(const char* mesh_filename, RenderContext& context);
     void Render(RenderContext& context);
 
     int index_count();
@@ -27,10 +26,6 @@ public:
     void set_pos(float x, float y, float z);
 
 private:
-    bool LoadMesh(const char* filename);
-
-    bool LoadTexture(const char* filename, Texture::Type type);
-
     std::unique_ptr<Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;
     std::unique_ptr<Texture> normal_texture_;

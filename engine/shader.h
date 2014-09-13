@@ -8,14 +8,10 @@
 class Shader
 {
 public:
-    Shader();
+    Shader(HWND, RenderContext& context);
     ~Shader();
 
-    bool Load(HWND, RenderContext& context);
     bool Render(int, TextureResource*, Matrix, Matrix, Matrix, RenderContext& context);
-
-private:
-    bool LoadShader(HWND, WCHAR*, WCHAR*, ShaderAttributeList, RenderContext& context);
 
 private:
     std::unique_ptr<ShaderResource> program_;

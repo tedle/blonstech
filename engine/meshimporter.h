@@ -11,7 +11,9 @@
 class MeshImporter
 {
 public:
-    MeshImporter();
+    // Defaults invert_y to false
+    MeshImporter(const char* filename);
+    MeshImporter(const char* filename, bool invert_y);
     ~MeshImporter();
 
     struct TextureInfo
@@ -19,10 +21,6 @@ public:
         std::string filename;
         Texture::Type type;
     };
-
-    // Defaults invert_y to false
-    bool Load(const char* filename);
-    bool Load(const char* filename, bool invert_y);
 
     unsigned int vertex_count();
     unsigned int index_count();
@@ -35,6 +33,8 @@ public:
     std::vector<TextureInfo>& textures();
 
 private:
+    bool Load(const char* filename, bool invert_y);
+
     unsigned int vertex_count_, index_count_, uv_count_, normal_count_, face_count_;
     std::vector<Vertex> vertices_;
     std::vector<unsigned int>indices_;

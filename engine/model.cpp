@@ -1,6 +1,6 @@
 #include "model.h"
 
-Model::Model()
+Model::Model(const char* mesh_filename, RenderContext& context)
 {
     mesh_ = nullptr;
     diffuse_texture_ = nullptr;
@@ -8,40 +8,23 @@ Model::Model()
     light_texture_ = nullptr;
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
     world_matrix_ = MatrixIdentity();
-}
 
-Model::~Model()
-{
-}
-
-bool Model::Load(const char* mesh_filename, RenderContext& context)
-{
     g_log->Debug("Loading %s... ", mesh_filename);
     DWORD start = GetTickCount();
 
-    MeshImporter mesh_data;
-    if (!mesh_data.Load(mesh_filename, true))
-    {
-        g_log->Debug("[FAILED]\n");
-        return false;
-    }
+    MeshImporter mesh_data(mesh_filename, true);
     DWORD end = GetTickCount();
     g_log->Debug("[%ims]\n", end - start);
 
-    mesh_ = std::unique_ptr<Mesh>(new Mesh);
+    mesh_ = std::unique_ptr<Mesh>(new Mesh(&mesh_data, context));
 
     if (mesh_ == nullptr)
     {
-        return false;
+        throw "Failed to initialize mesh";
     }
 
-    if (!mesh_->Load(&mesh_data, context))
-    {
-        return false;
-    }
-
-    start = GetTickCount();
     g_log->Debug("Loading textures... ");
+    start = GetTickCount();
     // TODO: replace this with proper filesystem class
     std::string tex_folder(mesh_filename);
     // Go from folder/mesh/ to folder/
@@ -50,18 +33,13 @@ bool Model::Load(const char* mesh_filename, RenderContext& context)
     tex_folder += "/tex/";
     for (const auto& tex : mesh_data.textures())
     {
-        auto texture = std::unique_ptr<Texture>(new Texture);
+        std::string tex_file;
+        tex_file = tex_folder + tex.filename;
+        auto texture = std::unique_ptr<Texture>(new Texture(tex_file.c_str(), tex.type, context));
 
         if (texture == nullptr)
         {
-            return false;
-        }
-
-        std::string tex_file;
-        tex_file = tex_folder + tex.filename;
-        if (!texture->Load(tex_file.c_str(), tex.type, context))
-        {
-            return false;
+            throw "Failed to load texture";
         }
 
         // Transfer new texture to aproppriate member
@@ -83,16 +61,19 @@ bool Model::Load(const char* mesh_filename, RenderContext& context)
     // TODO: make a proper solution for no diffuse texture
     if (diffuse_texture_ == nullptr)
     {
-        diffuse_texture_ = std::unique_ptr<Texture>(new Texture);
-        if (!diffuse_texture_->Load("../notes/me.dds", Texture::DIFFUSE, context))
+        diffuse_texture_ = std::unique_ptr<Texture>(new Texture("../notes/me.dds",
+                                                                Texture::DIFFUSE, context));
+        if (diffuse_texture_ == nullptr)
         {
-            return false;
+            throw "Failed to load diffuse texture";
         }
     }
     end = GetTickCount();
     g_log->Debug("[%ims]\n", end - start);
+}
 
-    return true;
+Model::~Model()
+{
 }
 
 void Model::Render(RenderContext& context)
@@ -128,15 +109,4 @@ Matrix Model::world_matrix()
 void Model::set_pos(float x, float y, float z)
 {
     pos_ = Vector3(x, y, z);
-}
-
-bool Model::LoadMesh(const char* filename)
-{
-
-    return true;
-}
-
-bool Model::LoadTexture(const char* filename, Texture::Type type)
-{
-    return true;
 }

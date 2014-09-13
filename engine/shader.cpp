@@ -1,22 +1,24 @@
 #include "shader.h"
 
-Shader::Shader()
-{
-    program_ = nullptr;
-}
-
-Shader::~Shader()
-{
-}
-
-bool Shader::Load(HWND hwnd, RenderContext& context)
+Shader::Shader(HWND hwnd, RenderContext& context)
 {
     program_ = std::unique_ptr<ShaderResource>(context->CreateShaderResource());
     ShaderAttributeList inputs;
     inputs.push_back(ShaderAttribute(0, "input_pos"));
     inputs.push_back(ShaderAttribute(1, "input_uv"));
     inputs.push_back(ShaderAttribute(2, "input_norm"));
-    return LoadShader(hwnd, L"test.vert.glsl", L"test.frag.glsl", inputs, context);
+    WCHAR* vertex_filename = L"test.vert.glsl";
+    WCHAR* pixel_filename = L"test.frag.glsl";
+
+    if (!context->RegisterShader(program_.get(), vertex_filename, pixel_filename, inputs))
+    {
+        g_log->Fatal("Shaders failed to compile\n");
+        throw "Shaders failed to compile";
+    }
+}
+
+Shader::~Shader()
+{
 }
 
 bool Shader::Render(int index_count, TextureResource* texture,
@@ -34,18 +36,6 @@ bool Shader::Render(int index_count, TextureResource* texture,
     }
 
     context->RenderShader(program_.get(), index_count);
-
-    return true;
-}
-
-bool Shader::LoadShader(HWND hwnd, WCHAR* vertex_filename, WCHAR* pixel_filename,
-                        ShaderAttributeList inputs, RenderContext& context)
-{
-    if (!context->RegisterShader(program_.get(), vertex_filename, pixel_filename, inputs))
-    {
-        g_log->Fatal("Shaders failed to compile\n");
-        return false;
-    }
 
     return true;
 }
