@@ -23,13 +23,6 @@ bool Texture::Load(const char* filename, Type type, RenderContext& context)
     return true;
 }
 
-void Texture::Finish(RenderContext& context)
-{
-    context->DestroyTextureResource(texture_.release());
-
-    return;
-}
-
 TextureResource* Texture::texture()
 {
     return texture_.get();

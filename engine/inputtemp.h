@@ -28,7 +28,6 @@ public:
     int MouseDeltaY();
 
     bool Frame();
-    void Finish();
 
 private:
     bool keys_[256];

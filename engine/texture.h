@@ -16,7 +16,6 @@ public:
     enum Type {DIFFUSE, NORMAL, LIGHT};
 
     bool Load(const char* filename, Type type, RenderContext& context);
-    void Finish(RenderContext& context);
 
     TextureResource* texture();
 

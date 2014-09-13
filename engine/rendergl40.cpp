@@ -1,11 +1,46 @@
 #include "rendergl40.h"
 
+BufferResourceGL40::~BufferResourceGL40()
+{
+    if (type_ == BufferResourceGL40::VERTEX_BUFFER)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+    else if (type_ == BufferResourceGL40::INDEX_BUFFER)
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+    glDeleteBuffers(1, &buffer_);
+
+    glBindVertexArray(0);
+    glDeleteVertexArrays(1, &vertex_array_id_);
+}
+
+TextureResourceGL40::~TextureResourceGL40()
+{
+    glDeleteTextures(1, &texture_);
+}
+
+ShaderResourceGL40::~ShaderResourceGL40()
+{
+    glDetachShader(program_, vertex_shader_);
+    glDetachShader(program_, frag_shader_);
+
+    glDeleteShader(vertex_shader_);
+    glDeleteShader(frag_shader_);
+
+    glDeleteProgram(program_);
+}
+
 RenderGL40::RenderGL40()
 {
 }
 
 RenderGL40::~RenderGL40()
 {
+    // Reset the current context before deleting it
+    wglMakeCurrent(device_context_, nullptr);
+    wglDeleteContext(render_context_);
 }
 
 bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd,
@@ -173,13 +208,6 @@ bool RenderGL40::Init(int screen_width, int screen_height, bool vsync, HWND hwnd
     return true;
 }
 
-void RenderGL40::Finish()
-{
-    // Reset the current context before deleting it
-    wglMakeCurrent(device_context_, nullptr);
-    wglDeleteContext(render_context_);
-}
-
 void RenderGL40::BeginScene()
 {
     glClearColor(1.0, 0.0, 1.0, 1.0);
@@ -204,41 +232,6 @@ TextureResource* RenderGL40::CreateTextureResource()
 ShaderResource* RenderGL40::CreateShaderResource()
 {
     return new ShaderResourceGL40;
-}
-
-void RenderGL40::DestroyBufferResource(BufferResource* buffer)
-{
-    BufferResourceGL40* buf = static_cast<BufferResourceGL40*>(buffer);
-    if (buf->type_ == BufferResourceGL40::VERTEX_BUFFER)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    else if (buf->type_ == BufferResourceGL40::INDEX_BUFFER)
-    {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    }
-    glDeleteBuffers(1, &buf->buffer_);
-
-    glBindVertexArray(0);
-    glDeleteVertexArrays(1, &buf->vertex_array_id_);
-}
-
-void RenderGL40::DestroyTextureResource(TextureResource* texture)
-{
-    TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
-    glDeleteTextures(1, &tex->texture_);
-}
-
-void RenderGL40::DestroyShaderResource(ShaderResource* shader)
-{
-    ShaderResourceGL40* program = static_cast<ShaderResourceGL40*>(shader);
-    glDetachShader(program->program_, program->vertex_shader_);
-    glDetachShader(program->program_, program->frag_shader_);
-
-    glDeleteShader(program->vertex_shader_);
-    glDeleteShader(program->frag_shader_);
-
-    glDeleteProgram(program->program_);
 }
 
 bool RenderGL40::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,

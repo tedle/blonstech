@@ -95,14 +95,6 @@ bool Model::Load(const char* mesh_filename, RenderContext& context)
     return true;
 }
 
-void Model::Finish(RenderContext& context)
-{
-    FinishMesh(context);
-    FinishTexture(context);
-
-    return;
-}
-
 void Model::Render(RenderContext& context)
 {
     // TODO: Clean this up with operator overloads
@@ -144,25 +136,7 @@ bool Model::LoadMesh(const char* filename)
     return true;
 }
 
-void Model::FinishMesh(RenderContext& context)
-{
-    if (mesh_)
-    {
-        mesh_->Finish(context);
-    }
-    return;
-}
-
 bool Model::LoadTexture(const char* filename, Texture::Type type)
 {
     return true;
-}
-
-void Model::FinishTexture(RenderContext& context)
-{
-    if (diffuse_texture_)
-    {
-        diffuse_texture_->Finish(context);
-    }
-    return;
 }

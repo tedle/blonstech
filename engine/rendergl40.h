@@ -19,6 +19,8 @@
 class BufferResourceGL40 : public BufferResource
 {
 public:
+    ~BufferResourceGL40();
+
     GLuint buffer_, vertex_array_id_;
     enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
 };
@@ -26,6 +28,8 @@ public:
 class TextureResourceGL40 : public TextureResource
 {
 public:
+    ~TextureResourceGL40();
+
     GLuint texture_, texture_unit_;
     //ID3D11ShaderResourceView* p;
 };
@@ -33,6 +37,8 @@ public:
 class ShaderResourceGL40 : public ShaderResource
 {
 public:
+    ~ShaderResourceGL40();
+
     GLuint program_;
     GLuint vertex_shader_;
     GLuint frag_shader_;
@@ -48,7 +54,6 @@ public:
 
     bool Init(int screen_width, int screen_height, bool vsync,
               HWND hwnd, bool fullscreen, float depth, float near);
-    void Finish();
 
     void BeginScene();
     void EndScene();
@@ -56,9 +61,6 @@ public:
     BufferResource* CreateBufferResource();
     TextureResource* CreateTextureResource();
     ShaderResource* CreateShaderResource();
-    void DestroyBufferResource(BufferResource* buffer);
-    void DestroyTextureResource(TextureResource* texture);
-    void DestroyShaderResource(ShaderResource* shader);
 
     bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                       Vertex* vertices, unsigned int vert_count,

@@ -24,21 +24,6 @@ bool Mesh::Load(MeshImporter* mesh_data, RenderContext& context)
     return true;
 }
 
-void Mesh::Finish(RenderContext& context)
-{
-    if (index_buffer_)
-    {
-        context->DestroyBufferResource(index_buffer_.release());
-    }
-    
-    if (vertex_buffer_)
-    {
-        context->DestroyBufferResource(vertex_buffer_.release());
-    }
-
-    return;
-}
-
 BufferResource* Mesh::vertex_buffer()
 {
     return vertex_buffer_.get();

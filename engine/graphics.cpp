@@ -82,26 +82,6 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
     return true;
 }
 
-void Graphics::Finish()
-{
-    for (auto const& model : models_)
-    {
-        model->Finish(context_);
-    }
-
-    if (shader_)
-    {
-        shader_->Finish(context_);
-    }
-
-    if (context_)
-    {
-        context_->Finish();
-    }
-
-    return;
-}
-
 bool Graphics::Frame()
 {
     if (!Render())

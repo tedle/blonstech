@@ -26,12 +26,22 @@ struct MatrixBuffer
     Matrix projection;
 };
 
-class BufferResource {};
-class ShaderResource {};
-class TextureResource {};
+class BufferResource {
+public:
+    virtual ~BufferResource() {};
+};
+class ShaderResource {
+public:
+    virtual ~ShaderResource() {};
+};
+class TextureResource {
+public:
+    virtual ~TextureResource() {};
+};
 
 typedef std::pair<unsigned int, std::string> ShaderAttribute;
 typedef std::vector<ShaderAttribute> ShaderAttributeList;
+typedef std::unique_ptr<class RenderAPI> RenderContext;
 
 class RenderAPI {
 
@@ -40,7 +50,6 @@ public:
 
     virtual bool Init(int screen_width, int screen_height, bool vsync,
                       HWND hwnd, bool fullscreen, float depth, float near)=0;
-    virtual void Finish()=0;
 
     virtual void BeginScene()=0;
     virtual void EndScene()=0;
@@ -48,9 +57,6 @@ public:
     virtual BufferResource* CreateBufferResource()=0;
     virtual TextureResource* CreateTextureResource()=0;
     virtual ShaderResource* CreateShaderResource()=0;
-    virtual void DestroyBufferResource(BufferResource* buffer)=0;
-    virtual void DestroyTextureResource(TextureResource* texture)=0;
-    virtual void DestroyShaderResource(ShaderResource* shader)=0;
 
     virtual bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                               Vertex* vertices, unsigned int vert_count,
@@ -81,8 +87,5 @@ protected:
     Matrix proj_matrix_;
     Matrix ortho_matrix_;
 };
-
-// To help readbility
-typedef std::unique_ptr<RenderAPI> RenderContext;
 
 #endif

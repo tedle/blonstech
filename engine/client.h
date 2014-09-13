@@ -23,7 +23,6 @@ public:
     ~Client();
 
     bool Init();
-    void Finish();
     void Run();
 
     // TODO: Temporary until Direct & Raw input are setup
@@ -33,7 +32,6 @@ private:
     // Private functions
     bool Frame();
     void InitWindow(int&, int&);
-    void FinishWindow();
 
     // Private members
     LPCWSTR app_name_;

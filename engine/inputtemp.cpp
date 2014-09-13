@@ -88,8 +88,3 @@ bool Input::Frame()
     old_mouse_y_ = mouse_y_;
     return true;
 }
-
-void Input::Finish()
-{
-    return;
-}

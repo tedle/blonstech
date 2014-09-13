@@ -17,7 +17,6 @@ public:
     ~Model();
 
     bool Load(const char* mesh_filename, RenderContext& context);
-    void Finish(RenderContext& context);
     void Render(RenderContext& context);
 
     int index_count();
@@ -29,10 +28,8 @@ public:
 
 private:
     bool LoadMesh(const char* filename);
-    void FinishMesh(RenderContext& context);
 
     bool LoadTexture(const char* filename, Texture::Type type);
-    void FinishTexture(RenderContext& context);
 
     std::unique_ptr<Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;

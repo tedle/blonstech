@@ -24,18 +24,24 @@
 class BufferResourceD3D11 : public BufferResource
 {
 public:
+    ~BufferResourceD3D11();
+
     ID3D11Buffer* p;
 };
 
 class TextureResourceD3D11 : public TextureResource
 {
 public:
+    ~TextureResourceD3D11();
+
     ID3D11ShaderResourceView* p;
 };
 
 class ShaderResourceD3D11 : public ShaderResource
 {
 public:
+    ~ShaderResourceD3D11();
+
     ID3D11VertexShader* vertex_shader_;
     ID3D11PixelShader* pixel_shader_;
     ID3D11InputLayout* layout_;
@@ -53,7 +59,6 @@ public:
 
     bool Init(int screen_width, int screen_height, bool vsync,
               HWND hwnd, bool fullscreen, float depth, float near);
-    void Finish();
 
     void BeginScene();
     void EndScene();
@@ -61,9 +66,6 @@ public:
     BufferResource* CreateBufferResource();
     TextureResource* CreateTextureResource();
     ShaderResource* CreateShaderResource();
-    void DestroyBufferResource(BufferResource* buffer);
-    void DestroyTextureResource(TextureResource* texture);
-    void DestroyShaderResource(ShaderResource* shader);
 
     bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                       Vertex* vertices, unsigned int vert_count,

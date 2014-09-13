@@ -18,7 +18,6 @@ public:
     ~Mesh();
 
     bool Load(MeshImporter* mesh_data, RenderContext& context);
-    void Finish(RenderContext& context);
 
     BufferResource* vertex_buffer();
     BufferResource* index_buffer();

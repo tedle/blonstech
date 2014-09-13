@@ -1,5 +1,50 @@
 #include "renderd3d11.h"
 
+BufferResourceD3D11::~BufferResourceD3D11()
+{
+    p->Release();
+}
+
+TextureResourceD3D11::~TextureResourceD3D11()
+{
+    p->Release();
+}
+
+ShaderResourceD3D11::~ShaderResourceD3D11()
+{
+    if (sampler_state_)
+    {
+        sampler_state_->Release();
+        sampler_state_ = nullptr;
+    }
+
+    if (matrix_buffer_)
+    {
+        matrix_buffer_->Release();
+        matrix_buffer_ = nullptr;
+    }
+
+    if (layout_)
+    {
+        layout_->Release();
+        layout_ = nullptr;
+    }
+
+    if (pixel_shader_)
+    {
+        pixel_shader_->Release();
+        pixel_shader_ = nullptr;
+    }
+
+    if (vertex_shader_)
+    {
+        vertex_shader_->Release();
+        vertex_shader_ = nullptr;
+    }
+
+    return;
+}
+
 RenderD3D11::RenderD3D11()
 {
     swapchain_ = nullptr;
@@ -14,6 +59,61 @@ RenderD3D11::RenderD3D11()
 
 RenderD3D11::~RenderD3D11()
 {
+    // Always shut down a swapchain in windowed mode or problems happen
+    if (swapchain_)
+    {
+        swapchain_->SetFullscreenState(false, nullptr);
+    }
+
+    if (raster_state_)
+    {
+        raster_state_->Release();
+        raster_state_ = nullptr;
+    }
+
+    if (depth_stencil_view_)
+    {
+        depth_stencil_view_->Release();
+        depth_stencil_view_ = nullptr;
+    }
+
+    if (depth_stencil_state_)
+    {
+        depth_stencil_state_->Release();
+        depth_stencil_state_ = nullptr;
+    }
+
+    if (depth_stencil_buffer_)
+    {
+        depth_stencil_buffer_->Release();
+        depth_stencil_buffer_ = nullptr;
+    }
+
+    if (render_target_view_)
+    {
+        render_target_view_->Release();
+        render_target_view_ = nullptr;
+    }
+
+    if (device_context_)
+    {
+        device_context_->Release();
+        device_context_ = nullptr;
+    }
+
+    if (device_)
+    {
+        device_->Release();
+        device_ = nullptr;
+    }
+
+    if (swapchain_)
+    {
+        swapchain_->Release();
+        swapchain_ = 0;
+    }
+
+    return;
 }
 
 bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwnd, bool fullscreen, float screen_depth, float screen_near)
@@ -289,65 +389,6 @@ bool RenderD3D11::Init(int screen_width, int screen_height, bool vsync, HWND hwn
     return true;
 }
 
-void RenderD3D11::Finish()
-{
-    // Always shut down a swapchain in windowed mode or problems happen
-    if (swapchain_)
-    {
-        swapchain_->SetFullscreenState(false, nullptr);
-    }
-
-    if (raster_state_)
-    {
-        raster_state_->Release();
-        raster_state_ = nullptr;
-    }
-
-    if (depth_stencil_view_)
-    {
-        depth_stencil_view_->Release();
-        depth_stencil_view_ = nullptr;
-    }
-
-    if (depth_stencil_state_)
-    {
-        depth_stencil_state_->Release();
-        depth_stencil_state_ = nullptr;
-    }
-
-    if (depth_stencil_buffer_)
-    {
-        depth_stencil_buffer_->Release();
-        depth_stencil_buffer_ = nullptr;
-    }
-
-    if (render_target_view_)
-    {
-        render_target_view_->Release();
-        render_target_view_ = nullptr;
-    }
-
-    if (device_context_)
-    {
-        device_context_->Release();
-        device_context_ = nullptr;
-    }
-
-    if (device_)
-    {
-        device_->Release();
-        device_ = nullptr;
-    }
-
-    if (swapchain_)
-    {
-        swapchain_->Release();
-        swapchain_ = 0;
-    }
-
-    return;
-}
-
 void RenderD3D11::BeginScene()
 {
     float colour[4];
@@ -384,59 +425,6 @@ TextureResource* RenderD3D11::CreateTextureResource()
 ShaderResource* RenderD3D11::CreateShaderResource()
 {
     return new ShaderResourceD3D11;
-}
-
-void RenderD3D11::DestroyBufferResource(BufferResource* buffer)
-{
-    BufferResourceD3D11* buf = static_cast<BufferResourceD3D11*>(buffer);
-    buf->p->Release();
-    delete buf;
-}
-
-void RenderD3D11::DestroyTextureResource(TextureResource* texture)
-{
-    TextureResourceD3D11* tex = static_cast<TextureResourceD3D11*>(texture);
-    tex->p->Release();
-    delete tex;
-}
-
-void RenderD3D11::DestroyShaderResource(ShaderResource* shader)
-{
-    ShaderResourceD3D11* p = static_cast<ShaderResourceD3D11*>(shader);
-
-    if (p->sampler_state_)
-    {
-        p->sampler_state_->Release();
-        p->sampler_state_ = nullptr;
-    }
-
-    if (p->matrix_buffer_)
-    {
-        p->matrix_buffer_->Release();
-        p->matrix_buffer_ = nullptr;
-    }
-
-    if (p->layout_)
-    {
-        p->layout_->Release();
-        p->layout_ = nullptr;
-    }
-
-    if (p->pixel_shader_)
-    {
-        p->pixel_shader_->Release();
-        p->pixel_shader_ = nullptr;
-    }
-
-    if (p->vertex_shader_)
-    {
-        p->vertex_shader_->Release();
-        p->vertex_shader_ = nullptr;
-    }
-
-    delete p;
-
-    return;
 }
 
 bool RenderD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,

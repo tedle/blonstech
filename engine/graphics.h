@@ -31,7 +31,6 @@ public:
     ~Graphics();
 
     bool Init(int, int, HWND);
-    void Finish();
     bool Frame();
 
     Camera* camera();

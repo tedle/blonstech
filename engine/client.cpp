@@ -12,6 +12,22 @@ Client::Client()
 
 Client::~Client()
 {
+    ShowCursor(true);
+
+    // TODO: Temporary until Direct & Raw input are setup
+    if (kRenderMode == kRenderModeFullscreen)
+    {
+        ChangeDisplaySettings(nullptr, 0);
+    }
+    g_application_handle = nullptr;
+
+    DestroyWindow(hwnd_);
+    hwnd_ = nullptr;
+
+    UnregisterClass(app_name_, hinstance_);
+    hinstance_ = nullptr;
+
+    return;
 }
 
 bool Client::Init()
@@ -50,23 +66,6 @@ bool Client::Init()
     }
 
     return true;
-}
-
-void Client::Finish()
-{
-    if (graphics_ != nullptr)
-    {
-        graphics_->Finish();
-    }
-
-    if (input_ != nullptr)
-    {
-        input_->Finish();
-    }
-
-    FinishWindow();
-
-    return;
 }
 
 void Client::Run()
@@ -209,26 +208,6 @@ void Client::InitWindow(int& screen_width, int& screen_height)
     SetFocus(hwnd_);
 
     //ShowCursor(false);
-
-    return;
-}
-
-void Client::FinishWindow()
-{
-    ShowCursor(true);
-
-    // TODO: Temporary until Direct & Raw input are setup
-    if (kRenderMode == kRenderModeFullscreen)
-    {
-        ChangeDisplaySettings(nullptr, 0);
-    }
-    g_application_handle = nullptr;
-
-    DestroyWindow(hwnd_);
-    hwnd_ = nullptr;
-
-    UnregisterClass(app_name_, hinstance_);
-    hinstance_ = nullptr;
 
     return;
 }
