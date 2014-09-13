@@ -225,7 +225,8 @@ void RenderGL40::DestroyBufferResource(BufferResource* buffer)
 
 void RenderGL40::DestroyTextureResource(TextureResource* texture)
 {
-
+    TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
+    glDeleteTextures(1, &tex->texture_);
 }
 
 void RenderGL40::DestroyShaderResource(ShaderResource* shader)
