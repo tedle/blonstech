@@ -11,7 +11,7 @@ namespace blons
 class Mesh
 {
 public:
-    Mesh(MeshImporter* mesh_data, RenderContext& context);
+    Mesh(class MeshImporter* mesh_data, RenderContext& context);
     ~Mesh();
 
     BufferResource* vertex_buffer();
