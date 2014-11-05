@@ -140,6 +140,7 @@ void FPS()
 
 std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<std::unique_ptr<Model>> models, RenderContext& context)
 {
+    DWORD start = GetTickCount();
     std::string csv_file = folder;
     if (csv_file.back() != '/' && csv_file.back() != '\\')
     {
@@ -187,5 +188,7 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
         throw "other model problem";
     }
     models[1]->set_pos(0.0, 0.0, 0.0);*/
+    DWORD end = GetTickCount();
+    g_log->Debug("Loaded map [%ims]\n", end - start);
     return models;
 }
