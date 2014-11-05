@@ -8,8 +8,6 @@
 #include <memory>
 #include <Windows.h>
 // Local Includes
-#include "loggeride.h"
-#include "temphelpers.h"
 #include "inputtemp.h"
 #include "graphics.h"
 

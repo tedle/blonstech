@@ -1,5 +1,8 @@
 #include "mesh.h"
 
+// Local Includes
+#include "meshimporter.h"
+
 Mesh::Mesh()
 {
 }

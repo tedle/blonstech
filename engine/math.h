@@ -62,6 +62,6 @@ Vector3 Vector3Cross(Vector3 a, Vector3 b);
 Vector3 Vector3Normalize(Vector3 n);
 Vector3 Vector3PitchYawRoll(Matrix view_matrix);
 
-const float kPi = XM_PI;
+const float kPi = 3.14159265358979323846f;
 
 #endif

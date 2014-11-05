@@ -2,12 +2,8 @@
 #define BLONSTECH_MESH_H_
 
 // Includes
-#include <map>
 #include <memory>
-#include <stdio.h>
-#include <vector>
 // Local Includes
-#include "meshimporter.h"
 #include "render.h"
 
 
@@ -17,7 +13,7 @@ public:
     Mesh();
     ~Mesh();
 
-    bool Load(MeshImporter* mesh_data, RenderContext& context);
+    bool Load(class MeshImporter* mesh_data, RenderContext& context);
     void Finish(RenderContext& context);
 
     BufferResource* vertex_buffer();

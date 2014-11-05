@@ -4,9 +4,6 @@
 // Includes
 #include <memory>
 // Local Includes
-#include "math.h"
-#include "mesh.h"
-#include "meshimporter.h"
 #include "render.h"
 #include "texture.h"
 
@@ -34,7 +31,7 @@ private:
     bool LoadTexture(const char* filename, Texture::Type type);
     void FinishTexture(RenderContext& context);
 
-    std::unique_ptr<Mesh> mesh_;
+    std::unique_ptr<class Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;
     std::unique_ptr<Texture> normal_texture_;
     std::unique_ptr<Texture> light_texture_;

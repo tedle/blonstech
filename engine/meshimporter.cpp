@@ -1,5 +1,8 @@
 #include "meshimporter.h"
 
+// Includes
+#include <map>
+
 MeshImporter::MeshImporter()
 {
     vertex_count_ = 0;

@@ -3,7 +3,6 @@
 
 // Includes
 #include <memory>
-#include <stdarg.h>
 #include <string>
 
 class LoggerAPI

@@ -1,5 +1,8 @@
 #include "loggeride.h"
 
+//Includes
+#include <Windows.h>
+
 LoggerIDE::LoggerIDE(Level log_level)
 {
     log_level_ = log_level;

@@ -6,8 +6,8 @@
 #include <gl/GL.h>
 #include <gl/glext.h>
 #include <gl/wglext.h>
-#include <vector>
 #include <string>
+#include <vector>
 
 // Platform independant function loader
 void* glGetProcAddress(const char* func);

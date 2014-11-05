@@ -1,5 +1,12 @@
 #include "renderd3d11.h"
 
+// Includes
+#include <dxgi.h>
+#include <d3dcommon.h>
+// TODO: get rid of this w/ the other one
+#include <d3dcompiler.h>
+#include <fstream>
+
 RenderD3D11::RenderD3D11()
 {
     swapchain_ = nullptr;

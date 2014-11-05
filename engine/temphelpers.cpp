@@ -1,5 +1,17 @@
 #include "temphelpers.h"
 
+// Includes
+#include <Windows.h>
+#include <stdio.h>
+#include <math.h>
+#include <DirectXMath.h>
+#include <iostream>
+#include <fstream>
+// Local Includes
+#include "camera.h"
+#include "inputtemp.h"
+#include "model.h"
+
 Vector3 cur_pos(0.0, 0.0, 0.0);
 
 void noclip(Input* input, Camera* camera)
@@ -120,7 +132,9 @@ void FPS()
         fps_count = 0;
     }
     else
+    {
         fps_count++;
+    }
 }
 
 

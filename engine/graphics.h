@@ -6,13 +6,7 @@
 #include <vector>
 #include <Windows.h>
 // Local Includes
-#include "renderd3d11.h"
-#include "rendergl40.h"
-#include "math.h"
-#include "camera.h"
-#include "model.h"
-#include "shader.h"
-#include "temphelpers.h"
+#include "render.h"
 
 const int kRenderModeFullscreen       = 1;
 const int kRenderModeWindow           = 2;
@@ -34,15 +28,15 @@ public:
     void Finish();
     bool Frame();
 
-    Camera* camera();
+    class Camera* camera();
 
 private:
     bool Render();
 
     RenderContext context_;
-    std::unique_ptr<Camera> camera_;
-    std::unique_ptr<Shader> shader_;
-    std::vector<std::unique_ptr<Model>>  models_;
+    std::unique_ptr<class Camera> camera_;
+    std::unique_ptr<class Shader> shader_;
+    std::vector<std::unique_ptr<class Model>> models_;
 
 };
 

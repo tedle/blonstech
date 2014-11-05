@@ -1,5 +1,10 @@
 #include "model.h"
 
+// Local Includes
+#include "math.h"
+#include "mesh.h"
+#include "meshimporter.h"
+
 Model::Model()
 {
     mesh_ = nullptr;

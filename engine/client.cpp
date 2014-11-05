@@ -1,5 +1,9 @@
 #include "client.h"
 
+// Local Includes
+#include "loggeride.h"
+#include "temphelpers.h"
+
 std::unique_ptr<LoggerAPI> g_log = nullptr;
 
 Client::Client()

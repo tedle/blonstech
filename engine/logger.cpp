@@ -1,5 +1,8 @@
 #include "logger.h"
 
+// Includes
+#include <stdarg.h>
+
 void LoggerAPI::Debug(const char* fmt, ...)
 {
     va_list args;

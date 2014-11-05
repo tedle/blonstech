@@ -1,7 +1,9 @@
 #ifndef BLONSTECH_INPUTTEMP_H_
 #define BLONSTECH_INPUTTEMP_H_
 
+// Includes
 #include <windowsx.h>
+
 class Input
 {
 

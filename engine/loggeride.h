@@ -3,8 +3,6 @@
 
 //Local Includes
 #include "logger.h"
-//Includes
-#include <Windows.h>
 
 class LoggerIDE : public LoggerAPI
 {

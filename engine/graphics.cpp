@@ -1,5 +1,14 @@
 #include "graphics.h"
 
+// Local Includes
+#include "renderd3d11.h"
+#include "rendergl40.h"
+#include "camera.h"
+#include "math.h"
+#include "model.h"
+#include "shader.h"
+#include "temphelpers.h"
+
 Graphics::Graphics()
 {
     context_ = nullptr;

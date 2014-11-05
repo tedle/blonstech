@@ -2,7 +2,6 @@
 #define BLONSTECH_MESHIMPORTER_H_
 
 // Includes
-#include <map>
 #include <string>
 #include <vector>
 // Local Includes

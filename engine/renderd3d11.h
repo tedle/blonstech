@@ -10,12 +10,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 // Includes
-#include <dxgi.h>
-#include <d3dcommon.h>
 #include <d3d11.h>
-// TODO: get rid of this w/ the other one
-#include <d3dcompiler.h>
-#include <fstream>
 // Local Includes
 // #include <DDSTextureLoader\DDSTextureLoader.h>
 #include "math.h"

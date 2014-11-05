@@ -1,17 +1,16 @@
 #ifndef BLONSTECH_TEMPHELPERS_H_
 #define BLONSTECH_TEMPHELPERS_H_
 
-#include <Windows.h>
-#include <stdio.h>
-#include <math.h>
-#include <DirectXMath.h>
-#include <iostream>
-#include <fstream>
-#include "camera.h"
-#include "model.h"
-#include "inputtemp.h"
+// Includes
+#include <memory>
+#include <vector>
+// Local Includes
+#include "render.h"
 
 using namespace DirectX;
+class Camera;
+class Input;
+class Model;
 
 void noclip(Input*, Camera*);
 void move_camera_around_origin(float, Camera*);
