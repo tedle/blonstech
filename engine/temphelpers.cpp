@@ -1,5 +1,19 @@
 #include "temphelpers.h"
 
+// Includes
+#include <Windows.h>
+#include <stdio.h>
+#include <math.h>
+#include <DirectXMath.h>
+#include <iostream>
+#include <fstream>
+// Local Includes
+#include "camera.h"
+#include "inputtemp.h"
+#include "model.h"
+
+namespace blons
+{
 Vector3 cur_pos(0.0, 0.0, 0.0);
 
 void noclip(Input* input, Camera* camera)
@@ -120,12 +134,15 @@ void FPS()
         fps_count = 0;
     }
     else
+    {
         fps_count++;
+    }
 }
 
 
 std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<std::unique_ptr<Model>> models, RenderContext& context)
 {
+    DWORD start = GetTickCount();
     std::string csv_file = folder;
     if (csv_file.back() != '/' && csv_file.back() != '\\')
     {
@@ -162,6 +179,14 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
     {
         throw "model problem";
     }
+
+    if (!models[1]->Init(L"../../notes/codmap.mesh", L"../notes/me.dds"))
+    {
+        throw "other model problem";
+    }
     models[1]->set_pos(0.0, 0.0, 0.0);*/
+    DWORD end = GetTickCount();
+    g_log->Debug("Loaded map [%ims]\n", end - start);
     return models;
 }
+} // namespace blons

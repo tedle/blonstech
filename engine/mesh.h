@@ -2,15 +2,12 @@
 #define BLONSTECH_MESH_H_
 
 // Includes
-#include <map>
 #include <memory>
-#include <stdio.h>
-#include <vector>
 // Local Includes
-#include "meshimporter.h"
 #include "render.h"
 
-
+namespace blons
+{
 class Mesh
 {
 public:
@@ -26,5 +23,6 @@ private:
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
     unsigned int vertex_count_, index_count_;
 };
+} // namespace blons
 
 #endif

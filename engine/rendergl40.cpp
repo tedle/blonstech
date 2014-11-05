@@ -1,5 +1,16 @@
 #include "rendergl40.h"
 
+// Includes
+#include <memory>
+#include <fstream>
+// OpenGL image loader
+#include <SOIL2\SOIL2.h>
+// Local Includes
+#include "glfuncloader.h"
+#include "math.h"
+
+namespace blons
+{
 BufferResourceGL40::~BufferResourceGL40()
 {
     if (type_ == BufferResourceGL40::VERTEX_BUFFER)
@@ -489,3 +500,4 @@ void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
 
     return;
 }
+} // namespace blons

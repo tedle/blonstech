@@ -1,5 +1,7 @@
 #include "inputtemp.h"
 
+namespace blons
+{
 Input::Input()
 {
     for (int i=0; i<256; i++)
@@ -82,3 +84,4 @@ bool Input::Frame()
     old_mouse_y_ = mouse_y_;
     return true;
 }
+} // namespace blons

@@ -10,17 +10,14 @@
 #pragma comment(lib, "d3dcompiler.lib")
 
 // Includes
-#include <dxgi.h>
-#include <d3dcommon.h>
 #include <d3d11.h>
-// TODO: get rid of this w/ the other one
-#include <d3dcompiler.h>
-#include <fstream>
 // Local Includes
 // #include <DDSTextureLoader\DDSTextureLoader.h>
 #include "math.h"
 #include "render.h"
 
+namespace blons
+{
 class BufferResourceD3D11 : public BufferResource
 {
 public:
@@ -104,5 +101,6 @@ private:
     ID3D11DepthStencilView* depth_stencil_view_;
     ID3D11RasterizerState* raster_state_;
 };
+} // namespace blons
     
 #endif

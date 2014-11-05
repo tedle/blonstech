@@ -3,9 +3,10 @@
 
 // Includes
 #include <memory>
-#include <stdarg.h>
 #include <string>
 
+namespace blons
+{
 class LoggerAPI
 {
 public:
@@ -31,4 +32,6 @@ private:
 };
 
 extern std::unique_ptr<LoggerAPI> g_log;
+} // namespace blons
+
 #endif

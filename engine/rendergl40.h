@@ -5,17 +5,13 @@
 #pragma comment(lib, "opengl32.lib")
 
 // Includes
-#include <memory>
 #include <Windows.h>
 #include <gl/GL.h>
-#include <fstream>
 // Local Includes
-#include "glfuncloader.h"
-// OpenGL image loader
-#include <SOIL2\SOIL2.h>
-#include "math.h"
 #include "render.h"
 
+namespace blons
+{
 class BufferResourceGL40 : public BufferResource
 {
 public:
@@ -94,5 +90,6 @@ private:
     HDC device_context_;
     HGLRC render_context_;
 };
+} // namespace blons
     
 #endif

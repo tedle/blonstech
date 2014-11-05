@@ -1,5 +1,7 @@
 #include "shader.h"
 
+namespace blons
+{
 Shader::Shader(HWND hwnd, RenderContext& context)
 {
     program_ = std::unique_ptr<ShaderResource>(context->CreateShaderResource());
@@ -39,3 +41,4 @@ bool Shader::Render(int index_count, TextureResource* texture,
 
     return true;
 }
+} // namespace blons

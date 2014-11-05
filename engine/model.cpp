@@ -1,5 +1,12 @@
 #include "model.h"
 
+// Local Includes
+#include "math.h"
+#include "mesh.h"
+#include "meshimporter.h"
+
+namespace blons
+{
 Model::Model(const char* mesh_filename, RenderContext& context)
 {
     mesh_ = nullptr;
@@ -61,7 +68,7 @@ Model::Model(const char* mesh_filename, RenderContext& context)
     // TODO: make a proper solution for no diffuse texture
     if (diffuse_texture_ == nullptr)
     {
-        diffuse_texture_ = std::unique_ptr<Texture>(new Texture("../notes/me.dds",
+        diffuse_texture_ = std::unique_ptr<Texture>(new Texture("../../notes/me.dds",
                                                                 Texture::DIFFUSE, context));
         if (diffuse_texture_ == nullptr)
         {
@@ -110,3 +117,4 @@ void Model::set_pos(float x, float y, float z)
 {
     pos_ = Vector3(x, y, z);
 }
+} // namespace blons

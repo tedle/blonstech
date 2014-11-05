@@ -1,5 +1,14 @@
 #include "renderd3d11.h"
 
+// Includes
+#include <dxgi.h>
+#include <d3dcommon.h>
+// TODO: get rid of this w/ the other one
+#include <d3dcompiler.h>
+#include <fstream>
+
+namespace blons
+{
 BufferResourceD3D11::~BufferResourceD3D11()
 {
     p->Release();
@@ -746,3 +755,4 @@ void RenderD3D11::OutputShaderErrorMessage(ID3D10Blob* error_message)
     
     return;
 }
+} // namespace blons

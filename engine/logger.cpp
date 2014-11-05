@@ -1,5 +1,10 @@
 #include "logger.h"
 
+// Includes
+#include <stdarg.h>
+
+namespace blons
+{
 void LoggerAPI::Debug(const char* fmt, ...)
 {
     va_list args;
@@ -49,3 +54,4 @@ std::string LoggerAPI::format(const char* fmt, va_list args)
 
     return formatted_string;
 }
+} // namespace blons

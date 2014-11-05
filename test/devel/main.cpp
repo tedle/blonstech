@@ -1,9 +1,8 @@
-#include "client.h"
+#include <engine/client.h>
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
-    Client* client;
-    client = new Client;
+    blons::Client* client = new blons::Client;
 
     if (!client)
         return 0;

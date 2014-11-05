@@ -1,5 +1,7 @@
 #include "math.h"
 
+namespace blons
+{
 Matrix MatrixIdentity()
 {
     XMFLOAT4X4 id;
@@ -170,3 +172,4 @@ Vector3 Vector3PitchYawRoll(Matrix view_matrix)
 
     return rot;
 }
+} // namespace blons

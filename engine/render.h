@@ -10,6 +10,8 @@
 #include "math.h"
 #include "loggeride.h"
 
+namespace blons
+{
 struct Vertex
 {
     Vector3 pos;
@@ -84,5 +86,6 @@ protected:
     Matrix proj_matrix_;
     Matrix ortho_matrix_;
 };
+} // namespace blons
 
 #endif

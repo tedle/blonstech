@@ -1,5 +1,7 @@
 #include "glfuncloader.h"
 
+namespace blons
+{
 void* glGetProcAddress(const char* func)
 {
     // Windows implementation
@@ -259,3 +261,4 @@ PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
+} // namespace blons

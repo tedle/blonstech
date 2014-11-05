@@ -1,5 +1,10 @@
 #include "meshimporter.h"
 
+// Includes
+#include <map>
+
+namespace blons
+{
 MeshImporter::MeshImporter(const char* filename)
 {
     vertex_count_ = 0;
@@ -135,7 +140,7 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     // to cache normal value as its updated once every 3 iterations (once per tri)
     Vector3 current_normal(0.0, 0.0, 0.0);
 
-    // Loads about 20x slower, but +10%~ perf and -50%~ memory
+    // If true: loads about 2x slower, but +10%~ perf and -50%~ memory
     const bool vbo_indexing = false;
     std::map<Vertex, unsigned int> vert_lookup;
 
@@ -253,3 +258,4 @@ std::vector<MeshImporter::TextureInfo>& MeshImporter::textures()
 {
     return textures_;
 }
+} // namespace blons

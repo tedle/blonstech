@@ -10,6 +10,13 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "engine", "engine\engine.vcx
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SOIL2", "external\SOIL2\SOIL2.vcxproj", "{50F9C43C-8124-4129-A5ED-C6013434D123}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "devel", "test\devel\devel.vcxproj", "{9EA41068-2818-4E8C-97B6-D1C99214C956}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B830743E-A80C-4703-8F6C-AD0ED8A1FB8A} = {B830743E-A80C-4703-8F6C-AD0ED8A1FB8A}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Projects", "Test Projects", "{BC467E0B-1594-416E-BD82-80C873D8744F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Multithreaded|Win32 = Debug Multithreaded|Win32
@@ -62,8 +69,15 @@ Global
 		{50F9C43C-8124-4129-A5ED-C6013434D123}.Release|Win32.ActiveCfg = Release|Win32
 		{50F9C43C-8124-4129-A5ED-C6013434D123}.Release|Win32.Build.0 = Release|Win32
 		{50F9C43C-8124-4129-A5ED-C6013434D123}.Release|x64.ActiveCfg = Release|Win32
+		{9EA41068-2818-4E8C-97B6-D1C99214C956}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9EA41068-2818-4E8C-97B6-D1C99214C956}.Debug|Win32.Build.0 = Debug|Win32
+		{9EA41068-2818-4E8C-97B6-D1C99214C956}.Release|Win32.ActiveCfg = Release|Win32
+		{9EA41068-2818-4E8C-97B6-D1C99214C956}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9EA41068-2818-4E8C-97B6-D1C99214C956} = {BC467E0B-1594-416E-BD82-80C873D8744F}
 	EndGlobalSection
 EndGlobal
