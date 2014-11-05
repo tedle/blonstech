@@ -21,6 +21,23 @@ struct Vertex
     bool operator< (const Vertex vert) const {return memcmp(this, &vert, sizeof(Vertex))>0;}
 };
 
+struct PixelData
+{
+    std::unique_ptr<unsigned char[]> pixels;
+    int width;
+    int height;
+    enum BitDepth {
+        A8       = 8,
+        R8G8B8   = 24,
+        R8G8B8A8 = 32
+    } bits;
+    enum Format {
+        AUTO, // Compresses to DXT5 & generates mipmaps
+        DDS,  // Uses mipmaps & compression from image file
+        RAW   // Will not gen mipmaps, will not compress on GPU
+    } format;
+};
+
 struct MatrixBuffer
 {
     Matrix world;
@@ -60,7 +77,7 @@ public:
     virtual bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                               Vertex* vertices, unsigned int vert_count,
                               unsigned int* indices, unsigned int index_count)=0;
-    virtual void RegisterTexture()=0;
+    virtual bool RegisterTexture(TextureResource* texture, PixelData* pixel_data)=0;
     virtual bool RegisterShader(ShaderResource* program,
                                 WCHAR* vertex_filename, WCHAR* pixel_filename,
                                 ShaderAttributeList inputs)=0;
@@ -77,7 +94,7 @@ public:
     virtual void GetVideoCardInfo(char* buffer, int& len_buffer)=0;
 
     // TODO: do this MANULLY in texture class later
-    virtual TextureResource* LoadDDSFile(const char* filename)=0;
+    virtual bool LoadPixelData(const char* filename, PixelData* pixel_data)=0;
 
 protected:
     bool vsync_;

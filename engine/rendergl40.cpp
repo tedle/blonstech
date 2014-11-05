@@ -284,9 +284,69 @@ bool RenderGL40::RegisterMesh(BufferResource* vertex_buffer, BufferResource* ind
     return true;
 }
 
-void RenderGL40::RegisterTexture()
+bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
 {
-    return;
+    TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
+    tex->texture_unit_ = 0;
+
+	// Set the texture unit in which to store the data.
+	glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
+
+	// Generate an ID for the texture.
+	glGenTextures(1, &tex->texture_);
+
+	// Bind the texture as a 2D texture.
+	glBindTexture(GL_TEXTURE_2D, tex->texture_);
+
+    // Load the texture onto GPU
+    unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
+    if (pixel_data->format == PixelData::DDS)
+    {
+        soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
+    }
+    else if (pixel_data->format == PixelData::AUTO)
+    {
+        soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_GL_MIPMAPS;
+    }
+    int channels = 0;
+    switch (pixel_data->bits)
+    {
+    case PixelData::A8:
+        channels = 1;
+        break;
+    case PixelData::R8G8B8:
+        channels = 3;
+        break;
+    case PixelData::R8G8B8A8:
+        channels = 4;
+        break;
+    default:
+        return false;
+    }
+    tex->texture_ = SOIL_create_OGL_texture(pixel_data->pixels.get(), &pixel_data->width, &pixel_data->height,
+                                            channels, tex->texture_, soil_flags);
+    if (tex->texture_ == 0)
+    {
+        return false;
+    }
+
+    // Apply our texture settings (we do this after to override SOIL settings)
+    // Set the texture to repeat when sampled outside UV range
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // Set the texture filtering (SOIL handles this currently)
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+
+    // TODO: attach this to a setting + safety check for max
+    // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &float);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
+
+    // Re enable this for non-dds textures
+    // glGenerateMipmap(GL_TEXTURE_2D);
+
+    return true;
 }
 
 bool RenderGL40::RegisterShader(ShaderResource* program,
@@ -424,52 +484,45 @@ void RenderGL40::GetVideoCardInfo(char* name, int& memory)
     return;
 }
 
-TextureResource* RenderGL40::LoadDDSFile(const char* filename)
+bool RenderGL40::LoadPixelData(const char* filename, PixelData* data)
 {
-    TextureResourceGL40* texture = new TextureResourceGL40;
-    texture->texture_unit_ = 0;
-
-	// Set the texture unit in which to store the data.
-	glActiveTexture(GL_TEXTURE0 + texture->texture_unit_);
-
-	// Generate an ID for the texture.
-	glGenTextures(1, &texture->texture_);
-
-	// Bind the texture as a 2D texture.
-	glBindTexture(GL_TEXTURE_2D, texture->texture_);
-
-    // Load the texture onto GPU
     std::string filetype(filename);
+    int channels = 0;
+    unsigned char* pixel_data = SOIL_load_image(filename, &data->width, &data->height,
+                                                &channels, SOIL_LOAD_AUTO);
+    if (pixel_data == nullptr)
+    {
+        return false;
+    }
+    data->pixels = std::unique_ptr<unsigned char[]>(pixel_data);
+
     filetype = filetype.substr(filetype.size() - 4);
-    unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
+
     if (filetype == ".dds")
     {
-        soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
+        data->format = PixelData::DDS;
     }
     else
     {
-        soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_GL_MIPMAPS;
+        data->format = PixelData::AUTO;
     }
-    texture->texture_ = SOIL_load_OGL_texture(filename, SOIL_LOAD_AUTO, texture->texture_,
-                                              soil_flags);
 
-    // Apply our texture settings (we do this after to override SOIL settings)
-	// Set the texture to repeat when sampled outside UV range
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-	// Set the texture filtering (SOIL handles this currently)
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-
-    // TODO: attach this to a setting + safety check for max
-    // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &float);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
-
-    // Re enable this for non-dds textures
-	// glGenerateMipmap(GL_TEXTURE_2D);
-
-	return texture;
+    switch (channels)
+    {
+    case 1:
+        data->bits = PixelData::A8;
+        break;
+    case 3:
+        data->bits = PixelData::R8G8B8;
+        break;
+    case 4:
+        data->bits = PixelData::R8G8B8A8;
+        break;
+    default:
+        data->bits = PixelData::R8G8B8A8;
+        break;
+    }
+    return true;
 }
 
 void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)

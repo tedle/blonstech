@@ -717,7 +717,7 @@ void RenderD3D11::GetVideoCardInfo(char* name, int& memory)
     return;
 }
 
-TextureResource* RenderD3D11::LoadDDSFile(WCHAR* filename)
+TextureResource* RenderD3D11::LoadPixelData(WCHAR* filename)
 {
     HRESULT result;
 

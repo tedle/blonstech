@@ -81,7 +81,7 @@ public:
     void GetVideoCardInfo(char* buffer, int& len_buffer);
 
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
-    TextureResource* LoadDDSFile(WCHAR* filename);
+    TextureResource* LoadPixelData(WCHAR* filename);
 
 private:
     void OutputShaderErrorMessage(ID3D10Blob*);

@@ -59,7 +59,7 @@ public:
     bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                       Vertex* vertices, unsigned int vert_count,
                       unsigned int* indices, unsigned int index_count);
-    void RegisterTexture();
+    bool RegisterTexture(TextureResource* texture, PixelData* pixel_data);
     bool RegisterShader(ShaderResource* program,
                         WCHAR* vertex_filename, WCHAR* pixel_filename,
                         ShaderAttributeList inputs);
@@ -76,7 +76,7 @@ public:
     void GetVideoCardInfo(char* buffer, int& len_buffer);
 
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
-    TextureResource* LoadDDSFile(const char* filename);
+    bool LoadPixelData(const char* filename, PixelData* pixel_data);
 
 private:
     void LogCompileErrors(GLuint resource, bool is_shader);
