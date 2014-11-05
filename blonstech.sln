@@ -12,6 +12,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SOIL2", "external\SOIL2\SOI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DDSTextureLoader", "external\DDSTextureLoader\DDSTextureLoader.vcxproj", "{9CA2CACB-9952-42B4-AD07-7216E4AEFE11}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "devel", "test\devel\devel.vcxproj", "{9EA41068-2818-4E8C-97B6-D1C99214C956}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B830743E-A80C-4703-8F6C-AD0ED8A1FB8A} = {B830743E-A80C-4703-8F6C-AD0ED8A1FB8A}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -30,6 +35,10 @@ Global
 		{9CA2CACB-9952-42B4-AD07-7216E4AEFE11}.Debug|Win32.Build.0 = Debug|Win32
 		{9CA2CACB-9952-42B4-AD07-7216E4AEFE11}.Release|Win32.ActiveCfg = Release|Win32
 		{9CA2CACB-9952-42B4-AD07-7216E4AEFE11}.Release|Win32.Build.0 = Release|Win32
+		{9EA41068-2818-4E8C-97B6-D1C99214C956}.Debug|Win32.ActiveCfg = Debug|Win32
+		{9EA41068-2818-4E8C-97B6-D1C99214C956}.Debug|Win32.Build.0 = Debug|Win32
+		{9EA41068-2818-4E8C-97B6-D1C99214C956}.Release|Win32.ActiveCfg = Release|Win32
+		{9EA41068-2818-4E8C-97B6-D1C99214C956}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

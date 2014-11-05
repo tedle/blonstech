@@ -1,4 +1,12 @@
 #include "rendergl40.h"
+// Includes
+#include <memory>
+#include <fstream>
+// Local Includes
+#include "glfuncloader.h"
+#include "math.h"
+// OpenGL image loader
+#include <SOIL2\SOIL2.h>
 
 RenderGL40::RenderGL40()
 {
