@@ -84,7 +84,7 @@ bool Model::Load(const char* mesh_filename, RenderContext& context)
     if (diffuse_texture_ == nullptr)
     {
         diffuse_texture_ = std::unique_ptr<Texture>(new Texture);
-        if (!diffuse_texture_->Load("../notes/me.dds", Texture::DIFFUSE, context))
+        if (!diffuse_texture_->Load("../../notes/me.dds", Texture::DIFFUSE, context))
         {
             return false;
         }

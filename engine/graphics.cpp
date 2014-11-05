@@ -45,7 +45,7 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[0]->Load("../notes/teapot_highpoly.bms", context_))
+    if (!models_[0]->Load("../../notes/teapot_highpoly.bms", context_))
     {
         g_log->Fatal("FATAL: Teapot initialization procedures were unsuccessful\n");
         return false;
@@ -58,13 +58,13 @@ bool Graphics::Init(int screen_width, int screen_height, HWND hwnd)
         return false;
     }
 
-    if (!models_[1]->Load("../notes/cube.bms", context_))
+    if (!models_[1]->Load("../../notes/cube.bms", context_))
     {
         g_log->Fatal("no cube :(\n");
         return false;
     }
     models_[1]->set_pos(10.0, 0.0, 20.0);
-    models_ = load_codmap("../notes/bms_test", std::move(models_), context_);
+    models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
 
     // Shaders
     shader_ = std::unique_ptr<Shader>(new Shader);
