@@ -17,6 +17,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "devel", "test\devel\devel.v
 		{B830743E-A80C-4703-8F6C-AD0ED8A1FB8A} = {B830743E-A80C-4703-8F6C-AD0ED8A1FB8A}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test Projects", "Test Projects", "{BC467E0B-1594-416E-BD82-80C873D8744F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -42,5 +44,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9EA41068-2818-4E8C-97B6-D1C99214C956} = {BC467E0B-1594-416E-BD82-80C873D8744F}
 	EndGlobalSection
 EndGlobal
