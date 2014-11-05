@@ -4,6 +4,8 @@
 // Includes
 #include <windowsx.h>
 
+namespace blons
+{
 class Input
 {
 
@@ -37,5 +39,6 @@ private:
     int mouse_x_, mouse_y_, old_mouse_x_, old_mouse_y_, delta_mouse_x_, delta_mouse_y_;
     bool buttons_[2];
 };
+} // namespace blons
 
 #endif

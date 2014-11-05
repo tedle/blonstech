@@ -10,6 +10,8 @@
 #include "math.h"
 #include "loggeride.h"
 
+namespace blons
+{
 struct Vertex
 {
     Vector3 pos;
@@ -84,5 +86,6 @@ protected:
 
 // To help readbility
 typedef std::unique_ptr<RenderAPI> RenderContext;
+} // namespace blons
 
 #endif

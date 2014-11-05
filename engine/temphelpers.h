@@ -7,6 +7,8 @@
 // Local Includes
 #include "render.h"
 
+namespace blons
+{
 using namespace DirectX;
 class Camera;
 class Input;
@@ -16,5 +18,6 @@ void noclip(Input*, Camera*);
 void move_camera_around_origin(float, Camera*);
 void FPS();
 std::vector<std::unique_ptr<Model>> load_codmap(const char*, std::vector<std::unique_ptr<Model>>, RenderContext& context);
+} // namespace blons
 
 #endif

@@ -11,6 +11,8 @@
 #include "inputtemp.h"
 #include "graphics.h"
 
+namespace blons
+{
 // Client Class
 // Controls entirety of program
 class Client{
@@ -46,5 +48,6 @@ private:
 static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 // TODO: Temporary until Direct & Raw input are setup
 static Client* g_application_handle = nullptr;
+} // namespace blons
 
 #endif

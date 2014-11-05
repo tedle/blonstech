@@ -4,6 +4,8 @@
 #include "loggeride.h"
 #include "temphelpers.h"
 
+namespace blons
+{
 std::unique_ptr<LoggerAPI> g_log = nullptr;
 
 Client::Client()
@@ -287,3 +289,4 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
         return DefWindowProc(hwnd, umsg, wparam, lparam);
     }
 }
+} // namespace blons

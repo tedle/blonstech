@@ -9,6 +9,8 @@
 #include "glfuncloader.h"
 #include "math.h"
 
+namespace blons
+{
 RenderGL40::RenderGL40()
 {
 }
@@ -511,3 +513,4 @@ void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
 
     return;
 }
+} // namespace blons

@@ -1,5 +1,7 @@
 #include "camera.h"
 
+namespace blons
+{
 Camera::Camera()
 {
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
@@ -62,3 +64,4 @@ Matrix Camera::view_matrix()
 {
     return view_matrix_;
 }
+} // namespace blons

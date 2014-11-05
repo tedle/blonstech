@@ -7,6 +7,8 @@
 #include <d3dcompiler.h>
 #include <fstream>
 
+namespace blons
+{
 RenderD3D11::RenderD3D11()
 {
     swapchain_ = nullptr;
@@ -769,3 +771,4 @@ void RenderD3D11::OutputShaderErrorMessage(ID3D10Blob* error_message)
     
     return;
 }
+} // namespace blons

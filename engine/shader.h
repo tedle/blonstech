@@ -5,6 +5,8 @@
 // Includes
 #include "render.h"
 
+namespace blons
+{
 class Shader
 {
 public:
@@ -22,5 +24,6 @@ private:
 private:
     std::unique_ptr<ShaderResource> program_;
 };
+} // namespace blons
 
 #endif

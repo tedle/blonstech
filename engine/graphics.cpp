@@ -9,6 +9,8 @@
 #include "shader.h"
 #include "temphelpers.h"
 
+namespace blons
+{
 Graphics::Graphics()
 {
     context_ = nullptr;
@@ -159,3 +161,4 @@ bool Graphics::Render()
 
     return true;
 }
+} // namespace blons

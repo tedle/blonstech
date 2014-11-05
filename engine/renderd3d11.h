@@ -16,6 +16,8 @@
 #include "math.h"
 #include "render.h"
 
+namespace blons
+{
 class BufferResourceD3D11 : public BufferResource
 {
 public:
@@ -99,5 +101,6 @@ private:
     ID3D11DepthStencilView* depth_stencil_view_;
     ID3D11RasterizerState* raster_state_;
 };
+} // namespace blons
     
 #endif

@@ -3,6 +3,8 @@
 // Includes
 #include <map>
 
+namespace blons
+{
 MeshImporter::MeshImporter()
 {
     vertex_count_ = 0;
@@ -243,3 +245,4 @@ std::vector<MeshImporter::TextureInfo>& MeshImporter::textures()
 {
     return textures_;
 }
+} // namespace blons

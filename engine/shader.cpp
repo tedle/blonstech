@@ -1,5 +1,7 @@
 #include "shader.h"
 
+namespace blons
+{
 Shader::Shader()
 {
     program_ = nullptr;
@@ -62,3 +64,4 @@ void Shader::FinishShader(RenderContext& context)
     context->DestroyShaderResource(program_.release());
     return;
 }
+} // namespace blons

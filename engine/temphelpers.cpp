@@ -12,6 +12,8 @@
 #include "inputtemp.h"
 #include "model.h"
 
+namespace blons
+{
 Vector3 cur_pos(0.0, 0.0, 0.0);
 
 void noclip(Input* input, Camera* camera)
@@ -192,3 +194,4 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
     g_log->Debug("Loaded map [%ims]\n", end - start);
     return models;
 }
+} // namespace blons

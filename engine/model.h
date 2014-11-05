@@ -7,6 +7,8 @@
 #include "render.h"
 #include "texture.h"
 
+namespace blons
+{
 class Model
 {
 public:
@@ -38,5 +40,6 @@ private:
     Matrix world_matrix_;
     Vector3 pos_;
 };
+} // namespace blons
 
 #endif

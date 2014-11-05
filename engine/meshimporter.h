@@ -7,6 +7,8 @@
 // Local Includes
 #include "texture.h"
 
+namespace blons
+{
 class MeshImporter
 {
 public:
@@ -39,4 +41,6 @@ private:
     std::vector<unsigned int>indices_;
     std::vector<TextureInfo> textures_;
 };
+} // namespace blons
+
 #endif

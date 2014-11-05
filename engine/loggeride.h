@@ -4,6 +4,8 @@
 //Local Includes
 #include "logger.h"
 
+namespace blons
+{
 class LoggerIDE : public LoggerAPI
 {
 public:
@@ -12,5 +14,6 @@ public:
 private:
     void out(std::string msg, Level log_level);
 };
+} // namespace blons
 
 #endif

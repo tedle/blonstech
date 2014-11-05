@@ -1,5 +1,7 @@
 #include "texture.h"
 
+namespace blons
+{
 Texture::Texture()
 {
     texture_ = nullptr;
@@ -34,3 +36,4 @@ TextureResource* Texture::texture()
 {
     return texture_.get();
 }
+} // namespace blons

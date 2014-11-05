@@ -6,6 +6,8 @@
 // Local Includes
 #include "render.h"
 
+namespace blons
+{
 class Texture
 {
 public:
@@ -25,5 +27,6 @@ private:
     Format format_;
     Type type_;
 };
+} // namespace blons
 
 #endif

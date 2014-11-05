@@ -3,6 +3,8 @@
 
 #include "math.h"
 
+namespace blons
+{
 class Camera
 {
 public:
@@ -24,5 +26,6 @@ private:
     Vector3 rot_;
     Matrix view_matrix_;
 };
+} // namespace blons
 
 #endif

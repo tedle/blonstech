@@ -5,6 +5,8 @@
 #include "mesh.h"
 #include "meshimporter.h"
 
+namespace blons
+{
 Model::Model()
 {
     mesh_ = nullptr;
@@ -171,3 +173,4 @@ void Model::FinishTexture(RenderContext& context)
     }
     return;
 }
+} // namespace blons

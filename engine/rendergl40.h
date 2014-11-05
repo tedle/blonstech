@@ -10,6 +10,8 @@
 // Local Includes
 #include "render.h"
 
+namespace blons
+{
 class BufferResourceGL40 : public BufferResource
 {
 public:
@@ -88,5 +90,6 @@ private:
     HDC device_context_;
     HGLRC render_context_;
 };
+} // namespace blons
     
 #endif

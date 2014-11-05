@@ -8,6 +8,8 @@
 // Local Includes
 #include "render.h"
 
+namespace blons
+{
 const int kRenderModeFullscreen       = 1;
 const int kRenderModeWindow           = 2;
 const int kRenderModeBorderlessWindow = 3;
@@ -39,5 +41,6 @@ private:
     std::vector<std::unique_ptr<class Model>> models_;
 
 };
+} // namespace blons
 
 #endif

@@ -1,5 +1,7 @@
 #include "inputtemp.h"
 
+namespace blons
+{
 Input::Input()
 {
 }
@@ -93,3 +95,4 @@ void Input::Finish()
 {
     return;
 }
+} // namespace blons

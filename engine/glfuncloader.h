@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+namespace blons
+{
 // Platform independant function loader
 void* glGetProcAddress(const char* func);
 
@@ -54,5 +56,6 @@ extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 extern PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 extern PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT;
+} // namespace blons
 
 #endif
