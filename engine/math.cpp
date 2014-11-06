@@ -55,8 +55,8 @@ Matrix MatrixOrthographic(float screen_width, float screen_height,
 {
     Matrix ortho_matrix;
     XMFLOAT4X4 xm;
-    XMStoreFloat4x4(&xm, XMMatrixOrthographicLH(screen_width, screen_height,
-                                                screen_near, screen_depth));
+    XMStoreFloat4x4(&xm, XMMatrixOrthographicOffCenterLH(0, screen_width, 0, screen_height,
+                                                         screen_near, screen_depth));
     ortho_matrix = xm;
     return ortho_matrix;
 }

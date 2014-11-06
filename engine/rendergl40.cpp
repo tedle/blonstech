@@ -294,12 +294,12 @@ bool RenderGL40::RegisterQuad(BufferResource* vertex_buffer, BufferResource* ind
     {
         indices.get()[i] = i;
     }
-    vertices.get()[0].pos.x = -0.5; vertices.get()[0].pos.y = -0.5;
-    vertices.get()[1].pos.x = 0.5; vertices.get()[1].pos.y = -0.5;
-    vertices.get()[2].pos.x = -0.5; vertices.get()[2].pos.y = 0.5;
-    vertices.get()[3].pos.x = -0.5; vertices.get()[3].pos.y = 0.5;
-    vertices.get()[4].pos.x = 0.5; vertices.get()[4].pos.y = 0.5;
-    vertices.get()[5].pos.x = 0.5; vertices.get()[5].pos.y = -0.5;
+    vertices.get()[0].pos.x = 0; vertices.get()[0].pos.y = 0;
+    vertices.get()[1].pos.x = 400; vertices.get()[1].pos.y = 0;
+    vertices.get()[2].pos.x = 0; vertices.get()[2].pos.y = 300;
+    vertices.get()[3].pos.x = 0; vertices.get()[3].pos.y = 300;
+    vertices.get()[4].pos.x = 400; vertices.get()[4].pos.y = 300;
+    vertices.get()[5].pos.x = 400; vertices.get()[5].pos.y = 0;
 
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     BufferResourceGL40* index_buf = static_cast<BufferResourceGL40*>(index_buffer);
