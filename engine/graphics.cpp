@@ -59,7 +59,11 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
 
     // Shaders
-    shader_ = std::unique_ptr<Shader>(new Shader(hwnd, context_));
+    ShaderAttributeList inputs;
+    inputs.push_back(ShaderAttribute(0, "input_pos"));
+    inputs.push_back(ShaderAttribute(1, "input_uv"));
+    inputs.push_back(ShaderAttribute(2, "input_norm"));
+    shader_ = std::unique_ptr<Shader>(new Shader("3d_test.vert.glsl", "3d_test.frag.glsl", inputs, context_));
     if (shader_ == nullptr)
     {
         g_log->Fatal("Shaders failed to initialize\n");
@@ -106,9 +110,17 @@ bool Graphics::Render()
         model->Render(context_);
         world_matrix = model->world_matrix();
 
+        // Set the inputs
+        if (!shader_->SetInput("world_matrix", world_matrix, context_) ||
+            !shader_->SetInput("view_matrix", view_matrix, context_) ||
+            !shader_->SetInput("proj_matrix", projection_matrix, context_) ||
+            !shader_->SetInput("diffuse", model->texture(), context_))
+        {
+            return false;
+        }
+
         // Finally do the render
-        if (!shader_->Render(model->index_count(), model->texture(),
-            world_matrix, view_matrix, projection_matrix, context_))
+        if (!shader_->Render(model->index_count(), context_))
         {
             return false;
         }

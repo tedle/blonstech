@@ -96,10 +96,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="test.frag.glsl">
+    <None Include="3d_test.frag.glsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </None>
-    <None Include="test.vert.glsl">
+    <None Include="3d_test.vert.glsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </None>
   </ItemGroup>

@@ -61,7 +61,7 @@ public:
                       unsigned int* indices, unsigned int index_count);
     bool RegisterTexture(TextureResource* texture, PixelData* pixel_data);
     bool RegisterShader(ShaderResource* program,
-                        WCHAR* vertex_filename, WCHAR* pixel_filename,
+                        const char* vertex_filename, const char* pixel_filename,
                         ShaderAttributeList inputs);
 
     void RenderShader(ShaderResource* program, int index_count);

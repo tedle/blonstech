@@ -23,16 +23,16 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="test.frag.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
-    <None Include="test.vert.glsl">
-      <Filter>Shader Files</Filter>
-    </None>
     <None Include="test.frag.fx">
       <Filter>Shader Files</Filter>
     </None>
     <None Include="test.vert.fx">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="3d_test.frag.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="3d_test.vert.glsl">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>

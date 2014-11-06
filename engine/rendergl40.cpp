@@ -350,7 +350,7 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data
 }
 
 bool RenderGL40::RegisterShader(ShaderResource* program,
-                                WCHAR* vertex_filename, WCHAR* pixel_filename,
+                                const char* vertex_filename, const char* pixel_filename,
                                 ShaderAttributeList inputs)
 {
     ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
