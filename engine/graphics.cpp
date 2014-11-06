@@ -15,7 +15,8 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 {
     context_ = nullptr;
     camera_ = nullptr;
-    shader_ = nullptr;
+    shader3d_ = nullptr;
+    shader2d_ = nullptr;
 
     // DirectX
     //context_ = RenderContext(new RenderD3D11);
@@ -56,19 +57,24 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
         throw "Failed to initialize model";
     }
     models_[1]->set_pos(10.0, 0.0, 20.0);
-    models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
+    //models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
 
     // Shaders
-    ShaderAttributeList inputs;
-    inputs.push_back(ShaderAttribute(0, "input_pos"));
-    inputs.push_back(ShaderAttribute(1, "input_uv"));
-    inputs.push_back(ShaderAttribute(2, "input_norm"));
-    shader_ = std::unique_ptr<Shader>(new Shader("3d_test.vert.glsl", "3d_test.frag.glsl", inputs, context_));
-    if (shader_ == nullptr)
+    ShaderAttributeList inputs3d;
+    inputs3d.push_back(ShaderAttribute(0, "input_pos"));
+    inputs3d.push_back(ShaderAttribute(1, "input_uv"));
+    inputs3d.push_back(ShaderAttribute(2, "input_norm"));
+    shader3d_ = std::unique_ptr<Shader>(new Shader("3d_test.vert.glsl", "3d_test.frag.glsl", inputs3d, context_));
+    if (shader3d_ == nullptr)
     {
         g_log->Fatal("Shaders failed to initialize\n");
         throw "Failed to initialize shader";
     }
+
+    ShaderAttributeList inputs2d;
+    inputs2d.push_back(ShaderAttribute(0, "input_pos"));
+    inputs2d.push_back(ShaderAttribute(1, "input_uv"));
+    shader2d_ = std::unique_ptr<Shader>(new Shader("2d_test.vert.glsl", "2d_test.frag.glsl", inputs2d, context_));
 }
 
 Graphics::~Graphics()
@@ -111,20 +117,32 @@ bool Graphics::Render()
         world_matrix = model->world_matrix();
 
         // Set the inputs
-        if (!shader_->SetInput("world_matrix", world_matrix, context_) ||
-            !shader_->SetInput("view_matrix", view_matrix, context_) ||
-            !shader_->SetInput("proj_matrix", projection_matrix, context_) ||
-            !shader_->SetInput("diffuse", model->texture(), context_))
+        if (!shader3d_->SetInput("world_matrix", world_matrix, context_) ||
+            !shader3d_->SetInput("view_matrix", view_matrix, context_) ||
+            !shader3d_->SetInput("proj_matrix", projection_matrix, context_) ||
+            !shader3d_->SetInput("diffuse", model->texture(), context_))
         {
             return false;
         }
 
         // Finally do the render
-        if (!shader_->Render(model->index_count(), context_))
+        if (!shader3d_->Render(model->index_count(), context_))
         {
             return false;
         }
     }
+
+    // USE STREAM TO UPDATE POS
+    Texture* sprite = new Texture("../../notes/me.dds", Texture::Type::DIFFUSE, context_);
+    std::unique_ptr<BufferResource> vert_buffer(context_->CreateBufferResource());
+    std::unique_ptr<BufferResource> index_buffer(context_->CreateBufferResource());
+    context_->RegisterQuad(vert_buffer.get(), index_buffer.get());
+    context_->SetModelBuffer(vert_buffer.get(), index_buffer.get());
+
+    shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
+    shader2d_->SetInput("view_matrix", view_matrix, context_);
+    shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
+    shader2d_->Render(6, context_);
 
     // Swap buffers
     context_->EndScene();

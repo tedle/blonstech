@@ -77,6 +77,7 @@ public:
     virtual bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                               Vertex* vertices, unsigned int vert_count,
                               unsigned int* indices, unsigned int index_count)=0;
+    virtual bool RegisterQuad(BufferResource* vertex_buffer, BufferResource* index_buffer)=0;
     virtual bool RegisterTexture(TextureResource* texture, PixelData* pixel_data)=0;
     virtual bool RegisterShader(ShaderResource* program,
                                 const char* vertex_filename, const char* pixel_filename,

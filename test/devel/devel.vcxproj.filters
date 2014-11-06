@@ -35,5 +35,11 @@
     <None Include="3d_test.vert.glsl">
       <Filter>Shader Files</Filter>
     </None>
+    <None Include="2d_test.frag.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="2d_test.vert.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

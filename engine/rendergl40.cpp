@@ -192,7 +192,7 @@ RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwn
 
     // Configure how we render tris
     // TODO: re enable back face cullin
-    glEnable(GL_CULL_FACE);
+    glDisable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
     //glDisable(GL_CULL_FACE);
@@ -280,6 +280,61 @@ bool RenderGL40::RegisterMesh(BufferResource* vertex_buffer, BufferResource* ind
     glGenBuffers(1, &index_buf->buffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
+    return true;
+}
+
+bool RenderGL40::RegisterQuad(BufferResource* vertex_buffer, BufferResource* index_buffer)
+{
+    unsigned int vert_count = 6;
+    unsigned int index_count = 6;
+    std::unique_ptr<Vertex> vertices(new Vertex[vert_count]);
+    std::unique_ptr<unsigned int> indices(new unsigned int [index_count]);
+    for (unsigned int i = 0; i < index_count; i++)
+    {
+        indices.get()[i] = i;
+    }
+    vertices.get()[0].pos.x = -0.5; vertices.get()[0].pos.y = -0.5;
+    vertices.get()[1].pos.x = 0.5; vertices.get()[1].pos.y = -0.5;
+    vertices.get()[2].pos.x = -0.5; vertices.get()[2].pos.y = 0.5;
+    vertices.get()[3].pos.x = -0.5; vertices.get()[3].pos.y = 0.5;
+    vertices.get()[4].pos.x = 0.5; vertices.get()[4].pos.y = 0.5;
+    vertices.get()[5].pos.x = 0.5; vertices.get()[5].pos.y = -0.5;
+
+    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
+    BufferResourceGL40* index_buf = static_cast<BufferResourceGL40*>(index_buffer);
+
+    // Set the buffer types
+    vertex_buf->type_ = BufferResourceGL40::VERTEX_BUFFER;
+    index_buf->type_ = BufferResourceGL40::INDEX_BUFFER;
+
+    // Generate a vertex array and set it
+    GLuint vertex_array_id;
+    glGenVertexArrays(1, &vertex_array_id);
+    vertex_buf->vertex_array_id_ = index_buf->vertex_array_id_ = vertex_array_id;
+    glBindVertexArray(vertex_array_id);
+
+    // Attach vertex buffer data to VAO
+    glGenBuffers(1, &vertex_buf->buffer_);
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices.get(), GL_STATIC_DRAW);
+
+    // Enable pos and uv inputs ??
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(1);
+
+    // Layout the Vertex struct type to gpu vertex attributes
+    // Position declaration
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    // UV declaration
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(2*sizeof(float)));
+
+    // Setup the index buffer
+    glGenBuffers(1, &index_buf->buffer_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices.get(), GL_STATIC_DRAW);
 
     return true;
 }
@@ -438,6 +493,9 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Textu
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
     GLuint loc;
 
+    // Must bind shader before you can uniform... for some reason
+    glUseProgram(prog->program_);
+
     // Bind our uniform variables to the shader
     loc = glGetUniformLocation(prog->program_, name);
     if (loc < 0)
@@ -455,6 +513,9 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matri
 {
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
     GLuint loc;
+
+    // Must bind shader before you can uniform... for some reason
+    glUseProgram(prog->program_);
 
     // Bind our uniform variables to the shader
     loc = glGetUniformLocation(prog->program_, name);
