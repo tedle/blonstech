@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "math.h"
 #include "model.h"
+#include "sprite.h"
 #include "shader.h"
 #include "temphelpers.h"
 
@@ -133,11 +134,12 @@ bool Graphics::Render()
     }
 
     // USE STREAM TO UPDATE POS
-    std::unique_ptr<Texture> sprite(new Texture("../../notes/me.dds", Texture::Type::DIFFUSE, context_));
+    /*std::unique_ptr<Texture> sprite(new Texture("../../notes/me.dds", Texture::Type::DIFFUSE, context_));
     std::unique_ptr<BufferResource> vert_buffer(context_->CreateBufferResource());
     std::unique_ptr<BufferResource> index_buffer(context_->CreateBufferResource());
     context_->RegisterQuad(vert_buffer.get(), index_buffer.get());
-    context_->SetModelBuffer(vert_buffer.get(), index_buffer.get());
+    context_->SetModelBuffer(vert_buffer.get(), index_buffer.get());*/
+    std::unique_ptr<Sprite> quad(new Sprite("../../notes/me.dds", context_));
 
     shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
     shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);

@@ -95,6 +95,7 @@
     <ClCompile Include="model.cpp" />
     <ClCompile Include="rendergl40.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="sprite.cpp" />
     <ClCompile Include="temphelpers.cpp" />
     <ClCompile Include="texture.cpp" />
   </ItemGroup>
@@ -118,6 +119,7 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="rendergl40.h" />
     <ClInclude Include="shader.h" />
+    <ClInclude Include="sprite.h" />
     <ClInclude Include="temphelpers.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
