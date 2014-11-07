@@ -12,17 +12,13 @@ Sprite::Sprite(const char* texture_filename, RenderContext& context)
     width_.x = 100;
     width_.y = 500;
 
-    for (unsigned int i = 0; i < 6; i++)
-    {
-        indices_.push_back(i);
-    }
+    indices_.resize(6);
+    indices_ = { 0, 1, 2, 1, 3, 2 };
     Vertex vert;
     vert.pos.x = pos_.x;   vert.pos.y = pos_.y;   vertices_.push_back(vert);
     vert.pos.x = pos_.x;   vert.pos.y = width_.y; vertices_.push_back(vert);
     vert.pos.x = width_.x; vert.pos.y = pos_.y;   vertices_.push_back(vert);
-    vert.pos.x = pos_.x;   vert.pos.y = width_.y; vertices_.push_back(vert);
     vert.pos.x = width_.x; vert.pos.y = width_.y; vertices_.push_back(vert);
-    vert.pos.x = width_.x; vert.pos.y = pos_.y;   vertices_.push_back(vert);
 
     if (!context->RegisterQuad(vertex_buffer_.get(), index_buffer_.get(),
                                vertices_.data(), vertices_.size(),
