@@ -12,5 +12,5 @@ void main(void)
 {
     vec4 texture_col = texture(diffuse, tex_coord);
     frag_colour = texture_col;
-    frag_colour = vec4(1.0, 0.0, 0.0, 1.0);
+    //frag_colour = vec4(1.0, 0.0, 0.0, 1.0);
 }

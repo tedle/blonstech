@@ -138,12 +138,15 @@ bool Graphics::Render()
     std::unique_ptr<BufferResource> vert_buffer(context_->CreateBufferResource());
     std::unique_ptr<BufferResource> index_buffer(context_->CreateBufferResource());
     context_->RegisterQuad(vert_buffer.get(), index_buffer.get());
-    context_->SetModelBuffer(vert_buffer.get(), index_buffer.get());*/
+    context_->BindModelBuffer(vert_buffer.get(), index_buffer.get());*/
     std::unique_ptr<Sprite> quad(new Sprite("../../notes/me.dds", context_));
+    quad->set_pos((sin(GetTickCount64()/500.0f) + 1) * 100,
+                  (sin(GetTickCount64()/351.3854f) + 1) * 100);
+    quad->Render(context_);
 
     shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
     shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-    shader2d_->Render(6, context_);
+    shader2d_->Render(quad->index_count(), context_);
 
     // Swap buffers
     context_->EndScene();

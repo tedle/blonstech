@@ -305,7 +305,8 @@ bool RenderGL40::RegisterQuad(BufferResource* vertex_buffer, BufferResource* ind
     // Attach vertex buffer data to VAO
     glGenBuffers(1, &vertex_buf->buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+    // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
+    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_DYNAMIC_DRAW);
 
     // Enable pos and uv inputs ??
     glEnableVertexAttribArray(0);
@@ -469,9 +470,20 @@ void RenderGL40::RenderShader(ShaderResource* program, int index_count)
     glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
 }
 
-void RenderGL40::SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
+void RenderGL40::BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
+    glBindVertexArray(vertex_buf->vertex_array_id_);
+}
+
+void RenderGL40::SetQuadData(BufferResource* vertex_buffer, Vertex* vertices, unsigned int vert_count)
+{
+    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
+    // Attach vertex buffer data to VAO
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
+    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_DYNAMIC_DRAW);
+
     glBindVertexArray(vertex_buf->vertex_array_id_);
 }
 

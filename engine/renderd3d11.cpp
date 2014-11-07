@@ -631,7 +631,7 @@ void RenderD3D11::RenderShader(ShaderResource* program, int index_count)
     return;
 }
 
-void RenderD3D11::SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
+void RenderD3D11::BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
     BufferResourceD3D11* vertex_buf = static_cast<BufferResourceD3D11*>(vertex_buffer);
     BufferResourceD3D11* index_buf  = static_cast<BufferResourceD3D11*>(index_buffer);

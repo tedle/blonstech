@@ -71,7 +71,7 @@ public:
 
     void RenderShader(ShaderResource* program, int index_count);
 
-    void SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
+    void BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
     bool SetShaderInputs(ShaderResource* program, TextureResource* texture,
                          Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix);
 

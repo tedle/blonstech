@@ -69,7 +69,8 @@ public:
 
     void RenderShader(ShaderResource* program, int index_count);
 
-    void SetModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
+    void BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
+    void SetQuadData(BufferResource* vertex_buffer, Vertex* vertices, unsigned int vert_count);
     bool SetShaderInput(ShaderResource* program, const char* name, Matrix value);
     bool SetShaderInput(ShaderResource* program, const char* name, TextureResource* value);
 
