@@ -2,6 +2,24 @@
 #define BLONSTECH_FONT_H_
 
 // Includes
-#include <FreeType2\include\ft2build.h>
+#include <map>
+#include <vector>
+// Local Includes
+#include "sprite.h"
 
+namespace blons
+{
+class Font
+{
+public:
+    Font(const char* font_filename, RenderContext& context);
+    ~Font();
+    Sprite* test();
+
+private:
+    class Glyph;
+    std::map<unsigned char, Glyph> charset_;
+    std::unique_ptr<Sprite> fontsheet_;
+};
+} // namespace blons
 #endif

@@ -37,6 +37,7 @@ private:
     std::unique_ptr<class Camera> camera_;
     std::unique_ptr<class Shader> shader3d_;
     std::unique_ptr<class Shader> shader2d_;
+    std::unique_ptr<class Font> font_;
     std::vector<std::unique_ptr<class Model>> models_;
 
 };

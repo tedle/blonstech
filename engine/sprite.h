@@ -20,6 +20,7 @@ public:
 
 public:
     Sprite(const char* texture_filename, RenderContext& context);
+    Sprite(PixelData* texture_data, RenderContext& context);
     ~Sprite();
 
     void Render(RenderContext& context);
@@ -31,6 +32,7 @@ public:
     void set_pos(float x, float y);
 
 private:
+    void Init(RenderContext& context);
     void BuildQuad();
 
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;

@@ -4,9 +4,20 @@ namespace blons
 {
 Sprite::Sprite(const char* texture_filename, RenderContext& context)
 {
+    texture_ = std::unique_ptr<Texture>(new Texture(texture_filename, Texture::Type::SPRITE, context));
+    Init(context);
+}
+
+Sprite::Sprite(PixelData* texture_data, RenderContext& context)
+{
+    texture_ = std::unique_ptr<Texture>(new Texture(texture_data, Texture::Type::SPRITE, context));
+    Init(context);
+}
+
+void Sprite::Init(RenderContext& context)
+{
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
-    texture_ = std::unique_ptr<Texture>(new Texture(texture_filename, Texture::Type::DIFFUSE, context));
     pos_ = Box(0, 0, 128, 128);
     tex_map_ = Box(0, 0, 1, 1);
 
@@ -26,7 +37,6 @@ Sprite::Sprite(const char* texture_filename, RenderContext& context)
 
 Sprite::~Sprite()
 {
-
 }
 
 void Sprite::Render(RenderContext& context)

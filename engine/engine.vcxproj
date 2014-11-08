@@ -41,12 +41,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\external;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\external;$(SolutionDir)\external\FreeType2\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\external;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\external;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\external;$(SolutionDir)\external\FreeType2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\external;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -62,6 +63,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>FreeType2/lib/freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalDependencies>FreeType2\lib\freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -79,10 +84,15 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib>
+      <AdditionalDependencies>FreeType2\lib\freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <ProjectReference />
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="font.cpp" />
     <ClCompile Include="glfuncloader.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="loggeride.cpp" />

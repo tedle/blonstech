@@ -4,6 +4,7 @@
 #include "renderd3d11.h"
 #include "rendergl40.h"
 #include "camera.h"
+#include "font.h"
 #include "math.h"
 #include "model.h"
 #include "sprite.h"
@@ -14,6 +15,7 @@ namespace blons
 {
 Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 {
+    font_ = nullptr;
     context_ = nullptr;
     camera_ = nullptr;
     shader3d_ = nullptr;
@@ -59,6 +61,9 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     }
     models_[1]->set_pos(10.0, 0.0, 20.0);
     //models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
+
+    // Fonts
+    font_ = std::unique_ptr<Font>(new Font("yo", context_));
 
     // Shaders
     ShaderAttributeList inputs3d;
@@ -139,14 +144,15 @@ bool Graphics::Render()
     std::unique_ptr<BufferResource> index_buffer(context_->CreateBufferResource());
     context_->RegisterQuad(vert_buffer.get(), index_buffer.get());
     context_->BindModelBuffer(vert_buffer.get(), index_buffer.get());*/
-    std::unique_ptr<Sprite> quad(new Sprite("../../notes/me.dds", context_));
-    quad->set_pos((sin(GetTickCount64()/500.0f) + 1) * 100,
+    //std::unique_ptr<Sprite> quad(new Sprite("../../notes/me.dds", context_));
+    font_->test()->set_pos((sin(GetTickCount64()/500.0f) + 1) * 100,
                   (sin(GetTickCount64()/351.3854f) + 1) * 100);
-    quad->Render(context_);
+    font_->test()->Render(context_);
 
     shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
     shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-    shader2d_->Render(quad->index_count(), context_);
+    shader2d_->SetInput("diffuse", font_->test()->texture(), context_);
+    shader2d_->Render(font_->test()->index_count(), context_);
 
     // Swap buffers
     context_->EndScene();
