@@ -36,7 +36,7 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture
     {
         throw "Couldn't load character";
     }
-    if (FT_Render_Glyph(font_face->glyph, FT_RENDER_MODE_NORMAL) != 0 )
+    if (FT_Render_Glyph(font_face->glyph, FT_RENDER_MODE_NORMAL) != 0)
     {
         throw "Couldn't render character";
     }
