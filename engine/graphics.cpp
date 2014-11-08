@@ -147,6 +147,7 @@ bool Graphics::Render()
     //std::unique_ptr<Sprite> quad(new Sprite("../../notes/me.dds", context_));
     font_->test()->set_pos((sin(GetTickCount64()/500.0f) + 1) * 100,
                   (sin(GetTickCount64()/351.3854f) + 1) * 100);
+    //font_->test()->set_pos(0, 0);
     font_->test()->Render(context_);
 
     shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);

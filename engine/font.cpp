@@ -18,11 +18,11 @@ public:
 Font::Font(const char* font_filename, RenderContext& context)
 {
     fontsheet_ = nullptr;
-    int size_px = 16;
+    int size_px = 72;
     FT_Library library;
     FT_Face face;
 
-    std::string available_chars = "Abcy";
+    std::string available_chars = "Hi, what's up :)";
 
     int error = FT_Init_FreeType(&library);
     if (error)
@@ -87,7 +87,7 @@ Font::Font(const char* font_filename, RenderContext& context)
             {
                 g.pixels_.push_back(*(bitmap.buffer++));
             }
-            bitmap.buffer += bitmap.pitch;
+            bitmap.buffer += (bitmap.pitch - bitmap.width);
         }
         charset_[c] = g;
         tex_width += g.width_;
@@ -111,6 +111,7 @@ Font::Font(const char* font_filename, RenderContext& context)
             tex.get()[x + y * tex_width] = glyph->pixels_[i];
         }
     }
+
     PixelData font;
     font.pixels = std::move(tex);
     font.width = tex_width;

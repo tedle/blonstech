@@ -18,7 +18,7 @@ void Sprite::Init(RenderContext& context)
 {
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
-    pos_ = Box(0, 0, 128, 128);
+    pos_ = Box(0, 0, 275, 48);
     tex_map_ = Box(0, 0, 1, 1);
 
     indices_.resize(6);
