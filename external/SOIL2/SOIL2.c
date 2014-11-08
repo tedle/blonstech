@@ -101,6 +101,10 @@
 
 #endif
 
+#ifndef GL_RG
+#define GL_RG                                               0x8227
+#endif
+
 #ifndef GL_BGRA
 #define GL_BGRA                                             0x80E1
 #endif
@@ -196,6 +200,19 @@ static int isAtLeastGL3()
 	}
 
 	return is_gl3;
+}
+
+static int isAtLeastGL4()
+{
+	static int is_gl4 = SOIL_CAPABILITY_UNKNOWN;
+
+	if ( SOIL_CAPABILITY_UNKNOWN == is_gl4 )
+	{
+		const char * verstr	= (const char *) glGetString( GL_VERSION );
+		is_gl4				= ( verstr && ( atoi(verstr) >= 4 ) );
+	}
+
+	return is_gl4;
 }
 #endif
 
@@ -1613,10 +1630,25 @@ unsigned int
 		switch( channels )
 		{
 		case 1:
-			original_texture_format = GL_LUMINANCE;
+            /* GL_LUMINANCE does not work in GL4, but GL_RED behaves differently */
+            if( isAtLeastGL4() )
+            {
+                original_texture_format = GL_RED;
+            }
+            else
+            {
+                original_texture_format = GL_LUMINANCE;
+            }
 			break;
 		case 2:
-			original_texture_format = GL_LUMINANCE_ALPHA;
+            if (isAtLeastGL4())
+            {
+                original_texture_format = GL_RG;
+            }
+            else
+            {
+                original_texture_format = GL_LUMINANCE_ALPHA;
+            }
 			break;
 		case 3:
 			original_texture_format = GL_RGB;
