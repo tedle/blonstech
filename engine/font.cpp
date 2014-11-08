@@ -8,119 +8,138 @@
 
 namespace blons
 {
-class Font::Glyph
+struct Font::Glyph
 {
-public:
-    std::vector<unsigned char> pixels_;
-    unsigned int width_, height_, tex_offset_, x_offset_, y_offset_;
+    // Needed for std::map storage
+    Glyph() = default;
+    // This constructor's really just for refactoring code into smaller functions
+    Glyph(unsigned char letter, FT_Face font_face, unsigned int texture_offset);
+    // 8-bit monochrome bitmap of character data
+    std::vector<unsigned char> pixels;
+    // Width and height of bitmap
+    unsigned int width, height;
+    // Offset from origin in fontsheet texture
+    unsigned int tex_offset;
+    // Offset from previously rendered character
+    unsigned int x_offset, y_offset;
 };
 
-Font::Font(const char* font_filename, RenderContext& context)
+Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture_offset)
+{
+    unsigned int glyph_index = FT_Get_Char_Index(font_face, letter);
+    if (!glyph_index)
+    {
+        throw "Couldn't locate character";
+    }
+
+    if (FT_Load_Glyph(font_face, glyph_index, FT_LOAD_DEFAULT) != 0)
+    {
+        throw "Couldn't load character";
+    }
+    if (FT_Render_Glyph(font_face->glyph, FT_RENDER_MODE_NORMAL) != 0 )
+    {
+        throw "Couldn't render character";
+    }
+    if (font_face->glyph->format != FT_GLYPH_FORMAT_BITMAP ||
+        font_face->glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY)
+    {
+        throw "Incorrent format of character";
+    }
+
+    FT_Bitmap bitmap = font_face->glyph->bitmap;
+    width = bitmap.width;
+    height = bitmap.rows;
+    tex_offset = texture_offset;
+    x_offset = font_face->glyph->advance.x / 64 - width;
+    y_offset = font_face->glyph->metrics.horiBearingY / 64;
+
+    for (int y = 0; y < bitmap.rows; y++)
+    {
+        for (int x = 0; x < bitmap.width; x++)
+        {
+            pixels.push_back(*(bitmap.buffer++));
+        }
+        // Accounts for bitmap padding
+        bitmap.buffer += (bitmap.pitch - bitmap.width);
+    }
+}
+
+Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
 {
     fontsheet_ = nullptr;
-    int size_px = 72;
+    pixel_size_ = pixel_size;
+
     FT_Library library;
     FT_Face face;
 
-    std::string available_chars = "Hi, what's up :)";
-
-    int error = FT_Init_FreeType(&library);
-    if (error)
+    if (FT_Init_FreeType(&library) != 0)
     {
-        throw "uh oh";
+        throw "Couldn't initialize font library";
     }
 
-    error = FT_New_Face(library, "../../notes/font stuff/test.otf", 0, &face);
-    if (error)
+    if (FT_New_Face(library, font_filename, 0, &face) != 0)
     {
-        throw "uh oh";
+        throw "Couldn't load font file";
     }
 
-    int screen_dpi_w = 0;
-    int screen_dpi_h = 0;
-    //error = FT_Set_Char_Size(face, 0, size_px * 16, screen_dpi_w, screen_dpi_h);
-    error = FT_Set_Pixel_Sizes(face, 0, size_px);
-    if (error)
+    if (FT_Set_Pixel_Sizes(face, 0, pixel_size_) != 0)
     {
-        throw "uh oh";
+        throw "Couldn't set pixel size";
     }
 
     // Used to find glyph in texture fontsheet later
     unsigned int tex_width = 0;
     // Used to determine how tall font texture must be
     unsigned int tex_height = 0;
-    for (auto& c : available_chars)
+    // For every drawable character, get a bitmap rendering of the letter and store it
+    for (auto& c : kAvailableCharacters)
     {
-        unsigned int glyph_index = FT_Get_Char_Index(face, c);
-        if (!glyph_index)
-        {
-            throw "uh oh";
-        }
-
-        error = FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
-        if (error)
-        {
-            throw "uh oh";
-        }
-        error = FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-        if (error)
-        {
-            throw "uh oh";
-        }
-        if (face->glyph->format != FT_GLYPH_FORMAT_BITMAP ||
-            face->glyph->bitmap.pixel_mode != FT_PIXEL_MODE_GRAY)
-        {
-            throw "uh oh";
-        }
-
-        FT_Bitmap bitmap = face->glyph->bitmap;
-        Glyph g;
-        g.width_ = bitmap.width;
-        g.height_ = bitmap.rows;
-        g.tex_offset_ = tex_width;
-        g.x_offset_ = face->glyph->advance.x / 64 - g.width_;
-        g.y_offset_ = face->glyph->metrics.horiBearingY / 64;
-
-        for (int y = 0; y < bitmap.rows; y++)
-        {
-            for (int x = 0; x < bitmap.width; x++)
-            {
-                g.pixels_.push_back(*(bitmap.buffer++));
-            }
-            bitmap.buffer += (bitmap.pitch - bitmap.width);
-        }
+        Glyph g(c, face, tex_width);
         charset_[c] = g;
-        tex_width += g.width_;
-        if (g.height_ > tex_height)
+        tex_width += g.width;
+        if (g.height > tex_height)
         {
-            tex_height = g.height_;
+            tex_height = g.height;
         }
     }
 
+    // Generate a single texture containing every character
     std::unique_ptr<unsigned char> tex(new unsigned char[tex_width*tex_height]);
     // Zero the memory since not all glyphs have the same height
     std::fill(tex.get(), tex.get()+(tex_width*tex_height), 0);
+    // We have to do this as a second pass because we dont know the fontsheet width until
+    // all of the glyphs have been rendered and stored
     for (auto& it : charset_)
     {
         auto glyph = &it.second;
-        auto offset = glyph->tex_offset_;
-        for (unsigned int i = 0; i < glyph->pixels_.size(); i++)
+        auto offset = glyph->tex_offset;
+        for (unsigned int i = 0; i < glyph->pixels.size(); i++)
         {
-            int x = offset + i % glyph->width_;
-            int y = i / glyph->width_;
-            tex.get()[x + y * tex_width] = glyph->pixels_[i];
+            int x = offset + i % glyph->width;
+            int y = i / glyph->width;
+            tex.get()[x + y * tex_width] = glyph->pixels[i];
         }
     }
 
+    // Converge all our pixel data into a handy dandy struct
     PixelData font;
     font.pixels = std::move(tex);
     font.width = tex_width;
     font.height = tex_height;
+    // Single channel monochrome
     font.bits = PixelData::A8;
+    // No compression or mipmaps
     font.format = PixelData::RAW;
+    // Make it a sprite!
     fontsheet_ = std::unique_ptr<Sprite>(new Sprite(&font, context));
+
+    if (FT_Done_FreeType(library) != 0)
+    {
+        throw "uh oh";
+    }
     return;
 }
+// TODO: get rid of this
 Sprite* Font::test()
 {
     return fontsheet_.get();

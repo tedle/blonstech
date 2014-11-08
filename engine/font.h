@@ -12,14 +12,19 @@ namespace blons
 class Font
 {
 public:
-    Font(const char* font_filename, RenderContext& context);
+    Font(const char* font_filename, int pixel_size, RenderContext& context);
     ~Font();
     Sprite* test();
+    const std::string kAvailableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                             "abcdefghijklmnopqrstuvwxyz"
+                                             "0123456789!@#$%^&*()"
+                                             " ,./<>?;':\"[]\\{}|-=_+";
 
 private:
-    class Glyph;
+    struct Glyph;
     std::map<unsigned char, Glyph> charset_;
     std::unique_ptr<Sprite> fontsheet_;
+    std::size_t pixel_size_;
 };
 } // namespace blons
 #endif

@@ -63,7 +63,7 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     //models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
 
     // Fonts
-    font_ = std::unique_ptr<Font>(new Font("yo", context_));
+    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.otf", 24, context_));
 
     // Shaders
     ShaderAttributeList inputs3d;
