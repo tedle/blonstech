@@ -30,7 +30,7 @@ public:
 private:
     // Private functions
     bool Frame();
-    void InitWindow(int& width, int& height);
+    void InitWindow(int* width, int* height);
 
     // Private members
     LPCWSTR app_name_;

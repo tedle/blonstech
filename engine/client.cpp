@@ -22,7 +22,7 @@ Client::Client()
     screen_width = screen_height = 0;
 
     // Open window and get w+h
-    InitWindow(screen_width, screen_height);
+    InitWindow(&screen_width, &screen_height);
 
     input_ = std::unique_ptr<Input>(new Input);
     if (input_ == nullptr)
@@ -118,11 +118,12 @@ bool Client::Frame()
     return true;
 }
 
-void Client::InitWindow(int& screen_width, int& screen_height)
+void Client::InitWindow(int* screen_width, int* screen_height)
 {
     WNDCLASSEX wc = {};
     DEVMODE screen_settings;
     int pos_x, pos_y;
+    int r_width, r_height;
     DWORD style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
     // TODO: Temporary until Direct & Raw input are setup
@@ -151,8 +152,8 @@ void Client::InitWindow(int& screen_width, int& screen_height)
     // TODO: Do it in Graphics later
     if (kRenderMode == kRenderModeFullscreen)
     {
-        screen_width  = GetSystemMetrics(SM_CXSCREEN);
-        screen_height = GetSystemMetrics(SM_CYSCREEN);
+        r_width  = GetSystemMetrics(SM_CXSCREEN);
+        r_height = GetSystemMetrics(SM_CYSCREEN);
 
         // Init screen settings
         memset(&screen_settings, 0, sizeof(screen_settings));
@@ -169,18 +170,18 @@ void Client::InitWindow(int& screen_width, int& screen_height)
     }
     else if (kRenderMode == kRenderModeWindow)
     {
-        screen_width = 800;
-        screen_height = 600;
+        r_width  = 800;
+        r_height = 600;
 
-        pos_x = (GetSystemMetrics(SM_CXSCREEN) - screen_width) / 2;
-        pos_y = (GetSystemMetrics(SM_CYSCREEN) - screen_height) / 2;
+        pos_x = (GetSystemMetrics(SM_CXSCREEN) - r_width)  / 2;
+        pos_y = (GetSystemMetrics(SM_CYSCREEN) - r_height) / 2;
 
         style |= WS_BORDER | WS_SYSMENU;
     }
     else if (kRenderMode == kRenderModeBorderlessWindow)
     {
-        screen_width  = GetSystemMetrics(SM_CXSCREEN);
-        screen_height = GetSystemMetrics(SM_CYSCREEN);
+        r_width  = GetSystemMetrics(SM_CXSCREEN);
+        r_height = GetSystemMetrics(SM_CYSCREEN);
 
         pos_x = pos_y = 0;
 
@@ -189,12 +190,18 @@ void Client::InitWindow(int& screen_width, int& screen_height)
 
     // Finally make the window, fuck win32
     hwnd_ = CreateWindowEx(WS_EX_APPWINDOW, app_name_, app_name_, style,
-                            pos_x, pos_y, screen_width, screen_height, nullptr, nullptr, hinstance_, nullptr);
+                            pos_x, pos_y, r_width, r_height, nullptr, nullptr, hinstance_, nullptr);
 
     // Make it real
     ShowWindow(hwnd_, SW_SHOW);
     SetForegroundWindow(hwnd_);
     SetFocus(hwnd_);
+
+    // Poll for inner window dimensions (r_width/height have window border tacked on)
+    RECT rect;
+    GetClientRect(hwnd_, &rect); 
+    (*screen_width)  = rect.right;
+    (*screen_height) = rect.bottom;
 
     //ShowCursor(false);
 
