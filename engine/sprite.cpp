@@ -18,7 +18,8 @@ void Sprite::Init(RenderContext& context)
 {
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
-    pos_ = Box(0, 0, 275, 48);
+    Texture::Info dimensions = texture_->info();
+    pos_ = Box(0, 0, dimensions.width, dimensions.height);
     tex_map_ = Box(0, 0, 1, 1);
 
     indices_.resize(6);
@@ -64,8 +65,15 @@ Vector2 Sprite::pos()
 
 void Sprite::set_pos(float x, float y)
 {
+    set_pos(x, y, pos_.w, pos_.h);
+}
+
+void Sprite::set_pos(float x, float y, float w, float h)
+{
     pos_.x = x;
     pos_.y = y;
+    pos_.w = w;
+    pos_.h = h;
 }
 
 void Sprite::BuildQuad()

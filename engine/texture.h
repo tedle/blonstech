@@ -11,20 +11,24 @@ namespace blons
 class Texture
 {
 public:
-    enum Format {NONE, DXT5, TGA};
     enum Type {DIFFUSE, NORMAL, LIGHT, SPRITE};
+    struct Info
+    {
+        size_t width, height;
+        Type type;
+    };
 
     Texture(const char* filename, Type type, RenderContext& context);
     Texture(PixelData* pixels, Type type, RenderContext& context);
     ~Texture();
 
+    Info info();
     TextureResource* texture();
 
 private:
     void Init(PixelData* pixels, Type type, RenderContext& context);
     std::unique_ptr<TextureResource> texture_;
-    Format format_;
-    Type type_;
+    Info info_;
 };
 } // namespace blons
 

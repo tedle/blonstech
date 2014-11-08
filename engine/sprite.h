@@ -30,6 +30,7 @@ public:
     Vector2 pos();
 
     void set_pos(float x, float y);
+    void set_pos(float x, float y, float w, float h);
 
 private:
     void Init(RenderContext& context);

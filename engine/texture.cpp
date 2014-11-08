@@ -30,11 +30,18 @@ void Texture::Init(PixelData* pixels, Type type, RenderContext& context)
         throw "Failed to load texture";
     }
 
-    type_ = type;
+    info_.width = pixels->width;
+    info_.height = pixels->height;
+    info_.type = type;
 }
 
 Texture::~Texture()
 {
+}
+
+Texture::Info Texture::info()
+{
+    return info_;
 }
 
 TextureResource* Texture::texture()
