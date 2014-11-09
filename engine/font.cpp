@@ -20,8 +20,10 @@ struct Font::Glyph
     unsigned int width, height;
     // Offset from origin in fontsheet texture
     unsigned int tex_offset;
-    // Offset from previously rendered character
+    // Offset from cursor,line respectively
     int x_offset, y_offset;
+    // Offset from previously rendered character
+    int x_advance;
 };
 
 Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture_offset)
@@ -50,7 +52,8 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture
     width = bitmap.width;
     height = bitmap.rows;
     tex_offset = texture_offset;
-    x_offset = font_face->glyph->advance.x / 64 - width;
+    x_advance = font_face->glyph->advance.x / 64;
+    x_offset = font_face->glyph->metrics.horiBearingX / 64;
     y_offset = font_face->glyph->metrics.horiBearingY / 64 - height;
 
     for (int y = 0; y < bitmap.rows; y++)
@@ -157,12 +160,12 @@ bool Font::Render(unsigned char letter, int x, int y, RenderContext& context)
         return false;
     }
     // Setup the character sprites position and texture
-    fontsheet_->set_pos(x, y + g.y_offset, g.width, g.height);
+    fontsheet_->set_pos(x + g.x_offset, y + g.y_offset, g.width, g.height);
     fontsheet_->set_subtexture(g.tex_offset, 0, g.width, g.height);
     // Build the quad and push it to buffer
     fontsheet_->Render(context);
     // How far to advance cursor for next letter
-    advance_ = g.width + g.x_offset;
+    advance_ = g.x_advance;
     return true;
 }
 
