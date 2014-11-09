@@ -285,6 +285,9 @@ bool RenderGL40::RegisterMesh(BufferResource* vertex_buffer, BufferResource* ind
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
+    // nvogl32.dll loves it when i clean up my VAOs!
+    glBindVertexArray(0);
+
     return true;
 }
 
@@ -328,6 +331,9 @@ bool RenderGL40::RegisterQuad(BufferResource* vertex_buffer, BufferResource* ind
     glGenBuffers(1, &index_buf->buffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+
+    // nvogl32.dll loves it when i clean up my VAOs!
+    glBindVertexArray(0);
 
     return true;
 }
@@ -472,6 +478,9 @@ void RenderGL40::RenderShader(ShaderResource* program, int index_count)
     // Bind our shader then do the draw call
     glUseProgram(shader->program_);
     glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+    // TODO: make this only called once per shader somehow
+    // nvogl32.dll loves it when i clean up my VAOs!
+    glBindVertexArray(0);
 }
 
 void RenderGL40::BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
