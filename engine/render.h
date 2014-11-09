@@ -94,6 +94,8 @@ public:
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, TextureResource* value)=0;
 
+    virtual bool SetDepthTesting(bool enable)=0;
+
     virtual Matrix projection_matrix()=0;
     virtual Matrix ortho_matrix()=0;
 

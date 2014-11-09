@@ -75,6 +75,8 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value);
     bool SetShaderInput(ShaderResource* program, const char* name, TextureResource* value);
 
+    bool SetDepthTesting(bool enable);
+
     Matrix projection_matrix();
     Matrix ortho_matrix();
 

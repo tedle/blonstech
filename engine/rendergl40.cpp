@@ -579,6 +579,19 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Textu
     return true;
 }
 
+bool RenderGL40::SetDepthTesting(bool enable)
+{
+    if (enable)
+    {
+        glEnable(GL_DEPTH_TEST);
+    }
+    else
+    {
+        glDisable(GL_DEPTH_TEST);
+    }
+    return true;
+}
+
 Matrix RenderGL40::projection_matrix()
 {
     return proj_matrix_;

@@ -63,7 +63,8 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     //models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
 
     // Fonts
-    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.otf", 16, context_));
+    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.otf", 32, context_));
+    //font_ = std::unique_ptr<Font>(new Font("C:/Windows/Fonts/arial.ttf", 32, context_));
 
     // Shaders
     ShaderAttributeList inputs3d;
@@ -124,6 +125,8 @@ bool Graphics::Render()
     view_matrix       = camera_->view_matrix();
     projection_matrix = context_->projection_matrix();
 
+    // Needed so models dont render over themselves
+    context_->SetDepthTesting(true);
     for (auto const& model : models_)
     {
         // Prep the pipeline 4 drawering
@@ -146,24 +149,18 @@ bool Graphics::Render()
         }
     }
 
-    // USE STREAM TO UPDATE POS
-    /*std::unique_ptr<Texture> sprite(new Texture("../../notes/me.dds", Texture::Type::DIFFUSE, context_));
-    std::unique_ptr<BufferResource> vert_buffer(context_->CreateBufferResource());
-    std::unique_ptr<BufferResource> index_buffer(context_->CreateBufferResource());
-    context_->RegisterQuad(vert_buffer.get(), index_buffer.get());
-    context_->BindModelBuffer(vert_buffer.get(), index_buffer.get());*/
-    //std::unique_ptr<Sprite> quad(new Sprite("../../notes/me.dds", context_));
-    /*font_->test()->set_pos((sin(GetTickCount64()/500.0f) + 1) * 100,
-                  (sin(GetTickCount64()/351.3854f) + 1) * 100);
-    //font_->test()->set_pos(0, 0);
-    font_->test()->Render(context_);*/
-    std::string words = "yo yo hello :)";
+    // Needed so sprites can render over themselves
+    context_->SetDepthTesting(false);
+
+    //(sin(GetTickCount64()/500.0f) + 1) * 100
+
+    std::string words = "std::move('run config') // testing setup";
     int x = 100;
     int y = 100;
     shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
     shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
     shader_font_->SetInput("diffuse", font_->texture(), context_);
-    shader_font_->SetInput("text_colour", Vector3(0.0, 1.0, 0.0), context_);
+    shader_font_->SetInput("text_colour", Vector3(0.0, 0.0, 0.0), context_);
     for (auto& c : words)
     {
         font_->Render(c, x, y, context_);

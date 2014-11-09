@@ -254,6 +254,7 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
         /* g_log->Debug("pos(%i,%i), delta(%i,%i), down(%i, %i)\n",
                      input_->MouseX(), input_->MouseY(), input_->MouseDeltaX(), input_->MouseDeltaY(),
                      input_->IsMouseDown(0), input_->IsMouseDown(1)); */
+        return 0;
     default:
         return DefWindowProc(hwnd, umsg, wparam, lparam);
     }
