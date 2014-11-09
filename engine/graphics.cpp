@@ -63,7 +63,7 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     //models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
 
     // Fonts
-    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.otf", 32, context_));
+    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.otf", 24, context_));
     //font_ = std::unique_ptr<Font>(new Font("C:/Windows/Fonts/arial.ttf", 32, context_));
 
     // Shaders
@@ -125,6 +125,7 @@ bool Graphics::Render()
     view_matrix       = camera_->view_matrix();
     projection_matrix = context_->projection_matrix();
 
+    // 3D Rendering pass
     // Needed so models dont render over themselves
     context_->SetDepthTesting(true);
     for (auto const& model : models_)
@@ -149,25 +150,43 @@ bool Graphics::Render()
         }
     }
 
+    // 2D Rendering pass
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
 
     //(sin(GetTickCount64()/500.0f) + 1) * 100
+    PixelData black_pixel;
+    black_pixel.pixels = std::unique_ptr<unsigned char>(new unsigned char[4] {0, 0, 0, 160});
+    black_pixel.width = 1;
+    black_pixel.height = 1;
+    black_pixel.bits = PixelData::R8G8B8A8;
+    black_pixel.format = PixelData::RAW;
+    std::unique_ptr<Sprite>black_box(new Sprite(&black_pixel, context_));
+    black_box->set_pos(0, 400, 800, 200);
+    black_box->Render(context_);
+    shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
+    shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
+    shader2d_->SetInput("diffuse", black_box->texture(), context_);
+    shader2d_->Render(black_box->index_count(), context_);
 
-    std::string words = "std::move('run config') // testing setup";
-    int x = 100;
-    int y = 100;
-    shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
-    shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-    shader_font_->SetInput("diffuse", font_->texture(), context_);
-    shader_font_->SetInput("text_colour", Vector3(0.0, 0.0, 0.0), context_);
-    for (auto& c : words)
+    auto render_text = [&](int x, int y, std::string words)
     {
-        font_->Render(c, x, y, context_);
-        x += font_->advance();
+        shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
+        shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
+        shader_font_->SetInput("diffuse", font_->texture(), context_);
+        shader_font_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context_);
+        for (auto& c : words)
+        {
+            font_->Render(c, x, y, context_);
+            x += font_->advance();
 
-        shader_font_->Render(font_->index_count(), context_);
-    }
+            shader_font_->Render(font_->index_count(), context_);
+        }
+    };
+    render_text(20, 527, "std::move('run config'); // testing setup");
+    render_text(20, 492, "here's some longer running sentence... probably has to go on a");
+    render_text(20, 457, "ways before we need to wrap it huh :)");
+    render_text(20, 422, "> _");
 
     // Swap buffers
     context_->EndScene();
