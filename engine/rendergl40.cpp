@@ -46,6 +46,10 @@ ShaderResourceGL40::~ShaderResourceGL40()
 RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwnd,
                        bool fullscreen, float screen_depth, float screen_near)
 {
+    // TODO: this is a bad solution, cus shader deletion doesnt reset this
+    // Mitigates repeated calls to glUseProgram
+    active_shader_ = 0;
+
     // Defining the pixel format we want OpenGL to use
     const int color_depth = 24;
     const int depth_bits = 24;
@@ -475,8 +479,8 @@ void RenderGL40::RenderShader(ShaderResource* program, int index_count)
 {
     ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
 
-    // Bind our shader then do the draw call
-    glUseProgram(shader->program_);
+    BindShader(shader->program_);
+
     glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
     // TODO: make this only called once per shader somehow
     // nvogl32.dll loves it when i clean up my VAOs!
@@ -505,8 +509,7 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matri
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
     GLuint loc;
 
-    // Must bind shader before you can uniform... for some reason
-    glUseProgram(prog->program_);
+    BindShader(prog->program_);
 
     // Bind our uniform variables to the shader
     loc = glGetUniformLocation(prog->program_, name);
@@ -524,8 +527,7 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vecto
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
     GLuint loc;
 
-    // Must bind shader before you can uniform... for some reason
-    glUseProgram(prog->program_);
+    BindShader(prog->program_);
 
     // Bind our uniform variables to the shader
     loc = glGetUniformLocation(prog->program_, name);
@@ -543,8 +545,7 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vecto
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
     GLuint loc;
 
-    // Must bind shader before you can uniform... for some reason
-    glUseProgram(prog->program_);
+    BindShader(prog->program_);
 
     // Bind our uniform variables to the shader
     loc = glGetUniformLocation(prog->program_, name);
@@ -563,8 +564,7 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Textu
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
     GLuint loc;
 
-    // Must bind shader before you can uniform... for some reason
-    glUseProgram(prog->program_);
+    BindShader(prog->program_);
 
     // Bind our uniform variables to the shader
     loc = glGetUniformLocation(prog->program_, name);
@@ -677,5 +677,15 @@ void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
     g_log->Debug("------------------------------------------------------\n");
 
     return;
+}
+
+void RenderGL40::BindShader(GLuint shader)
+{
+    // Avoid repeated calls to glUseProgram (perf boost)
+    if (shader != active_shader_)
+    {
+        glUseProgram(shader);
+    }
+    active_shader_ = shader;
 }
 } // namespace blons

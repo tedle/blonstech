@@ -96,6 +96,8 @@ private:
     // API specific
     HDC device_context_;
     HGLRC render_context_;
+    void BindShader(GLuint shader);
+    GLuint active_shader_;
 };
 } // namespace blons
     
