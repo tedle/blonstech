@@ -30,6 +30,7 @@ public:
     TextureResource* texture();
     Vector2 pos();
     Vector2 dimensions();
+    MeshData* mesh();
 
     // The set the position and/or size of sprite
     // as rendered on screen in pixels

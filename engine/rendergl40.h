@@ -55,12 +55,12 @@ public:
     TextureResource* CreateTextureResource();
     ShaderResource* CreateShaderResource();
 
-    bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                      Vertex* vertices, unsigned int vert_count,
-                      unsigned int* indices, unsigned int index_count);
-    bool RegisterQuad(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                      Vertex* vertices, unsigned int vert_count,
-                      unsigned int* indices, unsigned int index_count);
+    bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                        Vertex* vertices, unsigned int vert_count,
+                        unsigned int* indices, unsigned int index_count);
+    bool Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                        Vertex* vertices, unsigned int vert_count,
+                        unsigned int* indices, unsigned int index_count);
     bool RegisterTexture(TextureResource* texture, PixelData* pixel_data);
     bool RegisterShader(ShaderResource* program,
                         const char* vertex_filename, const char* pixel_filename,
@@ -68,8 +68,10 @@ public:
 
     void RenderShader(ShaderResource* program, int index_count);
 
-    void BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
-    void SetQuadData(BufferResource* vertex_buffer, Vertex* vertices, unsigned int vert_count);
+    void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
+    void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                     Vertex* vertices, unsigned int vert_count,
+                     unsigned int* indices, unsigned int index_count);
     bool SetShaderInput(ShaderResource* program, const char* name, Matrix value);
     bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value);
     bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value);

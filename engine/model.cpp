@@ -87,7 +87,7 @@ void Model::Render(RenderContext& context)
 {
     // TODO: Clean this up with operator overloads
     world_matrix_ = MatrixMultiply(MatrixIdentity(), MatrixTranslation(pos_.x, pos_.y, pos_.z));
-    context->BindModelBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
+    context->BindMeshBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
 
     return;
 }

@@ -30,7 +30,7 @@ public:
     unsigned int normal_count();
     unsigned int face_count();
     // Anything returned by these getters will be freed on class destruction
-    MeshData& mesh_data();
+    MeshData* mesh_data();
     std::vector<TextureInfo>& textures();
 
 private:

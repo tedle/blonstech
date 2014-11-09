@@ -74,12 +74,12 @@ public:
     virtual TextureResource* CreateTextureResource()=0;
     virtual ShaderResource* CreateShaderResource()=0;
 
-    virtual bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                              Vertex* vertices, unsigned int vert_count,
-                              unsigned int* indices, unsigned int index_count)=0;
-    virtual bool RegisterQuad(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                              Vertex* vertices, unsigned int vert_count,
-                              unsigned int* indices, unsigned int index_count)=0;
+    virtual bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                                Vertex* vertices, unsigned int vert_count,
+                                unsigned int* indices, unsigned int index_count)=0;
+    virtual bool Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                                Vertex* vertices, unsigned int vert_count,
+                                unsigned int* indices, unsigned int index_count)=0;
     virtual bool RegisterTexture(TextureResource* texture, PixelData* pixel_data)=0;
     virtual bool RegisterShader(ShaderResource* program,
                                 const char* vertex_filename, const char* pixel_filename,
@@ -87,8 +87,10 @@ public:
 
     virtual void RenderShader(ShaderResource* program, int index_count)=0;
 
-    virtual void BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)=0;
-    virtual void SetQuadData(BufferResource* vertex_buffer, Vertex* vertices, unsigned int vert_count)=0;
+    virtual void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)=0;
+    virtual void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                             Vertex* vertices, unsigned int vert_count,
+                             unsigned int* indices, unsigned int index_count)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Matrix value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value)=0;

@@ -241,9 +241,9 @@ unsigned int MeshImporter::face_count()
     return face_count_;
 }
 
-MeshData& MeshImporter::mesh_data()
+MeshData* MeshImporter::mesh_data()
 {
-    return mesh_data_;
+    return &mesh_data_;
 }
 
 std::vector<MeshImporter::TextureInfo>& MeshImporter::textures()

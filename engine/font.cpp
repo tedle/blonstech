@@ -149,7 +149,7 @@ Font::~Font()
 {
 }
 
-bool Font::Render(unsigned char letter, int x, int y, RenderContext& context)
+Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
 {
     // Pointer to avoid expensive copying
     Glyph* g;
@@ -165,10 +165,15 @@ bool Font::Render(unsigned char letter, int x, int y, RenderContext& context)
     // Setup the character sprites position and texture
     fontsheet_->set_pos(x + g->x_offset, y + g->y_offset, g->width, g->height);
     fontsheet_->set_subtexture(g->tex_offset, 0, g->width, g->height);
-    // Build the quad and push it to buffer
-    fontsheet_->Render(context);
     // How far to advance cursor for next letter
     advance_ = g->x_advance;
+
+    return fontsheet_.get();
+}
+
+bool Font::Render(unsigned char letter, int x, int y, RenderContext& context)
+{
+    BuildSprite(letter, x, y)->Render(context);
     return true;
 }
 

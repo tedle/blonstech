@@ -4,6 +4,7 @@
 #include "renderd3d11.h"
 #include "rendergl40.h"
 #include "camera.h"
+#include "drawbatcher.h"
 #include "font.h"
 #include "math.h"
 #include "model.h"
@@ -155,7 +156,7 @@ bool Graphics::Render()
     context_->SetDepthTesting(false);
 
     //(sin(GetTickCount64()/500.0f) + 1) * 100
-    PixelData black_pixel;
+    /*PixelData black_pixel;
     black_pixel.pixels = std::unique_ptr<unsigned char>(new unsigned char[4] {0, 0, 0, 160});
     black_pixel.width = 1;
     black_pixel.height = 1;
@@ -167,24 +168,63 @@ bool Graphics::Render()
     shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
     shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
     shader2d_->SetInput("diffuse", black_box->texture(), context_);
-    shader2d_->Render(black_box->index_count(), context_);
+    shader2d_->Render(black_box->index_count(), context_);*/
+    /*std::vector<MeshData>* quaddies = new std::vector<MeshData>;
+    static auto s1 = new Sprite("../../notes/alpha_test.dds", context_);
+    s1->set_pos(0, 0, 200, 200);
+    quaddies->push_back(*s1->mesh());
+    //static auto s2 = new Sprite("../../notes/alpha_test.dds", context_);
+    //s2->set_pos(200, 200, 200, 200);
+    s1->set_pos(200, 200, 200, 200);
+    quaddies->push_back(*s1->mesh());
+    DrawBatcher batch(context_);
+    batch.Input(*quaddies, context_);
+    auto testino = batch.mesh();
+    //context_->BindModelBuffer(vertex_buffer.get(), index_buffer.get());
+    //s1->Render(context_);
+    shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
+    shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
+    shader2d_->SetInput("diffuse", s1->texture(), context_);
+    shader2d_->Render(testino->indices.size(), context_);*/
 
-    auto render_text = [&](int x, int y, std::string words)
+
+    DrawBatcher batchie(context_);
+    /*auto render_text = [&](int x, int y, std::string words)
     {
         shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
         shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
         shader_font_->SetInput("diffuse", font_->texture(), context_);
         shader_font_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context_);
+        int i = 0;
         for (auto& c : words)
         {
             font_->Render(c, x, y, context_);
             x += font_->advance();
-
+            i++;
             shader_font_->Render(font_->index_count(), context_);
         }
+    };*/
+    auto render_text = [&](int x, int y, std::string words)
+    {
+        std::vector<MeshData> letters(words.length());
+        //letters.reserve(words.length());
+        shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
+        shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
+        shader_font_->SetInput("diffuse", font_->texture(), context_);
+        shader_font_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context_);
+        int i = 0;
+        for (auto& c : words)
+        {
+            letters[i] = std::move(*font_->BuildSprite(c, x, y)->mesh());
+            x += font_->advance();
+            i++;
+        }
+        batchie.Input(letters, context_);
+        shader_font_->Render(batchie.index_count(), context_);
     };
     render_text(20, 527, "std::move('run config'); // testing setup");
-    render_text(20, 492, "here's some longer running sentence... probably has to go on a");
+    for (int i = 0; i < 30; i++)
+        render_text(20, 492, "here's some longer running sentence... probably has to go on a");
     render_text(20, 457, "ways before we need to wrap it huh :)");
     render_text(20, 422, "> _");
 

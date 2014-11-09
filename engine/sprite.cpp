@@ -28,9 +28,9 @@ void Sprite::Init(RenderContext& context)
     mesh_.vertices.resize(4);
     BuildQuad();
 
-    if (!context->RegisterQuad(vertex_buffer_.get(), index_buffer_.get(),
-                               mesh_.vertices.data(), mesh_.vertices.size(),
-                               mesh_.indices.data(), mesh_.indices.size()))
+    if (!context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(),
+                                 mesh_.vertices.data(), mesh_.vertices.size(),
+                                 mesh_.indices.data(), mesh_.indices.size()))
     {
         throw "Failed to register sprite";
     }
@@ -43,8 +43,10 @@ Sprite::~Sprite()
 void Sprite::Render(RenderContext& context)
 {
     BuildQuad();
-    context->SetQuadData(vertex_buffer_.get(), mesh_.vertices.data(), mesh_.vertices.size());
-    context->BindModelBuffer(vertex_buffer_.get(), index_buffer_.get());
+    context->SetMeshData(vertex_buffer_.get(), index_buffer_.get(),
+                         mesh_.vertices.data(), mesh_.vertices.size(),
+                         mesh_.indices.data(), mesh_.indices.size());
+    context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 }
 
 int Sprite::index_count()
@@ -108,6 +110,12 @@ void Sprite::set_subtexture(int x, int y, int w, int h)
                    static_cast<float>(y),
                    static_cast<float>(w),
                    static_cast<float>(h));
+}
+
+MeshData* Sprite::mesh()
+{
+    BuildQuad();
+    return &mesh_;
 }
 
 void Sprite::BuildQuad()

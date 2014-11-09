@@ -92,6 +92,7 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="drawbatcher.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="glfuncloader.cpp" />
     <ClCompile Include="logger.cpp" />
@@ -112,6 +113,7 @@
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="client.h" />
+    <ClInclude Include="drawbatcher.h" />
     <ClInclude Include="font.h" />
     <ClInclude Include="glfuncloader.h" />
     <ClInclude Include="logger.h" />
