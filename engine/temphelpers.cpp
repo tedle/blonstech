@@ -121,22 +121,28 @@ void move_camera_around_origin(float delta, Camera* camera)
     }
 }
 
-DWORD last_time = 0;
-int fps_count = 0;
 void FPS()
 {
-    DWORD st = GetTickCount();
+    static DWORD last_second = 0;
+    static DWORD last_frame = 0;
+    static DWORD max_frame = 0;
+    static int fps_count = 0;
+    DWORD st = GetTickCount64();
 
-    if (st > last_time+1000)
+    max_frame = max(max_frame, st - last_frame);
+
+    if (st > last_second+1000)
     {
-        g_log->Debug("FPS: %i, (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, cur_pos.x, cur_pos.y, cur_pos.z);
-        last_time = st;
+        g_log->Debug("FPS: %i(min:%i), (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, 1000/max_frame, cur_pos.x, cur_pos.y, cur_pos.z);
+        last_second = st;
+        max_frame = 0;
         fps_count = 0;
     }
     else
     {
         fps_count++;
     }
+    last_frame = st;
 }
 
 
