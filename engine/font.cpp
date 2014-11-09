@@ -21,7 +21,7 @@ struct Font::Glyph
     // Offset from origin in fontsheet texture
     unsigned int tex_offset;
     // Offset from previously rendered character
-    unsigned int x_offset, y_offset;
+    int x_offset, y_offset;
 };
 
 Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture_offset)
@@ -51,7 +51,7 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture
     height = bitmap.rows;
     tex_offset = texture_offset;
     x_offset = font_face->glyph->advance.x / 64 - width;
-    y_offset = font_face->glyph->metrics.horiBearingY / 64;
+    y_offset = font_face->glyph->metrics.horiBearingY / 64 - height;
 
     for (int y = 0; y < bitmap.rows; y++)
     {
@@ -139,12 +139,47 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
     }
     return;
 }
-// TODO: get rid of this
-Sprite* Font::test()
-{
-    return fontsheet_.get();
-}
+
 Font::~Font()
 {
+}
+
+bool Font::Render(unsigned char letter, int x, int y, RenderContext& context)
+{
+    Glyph g;
+    // In case someone tries to render a string using chars we dont have
+    try
+    {
+        g = charset_[letter];
+    }
+    catch (...)
+    {
+        return false;
+    }
+    // Setup the character sprites position and texture
+    fontsheet_->set_pos(x, y + g.y_offset, g.width, g.height);
+    fontsheet_->set_subtexture(g.tex_offset, 0, g.width, g.height);
+    // Build the quad and push it to buffer
+    fontsheet_->Render(context);
+    // How far to advance cursor for next letter
+    advance_ = g.width + g.x_offset;
+    return true;
+}
+
+int Font::advance()
+{
+    int ret = advance_;
+    advance_ = 0;
+    return ret;
+}
+
+int Font::index_count()
+{
+    return fontsheet_->index_count();
+}
+
+TextureResource* Font::texture()
+{
+    return fontsheet_->texture();
 }
 } // namespace blons

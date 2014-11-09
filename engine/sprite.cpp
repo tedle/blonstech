@@ -19,8 +19,8 @@ void Sprite::Init(RenderContext& context)
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     Texture::Info dimensions = texture_->info();
-    pos_ = Box(0, 0, dimensions.width, dimensions.height);
-    tex_map_ = Box(0, 0, 1, 1);
+    set_pos(0, 0, dimensions.width, dimensions.height);
+    set_subtexture(0, 0, dimensions.width, dimensions.height);
 
     indices_.resize(6);
     indices_ = { 0, 1, 2, 1, 3, 2 };
@@ -63,6 +63,11 @@ Vector2 Sprite::pos()
     return Vector2(pos_.x, pos_.y);
 }
 
+Vector2 Sprite::dimensions()
+{
+    return Vector2(pos_.w, pos_.h);
+}
+
 void Sprite::set_pos(float x, float y)
 {
     set_pos(x, y, pos_.w, pos_.h);
@@ -76,6 +81,35 @@ void Sprite::set_pos(float x, float y, float w, float h)
     pos_.h = h;
 }
 
+void Sprite::set_pos(int x, int y)
+{
+    set_pos(static_cast<float>(x), static_cast<float>(y));
+}
+
+void Sprite::set_pos(int x, int y, int w, int h)
+{
+    set_pos(static_cast<float>(x),
+            static_cast<float>(y),
+            static_cast<float>(w),
+            static_cast<float>(h));
+}
+
+void Sprite::set_subtexture(float x, float y, float w, float h)
+{
+    tex_map_.x = x;
+    tex_map_.y = y;
+    tex_map_.w = w;
+    tex_map_.h = h;
+}
+
+void Sprite::set_subtexture(int x, int y, int w, int h)
+{
+    set_subtexture(static_cast<float>(x),
+                   static_cast<float>(y),
+                   static_cast<float>(w),
+                   static_cast<float>(h));
+}
+
 void Sprite::BuildQuad()
 {
     vertices_[0].pos.x = pos_.x;          vertices_[0].pos.y = pos_.y;
@@ -83,9 +117,15 @@ void Sprite::BuildQuad()
     vertices_[2].pos.x = pos_.x + pos_.w; vertices_[2].pos.y = pos_.y;
     vertices_[3].pos.x = pos_.x + pos_.w; vertices_[3].pos.y = pos_.y + pos_.h;
 
-    vertices_[0].tex.x = tex_map_.x;              vertices_[0].tex.y = tex_map_.y + tex_map_.h;
-    vertices_[1].tex.x = tex_map_.x;              vertices_[1].tex.y = tex_map_.y;
-    vertices_[2].tex.x = tex_map_.x + tex_map_.w; vertices_[2].tex.y = tex_map_.y + tex_map_.h;
-    vertices_[3].tex.x = tex_map_.x + tex_map_.w; vertices_[3].tex.y = tex_map_.y;
+    Texture::Info info = texture_->info();
+    Box normal_tex(tex_map_.x / info.width,
+                   tex_map_.y / info.height,
+                   tex_map_.w / info.width,
+                   tex_map_.h / info.height);
+
+    vertices_[0].tex.x = normal_tex.x;                vertices_[0].tex.y = normal_tex.y + normal_tex.h;
+    vertices_[1].tex.x = normal_tex.x;                vertices_[1].tex.y = normal_tex.y;
+    vertices_[2].tex.x = normal_tex.x + normal_tex.w; vertices_[2].tex.y = normal_tex.y + normal_tex.h;
+    vertices_[3].tex.x = normal_tex.x + normal_tex.w; vertices_[3].tex.y = normal_tex.y;
 }
 } // namespace blons

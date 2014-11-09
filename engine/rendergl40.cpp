@@ -197,6 +197,10 @@ RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwn
     glCullFace(GL_BACK);
     //glDisable(GL_CULL_FACE);
 
+    // Enable transparency
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     // Configure vsync (please be false)
     vsync_ = vsync;
     if (!wglSwapIntervalEXT(vsync))

@@ -28,9 +28,18 @@ public:
     int index_count();
     TextureResource* texture();
     Vector2 pos();
+    Vector2 dimensions();
 
+    // The set the position and/or size of sprite
+    // as rendered on screen in pixels
     void set_pos(float x, float y);
     void set_pos(float x, float y, float w, float h);
+    void set_pos(int x, int y);
+    void set_pos(int x, int y, int w, int h);
+    // Sets the subregion of sprite texture that is rendered
+    // Measured in pixels of texture
+    void set_subtexture(float x, float y, float w, float h);
+    void set_subtexture(int x, int y, int w, int h);
 
 private:
     void Init(RenderContext& context);

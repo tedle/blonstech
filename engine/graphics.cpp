@@ -63,7 +63,7 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     //models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
 
     // Fonts
-    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.otf", 24, context_));
+    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.otf", 16, context_));
 
     // Shaders
     ShaderAttributeList inputs3d;
@@ -145,15 +145,23 @@ bool Graphics::Render()
     context_->RegisterQuad(vert_buffer.get(), index_buffer.get());
     context_->BindModelBuffer(vert_buffer.get(), index_buffer.get());*/
     //std::unique_ptr<Sprite> quad(new Sprite("../../notes/me.dds", context_));
-    font_->test()->set_pos((sin(GetTickCount64()/500.0f) + 1) * 100,
+    /*font_->test()->set_pos((sin(GetTickCount64()/500.0f) + 1) * 100,
                   (sin(GetTickCount64()/351.3854f) + 1) * 100);
     //font_->test()->set_pos(0, 0);
-    font_->test()->Render(context_);
-
+    font_->test()->Render(context_);*/
+    std::string words = "yo yo hello :)";
+    int x = 100;
+    int y = 100;
     shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
     shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-    shader2d_->SetInput("diffuse", font_->test()->texture(), context_);
-    shader2d_->Render(font_->test()->index_count(), context_);
+    shader2d_->SetInput("diffuse", font_->texture(), context_);
+    for (auto& c : words)
+    {
+        font_->Render(c, x, y, context_);
+        x += font_->advance();
+
+        shader2d_->Render(font_->index_count(), context_);
+    }
 
     // Swap buffers
     context_->EndScene();
