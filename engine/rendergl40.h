@@ -27,7 +27,6 @@ public:
     ~TextureResourceGL40();
 
     GLuint texture_, texture_unit_;
-    //ID3D11ShaderResourceView* p;
 };
 
 class ShaderResourceGL40 : public ShaderResource
@@ -72,6 +71,8 @@ public:
     void BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
     void SetQuadData(BufferResource* vertex_buffer, Vertex* vertices, unsigned int vert_count);
     bool SetShaderInput(ShaderResource* program, const char* name, Matrix value);
+    bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value);
+    bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value);
     bool SetShaderInput(ShaderResource* program, const char* name, TextureResource* value);
 
     Matrix projection_matrix();

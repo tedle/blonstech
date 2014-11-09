@@ -180,6 +180,18 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glUniform1i");
     }
 
+    glUniform3fv = (PFNGLUNIFORM3FVPROC)glGetProcAddress("glUniform3fv");
+    if (glUniform3fv == nullptr)
+    {
+        failed.push_back("glUniform3fv");
+    }
+
+    glUniform4fv = (PFNGLUNIFORM4FVPROC)glGetProcAddress("glUniform4fv");
+    if (glUniform4fv == nullptr)
+    {
+        failed.push_back("glUniform4fv");
+    }
+
     glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)glGetProcAddress("glUniformMatrix4fv");
     if (glUniformMatrix4fv == nullptr)
     {
@@ -254,6 +266,8 @@ PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLLINKPROGRAMPROC glLinkProgram;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLUNIFORM3FVPROC glUniform3fv;
+PFNGLUNIFORM4FVPROC glUniform4fv;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 PFNGLUSEPROGRAMPROC glUseProgram;
 PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;

@@ -29,6 +29,16 @@ bool Shader::SetInput(const char* field, Matrix value, RenderContext& context)
     return context->SetShaderInput(program_.get(), field, value);
 }
 
+bool Shader::SetInput(const char* field, Vector3 value, RenderContext& context)
+{
+    return context->SetShaderInput(program_.get(), field, value);
+}
+
+bool Shader::SetInput(const char* field, Vector4 value, RenderContext& context)
+{
+    return context->SetShaderInput(program_.get(), field, value);
+}
+
 bool Shader::SetInput(const char* field, TextureResource* value, RenderContext& context)
 {
     return context->SetShaderInput(program_.get(), field, value);

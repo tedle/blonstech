@@ -491,6 +491,63 @@ void RenderGL40::SetQuadData(BufferResource* vertex_buffer, Vertex* vertices, un
     glBindVertexArray(vertex_buf->vertex_array_id_);
 }
 
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matrix value)
+{
+    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
+    GLuint loc;
+
+    // Must bind shader before you can uniform... for some reason
+    glUseProgram(prog->program_);
+
+    // Bind our uniform variables to the shader
+    loc = glGetUniformLocation(prog->program_, name);
+    if (loc < 0)
+    {
+        return false;
+    }
+    glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)value.m);
+
+    return true;
+}
+
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector3 value)
+{
+    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
+    GLuint loc;
+
+    // Must bind shader before you can uniform... for some reason
+    glUseProgram(prog->program_);
+
+    // Bind our uniform variables to the shader
+    loc = glGetUniformLocation(prog->program_, name);
+    if (loc < 0)
+    {
+        return false;
+    }
+    glUniform3fv(loc, 1, &value.x);
+
+    return true;
+}
+
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector4 value)
+{
+    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
+    GLuint loc;
+
+    // Must bind shader before you can uniform... for some reason
+    glUseProgram(prog->program_);
+
+    // Bind our uniform variables to the shader
+    loc = glGetUniformLocation(prog->program_, name);
+    if (loc < 0)
+    {
+        return false;
+    }
+    glUniform4fv(loc, 1, &value.x);
+
+    return true;
+}
+
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, TextureResource* value)
 {
     TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(value);
@@ -509,25 +566,6 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Textu
     glUniform1i(loc, GL_TEXTURE0 + tex->texture_unit_);
     glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
     glBindTexture(GL_TEXTURE_2D, tex->texture_);
-
-    return true;
-}
-
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matrix value)
-{
-    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-    GLuint loc;
-
-    // Must bind shader before you can uniform... for some reason
-    glUseProgram(prog->program_);
-
-    // Bind our uniform variables to the shader
-    loc = glGetUniformLocation(prog->program_, name);
-    if (loc < 0)
-    {
-        return false;
-    }
-    glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)value.m);
 
     return true;
 }
