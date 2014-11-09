@@ -8,6 +8,12 @@
 
 namespace blons
 {
+struct MeshData
+{
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> indices;
+};
+
 class Mesh
 {
 public:
@@ -21,7 +27,7 @@ public:
 
 private:
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
-    unsigned int vertex_count_, index_count_;
+    MeshData mesh_data_;
 };
 } // namespace blons
 

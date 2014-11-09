@@ -7,8 +7,6 @@ namespace blons
 {
 MeshImporter::MeshImporter(const char* filename)
 {
-    vertex_count_ = 0;
-    index_count_ = 0;
     uv_count_ = 0;
     normal_count_ = 0;
     face_count_ = 0;
@@ -21,8 +19,6 @@ MeshImporter::MeshImporter(const char* filename)
 
 MeshImporter::MeshImporter(const char* filename, bool invert_y)
 {
-    vertex_count_ = 0;
-    index_count_ = 0;
     uv_count_ = 0;
     normal_count_ = 0;
     face_count_ = 0;
@@ -43,6 +39,8 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     std::vector<Vector3> vertices, normals;
     std::vector<Vector2> uvs;
     std::vector<unsigned int> faces;
+    unsigned int vertex_count = 0;
+    unsigned int index_count = 0;
 
     fopen_s(&file, filename, "rb");
     if (file == nullptr)
@@ -57,15 +55,15 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     fseek(file, 0, SEEK_SET);
 
     // Get the header info
-    fread(&vertex_count_, sizeof(unsigned int), 1, file);
+    fread(&vertex_count, sizeof(unsigned int), 1, file);
     fread(&uv_count_,     sizeof(unsigned int), 1, file);
     fread(&normal_count_, sizeof(unsigned int), 1, file);
     fread(&face_count_,   sizeof(unsigned int), 1, file);
     fread(&texture_count, sizeof(unsigned int), 1, file);
 
     // Needs verts dude + make sure we arent loading some garbage file thatd allocate 4gb of memory
-    if (!vertex_count_ ||
-        vertex_count_ * sizeof(Vector3) > file_size ||
+    if (!vertex_count ||
+        vertex_count * sizeof(Vector3) > file_size ||
         uv_count_ * sizeof(Vector2) > file_size ||
         normal_count_ * sizeof(Vector3) > file_size ||
         face_count_ * sizeof(unsigned int) > file_size)
@@ -81,8 +79,8 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
 
     // The seems like the most efficient way to read a lot of data straight into a vector...
     // Kinda gross really
-    vertices.resize(vertex_count_);
-    vertices_read = fread(vertices.data(), sizeof(Vector3), vertex_count_, file);
+    vertices.resize(vertex_count);
+    vertices_read = fread(vertices.data(), sizeof(Vector3), vertex_count, file);
 
     uvs.resize(uv_count_);
     uvs_read = fread(uvs.data(), sizeof(Vector2), uv_count_, file);
@@ -91,7 +89,7 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     normals_read = fread(normals.data(), sizeof(Vector3), normal_count_, file);
 
     // Allocate 3 uints per face for each type of mesh data supplied
-    unsigned int face_size = 3 * (vertex_count_ > 0) +
+    unsigned int face_size = 3 * (vertex_count > 0) +
                              3 * (uv_count_ > 0) +
                              3 * (normal_count_ > 0);
     faces.resize(face_count_ * face_size);
@@ -116,23 +114,23 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     int eof = feof(file);
     fclose(file);
 
-    if (vertices_read != vertex_count_ || uvs_read != uv_count_ ||
+    if (vertices_read != vertex_count || uvs_read != uv_count_ ||
         normals_read != normal_count_ || faces_read != face_count_ || !eof)
     {
         return false;
     }
 
     // 3 vertices for every tri
-    vertex_count_ = index_count_ = face_count_ * 3;
+    vertex_count = index_count = face_count_ * 3;
 
-    vertices_.reserve(vertex_count_);
+    mesh_data_.vertices.reserve(vertex_count);
 
-    if (vertices_.max_size() < vertex_count_)
+    if (mesh_data_.vertices.max_size() < vertex_count)
     {
         return false;
     }
 
-    indices_.resize(index_count_);
+    mesh_data_.indices.resize(index_count);
 
     // If there's no UVs, normals immediately follow vertex
     const int norm_offset = (uv_count_ > 0 ? 2 : 1);
@@ -144,7 +142,7 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     const bool vbo_indexing = false;
     std::map<Vertex, unsigned int> vert_lookup;
 
-    for (unsigned int i = 0; i < vertex_count_; i++)
+    for (unsigned int i = 0; i < vertex_count; i++)
     {
         // TODO: store normals
         // Each face_size is vert*uv*norm*3, we wanna loop once for each vert*uv*norm
@@ -197,36 +195,35 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
             auto index_match = vert_lookup.find(new_vert);
             if (index_match != vert_lookup.end())
             {
-                indices_[i] = index_match->second;
+                mesh_data_.indices[i] = index_match->second;
             }
             else
             {
-                vertices_.push_back(new_vert);
-                indices_[i] = vertices_.size() - 1;
-                vert_lookup[new_vert] = indices_[i];
+                mesh_data_.vertices.push_back(new_vert);
+                mesh_data_.indices[i] = mesh_data_.vertices.size() - 1;
+                vert_lookup[new_vert] = mesh_data_.indices[i];
             }
         }
         else
         {
-            vertices_.push_back(new_vert);
-            indices_[i] = vertices_.size()-1;
+            mesh_data_.vertices.push_back(new_vert);
+            mesh_data_.indices[i] = mesh_data_.vertices.size()-1;
         }
     }
     // Update vertex count to account for removed duplicates
-    g_log->Debug("%.1f%%v", (((float)vertex_count_ - (float)vertices_.size()) / (float)vertex_count_) * 100.0);
-    vertex_count_ = vertices_.size();
+    g_log->Debug("%.1f%%v", (((float)vertex_count - (float)mesh_data_.vertices.size()) / (float)vertex_count) * 100.0);
 
     return true;
 }
 
 unsigned int MeshImporter::vertex_count()
 {
-    return vertex_count_;
+    return mesh_data_.vertices.size();
 }
 
 unsigned int MeshImporter::index_count()
 {
-    return index_count_;
+    return mesh_data_.indices.size();
 }
 
 unsigned int MeshImporter::uv_count()
@@ -244,14 +241,9 @@ unsigned int MeshImporter::face_count()
     return face_count_;
 }
 
-std::vector<Vertex>& MeshImporter::vertices()
+MeshData& MeshImporter::mesh_data()
 {
-    return vertices_;
-}
-
-std::vector<unsigned int>& MeshImporter::indices()
-{
-    return indices_;
+    return mesh_data_;
 }
 
 std::vector<MeshImporter::TextureInfo>& MeshImporter::textures()

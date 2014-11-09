@@ -5,15 +5,16 @@
 
 namespace blons
 {
-Mesh::Mesh(MeshImporter* mesh_data, RenderContext& context)
+Mesh::Mesh(MeshImporter* mesh, RenderContext& context)
 {
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
-    vertex_count_ = mesh_data->vertex_count();
-    index_count_ = mesh_data->index_count();
+    mesh_data_.vertices = mesh->mesh_data().vertices;
+    mesh_data_.indices = mesh->mesh_data().indices;
 
-    if (!context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), mesh_data->vertices().data(), vertex_count_,
-        mesh_data->indices().data(), index_count_))
+    if (!context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(),
+                               mesh_data_.vertices.data(), mesh_data_.vertices.size(),
+                               mesh_data_.indices.data(), mesh_data_.indices.size()))
     {
         throw "Failed to register mesh data";
     }
@@ -35,11 +36,11 @@ BufferResource* Mesh::index_buffer()
 
 int Mesh::vertex_count()
 {
-    return vertex_count_;
+    return mesh_data_.vertices.size();
 }
 
 int Mesh::index_count()
 {
-    return index_count_;
+    return mesh_data_.indices.size();
 }
 } // namespace blons

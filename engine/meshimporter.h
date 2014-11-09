@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 // Local Includes
+#include "mesh.h"
 #include "texture.h"
 
 namespace blons
@@ -29,16 +30,14 @@ public:
     unsigned int normal_count();
     unsigned int face_count();
     // Anything returned by these getters will be freed on class destruction
-    std::vector<Vertex>& vertices();
-    std::vector<unsigned int>& indices();
+    MeshData& mesh_data();
     std::vector<TextureInfo>& textures();
 
 private:
     bool Load(const char* filename, bool invert_y);
 
-    unsigned int vertex_count_, index_count_, uv_count_, normal_count_, face_count_;
-    std::vector<Vertex> vertices_;
-    std::vector<unsigned int>indices_;
+    unsigned int uv_count_, normal_count_, face_count_;
+    MeshData mesh_data_;
     std::vector<TextureInfo> textures_;
 };
 } // namespace blons
