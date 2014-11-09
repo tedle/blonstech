@@ -70,17 +70,25 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     inputs3d.push_back(ShaderAttribute(0, "input_pos"));
     inputs3d.push_back(ShaderAttribute(1, "input_uv"));
     inputs3d.push_back(ShaderAttribute(2, "input_norm"));
-    shader3d_ = std::unique_ptr<Shader>(new Shader("3d_test.vert.glsl", "3d_test.frag.glsl", inputs3d, context_));
-    if (shader3d_ == nullptr)
-    {
-        g_log->Fatal("Shaders failed to initialize\n");
-        throw "Failed to initialize shader";
-    }
+    shader3d_ = std::unique_ptr<Shader>(new Shader("mesh.vert.glsl", "mesh.frag.glsl", inputs3d, context_));
 
     ShaderAttributeList inputs2d;
     inputs2d.push_back(ShaderAttribute(0, "input_pos"));
     inputs2d.push_back(ShaderAttribute(1, "input_uv"));
-    shader2d_ = std::unique_ptr<Shader>(new Shader("2d_test.vert.glsl", "2d_test.frag.glsl", inputs2d, context_));
+    shader2d_ = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "sprite.frag.glsl", inputs2d, context_));
+
+    ShaderAttributeList inputs_font;
+    inputs_font.push_back(ShaderAttribute(0, "input_pos"));
+    inputs_font.push_back(ShaderAttribute(1, "input_uv"));
+    shader_font_ = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "font.frag.glsl", inputs_font, context_));
+
+    if (shader3d_ == nullptr ||
+        shader2d_ == nullptr ||
+        shader_font_ == nullptr)
+    {
+        g_log->Fatal("Shaders failed to initialize\n");
+        throw "Failed to initialize shader";
+    }
 }
 
 Graphics::~Graphics()
@@ -152,15 +160,16 @@ bool Graphics::Render()
     std::string words = "yo yo hello :)";
     int x = 100;
     int y = 100;
-    shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
-    shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-    shader2d_->SetInput("diffuse", font_->texture(), context_);
+    shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
+    shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
+    shader_font_->SetInput("diffuse", font_->texture(), context_);
+    shader_font_->SetInput("text_colour", Vector3(0.0, 1.0, 0.0), context_);
     for (auto& c : words)
     {
         font_->Render(c, x, y, context_);
         x += font_->advance();
 
-        shader2d_->Render(font_->index_count(), context_);
+        shader_font_->Render(font_->index_count(), context_);
     }
 
     // Swap buffers

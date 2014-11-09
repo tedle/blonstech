@@ -29,16 +29,19 @@
     <None Include="test.vert.fx">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="3d_test.frag.glsl">
+    <None Include="font.frag.glsl">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="3d_test.vert.glsl">
+    <None Include="mesh.frag.glsl">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="2d_test.frag.glsl">
+    <None Include="mesh.vert.glsl">
       <Filter>Shader Files</Filter>
     </None>
-    <None Include="2d_test.vert.glsl">
+    <None Include="sprite.frag.glsl">
+      <Filter>Shader Files</Filter>
+    </None>
+    <None Include="sprite.vert.glsl">
       <Filter>Shader Files</Filter>
     </None>
   </ItemGroup>
