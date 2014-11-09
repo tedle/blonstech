@@ -22,15 +22,15 @@ void Sprite::Init(RenderContext& context)
     set_pos(0, 0, dimensions.width, dimensions.height);
     set_subtexture(0, 0, dimensions.width, dimensions.height);
 
-    indices_.resize(6);
-    indices_ = { 0, 1, 2, 1, 3, 2 };
+    mesh_.indices.resize(6);
+    mesh_.indices = { 0, 1, 2, 1, 3, 2 };
 
-    vertices_.resize(4);
+    mesh_.vertices.resize(4);
     BuildQuad();
 
     if (!context->RegisterQuad(vertex_buffer_.get(), index_buffer_.get(),
-                               vertices_.data(), vertices_.size(),
-                               indices_.data(), indices_.size()))
+                               mesh_.vertices.data(), mesh_.vertices.size(),
+                               mesh_.indices.data(), mesh_.indices.size()))
     {
         throw "Failed to register sprite";
     }
@@ -43,14 +43,14 @@ Sprite::~Sprite()
 void Sprite::Render(RenderContext& context)
 {
     BuildQuad();
-    context->SetQuadData(vertex_buffer_.get(), vertices_.data(), vertices_.size());
+    context->SetQuadData(vertex_buffer_.get(), mesh_.vertices.data(), mesh_.vertices.size());
     context->BindModelBuffer(vertex_buffer_.get(), index_buffer_.get());
 }
 
 int Sprite::index_count()
 {
     // 6, lol
-    return indices_.size();
+    return mesh_.indices.size();
 }
 
 TextureResource* Sprite::texture()
@@ -112,10 +112,11 @@ void Sprite::set_subtexture(int x, int y, int w, int h)
 
 void Sprite::BuildQuad()
 {
-    vertices_[0].pos.x = pos_.x;          vertices_[0].pos.y = pos_.y;
-    vertices_[1].pos.x = pos_.x;          vertices_[1].pos.y = pos_.y + pos_.h;
-    vertices_[2].pos.x = pos_.x + pos_.w; vertices_[2].pos.y = pos_.y;
-    vertices_[3].pos.x = pos_.x + pos_.w; vertices_[3].pos.y = pos_.y + pos_.h;
+    auto& vs = mesh_.vertices;
+    vs[0].pos.x = pos_.x;          vs[0].pos.y = pos_.y;
+    vs[1].pos.x = pos_.x;          vs[1].pos.y = pos_.y + pos_.h;
+    vs[2].pos.x = pos_.x + pos_.w; vs[2].pos.y = pos_.y;
+    vs[3].pos.x = pos_.x + pos_.w; vs[3].pos.y = pos_.y + pos_.h;
 
     Texture::Info info = texture_->info();
     Box normal_tex(tex_map_.x / info.width,
@@ -123,9 +124,9 @@ void Sprite::BuildQuad()
                    tex_map_.w / info.width,
                    tex_map_.h / info.height);
 
-    vertices_[0].tex.x = normal_tex.x;                vertices_[0].tex.y = normal_tex.y + normal_tex.h;
-    vertices_[1].tex.x = normal_tex.x;                vertices_[1].tex.y = normal_tex.y;
-    vertices_[2].tex.x = normal_tex.x + normal_tex.w; vertices_[2].tex.y = normal_tex.y + normal_tex.h;
-    vertices_[3].tex.x = normal_tex.x + normal_tex.w; vertices_[3].tex.y = normal_tex.y;
+    vs[0].tex.x = normal_tex.x;                vs[0].tex.y = normal_tex.y + normal_tex.h;
+    vs[1].tex.x = normal_tex.x;                vs[1].tex.y = normal_tex.y;
+    vs[2].tex.x = normal_tex.x + normal_tex.w; vs[2].tex.y = normal_tex.y + normal_tex.h;
+    vs[3].tex.x = normal_tex.x + normal_tex.w; vs[3].tex.y = normal_tex.y;
 }
 } // namespace blons

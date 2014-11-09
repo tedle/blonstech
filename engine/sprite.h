@@ -2,6 +2,7 @@
 #define BLONSTECH_SPRITE_H_
 
 // Local Includes
+#include "mesh.h"
 #include "render.h"
 #include "texture.h"
 
@@ -46,8 +47,7 @@ private:
     void BuildQuad();
 
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
-    std::vector<Vertex> vertices_;
-    std::vector<unsigned int> indices_;
+    MeshData mesh_;
     std::unique_ptr<Texture> texture_;
     Box pos_;
     Box tex_map_;
