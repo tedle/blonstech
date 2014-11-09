@@ -3,8 +3,10 @@
 // Includes
 #include <FreeType2\include\ft2build.h>
 #include FT_FREETYPE_H
+#include <algorithm>
 // Local Includes
 #include "render.h"
+
 
 namespace blons
 {
@@ -71,6 +73,10 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
 {
     fontsheet_ = nullptr;
     pixel_size_ = pixel_size;
+    // std::map would be a lot cleaner than a vector, but we need very fast access :)
+    size_t largest_char = *std::max_element(kAvailableCharacters.begin(),
+                                            kAvailableCharacters.end()) + 1;
+    charset_.resize(largest_char);
 
     FT_Library library;
     FT_Face face;
@@ -100,10 +106,8 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
         Glyph g(c, face, tex_width);
         charset_[c] = g;
         tex_width += g.width;
-        if (g.height > tex_height)
-        {
-            tex_height = g.height;
-        }
+        // Funky parentheses to appease the lord of windows macros
+        tex_height = (std::max)(g.height, tex_height);
     }
 
     // Generate a single texture containing every character
@@ -112,15 +116,13 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
     std::fill(tex.get(), tex.get()+(tex_width*tex_height), 0);
     // We have to do this as a second pass because we dont know the fontsheet width until
     // all of the glyphs have been rendered and stored
-    for (auto& it : charset_)
+    for (auto& glyph : charset_)
     {
-        auto glyph = &it.second;
-        auto offset = glyph->tex_offset;
-        for (unsigned int i = 0; i < glyph->pixels.size(); i++)
+        for (unsigned int i = 0; i < glyph.pixels.size(); i++)
         {
-            int x = offset + i % glyph->width;
-            int y = i / glyph->width;
-            tex.get()[x + y * tex_width] = glyph->pixels[i];
+            int x = glyph.tex_offset + i % glyph.width;
+            int y = i / glyph.width;
+            tex.get()[x + y * tex_width] = glyph.pixels[i];
         }
     }
 
@@ -149,23 +151,24 @@ Font::~Font()
 
 bool Font::Render(unsigned char letter, int x, int y, RenderContext& context)
 {
-    Glyph g;
+    // Pointer to avoid expensive copying
+    Glyph* g;
     // In case someone tries to render a string using chars we dont have
     try
     {
-        g = charset_[letter];
+        g = &charset_[letter];
     }
     catch (...)
     {
         return false;
     }
     // Setup the character sprites position and texture
-    fontsheet_->set_pos(x + g.x_offset, y + g.y_offset, g.width, g.height);
-    fontsheet_->set_subtexture(g.tex_offset, 0, g.width, g.height);
+    fontsheet_->set_pos(x + g->x_offset, y + g->y_offset, g->width, g->height);
+    fontsheet_->set_subtexture(g->tex_offset, 0, g->width, g->height);
     // Build the quad and push it to buffer
     fontsheet_->Render(context);
     // How far to advance cursor for next letter
-    advance_ = g.x_advance;
+    advance_ = g->x_advance;
     return true;
 }
 
