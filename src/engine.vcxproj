@@ -11,23 +11,23 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{9EA41068-2818-4E8C-97B6-D1C99214C956}</ProjectGuid>
+    <ProjectGuid>{B830743E-A80C-4703-8F6C-AD0ED8A1FB8A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>devel</RootNamespace>
+    <RootNamespace>engine</RootNamespace>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -41,9 +41,13 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(SolutionDir)\external;$(SolutionDir)\external\FreeType2\include;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\external;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>$(SolutionDir)\external;$(SolutionDir)\external\FreeType2\include;$(SolutionDir)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\external;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -52,12 +56,17 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..</AdditionalIncludeDirectories>
+      <AdditionalOptions>/D_WIN32_WINNT=0x0600 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>FreeType2/lib/freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <Lib>
+      <AdditionalDependencies>FreeType2\lib\freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <ProjectReference />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -68,7 +77,6 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\..</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -76,27 +84,62 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
+    <Lib>
+      <AdditionalDependencies>FreeType2\lib\freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <ProjectReference />
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="camera.cpp" />
+    <ClCompile Include="client.cpp" />
+    <ClCompile Include="drawbatcher.cpp" />
+    <ClCompile Include="font.cpp" />
+    <ClCompile Include="glfuncloader.cpp" />
+    <ClCompile Include="logger.cpp" />
+    <ClCompile Include="loggeride.cpp" />
+    <ClCompile Include="math.cpp" />
+    <ClCompile Include="mesh.cpp" />
+    <ClCompile Include="meshimporter.cpp" />
+    <ClCompile Include="renderd3d11.cpp" />
+    <ClCompile Include="graphics.cpp" />
+    <ClCompile Include="inputtemp.cpp" />
+    <ClCompile Include="model.cpp" />
+    <ClCompile Include="rendergl40.cpp" />
+    <ClCompile Include="shader.cpp" />
+    <ClCompile Include="sprite.cpp" />
+    <ClCompile Include="temphelpers.cpp" />
+    <ClCompile Include="texture.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="font.frag.glsl" />
-    <None Include="mesh.frag.glsl" />
-    <None Include="mesh.vert.glsl" />
-    <None Include="sprite.frag.glsl" />
-    <None Include="sprite.vert.glsl" />
-    <None Include="test.frag.fx">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="test.vert.fx">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\engine.vcxproj">
-      <Project>{b830743e-a80c-4703-8f6c-ad0ed8a1fb8a}</Project>
+    <ProjectReference Include="..\external\SOIL2\SOIL2.vcxproj">
+      <Project>{50f9c43c-8124-4129-a5ed-c6013434d123}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\blons.h" />
+    <ClInclude Include="..\include\debug\logger.h" />
+    <ClInclude Include="..\include\debug\loggeride.h" />
+    <ClInclude Include="..\include\graphics\camera.h" />
+    <ClInclude Include="..\include\graphics\font.h" />
+    <ClInclude Include="..\include\graphics\graphics.h" />
+    <ClInclude Include="..\include\graphics\mesh.h" />
+    <ClInclude Include="..\include\graphics\meshimporter.h" />
+    <ClInclude Include="..\include\graphics\model.h" />
+    <ClInclude Include="..\include\graphics\sprite.h" />
+    <ClInclude Include="..\include\graphics\texture.h" />
+    <ClInclude Include="..\include\input\inputbase.h" />
+    <ClInclude Include="..\include\input\inputdirect.h" />
+    <ClInclude Include="..\include\input\inputraw.h" />
+    <ClInclude Include="..\include\input\inputtemp.h" />
+    <ClInclude Include="..\include\math\math.h" />
+    <ClInclude Include="..\include\os\client.h" />
+    <ClInclude Include="..\include\render\drawbatcher.h" />
+    <ClInclude Include="..\include\render\glfuncloader.h" />
+    <ClInclude Include="..\include\render\render.h" />
+    <ClInclude Include="..\include\render\renderd3d11.h" />
+    <ClInclude Include="..\include\render\rendergl40.h" />
+    <ClInclude Include="..\include\render\shader.h" />
+    <ClInclude Include="..\include\temphelpers.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

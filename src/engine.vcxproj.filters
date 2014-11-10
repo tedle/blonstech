@@ -1,0 +1,160 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="src\debug">
+      <UniqueIdentifier>{3d8e3c6a-893a-4915-801f-ab7bf9cc13ec}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\render">
+      <UniqueIdentifier>{ed1f6f4d-d17f-4b92-8901-123a944679b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\os">
+      <UniqueIdentifier>{26a604fb-f88a-4ca6-a2cd-964adcb23926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\math">
+      <UniqueIdentifier>{c9b64562-c5b4-4ee7-bf29-d14b1bbaeed9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\input">
+      <UniqueIdentifier>{b0553186-1db7-4fe9-8ac2-10b5358e990d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics">
+      <UniqueIdentifier>{f426e4a2-fc70-45f7-9147-890478783c5b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="temphelpers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="logger.cpp">
+      <Filter>src\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="loggeride.cpp">
+      <Filter>src\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="drawbatcher.cpp">
+      <Filter>src\render</Filter>
+    </ClCompile>
+    <ClCompile Include="glfuncloader.cpp">
+      <Filter>src\render</Filter>
+    </ClCompile>
+    <ClCompile Include="renderd3d11.cpp">
+      <Filter>src\render</Filter>
+    </ClCompile>
+    <ClCompile Include="rendergl40.cpp">
+      <Filter>src\render</Filter>
+    </ClCompile>
+    <ClCompile Include="shader.cpp">
+      <Filter>src\render</Filter>
+    </ClCompile>
+    <ClCompile Include="camera.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="client.cpp">
+      <Filter>src\os</Filter>
+    </ClCompile>
+    <ClCompile Include="font.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="texture.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="sprite.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="model.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="meshimporter.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="mesh.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="inputtemp.cpp">
+      <Filter>src\input</Filter>
+    </ClCompile>
+    <ClCompile Include="math.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\blons.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\temphelpers.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\debug\logger.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\debug\loggeride.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\render\drawbatcher.h">
+      <Filter>src\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\render\glfuncloader.h">
+      <Filter>src\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\render\render.h">
+      <Filter>src\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\render\renderd3d11.h">
+      <Filter>src\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\render\rendergl40.h">
+      <Filter>src\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\render\shader.h">
+      <Filter>src\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\camera.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\font.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\graphics.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\mesh.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\meshimporter.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\model.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\sprite.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\texture.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\input\inputbase.h">
+      <Filter>src\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\input\inputdirect.h">
+      <Filter>src\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\input\inputraw.h">
+      <Filter>src\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\input\inputtemp.h">
+      <Filter>src\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\math\math.h">
+      <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\os\client.h">
+      <Filter>src\os</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
