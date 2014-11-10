@@ -38,10 +38,15 @@ void DrawBatcher::Render(RenderContext& context)
     indices_ = std::unique_ptr<unsigned int>(new unsigned int[index_count_]);
     for (size_t i = 0; i < batch_index_; i++)
     {
-        for (size_t j = 0; j < batch_[i].vertices.size(); j++)
+        // memcpy is noticably faster in debug builds, not so much with compiler optimizations
+        // cant do it for indices because they need to be incremented as the loop progresses
+        size_t vert_size = batch_[i].vertices.size();
+        memcpy(vertices_.get()+vertex_idx, batch_[i].vertices.data(), sizeof(Vertex) * vert_size);
+        vertex_idx += vert_size;
+        /*for (size_t j = 0; j < batch_[i].vertices.size(); j++)
         {
             vertices_.get()[vertex_idx++] = batch_[i].vertices[j];
-        }
+        }*/
         for (size_t j = 0; j < batch_[i].indices.size(); j++)
         {
             indices_.get()[index_idx++] = batch_[i].indices[j] + vertex_offset;
