@@ -64,7 +64,7 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     //models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
 
     // Fonts
-    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.otf", 24, context_));
+    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.ttf", 28, context_));
     //font_ = std::unique_ptr<Font>(new Font("C:/Windows/Fonts/arial.ttf", 32, context_));
 
     // Shaders
