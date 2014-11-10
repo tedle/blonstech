@@ -120,7 +120,9 @@ MeshData* Sprite::mesh()
 
 void Sprite::BuildQuad()
 {
-    auto& vs = mesh_.vertices;
+    // Faster than working with the vector object
+    auto* vs = mesh_.vertices.data();
+
     vs[0].pos.x = pos_.x;          vs[0].pos.y = pos_.y;
     vs[1].pos.x = pos_.x;          vs[1].pos.y = pos_.y + pos_.h;
     vs[2].pos.x = pos_.x + pos_.w; vs[2].pos.y = pos_.y;
