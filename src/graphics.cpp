@@ -129,6 +129,9 @@ bool Graphics::Render()
     // 3D Rendering pass
     // Needed so models dont render over themselves
     context_->SetDepthTesting(true);
+    // TODO: 3D pass ->
+    //      Render static world geo as batches without world matrix
+    //      Render movable objects singularly with world matrix
     for (auto const& model : models_)
     {
         // Prep the pipeline 4 drawering
