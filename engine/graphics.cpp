@@ -188,7 +188,7 @@ bool Graphics::Render()
     shader2d_->Render(testino->indices.size(), context_);*/
 
 
-    DrawBatcher batchie(context_);
+    static DrawBatcher batchie(context_);
     /*auto render_text = [&](int x, int y, std::string words)
     {
         shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
@@ -206,28 +206,26 @@ bool Graphics::Render()
     };*/
     auto render_text = [&](int x, int y, std::string words)
     {
-        std::vector<MeshData> letters(words.length());
         //letters.reserve(words.length());
-        shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
-        shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-        shader_font_->SetInput("diffuse", font_->texture(), context_);
-        shader_font_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context_);
-        int i = 0;
         for (auto& c : words)
         {
-            letters[i] = std::move(*font_->BuildSprite(c, x, y)->mesh());
+            batchie.Append(font_->BuildSprite(c, x, y)->mesh());
             x += font_->advance();
-            i++;
         }
-        batchie.Input(letters, context_);
-        shader_font_->Render(batchie.index_count(), context_);
     };
     render_text(20, 527, "std::move('run config'); // testing setup");
-    for (int i = 0; i < 30; i++)
+    //for (int i = 0; i < 30; i++)
         render_text(20, 492, "here's some longer running sentence... probably has to go on a");
     render_text(20, 457, "ways before we need to wrap it huh :)");
     render_text(20, 422, "> _");
 
+    shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
+    shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
+    shader_font_->SetInput("diffuse", font_->texture(), context_);
+    shader_font_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context_);
+
+    batchie.Render(context_);
+    shader_font_->Render(batchie.index_count(), context_);
     // Swap buffers
     context_->EndScene();
 

@@ -14,7 +14,8 @@ public:
     DrawBatcher(RenderContext& context);
     ~DrawBatcher();
 
-    void Input(std::vector<MeshData>& mesh_data, RenderContext& context);
+    void Append(MeshData* mesh_data);
+    void Render(RenderContext& context);
 
     int index_count();
 
@@ -26,6 +27,10 @@ private:
     std::unique_ptr<Vertex> vertices_;
     std::unique_ptr<unsigned int> indices_;
     unsigned int vertex_count_, index_count_;
+
+    // We pretty much treat this as a resizable C array for perf reasons... ugly :(
+    std::vector<MeshData> batch_;
+    unsigned int batch_index_;
 };
 }
 #endif
