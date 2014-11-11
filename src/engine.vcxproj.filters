@@ -8,9 +8,6 @@
     <Filter Include="src\debug">
       <UniqueIdentifier>{3d8e3c6a-893a-4915-801f-ab7bf9cc13ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\render">
-      <UniqueIdentifier>{ed1f6f4d-d17f-4b92-8901-123a944679b8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\os">
       <UniqueIdentifier>{26a604fb-f88a-4ca6-a2cd-964adcb23926}</UniqueIdentifier>
     </Filter>
@@ -23,7 +20,10 @@
     <Filter Include="src\graphics">
       <UniqueIdentifier>{f426e4a2-fc70-45f7-9147-890478783c5b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\gui">
+    <Filter Include="src\graphics\render">
+      <UniqueIdentifier>{ed1f6f4d-d17f-4b92-8901-123a944679b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\graphics\gui">
       <UniqueIdentifier>{41e15434-3732-485f-baeb-51669960c2a2}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -38,19 +38,19 @@
       <Filter>src\debug</Filter>
     </ClCompile>
     <ClCompile Include="drawbatcher.cpp">
-      <Filter>src\render</Filter>
+      <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="glfuncloader.cpp">
-      <Filter>src\render</Filter>
+      <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="renderd3d11.cpp">
-      <Filter>src\render</Filter>
+      <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="rendergl40.cpp">
-      <Filter>src\render</Filter>
+      <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="shader.cpp">
-      <Filter>src\render</Filter>
+      <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="camera.cpp">
       <Filter>src\graphics</Filter>
@@ -83,7 +83,7 @@
       <Filter>src\math</Filter>
     </ClCompile>
     <ClCompile Include="font.cpp">
-      <Filter>src\gui</Filter>
+      <Filter>src\graphics\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -98,24 +98,6 @@
     </ClInclude>
     <ClInclude Include="..\include\debug\loggeride.h">
       <Filter>src\debug</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\render\drawbatcher.h">
-      <Filter>src\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\render\glfuncloader.h">
-      <Filter>src\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\render\render.h">
-      <Filter>src\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\render\renderd3d11.h">
-      <Filter>src\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\render\rendergl40.h">
-      <Filter>src\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\render\shader.h">
-      <Filter>src\render</Filter>
     </ClInclude>
     <ClInclude Include="..\include\graphics\camera.h">
       <Filter>src\graphics</Filter>
@@ -156,11 +138,29 @@
     <ClInclude Include="..\include\os\client.h">
       <Filter>src\os</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gui\font.h">
-      <Filter>src\gui</Filter>
+    <ClInclude Include="..\include\graphics\render\drawbatcher.h">
+      <Filter>src\graphics\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\gui\gui.h">
-      <Filter>src\gui</Filter>
+    <ClInclude Include="..\include\graphics\render\glfuncloader.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\render\render.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\render\renderd3d11.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\render\rendergl40.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\render\shader.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\font.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\gui.h">
+      <Filter>src\graphics\gui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
