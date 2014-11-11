@@ -9,7 +9,6 @@
 #include <Windows.h>
 // Local Includes
 #include "input/inputtemp.h"
-#include "graphics/graphics.h"
 
 namespace blons
 {
@@ -18,27 +17,34 @@ namespace blons
 class Client{
 
 public:
+    struct Info
+    {
+        int width, height;
+        HWND hwnd;
+    };
+
     // Public functions
     Client();
     ~Client();
 
-    void Run();
+    bool Frame();
+
+    Info screen_info();
 
     // TODO: Temporary until Direct & Raw input are setup
     LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
+    Input* input();
 
 private:
     // Private functions
-    bool Frame();
     void InitWindow(int* width, int* height);
 
     // Private members
     LPCWSTR app_name_;
     HINSTANCE hinstance_;
-    HWND hwnd_;
+    Info screen_info_;
 
     std::unique_ptr<Input> input_;
-    std::unique_ptr<Graphics> graphics_;
 };
 
 // Message hooking helpers

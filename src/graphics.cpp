@@ -102,6 +102,16 @@ Camera* Graphics::camera()
     return camera_.get();
 }
 
+std::unique_ptr<Model> Graphics::CreateModel(const char* filename)
+{
+    return std::unique_ptr<Model>(new Model(filename, context_));
+}
+
+std::unique_ptr<Sprite> Graphics::CreateSprite(const char* filename)
+{
+    return std::unique_ptr<Sprite>(new Sprite(filename, context_));
+}
+
 bool Graphics::Render()
 {
     Matrix view_matrix, projection_matrix, world_matrix;

@@ -2,7 +2,7 @@
 
 // Local Includes
 #include "debug/loggeride.h"
-#include "temphelpers.h"
+#include "graphics/graphics.h"
 
 namespace blons
 {
@@ -13,7 +13,6 @@ Client::Client()
     g_log = nullptr;
 
     input_ = nullptr;
-    graphics_ = nullptr;
 
     // Initialize logger
     g_log = std::unique_ptr<LoggerAPI>(new LoggerIDE(LoggerAPI::Level::DEBUG));
@@ -23,17 +22,13 @@ Client::Client()
 
     // Open window and get w+h
     InitWindow(&screen_width, &screen_height);
+    screen_info_.width = screen_width;
+    screen_info_.height = screen_height;
 
     input_ = std::unique_ptr<Input>(new Input);
     if (input_ == nullptr)
     {
         throw "Failed input initilization";
-    }
-
-    graphics_ = std::unique_ptr<Graphics>(new Graphics(screen_width, screen_height, hwnd_));
-    if (graphics_ == nullptr)
-    {
-        throw "Failed graphics initialization";
     }
 }
 
@@ -48,8 +43,8 @@ Client::~Client()
     }
     g_application_handle = nullptr;
 
-    DestroyWindow(hwnd_);
-    hwnd_ = nullptr;
+    DestroyWindow(screen_info_.hwnd);
+    screen_info_.hwnd = nullptr;
 
     UnregisterClass(app_name_, hinstance_);
     hinstance_ = nullptr;
@@ -57,65 +52,35 @@ Client::~Client()
     return;
 }
 
-void Client::Run()
-{
-    MSG msg = {};
-    bool quit;
-
-    quit = false;
-    while(!quit)
-    {
-        while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-        {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-        }
-
-        // Is someone trying to X out
-        if (msg.message == WM_QUIT)
-        {
-            quit = true;
-        }
-        else
-        {
-            if (!Frame())
-            {
-                quit = true;
-            }
-        }
-    }
-}
-
 bool Client::Frame()
 {
-    FPS();
+    MSG msg = {};
+
+    bool quit = false;
+    while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
+
+    // Is someone trying to X out
+    if (msg.message == WM_QUIT)
+    {
+        quit = true;
+    }
+
     // Esc = exit
     if (!input_->Frame() || input_->IsKeyDown(VK_ESCAPE))
     {
-        return false;
+        return true;
     }
 
-    // TODO: THIS IS TEMP DELETE LATER
-    // Handles mouselook and wasd movement
-    noclip(input_.get(), graphics_->camera());
-    //move_camera_around_origin(1.0f, graphics_->camera());
-    /*if (input_->IsKeyDown('A'))
-    {
-        move_camera_around_origin(-1.0f, graphics_->camera());
-    }
-    if (input_->IsKeyDown('D'))
-    {
-        move_camera_around_origin(1.0f, graphics_->camera());
-    }*/
-    // END TEMP
+    return quit;
+}
 
-    // Render scene
-    if (!graphics_->Render())
-    {
-        return false;
-    }
-
-    return true;
+Client::Info Client::screen_info()
+{
+    return screen_info_;
 }
 
 void Client::InitWindow(int* screen_width, int* screen_height)
@@ -189,17 +154,17 @@ void Client::InitWindow(int* screen_width, int* screen_height)
     }
 
     // Finally make the window, fuck win32
-    hwnd_ = CreateWindowEx(WS_EX_APPWINDOW, app_name_, app_name_, style,
-                            pos_x, pos_y, r_width, r_height, nullptr, nullptr, hinstance_, nullptr);
+    screen_info_.hwnd = CreateWindowEx(WS_EX_APPWINDOW, app_name_, app_name_, style,
+                                       pos_x, pos_y, r_width, r_height, nullptr, nullptr, hinstance_, nullptr);
 
     // Make it real
-    ShowWindow(hwnd_, SW_SHOW);
-    SetForegroundWindow(hwnd_);
-    SetFocus(hwnd_);
+    ShowWindow(screen_info_.hwnd, SW_SHOW);
+    SetForegroundWindow(screen_info_.hwnd);
+    SetFocus(screen_info_.hwnd);
 
     // Poll for inner window dimensions (r_width/height have window border tacked on)
     RECT rect;
-    GetClientRect(hwnd_, &rect); 
+    GetClientRect(screen_info_.hwnd, &rect); 
     (*screen_width)  = rect.right;
     (*screen_height) = rect.bottom;
 
@@ -258,5 +223,10 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
     default:
         return DefWindowProc(hwnd, umsg, wparam, lparam);
     }
+}
+
+Input* Client::input()
+{
+    return input_.get();
 }
 } // namespace blons

@@ -10,6 +10,9 @@
 
 namespace blons
 {
+typedef std::vector<std::unique_ptr<class Model>> ModelList;
+typedef std::vector<std::unique_ptr<class Sprite>> SpriteList;
+
 const int kRenderModeFullscreen       = 1;
 const int kRenderModeWindow           = 2;
 const int kRenderModeBorderlessWindow = 3;
@@ -25,10 +28,12 @@ const float kScreenNear  = 0.1f;
 //           graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, vector<string> shader_files, func shader_inputs_callback)
 class Graphics
 {
-
 public:
     Graphics(int screen_width, int screen_height, HWND hwnd);
     ~Graphics();
+
+    std::unique_ptr<class Model> CreateModel(const char* filename);
+    std::unique_ptr<class Sprite> CreateSprite(const char* filename);
 
     bool Render();
 

@@ -26,7 +26,9 @@ public:
 private:
     // So we can return models to users and let them modify without
     // getting confused why "Render" does nothing for them
-    friend bool Graphics::Render();
+    friend class Graphics;
+    // vvv This is preferable, but intellisense bug shows this as an error
+    //friend bool Graphics::Render();
     void Render(RenderContext& context);
 
     std::unique_ptr<class Mesh> mesh_;
