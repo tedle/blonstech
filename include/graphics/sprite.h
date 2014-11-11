@@ -23,14 +23,10 @@ public:
 
 public:
     Sprite(const char* texture_filename, RenderContext& context);
-    Sprite(const char* texture_filename, std::function<void(Sprite*)> deleter, RenderContext& context);
     Sprite(PixelData* texture_data, RenderContext& context);
-    Sprite(PixelData* texture_data, std::function<void(Sprite*)> deleter, RenderContext& context);
-    ~Sprite();
+    virtual ~Sprite();
 
     void Render(RenderContext& context);
-    // This is generally called by object managers to clean up before render api is shut down
-    void Finish();
 
     int index_count();
     TextureResource* texture();
@@ -49,12 +45,9 @@ public:
     void set_subtexture(float x, float y, float w, float h);
     void set_subtexture(int x, int y, int w, int h);
 
-private:
-    void Init(std::function<void(Sprite*)> deleter, RenderContext& context);
+protected:
+    void Init(RenderContext& context);
     void BuildQuad();
-
-    // Called on destruction
-    std::function<void(Sprite*)> deleter_;
 
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
     MeshData mesh_;

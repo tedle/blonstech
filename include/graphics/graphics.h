@@ -39,6 +39,30 @@ public:
     class Camera* camera();
 
 private:
+    // Managed assets let this class create and track models & sprites.
+    // It will auto-render all assets created thru this class every frame until they are deleted
+    // It will also clean up their buffers without destruction as the graphics class is shutting down
+    class ManagedModel : public Model
+    {
+    public:
+        ManagedModel(const char* filename, RenderContext& context) : Model(filename, context) {}
+        ~ManagedModel();
+    private:
+        friend Graphics;
+        void Finish();
+        std::function<void(ManagedModel*)> deleter_;
+    };
+
+    class ManagedSprite : public Sprite
+    {
+    public:
+        ManagedSprite(const char* filename, RenderContext& context) : Sprite(filename, context) {}
+        ~ManagedSprite();
+    private:
+        friend Graphics;
+        void Finish();
+        std::function<void(ManagedSprite*)> deleter_;
+    };
 
     RenderContext context_;
     std::unique_ptr<class Camera> camera_;
@@ -48,8 +72,8 @@ private:
     std::unique_ptr<class Font> font_;
     // Keeps track of generated models & sprites for rendering
     // Will automatically update when referenced resources are deleted, so go ham
-    std::set<Model*> models_;
-    std::set<Sprite*> sprites_;
+    std::set<ManagedModel*> models_;
+    std::set<ManagedSprite*> sprites_;
 };
 } // namespace blons
 

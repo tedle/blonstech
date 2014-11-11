@@ -5,31 +5,17 @@ namespace blons
 Sprite::Sprite(const char* texture_filename, RenderContext& context)
 {
     texture_ = std::unique_ptr<Texture>(new Texture(texture_filename, Texture::Type::SPRITE, context));
-    Init(nullptr, context);
-}
-
-Sprite::Sprite(const char* texture_filename, std::function<void(Sprite*)> deleter, RenderContext& context)
-{
-    texture_ = std::unique_ptr<Texture>(new Texture(texture_filename, Texture::Type::SPRITE, context));
-    Init(deleter, context);
+    Init(context);
 }
 
 Sprite::Sprite(PixelData* texture_data, RenderContext& context)
 {
     texture_ = std::unique_ptr<Texture>(new Texture(texture_data, Texture::Type::SPRITE, context));
-    Init(nullptr, context);
+    Init(context);
 }
 
-Sprite::Sprite(PixelData* texture_data, std::function<void(Sprite*)> deleter, RenderContext& context)
+void Sprite::Init(RenderContext& context)
 {
-    texture_ = std::unique_ptr<Texture>(new Texture(texture_data, Texture::Type::SPRITE, context));
-    Init(deleter, context);
-}
-
-void Sprite::Init(std::function<void(Sprite*)> deleter, RenderContext& context)
-{
-    deleter_ = deleter;
-
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     Texture::Info dimensions = texture_->info();
@@ -52,22 +38,6 @@ void Sprite::Init(std::function<void(Sprite*)> deleter, RenderContext& context)
 
 Sprite::~Sprite()
 {
-    if (deleter_ != nullptr)
-    {
-        deleter_(this);
-    }
-}
-
-void Sprite::Finish()
-{
-    if (deleter_ != nullptr)
-    {
-        deleter_(this);
-        deleter_ = nullptr;
-    }
-
-    vertex_buffer_.reset();
-    index_buffer_.reset();
 }
 
 void Sprite::Render(RenderContext& context)

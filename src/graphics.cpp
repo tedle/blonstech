@@ -96,22 +96,22 @@ Graphics::~Graphics()
 
 std::unique_ptr<Model> Graphics::CreateModel(const char* filename)
 {
-    auto deleter = [&](Model* m)
+    auto model = new ManagedModel(filename, context_);
+    model->deleter_ = [&](ManagedModel* m)
     {
         models_.erase(m);
     };
-    auto model = new Model(filename, deleter, context_);
     models_.insert(model);
     return std::unique_ptr<Model>(model);
 }
 
 std::unique_ptr<Sprite> Graphics::CreateSprite(const char* filename)
 {
-    auto deleter = [&](Sprite* s)
+    auto sprite = new ManagedSprite(filename, context_);
+    sprite->deleter_ = [&](ManagedSprite* s)
     {
         sprites_.erase(s);
     };
-    auto sprite = new Sprite(filename, deleter, context_);
     sprites_.insert(sprite);
     return std::unique_ptr<Sprite>(sprite);
 }
@@ -194,5 +194,48 @@ bool Graphics::Render()
     context_->EndScene();
 
     return true;
+}
+
+void Graphics::ManagedModel::Finish()
+{
+    if (deleter_ != nullptr)
+    {
+        deleter_(this);
+        deleter_ = nullptr;
+    }
+
+    mesh_.reset();
+    diffuse_texture_.reset();
+    normal_texture_.reset();
+    light_texture_.reset();
+}
+
+Graphics::ManagedModel::~ManagedModel()
+{
+    if (deleter_ != nullptr)
+    {
+        deleter_(this);
+    }
+}
+
+void Graphics::ManagedSprite::Finish()
+{
+    if (deleter_ != nullptr)
+    {
+        deleter_(this);
+        deleter_ = nullptr;
+    }
+
+    vertex_buffer_.reset();
+    index_buffer_.reset();
+    texture_.reset();
+}
+
+Graphics::ManagedSprite::~ManagedSprite()
+{
+    if (deleter_ != nullptr)
+    {
+        deleter_(this);
+    }
 }
 } // namespace blons

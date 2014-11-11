@@ -14,12 +14,9 @@ class Model
 {
 public:
     Model(const char* mesh_filename, RenderContext& context);
-    Model(const char* mesh_filename, std::function<void(Model*)> deleter, RenderContext& context);
-    ~Model();
+    virtual ~Model();
 
     void Render(RenderContext& context);
-    // This is generally called by object managers to clean up before render api is shut down
-    void Finish();
 
     int index_count();
     TextureResource* texture();
@@ -28,11 +25,8 @@ public:
 
     void set_pos(float x, float y, float z);
 
-private:
-    void Init(const char* mesh_filename, std::function<void(Model*)> deleter, RenderContext& context);
-
-    // Called on destruction
-    std::function<void(Model*)> deleter_;
+protected:
+    void Init(const char* mesh_filename, RenderContext& context);
 
     std::unique_ptr<class Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;
