@@ -2,6 +2,7 @@
 #define BLONSTECH_SPRITE_H_
 
 // Local Includes
+#include "graphics/graphics.h"
 #include "graphics/mesh.h"
 #include "graphics/texture.h"
 #include "render/render.h"
@@ -24,8 +25,6 @@ public:
     Sprite(PixelData* texture_data, RenderContext& context);
     ~Sprite();
 
-    void Render(RenderContext& context);
-
     int index_count();
     TextureResource* texture();
     Vector2 pos();
@@ -46,6 +45,11 @@ public:
 private:
     void Init(RenderContext& context);
     void BuildQuad();
+
+    // So we can return sprites to users and let them modify without
+    // getting confused why "Render" does nothing for them
+    friend bool Graphics::Render();
+    void Render(RenderContext& context);
 
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
     MeshData mesh_;

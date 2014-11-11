@@ -30,12 +30,11 @@ public:
     Graphics(int screen_width, int screen_height, HWND hwnd);
     ~Graphics();
 
-    bool Frame();
+    bool Render();
 
     class Camera* camera();
 
 private:
-    bool Render();
 
     RenderContext context_;
     std::unique_ptr<class Camera> camera_;

@@ -20,7 +20,6 @@ public:
                                              " ,./<>?;':\"[]\\{}|-=_+";
 
     Sprite* BuildSprite(unsigned char letter, int x, int y);
-    bool Render(unsigned char letter, int x, int y, RenderContext& context);
 
     // Return how far to advance horizontally after rendering a character in pixels
     // Resets to 0 after call

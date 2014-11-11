@@ -4,6 +4,7 @@
 // Includes
 #include <memory>
 // Local Includes
+#include "graphics/graphics.h"
 #include "graphics/texture.h"
 #include "render/render.h"
 
@@ -15,8 +16,6 @@ public:
     Model(const char* mesh_filename, RenderContext& context);
     ~Model();
 
-    void Render(RenderContext& context);
-
     int index_count();
     TextureResource* texture();
     Vector3 pos();
@@ -25,6 +24,11 @@ public:
     void set_pos(float x, float y, float z);
 
 private:
+    // So we can return models to users and let them modify without
+    // getting confused why "Render" does nothing for them
+    friend bool Graphics::Render();
+    void Render(RenderContext& context);
+
     std::unique_ptr<class Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;
     std::unique_ptr<Texture> normal_texture_;

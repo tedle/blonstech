@@ -170,12 +170,6 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
     return fontsheet_.get();
 }
 
-bool Font::Render(unsigned char letter, int x, int y, RenderContext& context)
-{
-    BuildSprite(letter, x, y)->Render(context);
-    return true;
-}
-
 int Font::advance()
 {
     int ret = advance_;

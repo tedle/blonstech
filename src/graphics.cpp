@@ -97,16 +97,6 @@ Graphics::~Graphics()
 {
 }
 
-bool Graphics::Frame()
-{
-    if (!Render())
-    {
-        return false;
-    }
-
-    return true;
-}
-
 Camera* Graphics::camera()
 {
     return camera_.get();

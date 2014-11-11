@@ -110,7 +110,7 @@ bool Client::Frame()
     // END TEMP
 
     // Render scene
-    if (!graphics_->Frame())
+    if (!graphics_->Render())
     {
         return false;
     }
