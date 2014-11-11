@@ -48,9 +48,12 @@ void DrawBatcher::Render(RenderContext& context)
         {
             vertices_.get()[vertex_idx++] = batch_[i].vertices[j];
         }*/
+        // Caching these helps debug perf
+        auto indices_ptr = indices_.get();
+        auto batch_indices_ptr = batch_[i].indices.data();
         for (std::size_t j = 0; j < index_size; j++)
         {
-            indices_.get()[index_idx++] = batch_[i].indices[j] + vertex_offset;
+            indices_ptr[index_idx++] = batch_indices_ptr[j] + vertex_offset;
         }
         vertex_offset += batch_[i].vertices.size();
     }
