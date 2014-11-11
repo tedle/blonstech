@@ -1,4 +1,4 @@
-#include "render/shader.h"
+#include "graphics/render/shader.h"
 
 namespace blons
 {

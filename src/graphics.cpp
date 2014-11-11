@@ -4,12 +4,12 @@
 #include "graphics/model.h"
 #include "graphics/sprite.h"
 #include "graphics/camera.h"
-#include "gui/gui.h"
+#include "graphics/gui/gui.h"
+#include "graphics/render/drawbatcher.h"
+#include "graphics/render/renderd3d11.h"
+#include "graphics/render/rendergl40.h"
+#include "graphics/render/shader.h"
 #include "math/math.h"
-#include "render/drawbatcher.h"
-#include "render/renderd3d11.h"
-#include "render/rendergl40.h"
-#include "render/shader.h"
 #include "temphelpers.h"
 
 namespace blons

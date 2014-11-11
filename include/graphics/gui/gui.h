@@ -4,7 +4,7 @@
 // Includes
 #include <map>
 // Local Includes
-#include "gui/font.h"
+#include "graphics/gui/font.h"
 
 namespace blons
 {

@@ -1,4 +1,4 @@
-#include "render/rendergl40.h"
+#include "graphics/render/rendergl40.h"
 
 
 // Includes
@@ -8,7 +8,7 @@
 #include <SOIL2/SOIL2.h>
 // Local Includes
 #include "math/math.h"
-#include "render/glfuncloader.h"
+#include "graphics/render/glfuncloader.h"
 
 namespace blons
 {
