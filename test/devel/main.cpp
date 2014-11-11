@@ -17,6 +17,9 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models[1]->set_pos(10.0, 0.0, 20.0);
     //models = blons::load_codmap("../../notes/bms_test", std::move(models), graphics.get());
 
+    auto sprite = graphics->CreateSprite("../../notes/me.dds");
+    sprite->set_pos(0, 0, 32, 32);
+
     auto start = GetTickCount64() + 5000;
     bool quit = false;
     while (!quit)
@@ -25,6 +28,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         {
             models.pop_back();
             start = GetTickCount64();
+            sprite.reset();
         }*/
         quit = client->Frame();
         blons::FPS();

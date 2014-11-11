@@ -123,7 +123,7 @@ Camera* Graphics::camera()
 
 bool Graphics::Render()
 {
-    Matrix view_matrix, projection_matrix, world_matrix;
+    Matrix world_matrix, view_matrix, projection_matrix, ortho_matrix;
 
     // Clear buffers
     context_->BeginScene();
@@ -134,6 +134,7 @@ bool Graphics::Render()
     // Get matrices
     view_matrix       = camera_->view_matrix();
     projection_matrix = context_->projection_matrix();
+    ortho_matrix      = context_->ortho_matrix();
 
     // 3D Rendering pass
     // Needed so models dont render over themselves
@@ -166,6 +167,25 @@ bool Graphics::Render()
     // 2D Rendering pass
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
+    for (const auto& sprite : sprites_)
+    {
+        // Prep the pipeline 4 drawering
+        sprite->Render(context_);
+
+        // Set the inputs
+        if (!shader2d_->SetInput("world_matrix", MatrixIdentity() , context_) ||
+            !shader2d_->SetInput("proj_matrix", ortho_matrix, context_) ||
+            !shader2d_->SetInput("diffuse", sprite->texture(), context_))
+        {
+            return false;
+        }
+
+        // Finally do the render
+        if (!shader2d_->Render(sprite->index_count(), context_))
+        {
+            return false;
+        }
+    }
 
     static DrawBatcher batchie(context_);
     auto render_text = [&](int x, int y, std::string words)
@@ -184,7 +204,7 @@ bool Graphics::Render()
     render_text(20, 422, "> _");
 
     shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
-    shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
+    shader_font_->SetInput("proj_matrix", ortho_matrix, context_);
     shader_font_->SetInput("diffuse", font_->texture(), context_);
     shader_font_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context_);
 
