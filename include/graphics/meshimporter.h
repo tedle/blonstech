@@ -31,7 +31,7 @@ public:
     unsigned int face_count();
     // Anything returned by these getters will be freed on class destruction
     MeshData* mesh_data();
-    std::vector<TextureInfo>& textures();
+    std::vector<TextureInfo>* textures();
 
 private:
     bool Load(const char* filename, bool invert_y);

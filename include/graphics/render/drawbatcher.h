@@ -14,7 +14,7 @@ public:
     DrawBatcher(RenderContext& context);
     ~DrawBatcher();
 
-    void Append(MeshData* mesh_data);
+    void Append(const MeshData& mesh_data);
     void Render(RenderContext& context);
 
     int index_count();

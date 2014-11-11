@@ -458,7 +458,7 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
     shader->program_ = glCreateProgram();
     glAttachShader(shader->program_, shader->vertex_shader_);
     glAttachShader(shader->program_, shader->frag_shader_);
-    for (auto const& input : inputs)
+    for (const auto& input : inputs)
     {
         glBindAttribLocation(shader->program_, input.first, input.second.c_str());
     }

@@ -100,7 +100,7 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
     // Used to determine how tall font texture must be
     unsigned int tex_height = 0;
     // For every drawable character, get a bitmap rendering of the letter and store it
-    for (auto& c : kAvailableCharacters)
+    for (const auto& c : kAvailableCharacters)
     {
         Glyph g(c, face, tex_width);
         charset_[c] = g;
@@ -115,7 +115,7 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
     std::fill(tex.get(), tex.get()+(tex_width*tex_height), 0);
     // We have to do this as a second pass because we dont know the fontsheet width until
     // all of the glyphs have been rendered and stored
-    for (auto& glyph : charset_)
+    for (const auto& glyph : charset_)
     {
         for (unsigned int i = 0; i < glyph.pixels.size(); i++)
         {

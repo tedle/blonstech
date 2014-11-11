@@ -15,13 +15,13 @@ DrawBatcher::~DrawBatcher()
 {
 }
 
-void DrawBatcher::Append(MeshData* mesh_data)
+void DrawBatcher::Append(const MeshData& mesh_data)
 {
     if (batch_index_ >= batch_.size())
     {
         batch_.resize(batch_.size() * 2);
     }
-    batch_[batch_index_++] = *mesh_data;
+    batch_[batch_index_++] = mesh_data;
 }
 
 void DrawBatcher::Render(RenderContext& context)

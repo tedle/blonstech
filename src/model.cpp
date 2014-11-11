@@ -39,7 +39,7 @@ Model::Model(const char* mesh_filename, RenderContext& context)
     tex_folder = tex_folder.substr(0, tex_folder.find_last_of('/'));
     tex_folder = tex_folder.substr(0, tex_folder.find_last_of('/'));
     tex_folder += "/tex/";
-    for (const auto& tex : mesh_data.textures())
+    for (const auto& tex : *mesh_data.textures())
     {
         std::string tex_file;
         tex_file = tex_folder + tex.filename;

@@ -135,7 +135,7 @@ bool Graphics::Render()
     // TODO: 3D pass ->
     //      Render static world geo as batches without world matrix
     //      Render movable objects singularly with world matrix
-    for (auto const& model : models_)
+    for (const auto& model : models_)
     {
         // Prep the pipeline 4 drawering
         model->Render(context_);
@@ -165,9 +165,9 @@ bool Graphics::Render()
     auto render_text = [&](int x, int y, std::string words)
     {
         //letters.reserve(words.length());
-        for (auto& c : words)
+        for (const auto& c : words)
         {
-            batchie.Append(font_->BuildSprite(c, x, y)->mesh());
+            batchie.Append(*font_->BuildSprite(c, x, y)->mesh());
             x += font_->advance();
         }
     };

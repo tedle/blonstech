@@ -246,8 +246,8 @@ MeshData* MeshImporter::mesh_data()
     return &mesh_data_;
 }
 
-std::vector<MeshImporter::TextureInfo>& MeshImporter::textures()
+std::vector<MeshImporter::TextureInfo>* MeshImporter::textures()
 {
-    return textures_;
+    return &textures_;
 }
 } // namespace blons
