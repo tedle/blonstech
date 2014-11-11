@@ -77,35 +77,41 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 Graphics::~Graphics()
 {
     // If graphics gets deleted before its models & sprites, make sure
-    // they don't try to reference our deleted tracker
-    for (const auto& m : models_)
+    // they're cleaned up safely
+    while (models_.size() > 0)
     {
-        m->deleter_ = nullptr;
+        auto m = *models_.begin();
+        m->Finish();
+        // Just to be safe
+        models_.erase(m);
     }
-    for (const auto& s : sprites_)
+    while (sprites_.size() > 0)
     {
-        s->deleter_ = nullptr;
+        auto s = *sprites_.begin();
+        s->Finish();
+        // Just to be safe
+        sprites_.erase(s);
     }
 }
 
 std::unique_ptr<Model> Graphics::CreateModel(const char* filename)
 {
-    auto model = new Model(filename, context_);
-    model->deleter_ = [&](Model* m)
+    auto deleter = [&](Model* m)
     {
         models_.erase(m);
     };
+    auto model = new Model(filename, deleter, context_);
     models_.insert(model);
     return std::unique_ptr<Model>(model);
 }
 
 std::unique_ptr<Sprite> Graphics::CreateSprite(const char* filename)
 {
-    auto sprite = new Sprite(filename, context_);
-    sprite->deleter_ = [&](Sprite* s)
+    auto deleter = [&](Sprite* s)
     {
         sprites_.erase(s);
     };
+    auto sprite = new Sprite(filename, deleter, context_);
     sprites_.insert(sprite);
     return std::unique_ptr<Sprite>(sprite);
 }

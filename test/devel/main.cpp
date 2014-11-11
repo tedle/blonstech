@@ -5,28 +5,15 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 {
     blons::Client* client = new blons::Client;
     auto info = client->screen_info();
-
-    if (!client)
-        return 0;
+    auto graphics = std::unique_ptr<blons::Graphics>(new blons::Graphics(info.width, info.height, info.hwnd));
     std::vector<std::unique_ptr<blons::Model>> models;
 
-    auto graphics = std::unique_ptr<blons::Graphics>(new blons::Graphics(info.width, info.height, info.hwnd));
     // Model 1
     models.push_back(graphics->CreateModel("../../notes/teapot_highpoly.bms"));
-    if (models[0] == nullptr)
-    {
-        blons::g_log->Fatal("FATAL: Teapot initialization procedures were unsuccessful\n");
-        return 1;
-    }
     models[0]->set_pos(0.0, 0.0, 20.0);
 
     // Model 2
     models.push_back(graphics->CreateModel("../../notes/cube.bms"));
-    if (models[1] == nullptr)
-    {
-        blons::g_log->Fatal("no cube :(\n");
-        return 1;
-    }
     models[1]->set_pos(10.0, 0.0, 20.0);
     //models = blons::load_codmap("../../notes/bms_test", std::move(models), graphics.get());
 
@@ -46,6 +33,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         blons::noclip(client->input(), graphics->camera());
         graphics->Render();
     }
+    graphics.reset();
 
     delete client;
 

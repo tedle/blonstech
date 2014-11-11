@@ -23,8 +23,14 @@ public:
 
 public:
     Sprite(const char* texture_filename, RenderContext& context);
+    Sprite(const char* texture_filename, std::function<void(Sprite*)> deleter, RenderContext& context);
     Sprite(PixelData* texture_data, RenderContext& context);
+    Sprite(PixelData* texture_data, std::function<void(Sprite*)> deleter, RenderContext& context);
     ~Sprite();
+
+    void Render(RenderContext& context);
+    // This is generally called by object managers to clean up before render api is shut down
+    void Finish();
 
     int index_count();
     TextureResource* texture();
@@ -44,15 +50,10 @@ public:
     void set_subtexture(int x, int y, int w, int h);
 
 private:
-    void Init(RenderContext& context);
+    void Init(std::function<void(Sprite*)> deleter, RenderContext& context);
     void BuildQuad();
 
-    // So we can return sprites to users and let them modify without
-    // getting confused why "Render" does nothing for them
-    friend class Graphics;
-    void Render(RenderContext& context);
-    // Also for this... which is really pretty dirty, but convenient for the user... i think
-    // Lets graphics class keep a list of living sprites & models
+    // Called on destruction
     std::function<void(Sprite*)> deleter_;
 
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;

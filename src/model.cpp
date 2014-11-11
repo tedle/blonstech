@@ -9,11 +9,22 @@ namespace blons
 {
 Model::Model(const char* mesh_filename, RenderContext& context)
 {
+    Init(mesh_filename, nullptr, context);
+}
+
+Model::Model(const char* mesh_filename, std::function<void(Model*)> deleter, RenderContext& context)
+{
+    Init(mesh_filename, deleter, context);
+}
+
+void Model::Init(const char* mesh_filename, std::function<void(Model*)> deleter, RenderContext& context)
+{
+    deleter_ = deleter;
+
     mesh_ = nullptr;
     diffuse_texture_ = nullptr;
     normal_texture_ = nullptr;
     light_texture_ = nullptr;
-    deleter_ = nullptr;
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
     world_matrix_ = MatrixIdentity();
 
@@ -86,6 +97,20 @@ Model::~Model()
     {
         deleter_(this);
     }
+}
+
+void Model::Finish()
+{
+    if (deleter_ != nullptr)
+    {
+        deleter_(this);
+        deleter_ = nullptr;
+    }
+
+    mesh_.reset();
+    diffuse_texture_.reset();
+    normal_texture_.reset();
+    light_texture_.reset();
 }
 
 void Model::Render(RenderContext& context)
