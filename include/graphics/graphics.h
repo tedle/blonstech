@@ -3,16 +3,15 @@
 
 // Includes
 #include <memory>
-#include <vector>
+#include <set>
 #include <Windows.h>
 // Local Includes
+#include "graphics/model.h"
+#include "graphics/sprite.h"
 #include "render/render.h"
 
 namespace blons
 {
-typedef std::vector<std::unique_ptr<class Model>> ModelList;
-typedef std::vector<std::unique_ptr<class Sprite>> SpriteList;
-
 const int kRenderModeFullscreen       = 1;
 const int kRenderModeWindow           = 2;
 const int kRenderModeBorderlessWindow = 3;
@@ -32,8 +31,8 @@ public:
     Graphics(int screen_width, int screen_height, HWND hwnd);
     ~Graphics();
 
-    std::unique_ptr<class Model> CreateModel(const char* filename);
-    std::unique_ptr<class Sprite> CreateSprite(const char* filename);
+    std::unique_ptr<Model> CreateModel(const char* filename);
+    std::unique_ptr<Sprite> CreateSprite(const char* filename);
 
     bool Render();
 
@@ -47,8 +46,10 @@ private:
     std::unique_ptr<class Shader> shader2d_;
     std::unique_ptr<class Shader> shader_font_;
     std::unique_ptr<class Font> font_;
-    std::vector<std::unique_ptr<class Model>> models_;
-
+    // Keeps track of generated models & sprites for rendering
+    // Will automatically update when referenced resources are deleted, so go ham
+    std::set<Model*> models_;
+    std::set<Sprite*> sprites_;
 };
 } // namespace blons
 

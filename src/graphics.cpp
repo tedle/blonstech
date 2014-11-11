@@ -44,25 +44,6 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 
     camera_->set_pos(0.0f, 0.0f, -10.0f);
 
-    // Model 1
-    models_.push_back(std::unique_ptr<Model>(new Model("../../notes/teapot_highpoly.bms", context_)));
-    if (models_[0] == nullptr)
-    {
-        g_log->Fatal("FATAL: Teapot initialization procedures were unsuccessful\n");
-        throw "Failed to initialize model";
-    }
-    models_[0]->set_pos(0.0, 0.0, 20.0);
-
-    // Model 2
-    models_.push_back(std::unique_ptr<Model>(new Model("../../notes/cube.bms", context_)));
-    if (models_[1] == nullptr)
-    {
-        g_log->Fatal("no cube :(\n");
-        throw "Failed to initialize model";
-    }
-    models_[1]->set_pos(10.0, 0.0, 20.0);
-    //models_ = load_codmap("../../notes/bms_test", std::move(models_), context_);
-
     // Fonts
     font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.ttf", 28, context_));
     //font_ = std::unique_ptr<Font>(new Font("C:/Windows/Fonts/arial.ttf", 32, context_));
@@ -95,21 +76,43 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 
 Graphics::~Graphics()
 {
+    // If graphics gets deleted before its models & sprites, make sure
+    // they don't try to reference our deleted tracker
+    for (const auto& m : models_)
+    {
+        m->deleter_ = nullptr;
+    }
+    for (const auto& s : sprites_)
+    {
+        s->deleter_ = nullptr;
+    }
+}
+
+std::unique_ptr<Model> Graphics::CreateModel(const char* filename)
+{
+    auto model = new Model(filename, context_);
+    model->deleter_ = [&](Model* m)
+    {
+        models_.erase(m);
+    };
+    models_.insert(model);
+    return std::unique_ptr<Model>(model);
+}
+
+std::unique_ptr<Sprite> Graphics::CreateSprite(const char* filename)
+{
+    auto sprite = new Sprite(filename, context_);
+    sprite->deleter_ = [&](Sprite* s)
+    {
+        sprites_.erase(s);
+    };
+    sprites_.insert(sprite);
+    return std::unique_ptr<Sprite>(sprite);
 }
 
 Camera* Graphics::camera()
 {
     return camera_.get();
-}
-
-std::unique_ptr<Model> Graphics::CreateModel(const char* filename)
-{
-    return std::unique_ptr<Model>(new Model(filename, context_));
-}
-
-std::unique_ptr<Sprite> Graphics::CreateSprite(const char* filename)
-{
-    return std::unique_ptr<Sprite>(new Sprite(filename, context_));
 }
 
 bool Graphics::Render()

@@ -13,6 +13,7 @@ Model::Model(const char* mesh_filename, RenderContext& context)
     diffuse_texture_ = nullptr;
     normal_texture_ = nullptr;
     light_texture_ = nullptr;
+    deleter_ = nullptr;
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
     world_matrix_ = MatrixIdentity();
 
@@ -81,6 +82,10 @@ Model::Model(const char* mesh_filename, RenderContext& context)
 
 Model::~Model()
 {
+    if (deleter_ != nullptr)
+    {
+        deleter_(this);
+    }
 }
 
 void Model::Render(RenderContext& context)

@@ -16,6 +16,8 @@ Sprite::Sprite(PixelData* texture_data, RenderContext& context)
 
 void Sprite::Init(RenderContext& context)
 {
+    deleter_ = nullptr;
+
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     Texture::Info dimensions = texture_->info();
@@ -38,6 +40,10 @@ void Sprite::Init(RenderContext& context)
 
 Sprite::~Sprite()
 {
+    if (deleter_ != nullptr)
+    {
+        deleter_(this);
+    }
 }
 
 void Sprite::Render(RenderContext& context)

@@ -1,8 +1,9 @@
 #ifndef BLONSTECH_SPRITE_H_
 #define BLONSTECH_SPRITE_H_
 
+// Includes
+#include <functional>
 // Local Includes
-#include "graphics/graphics.h"
 #include "graphics/mesh.h"
 #include "graphics/texture.h"
 #include "graphics/render/render.h"
@@ -49,9 +50,10 @@ private:
     // So we can return sprites to users and let them modify without
     // getting confused why "Render" does nothing for them
     friend class Graphics;
-    // vvv This is preferable, but intellisense bug shows this as an error
-    //friend bool Graphics::Render();
     void Render(RenderContext& context);
+    // Also for this... which is really pretty dirty, but convenient for the user... i think
+    // Lets graphics class keep a list of living sprites & models
+    std::function<void(Sprite*)> deleter_;
 
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
     MeshData mesh_;

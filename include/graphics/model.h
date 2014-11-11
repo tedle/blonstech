@@ -2,9 +2,9 @@
 #define BLONSTECH_MODEL_H_
 
 // Includes
+#include <functional>
 #include <memory>
 // Local Includes
-#include "graphics/graphics.h"
 #include "graphics/texture.h"
 #include "render/render.h"
 
@@ -30,6 +30,9 @@ private:
     // vvv This is preferable, but intellisense bug shows this as an error
     //friend bool Graphics::Render();
     void Render(RenderContext& context);
+    // Also for this... which is really pretty dirty, but convenient for the user... i think
+    // Lets graphics class keep a list of living sprites & models
+    std::function<void(Model*)> deleter_;
 
     std::unique_ptr<class Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;
