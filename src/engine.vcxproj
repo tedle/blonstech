@@ -120,13 +120,14 @@
     <ClInclude Include="..\include\debug\logger.h" />
     <ClInclude Include="..\include\debug\loggeride.h" />
     <ClInclude Include="..\include\graphics\camera.h" />
-    <ClInclude Include="..\include\graphics\font.h" />
     <ClInclude Include="..\include\graphics\graphics.h" />
     <ClInclude Include="..\include\graphics\mesh.h" />
     <ClInclude Include="..\include\graphics\meshimporter.h" />
     <ClInclude Include="..\include\graphics\model.h" />
     <ClInclude Include="..\include\graphics\sprite.h" />
     <ClInclude Include="..\include\graphics\texture.h" />
+    <ClInclude Include="..\include\gui\font.h" />
+    <ClInclude Include="..\include\gui\gui.h" />
     <ClInclude Include="..\include\input\inputbase.h" />
     <ClInclude Include="..\include\input\inputdirect.h" />
     <ClInclude Include="..\include\input\inputraw.h" />

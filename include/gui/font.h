@@ -4,7 +4,7 @@
 // Includes
 #include <vector>
 // Local Includes
-#include "sprite.h"
+#include "graphics/sprite.h"
 
 namespace blons
 {
@@ -31,7 +31,7 @@ public:
 private:
     struct Glyph;
     std::vector<Glyph> charset_;
-    std::unique_ptr<Sprite> fontsheet_;
+    std::unique_ptr<class Sprite> fontsheet_;
     std::size_t pixel_size_;
     int advance_;
 };

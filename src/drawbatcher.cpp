@@ -29,17 +29,17 @@ void DrawBatcher::Render(RenderContext& context)
     unsigned int vertex_offset = 0;
     unsigned int vertex_idx = 0, index_idx = 0;
     vertex_count_ = index_count_ = 0;
-    for (size_t i = 0; i < batch_index_; i++)
+    for (std::size_t i = 0; i < batch_index_; i++)
     {
         vertex_count_ += batch_[i].vertices.size();
         index_count_ += batch_[i].indices.size();
     }
     vertices_ = std::unique_ptr<Vertex>(new Vertex[vertex_count_]);
     indices_ = std::unique_ptr<unsigned int>(new unsigned int[index_count_]);
-    for (size_t i = 0; i < batch_index_; i++)
+    for (std::size_t i = 0; i < batch_index_; i++)
     {
-        size_t vert_size = batch_[i].vertices.size();
-        size_t index_size = batch_[i].indices.size();
+        std::size_t vert_size = batch_[i].vertices.size();
+        std::size_t index_size = batch_[i].indices.size();
         // memcpy is noticably faster in debug builds, not so much with compiler optimizations
         // cant do it for indices because they need to be incremented as the loop progresses
         memcpy(vertices_.get()+vertex_idx, batch_[i].vertices.data(), sizeof(Vertex) * vert_size);
@@ -48,7 +48,7 @@ void DrawBatcher::Render(RenderContext& context)
         {
             vertices_.get()[vertex_idx++] = batch_[i].vertices[j];
         }*/
-        for (size_t j = 0; j < index_size; j++)
+        for (std::size_t j = 0; j < index_size; j++)
         {
             indices_.get()[index_idx++] = batch_[i].indices[j] + vertex_offset;
         }

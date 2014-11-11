@@ -1,10 +1,10 @@
 #include "graphics/graphics.h"
 
 // Local Includes
-#include "graphics/font.h"
 #include "graphics/model.h"
 #include "graphics/sprite.h"
 #include "graphics/camera.h"
+#include "gui/gui.h"
 #include "math/math.h"
 #include "render/drawbatcher.h"
 #include "render/renderd3d11.h"
@@ -158,55 +158,7 @@ bool Graphics::Render()
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
 
-    //(sin(GetTickCount64()/500.0f) + 1) * 100
-    /*PixelData black_pixel;
-    black_pixel.pixels = std::unique_ptr<unsigned char>(new unsigned char[4] {0, 0, 0, 160});
-    black_pixel.width = 1;
-    black_pixel.height = 1;
-    black_pixel.bits = PixelData::R8G8B8A8;
-    black_pixel.format = PixelData::RAW;
-    std::unique_ptr<Sprite>black_box(new Sprite(&black_pixel, context_));
-    black_box->set_pos(0, 400, 800, 200);
-    black_box->Render(context_);
-    shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
-    shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-    shader2d_->SetInput("diffuse", black_box->texture(), context_);
-    shader2d_->Render(black_box->index_count(), context_);*/
-    /*std::vector<MeshData>* quaddies = new std::vector<MeshData>;
-    static auto s1 = new Sprite("../../notes/alpha_test.dds", context_);
-    s1->set_pos(0, 0, 200, 200);
-    quaddies->push_back(*s1->mesh());
-    //static auto s2 = new Sprite("../../notes/alpha_test.dds", context_);
-    //s2->set_pos(200, 200, 200, 200);
-    s1->set_pos(200, 200, 200, 200);
-    quaddies->push_back(*s1->mesh());
-    DrawBatcher batch(context_);
-    batch.Input(*quaddies, context_);
-    auto testino = batch.mesh();
-    //context_->BindModelBuffer(vertex_buffer.get(), index_buffer.get());
-    //s1->Render(context_);
-    shader2d_->SetInput("world_matrix", MatrixIdentity(), context_);
-    shader2d_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-    shader2d_->SetInput("diffuse", s1->texture(), context_);
-    shader2d_->Render(testino->indices.size(), context_);*/
-
-
     static DrawBatcher batchie(context_);
-    /*auto render_text = [&](int x, int y, std::string words)
-    {
-        shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
-        shader_font_->SetInput("proj_matrix", context_->ortho_matrix(), context_);
-        shader_font_->SetInput("diffuse", font_->texture(), context_);
-        shader_font_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context_);
-        int i = 0;
-        for (auto& c : words)
-        {
-            font_->Render(c, x, y, context_);
-            x += font_->advance();
-            i++;
-            shader_font_->Render(font_->index_count(), context_);
-        }
-    };*/
     auto render_text = [&](int x, int y, std::string words)
     {
         //letters.reserve(words.length());

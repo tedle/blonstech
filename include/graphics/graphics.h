@@ -19,6 +19,10 @@ const bool  kEnableVsync = false;
 const float kScreenDepth = 10000.0f;
 const float kScreenNear  = 0.1f;
 
+// TODO: Add sprite & model factories that inject this class's RenderContext
+//           Change RenderContext to shared_ptr??
+// TODO: Custom shader pipelines like
+//           graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, vector<string> shader_files, func shader_inputs_callback)
 class Graphics
 {
 

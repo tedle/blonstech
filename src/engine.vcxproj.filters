@@ -23,6 +23,9 @@
     <Filter Include="src\graphics">
       <UniqueIdentifier>{f426e4a2-fc70-45f7-9147-890478783c5b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\gui">
+      <UniqueIdentifier>{41e15434-3732-485f-baeb-51669960c2a2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="temphelpers.cpp">
@@ -55,9 +58,6 @@
     <ClCompile Include="client.cpp">
       <Filter>src\os</Filter>
     </ClCompile>
-    <ClCompile Include="font.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
     <ClCompile Include="graphics.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
@@ -81,6 +81,9 @@
     </ClCompile>
     <ClCompile Include="math.cpp">
       <Filter>src\math</Filter>
+    </ClCompile>
+    <ClCompile Include="font.cpp">
+      <Filter>src\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -115,9 +118,6 @@
       <Filter>src\render</Filter>
     </ClInclude>
     <ClInclude Include="..\include\graphics\camera.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\font.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
     <ClInclude Include="..\include\graphics\graphics.h">
@@ -155,6 +155,12 @@
     </ClInclude>
     <ClInclude Include="..\include\os\client.h">
       <Filter>src\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gui\font.h">
+      <Filter>src\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\gui\gui.h">
+      <Filter>src\gui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

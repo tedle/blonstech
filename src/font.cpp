@@ -1,4 +1,4 @@
-#include "graphics/font.h"
+#include "gui/font.h"
 
 // Includes
 #include <FreeType2\include\ft2build.h>
@@ -6,7 +6,6 @@
 #include <algorithm>
 // Local Includes
 #include "render/render.h"
-
 
 namespace blons
 {
