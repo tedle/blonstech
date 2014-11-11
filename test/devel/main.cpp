@@ -31,10 +31,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
             sprite.reset();
         }*/
         quit = client->Frame();
-        blons::FPS();
+        blons::temp::FPS();
         // TODO: THIS IS TEMP DELETE LATER
         // Handles mouselook and wasd movement
-        blons::noclip(client->input(), graphics->camera());
+        blons::temp::noclip(client->input(), graphics->camera());
         graphics->Render();
     }
     graphics.reset();

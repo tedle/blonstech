@@ -15,6 +15,8 @@
 
 namespace blons
 {
+namespace temp
+{
 Vector3 cur_pos(0.0, 0.0, 0.0);
 
 void noclip(Input* input, Camera* camera)
@@ -71,17 +73,17 @@ void noclip(Input* input, Camera* camera)
         // since im awful with math, this is how i make us not move faster when u/d + l/r are held together
         float hacky = static_cast<float>(lr == 0 ? 1.0 : 1.0 / sqrt(2));
         // ud!=0 to make sure we dont move forward/back if only A/D are held
-        float new_x = velocity * sin(yaw) * cos(pitch) * hacky * (float)(ud!=0);
+        float new_x = velocity * sin(yaw) * cos(pitch) * hacky * (float)(ud != 0);
         float new_y = velocity * -1.0f * (float)ud * hacky * sin(pitch);
-        float new_z = velocity * cos(yaw) * cos(pitch) * hacky * (float)(ud!=0);
+        float new_z = velocity * cos(yaw) * cos(pitch) * hacky * (float)(ud != 0);
 
         yaw = static_cast<float>(atan2(lr, 0) + rot.y);
 
         // sorry, still bad at match
         hacky = static_cast<float>(ud == 0 ? 1.0 : 1.0 / sqrt(2));
         // lr!=0 to make sure we dont move left/right if only W/S are held
-        new_x += velocity * sin(yaw) * hacky * (float)(lr!=0);
-        new_z += velocity * cos(yaw) * hacky * (float)(lr!=0);
+        new_x += velocity * sin(yaw) * hacky * (float)(lr != 0);
+        new_z += velocity * cos(yaw) * hacky * (float)(lr != 0);
 
         // in case we wanna go up/down w/o flailing mouse around
         if (input->IsKeyDown('E'))
@@ -93,7 +95,7 @@ void noclip(Input* input, Camera* camera)
             new_y -= velocity;
         }
 
-        camera->set_pos(pos.x+new_x, pos.y+new_y, pos.z+new_z);
+        camera->set_pos(pos.x + new_x, pos.y + new_y, pos.z + new_z);
         cur_pos = camera->pos();
     }
 }
@@ -103,7 +105,7 @@ void move_camera_around_origin(float delta, Camera* camera)
     float orientation = static_cast<float>(XM_PI)*1.5f;
     static DWORD64 last_call = 0;
 
-    if (GetTickCount64() > last_call+10)
+    if (GetTickCount64() > last_call + 10)
     {
         last_call = GetTickCount64();
 
@@ -132,9 +134,9 @@ void FPS()
 
     max_frame = max(max_frame, st - last_frame);
 
-    if (st > last_second+1000)
+    if (st > last_second + 1000)
     {
-        g_log->Debug("FPS: %i(min:%llu), (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, 1000/max_frame, cur_pos.x, cur_pos.y, cur_pos.z);
+        g_log->Debug("FPS: %i(min:%llu), (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, 1000 / max_frame, cur_pos.x, cur_pos.y, cur_pos.z);
         last_second = st;
         max_frame = 0;
         fps_count = 0;
@@ -167,8 +169,8 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
     while (std::getline(csv, line))
     {
         std::string mesh_file = mesh_folder + line.substr(0, line.find(','));
-        std::string tex_file = tex_folder + line.substr(line.find(',')+1);
-        
+        std::string tex_file = tex_folder + line.substr(line.find(',') + 1);
+
         if (mesh_file.size() == 0 || tex_file.size() == 0)
         {
             throw "csv read problem";
@@ -196,4 +198,5 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
     g_log->Debug("Loaded map [%ims]\n", end - start);
     return models;
 }
+} // namespace temp
 } // namespace blons
