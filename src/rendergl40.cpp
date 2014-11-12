@@ -337,14 +337,14 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data
     TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
     tex->texture_unit_ = 0;
 
-	// Set the texture unit in which to store the data.
-	glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
+    // Set the texture unit in which to store the data.
+    glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
 
-	// Generate an ID for the texture.
-	glGenTextures(1, &tex->texture_);
+    // Generate an ID for the texture.
+    glGenTextures(1, &tex->texture_);
 
-	// Bind the texture as a 2D texture.
-	glBindTexture(GL_TEXTURE_2D, tex->texture_);
+    // Bind the texture as a 2D texture.
+    glBindTexture(GL_TEXTURE_2D, tex->texture_);
 
     // Load the texture onto GPU
     unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
@@ -503,6 +503,24 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
 
 }
 
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, int value)
+{
+    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
+    GLuint loc;
+
+    BindShader(prog->program_);
+
+    // Bind our uniform variables to the shader
+    loc = glGetUniformLocation(prog->program_, name);
+    if (loc < 0)
+    {
+        return false;
+    }
+    glUniform1i(loc, value);
+
+    return true;
+}
+
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matrix value)
 {
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
@@ -560,18 +578,7 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vecto
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, TextureResource* value)
 {
     TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(value);
-    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-    GLuint loc;
-
-    BindShader(prog->program_);
-
-    // Bind our uniform variables to the shader
-    loc = glGetUniformLocation(prog->program_, name);
-    if (loc < 0)
-    {
-        return false;
-    }
-    glUniform1i(loc, GL_TEXTURE0 + tex->texture_unit_);
+    SetShaderInput(program, name, tex->texture_unit_);
     glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
     glBindTexture(GL_TEXTURE_2D, tex->texture_);
 

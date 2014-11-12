@@ -19,7 +19,7 @@ public:
         CONSOLE
     };
 public:
-    GUI(int width, int height, std::unique_ptr<class Shader>, RenderContext& context);
+    GUI(int screen_width, int screen_height, std::unique_ptr<class Shader>, RenderContext& context);
     ~GUI();
 
     bool LoadFont(const char* filename, int pixel_size, RenderContext& context);

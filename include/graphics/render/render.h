@@ -91,6 +91,7 @@ public:
     virtual void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                              Vertex* vertices, unsigned int vert_count,
                              unsigned int* indices, unsigned int index_count)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, int value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Matrix value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value)=0;

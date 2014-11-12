@@ -61,23 +61,23 @@ void GUI::Render(RenderContext& context)
     static DrawBatcher batchie(context);
     auto render_text = [&](int x, int y, std::string words)
     {
-        //letters.reserve(words.length());
         for (const auto& c : words)
         {
             batchie.Append(*font_list_.fallback->BuildSprite(c, x, y)->mesh());
             x += font_list_.fallback->advance();
         }
     };
-    render_text(20, 527, "std::move('run config'); // testing setup");
+    render_text(20, 527, "EVERY MORNING I WAKE UP AND OPEN PALM SLAM A VHS INTO ");
     //for (int i = 0; i < 30; i++)
-        render_text(20, 492, "here's some longer running sentence... probably has to go on a");
-    render_text(20, 457, "ways before we need to wrap it huh :)");
+        render_text(20, 492, "THE SLOT. ITS CHRONICLES OF RIDDICK AND RIGHT THEN ");
+    render_text(20, 457, "AND THERE I START DOING THE MOVES ALONGSIDE THE MAIN CHARACTER, RIDDICK. I D");
     render_text(20, 422, "> _");
 
     ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
     ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
     ui_shader_->SetInput("diffuse", font_list_.fallback->texture(), context);
     ui_shader_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context);
+    ui_shader_->SetInput("is_text", true, context);
 
     batchie.Render(context);
     ui_shader_->Render(batchie.index_count(), context);

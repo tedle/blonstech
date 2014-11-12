@@ -24,6 +24,11 @@ bool Shader::Render(int index_count, RenderContext& context)
     return true;
 }
 
+bool Shader::SetInput(const char* field, int value, RenderContext& context)
+{
+    return context->SetShaderInput(program_.get(), field, value);
+}
+
 bool Shader::SetInput(const char* field, Matrix value, RenderContext& context)
 {
     return context->SetShaderInput(program_.get(), field, value);

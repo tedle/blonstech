@@ -25,6 +25,8 @@ const float kScreenNear  = 0.1f;
 //           Change RenderContext to shared_ptr??
 // TODO: Custom shader pipelines like
 //           graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, vector<string> shader_files, func shader_inputs_callback)
+// OR        graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, Shader* shader)
+//              shader->SetInputCallback(std::function<void(Shader*)>)
 class Graphics
 {
 public:
