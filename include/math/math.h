@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_MATH_H_
-#define BLONSTECH_MATH_H_
+#ifndef BLONSTECH_MATH_MATH_H_
+#define BLONSTECH_MATH_MATH_H_
 
 // TODO: write own funcs instead of wrapping dxmath
 #include <DirectXMath.h>

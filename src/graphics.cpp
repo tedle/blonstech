@@ -26,7 +26,7 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 
     // OpenGL
     context_ = RenderContext(new RenderGL40(screen_width, screen_height, kEnableVsync, hwnd,
-                                            (kRenderMode == kRenderModeFullscreen)));
+                                            (kRenderMode == RenderMode::FULLSCREEN)));
     if (!context_)
     {
         g_log->Fatal("Renderer failed to initailize\n");
@@ -77,7 +77,7 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     }
 
     // GUI
-    gui_ = std::unique_ptr<GUI>(new GUI(screen_width, screen_height, std::move(ui_shader), context_));
+    gui_ = std::unique_ptr<GUI::Manager>(new GUI::Manager(screen_width, screen_height, std::move(ui_shader), context_));
     gui_->LoadFont("../../notes/font stuff/test.ttf", 28, context_);
 }
 
@@ -128,7 +128,7 @@ Camera* Graphics::camera()
     return camera_.get();
 }
 
-GUI* Graphics::gui()
+GUI::Manager* Graphics::gui()
 {
     return gui_.get();
 }

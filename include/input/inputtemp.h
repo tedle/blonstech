@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_INPUTTEMP_H_
-#define BLONSTECH_INPUTTEMP_H_
+#ifndef BLONSTECH_INPUT_INPUTTEMP_H_
+#define BLONSTECH_INPUT_INPUTTEMP_H_
 
 // Includes
 #include <windowsx.h>

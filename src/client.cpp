@@ -37,7 +37,7 @@ Client::~Client()
     ShowCursor(true);
 
     // TODO: Temporary until Direct & Raw input are setup
-    if (kRenderMode == kRenderModeFullscreen)
+    if (kRenderMode == RenderMode::FULLSCREEN)
     {
         ChangeDisplaySettings(nullptr, 0);
     }
@@ -115,7 +115,7 @@ void Client::InitWindow(int* screen_width, int* screen_height)
     RegisterClassEx(&wc);
 
     // TODO: Do it in Graphics later
-    if (kRenderMode == kRenderModeFullscreen)
+    if (kRenderMode == RenderMode::FULLSCREEN)
     {
         r_width  = GetSystemMetrics(SM_CXSCREEN);
         r_height = GetSystemMetrics(SM_CYSCREEN);
@@ -133,7 +133,7 @@ void Client::InitWindow(int* screen_width, int* screen_height)
 
         pos_x = pos_y = 0;
     }
-    else if (kRenderMode == kRenderModeWindow)
+    else if (kRenderMode == RenderMode::WINDOW)
     {
         r_width  = 800;
         r_height = 600;
@@ -143,7 +143,7 @@ void Client::InitWindow(int* screen_width, int* screen_height)
 
         style |= WS_BORDER | WS_SYSMENU;
     }
-    else if (kRenderMode == kRenderModeBorderlessWindow)
+    else if (kRenderMode == RenderMode::BORDERLESS_WINDOW)
     {
         r_width  = GetSystemMetrics(SM_CXSCREEN);
         r_height = GetSystemMetrics(SM_CYSCREEN);

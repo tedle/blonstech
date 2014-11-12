@@ -1,14 +1,22 @@
-#ifndef BLONSTECH_GUI_H_
-#define BLONSTECH_GUI_H_
+#ifndef BLONSTECH_GRAPHICS_GUI_GUI_H_
+#define BLONSTECH_GRAPHICS_GUI_GUI_H_
 
 // Includes
 #include <map>
 // Local Includes
 #include "graphics/gui/font.h"
+#include "graphics/gui/label.h"
+#include "graphics/gui/button.h"
+#include "graphics/gui/window.h"
 
 namespace blons
 {
-class GUI
+// Forward declarations
+class Shader;
+
+namespace GUI
+{
+class Manager
 {
 public:
     enum FontType
@@ -19,8 +27,8 @@ public:
         CONSOLE
     };
 public:
-    GUI(int screen_width, int screen_height, std::unique_ptr<class Shader>, RenderContext& context);
-    ~GUI();
+    Manager(int screen_width, int screen_height, std::unique_ptr<Shader>, RenderContext& context);
+    ~Manager();
 
     bool LoadFont(const char* filename, int pixel_size, RenderContext& context);
     bool LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context);
@@ -38,5 +46,6 @@ private:
 
     std::unique_ptr<Shader> ui_shader_;
 };
-}
+} // namespace GUI
+} // namespace blons
 #endif

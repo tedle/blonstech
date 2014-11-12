@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_TEXTURE_H_
-#define BLONSTECH_TEXTURE_H_
+#ifndef BLONSTECH_GRAPHICS_TEXTURE_H_
+#define BLONSTECH_GRAPHICS_TEXTURE_H_
 
 // Includes
 #include <memory>

@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_MODEL_H_
-#define BLONSTECH_MODEL_H_
+#ifndef BLONSTECH_GRAPHICS_MODEL_H_
+#define BLONSTECH_GRAPHICS_MODEL_H_
 
 // Includes
 #include <functional>

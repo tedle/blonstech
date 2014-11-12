@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_MESH_H_
-#define BLONSTECH_MESH_H_
+#ifndef BLONSTECH_GRAPHICS_MESH_H_
+#define BLONSTECH_GRAPHICS_MESH_H_
 
 // Includes
 #include <memory>

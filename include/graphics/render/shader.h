@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_SHADER_H_
-#define BLONSTECH_SHADER_H_
+#ifndef BLONSTECH_GRAPHICS_RENDER_SHADER_H_
+#define BLONSTECH_GRAPHICS_RENDER_SHADER_H_
 
 // Includes
 #include "render.h"

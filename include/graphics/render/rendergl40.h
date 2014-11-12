@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_RENDERGL40_H_
-#define BLONSTECH_RENDERGL40_H_
+#ifndef BLONSTECH_GRAPHICS_RENDER_RENDERGL40_H_
+#define BLONSTECH_GRAPHICS_RENDER_RENDERGL40_H_
 
 // Linking
 #pragma comment(lib, "opengl32.lib")

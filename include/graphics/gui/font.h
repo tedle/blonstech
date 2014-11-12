@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_FONT_H_
-#define BLONSTECH_FONT_H_
+#ifndef BLONSTECH_GRAPHICS_GUI_FONT_H_
+#define BLONSTECH_GRAPHICS_GUI_FONT_H_
 
 // Includes
 #include <vector>
@@ -7,6 +7,8 @@
 #include "graphics/sprite.h"
 
 namespace blons
+{
+namespace GUI
 {
 class Font
 {
@@ -34,5 +36,6 @@ private:
     std::size_t pixel_size_;
     int advance_;
 };
+} // namespace GUI
 } // namespace blons
 #endif

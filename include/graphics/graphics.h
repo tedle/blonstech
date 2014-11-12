@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_GRAPHICS_H_
-#define BLONSTECH_GRAPHICS_H_
+#ifndef BLONSTECH_GRAPHICS_GRAPHICS_H_
+#define BLONSTECH_GRAPHICS_GRAPHICS_H_
 
 // Includes
 #include <memory>
@@ -12,14 +12,22 @@
 
 namespace blons
 {
-const int kRenderModeFullscreen       = 1;
-const int kRenderModeWindow           = 2;
-const int kRenderModeBorderlessWindow = 3;
+enum RenderMode
+{
+    FULLSCREEN,
+    WINDOW,
+    BORDERLESS_WINDOW
+};
 
-const int   kRenderMode  = kRenderModeWindow;
-const bool  kEnableVsync = false;
-const float kScreenDepth = 10000.0f;
-const float kScreenNear  = 0.1f;
+const RenderMode kRenderMode  = RenderMode::WINDOW;
+const bool       kEnableVsync = false;
+const float      kScreenDepth = 10000.0f;
+const float      kScreenNear  = 0.1f;
+
+// Forward declarations
+namespace GUI { class Manager; }
+class Camera;
+class Shader;
 
 // TODO: Add sprite & model factories that inject this class's RenderContext
 //           Change RenderContext to shared_ptr??
@@ -27,6 +35,7 @@ const float kScreenNear  = 0.1f;
 //           graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, vector<string> shader_files, func shader_inputs_callback)
 // OR        graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, Shader* shader)
 //              shader->SetInputCallback(std::function<void(Shader*)>)
+//                  ^ but what about model world matrix??
 class Graphics
 {
 public:
@@ -38,8 +47,8 @@ public:
 
     bool Render();
 
-    class Camera* camera();
-    class GUI* gui();
+    Camera* camera();
+    GUI::Manager* gui();
 
 private:
     // Managed assets let this class create and track models & sprites.
@@ -68,10 +77,10 @@ private:
     };
 
     RenderContext context_;
-    std::unique_ptr<class Camera> camera_;
-    std::unique_ptr<class GUI> gui_;
-    std::unique_ptr<class Shader> shader3d_;
-    std::unique_ptr<class Shader> shader2d_;
+    std::unique_ptr<Camera> camera_;
+    std::unique_ptr<GUI::Manager> gui_;
+    std::unique_ptr<Shader> shader3d_;
+    std::unique_ptr<Shader> shader2d_;
 
     Matrix proj_matrix_, ortho_matrix_;
     // Keeps track of generated models & sprites for rendering

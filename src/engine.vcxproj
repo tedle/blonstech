@@ -90,12 +90,14 @@
     <ProjectReference />
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="button.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
     <ClCompile Include="drawbatcher.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="glfuncloader.cpp" />
     <ClCompile Include="gui.cpp" />
+    <ClCompile Include="label.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="loggeride.cpp" />
     <ClCompile Include="math.cpp" />
@@ -110,6 +112,7 @@
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="temphelpers.cpp" />
     <ClCompile Include="texture.cpp" />
+    <ClCompile Include="window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\external\SOIL2\SOIL2.vcxproj">
@@ -122,8 +125,11 @@
     <ClInclude Include="..\include\debug\loggeride.h" />
     <ClInclude Include="..\include\graphics\camera.h" />
     <ClInclude Include="..\include\graphics\graphics.h" />
+    <ClInclude Include="..\include\graphics\gui\button.h" />
     <ClInclude Include="..\include\graphics\gui\font.h" />
     <ClInclude Include="..\include\graphics\gui\gui.h" />
+    <ClInclude Include="..\include\graphics\gui\label.h" />
+    <ClInclude Include="..\include\graphics\gui\window.h" />
     <ClInclude Include="..\include\graphics\mesh.h" />
     <ClInclude Include="..\include\graphics\meshimporter.h" />
     <ClInclude Include="..\include\graphics\model.h" />

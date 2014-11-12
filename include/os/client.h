@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_CLIENT_H_
-#define BLONSTECH_CLIENT_H_
+#ifndef BLONSTECH_OS_CLIENT_H_
+#define BLONSTECH_OS_CLIENT_H_
 
 // Strips less used APIs from inclusion
 #define WIN32_LEAN_AND_MEAN

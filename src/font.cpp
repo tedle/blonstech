@@ -9,6 +9,8 @@
 
 namespace blons
 {
+namespace GUI
+{
 struct Font::Glyph
 {
     // Needed for std::map storage
@@ -186,4 +188,5 @@ TextureResource* Font::texture()
 {
     return fontsheet_->texture();
 }
+} // namespace GUI
 } // namespace blons

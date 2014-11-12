@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_SPRITE_H_
-#define BLONSTECH_SPRITE_H_
+#ifndef BLONSTECH_GRAPHICS_SPRITE_H_
+#define BLONSTECH_GRAPHICS_SPRITE_H_
 
 // Includes
 #include <functional>

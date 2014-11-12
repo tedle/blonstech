@@ -88,6 +88,15 @@
     <ClCompile Include="gui.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
+    <ClCompile Include="button.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="window.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="label.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons.h">
@@ -163,6 +172,15 @@
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\include\graphics\gui\gui.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\button.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\label.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\window.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
   </ItemGroup>

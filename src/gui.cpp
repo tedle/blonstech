@@ -8,7 +8,9 @@
 
 namespace blons
 {
-GUI::GUI(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
+namespace GUI
+{
+Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
     font_list_.fallback = nullptr;
     font_list_.heading = nullptr;
@@ -23,16 +25,16 @@ GUI::GUI(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext
     ui_shader_ = std::move(ui_shader);
 }
 
-GUI::~GUI()
+Manager::~Manager()
 {
 }
 
-bool GUI::LoadFont(const char* filename, int pixel_size, RenderContext& context)
+bool Manager::LoadFont(const char* filename, int pixel_size, RenderContext& context)
 {
     return LoadFont(filename, FontType::DEFAULT, pixel_size, context);
 }
 
-bool GUI::LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context)
+bool Manager::LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context)
 {
     auto font = std::unique_ptr<Font>(new Font(filename, pixel_size, context));
 
@@ -56,7 +58,7 @@ bool GUI::LoadFont(const char* filename, FontType usage, int pixel_size, RenderC
     return true;
 }
 
-void GUI::Render(RenderContext& context)
+void Manager::Render(RenderContext& context)
 {
     static DrawBatcher batchie(context);
     auto render_text = [&](int x, int y, std::string words)
@@ -69,7 +71,7 @@ void GUI::Render(RenderContext& context)
     };
     render_text(20, 527, "EVERY MORNING I WAKE UP AND OPEN PALM SLAM A VHS INTO ");
     //for (int i = 0; i < 30; i++)
-        render_text(20, 492, "THE SLOT. ITS CHRONICLES OF RIDDICK AND RIGHT THEN ");
+    render_text(20, 492, "THE SLOT. ITS CHRONICLES OF RIDDICK AND RIGHT THEN ");
     render_text(20, 457, "AND THERE I START DOING THE MOVES ALONGSIDE THE MAIN CHARACTER, RIDDICK. I D");
     render_text(20, 422, "> _");
 
@@ -82,4 +84,5 @@ void GUI::Render(RenderContext& context)
     batchie.Render(context);
     ui_shader_->Render(batchie.index_count(), context);
 }
+} // namespace GUI
 } // namespace blons

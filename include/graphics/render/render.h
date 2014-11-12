@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_RENDER_H_
-#define BLONSTECH_RENDER_H_
+#ifndef BLONSTECH_GRAPHICS_RENDER_RENDER_H_
+#define BLONSTECH_GRAPHICS_RENDER_RENDER_H_
 
 // Includes
 #include <memory>
