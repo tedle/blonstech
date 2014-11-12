@@ -9,7 +9,9 @@ notes/
 [Rr]elease/
 
 # Visual Studio
-*.sdf
 *.opensdf
+*.psess
+*.sdf
 *.suo
 *.vcxproj.user
+*.vsp
