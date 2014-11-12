@@ -21,9 +21,6 @@
     <None Include="test.vert.fx">
       <Filter>shaders</Filter>
     </None>
-    <None Include="font.frag.glsl">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="mesh.frag.glsl">
       <Filter>shaders</Filter>
     </None>
@@ -34,6 +31,9 @@
       <Filter>shaders</Filter>
     </None>
     <None Include="sprite.vert.glsl">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="ui.frag.glsl">
       <Filter>shaders</Filter>
     </None>
   </ItemGroup>

@@ -85,6 +85,9 @@
     <ClCompile Include="font.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
+    <ClCompile Include="gui.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons.h">

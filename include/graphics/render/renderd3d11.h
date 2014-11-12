@@ -52,7 +52,7 @@ class RenderD3D11 : public RenderAPI
     
 public:
     RenderD3D11(int screen_width, int screen_height, bool vsync,
-                HWND hwnd, bool fullscreen, float depth, float near);
+                HWND hwnd, bool fullscreen);
     ~RenderD3D11();
 
     void BeginScene();
@@ -75,9 +75,6 @@ public:
     bool SetShaderInputs(ShaderResource* program, TextureResource* texture,
                          Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix);
 
-    Matrix projection_matrix();
-    Matrix ortho_matrix();
-
     void GetVideoCardInfo(char* buffer, int& len_buffer);
 
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
@@ -88,8 +85,6 @@ private:
     bool vsync_;
     int video_card_memory_;
     std::string video_card_desc_;
-    Matrix proj_matrix_;
-    Matrix ortho_matrix_;
 
     // API specific
     IDXGISwapChain* swapchain_;

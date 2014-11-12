@@ -98,9 +98,6 @@ public:
 
     virtual bool SetDepthTesting(bool enable)=0;
 
-    virtual Matrix projection_matrix()=0;
-    virtual Matrix ortho_matrix()=0;
-
     virtual void GetVideoCardInfo(char* buffer, int& len_buffer)=0;
 
     // TODO: do this MANULLY in texture class later
@@ -110,8 +107,6 @@ protected:
     bool vsync_;
     int video_card_memory_;
     std::string video_card_desc_;
-    Matrix proj_matrix_;
-    Matrix ortho_matrix_;
 };
 } // namespace blons
 

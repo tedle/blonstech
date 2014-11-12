@@ -55,7 +55,7 @@ ShaderResourceD3D11::~ShaderResourceD3D11()
 }
 
 RenderD3D11::RenderD3D11(int screen_width, int screen_height, bool vsync,
-                         HWND hwnd, bool fullscreen, float screen_depth, float screen_near)
+                         HWND hwnd, bool fullscreen)
 {
     swapchain_ = nullptr;
     device_ = nullptr;
@@ -82,7 +82,6 @@ RenderD3D11::RenderD3D11(int screen_width, int screen_height, bool vsync,
     D3D11_DEPTH_STENCIL_VIEW_DESC depth_stencil_view_desc;
     D3D11_RASTERIZER_DESC raster_desc;
     D3D11_VIEWPORT viewport;
-    float fov, screen_aspect;
 
     vsync_ = vsync;
 
@@ -324,15 +323,6 @@ RenderD3D11::RenderD3D11(int screen_width, int screen_height, bool vsync,
     viewport.TopLeftY = 0.0f;
 
     device_context_->RSSetViewports(1, &viewport);
-
-    // Projection matrix (3D space->2D screen)
-    fov = kPi / 4.0f;
-    screen_aspect = (float)screen_width / (float)screen_height;
-
-    proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, screen_near, screen_depth);
-
-    // Ortho projection matrix (for 2d stuff)
-    ortho_matrix_ = MatrixOrthographic((float)screen_width, (float)screen_height, screen_near, screen_depth);
 }
 
 RenderD3D11::~RenderD3D11()
@@ -697,17 +687,6 @@ bool RenderD3D11::SetShaderInputs(ShaderResource* program, TextureResource* text
     device_context_->PSSetShaderResources(0, 1, &tex->p);
 
     return true;
-}
-
-// Copy helpers
-Matrix RenderD3D11::projection_matrix()
-{
-    return proj_matrix_;
-}
-
-Matrix RenderD3D11::ortho_matrix()
-{
-    return ortho_matrix_;
 }
 
 void RenderD3D11::GetVideoCardInfo(char* name, int& memory)

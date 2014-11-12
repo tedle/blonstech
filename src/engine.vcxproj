@@ -95,6 +95,7 @@
     <ClCompile Include="drawbatcher.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="glfuncloader.cpp" />
+    <ClCompile Include="gui.cpp" />
     <ClCompile Include="logger.cpp" />
     <ClCompile Include="loggeride.cpp" />
     <ClCompile Include="math.cpp" />

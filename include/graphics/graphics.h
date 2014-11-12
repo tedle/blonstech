@@ -37,6 +37,7 @@ public:
     bool Render();
 
     class Camera* camera();
+    class GUI* gui();
 
 private:
     // Managed assets let this class create and track models & sprites.
@@ -66,10 +67,11 @@ private:
 
     RenderContext context_;
     std::unique_ptr<class Camera> camera_;
+    std::unique_ptr<class GUI> gui_;
     std::unique_ptr<class Shader> shader3d_;
     std::unique_ptr<class Shader> shader2d_;
-    std::unique_ptr<class Shader> shader_font_;
-    std::unique_ptr<class Font> font_;
+
+    Matrix proj_matrix_, ortho_matrix_;
     // Keeps track of generated models & sprites for rendering
     // Will automatically update when referenced resources are deleted, so go ham
     std::set<ManagedModel*> models_;

@@ -16,7 +16,6 @@ namespace blons
 {
 Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 {
-    font_ = nullptr;
     context_ = nullptr;
     camera_ = nullptr;
     shader3d_ = nullptr;
@@ -27,13 +26,21 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 
     // OpenGL
     context_ = RenderContext(new RenderGL40(screen_width, screen_height, kEnableVsync, hwnd,
-                                            (kRenderMode==kRenderModeFullscreen),
-                                            kScreenDepth, kScreenNear));
+                                            (kRenderMode == kRenderModeFullscreen)));
     if (!context_)
     {
         g_log->Fatal("Renderer failed to initailize\n");
         throw "Failed to initialize rendering context";
     }
+
+    // Projection matrix (3D space->2D screen)
+    float fov = kPi / 4.0f;
+    float screen_aspect = (float)screen_width / (float)screen_height;
+
+    proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, kScreenNear, kScreenDepth);
+
+    // Ortho projection matrix (for 2d stuff, shadow maps, etc)
+    ortho_matrix_ = MatrixOrthographic((float)screen_width, (float)screen_height, kScreenNear, kScreenDepth);
 
     // Camera
     camera_ = std::unique_ptr<Camera>(new Camera);
@@ -43,10 +50,6 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     }
 
     camera_->set_pos(0.0f, 0.0f, -10.0f);
-
-    // Fonts
-    font_ = std::unique_ptr<Font>(new Font("../../notes/font stuff/test.ttf", 28, context_));
-    //font_ = std::unique_ptr<Font>(new Font("C:/Windows/Fonts/arial.ttf", 32, context_));
 
     // Shaders
     ShaderAttributeList inputs3d;
@@ -60,18 +63,22 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
     inputs2d.push_back(ShaderAttribute(1, "input_uv"));
     shader2d_ = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "sprite.frag.glsl", inputs2d, context_));
 
-    ShaderAttributeList inputs_font;
-    inputs_font.push_back(ShaderAttribute(0, "input_pos"));
-    inputs_font.push_back(ShaderAttribute(1, "input_uv"));
-    shader_font_ = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "font.frag.glsl", inputs_font, context_));
+    ShaderAttributeList inputs_ui;
+    inputs_ui.push_back(ShaderAttribute(0, "input_pos"));
+    inputs_ui.push_back(ShaderAttribute(1, "input_uv"));
+    auto ui_shader = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "ui.frag.glsl", inputs_ui, context_));
 
     if (shader3d_ == nullptr ||
         shader2d_ == nullptr ||
-        shader_font_ == nullptr)
+        ui_shader == nullptr)
     {
         g_log->Fatal("Shaders failed to initialize\n");
         throw "Failed to initialize shader";
     }
+
+    // GUI
+    gui_ = std::unique_ptr<GUI>(new GUI(screen_width, screen_height, std::move(ui_shader), context_));
+    gui_->LoadFont("../../notes/font stuff/test.ttf", 28, context_);
 }
 
 Graphics::~Graphics()
@@ -121,9 +128,14 @@ Camera* Graphics::camera()
     return camera_.get();
 }
 
+GUI* Graphics::gui()
+{
+    return gui_.get();
+}
+
 bool Graphics::Render()
 {
-    Matrix world_matrix, view_matrix, projection_matrix, ortho_matrix;
+    Matrix world_matrix, view_matrix;
 
     // Clear buffers
     context_->BeginScene();
@@ -133,8 +145,6 @@ bool Graphics::Render()
 
     // Get matrices
     view_matrix       = camera_->view_matrix();
-    projection_matrix = context_->projection_matrix();
-    ortho_matrix      = context_->ortho_matrix();
 
     // 3D Rendering pass
     // Needed so models dont render over themselves
@@ -151,7 +161,7 @@ bool Graphics::Render()
         // Set the inputs
         if (!shader3d_->SetInput("world_matrix", world_matrix, context_) ||
             !shader3d_->SetInput("view_matrix", view_matrix, context_) ||
-            !shader3d_->SetInput("proj_matrix", projection_matrix, context_) ||
+            !shader3d_->SetInput("proj_matrix", proj_matrix_, context_) ||
             !shader3d_->SetInput("diffuse", model->texture(), context_))
         {
             return false;
@@ -174,7 +184,7 @@ bool Graphics::Render()
 
         // Set the inputs
         if (!shader2d_->SetInput("world_matrix", MatrixIdentity() , context_) ||
-            !shader2d_->SetInput("proj_matrix", ortho_matrix, context_) ||
+            !shader2d_->SetInput("proj_matrix", ortho_matrix_, context_) ||
             !shader2d_->SetInput("diffuse", sprite->texture(), context_))
         {
             return false;
@@ -187,29 +197,9 @@ bool Graphics::Render()
         }
     }
 
-    static DrawBatcher batchie(context_);
-    auto render_text = [&](int x, int y, std::string words)
-    {
-        //letters.reserve(words.length());
-        for (const auto& c : words)
-        {
-            batchie.Append(*font_->BuildSprite(c, x, y)->mesh());
-            x += font_->advance();
-        }
-    };
-    render_text(20, 527, "std::move('run config'); // testing setup");
-    //for (int i = 0; i < 30; i++)
-        render_text(20, 492, "here's some longer running sentence... probably has to go on a");
-    render_text(20, 457, "ways before we need to wrap it huh :)");
-    render_text(20, 422, "> _");
+    // 2D UI Pass
+    gui_->Render(context_);
 
-    shader_font_->SetInput("world_matrix", MatrixIdentity(), context_);
-    shader_font_->SetInput("proj_matrix", ortho_matrix, context_);
-    shader_font_->SetInput("diffuse", font_->texture(), context_);
-    shader_font_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context_);
-
-    batchie.Render(context_);
-    shader_font_->Render(batchie.index_count(), context_);
     // Swap buffers
     context_->EndScene();
 

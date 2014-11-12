@@ -44,8 +44,7 @@ ShaderResourceGL40::~ShaderResourceGL40()
     glDeleteProgram(program_);
 }
 
-RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwnd,
-                       bool fullscreen, float screen_depth, float screen_near)
+RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwnd, bool fullscreen)
 {
     // TODO: this is a bad solution, cus shader deletion doesnt reset this
     // Mitigates repeated calls to glUseProgram
@@ -174,15 +173,6 @@ RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwn
     {
         throw "Failed to load OpenGL proc addresses";
     }
-
-    // Projection matrix (3D space->2D screen)
-    float fov = kPi / 4.0f;
-    float screen_aspect = (float)screen_width / (float)screen_height;
-
-    proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, screen_near, screen_depth);
-
-    // Ortho projection matrix (for 2d stuff, shadow maps, etc)
-    ortho_matrix_ = MatrixOrthographic((float)screen_width, (float)screen_height, screen_near, screen_depth);
 
     // Grab video card info
     video_card_desc_ = (char*)glGetString(GL_VENDOR);
@@ -599,16 +589,6 @@ bool RenderGL40::SetDepthTesting(bool enable)
         glDisable(GL_DEPTH_TEST);
     }
     return true;
-}
-
-Matrix RenderGL40::projection_matrix()
-{
-    return proj_matrix_;
-}
-
-Matrix RenderGL40::ortho_matrix()
-{
-    return ortho_matrix_;
 }
 
 void RenderGL40::GetVideoCardInfo(char* name, int& memory)

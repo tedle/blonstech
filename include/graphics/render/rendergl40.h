@@ -45,7 +45,7 @@ class RenderGL40 : public RenderAPI
     
 public:
     RenderGL40(int screen_width, int screen_height, bool vsync,
-               HWND hwnd, bool fullscreen, float depth, float near);
+               HWND hwnd, bool fullscreen);
     ~RenderGL40();
 
     void BeginScene();
@@ -79,9 +79,6 @@ public:
 
     bool SetDepthTesting(bool enable);
 
-    Matrix projection_matrix();
-    Matrix ortho_matrix();
-
     void GetVideoCardInfo(char* buffer, int& len_buffer);
 
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
@@ -92,8 +89,6 @@ private:
     bool vsync_;
     int video_card_memory_;
     std::string video_card_desc_;
-    Matrix proj_matrix_;
-    Matrix ortho_matrix_;
 
     // API specific
     HDC device_context_;

@@ -81,7 +81,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="font.frag.glsl" />
+    <None Include="ui.frag.glsl" />
     <None Include="mesh.frag.glsl" />
     <None Include="mesh.vert.glsl" />
     <None Include="sprite.frag.glsl" />
