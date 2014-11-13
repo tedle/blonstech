@@ -18,7 +18,7 @@ public:
 
     const std::string kAvailableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                              "abcdefghijklmnopqrstuvwxyz"
-                                             "0123456789!@#$%^&*()"
+                                             "`~0123456789!@#$%^&*()"
                                              " ,./<>?;':\"[]\\{}|-=_+";
 
     Sprite* BuildSprite(unsigned char letter, int x, int y);

@@ -12,10 +12,10 @@ namespace GUI
 {
 Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
-    font_list_.fallback = nullptr;
-    font_list_.heading = nullptr;
-    font_list_.label = nullptr;
-    font_list_.console = nullptr;
+    font_list_[DEFAULT] = nullptr;
+    font_list_[HEADING] = nullptr;
+    font_list_[LABEL] = nullptr;
+    font_list_[CONSOLE] = nullptr;
 
     width_ = width;
     height_ = height;
@@ -23,6 +23,12 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
                                        kScreenNear, kScreenDepth);
 
     ui_shader_ = std::move(ui_shader);
+
+    temp_labels_.push_back(Label(20, 527, "EVERY MORNING I WAKE UP AND OPEN PALM SLAM A VHS INTO ", this));
+    //for (int i = 0; i < 30; i++)
+    temp_labels_.push_back(Label(20, 492, "THE SLOT. ITS CHRONICLES OF RIDDICK AND RIGHT THEN ", this));
+    temp_labels_.push_back(Label(20, 457, "AND THERE I START DOING THE MOVES ALONGSIDE THE MAIN CHARACTER, RIDDICK. I D", this));
+    temp_labels_.push_back(Label(20, 422, "> _", this));
 }
 
 Manager::~Manager()
@@ -36,53 +42,60 @@ bool Manager::LoadFont(const char* filename, int pixel_size, RenderContext& cont
 
 bool Manager::LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context)
 {
-    auto font = std::unique_ptr<Font>(new Font(filename, pixel_size, context));
-
-    switch (usage)
-    {
-    case HEADING:
-        font_list_.heading = std::move(font);
-        break;
-    case LABEL:
-        font_list_.label = std::move(font);
-        break;
-    case CONSOLE:
-        font_list_.console = std::move(font);
-        break;
-    case DEFAULT:
-    default:
-        font_list_.fallback = std::move(font);
-        break;
-    }
+    font_list_[usage] = std::unique_ptr<Font>(new Font(filename, pixel_size, context));
 
     return true;
 }
 
+Font* Manager::GetFont(FontType usage)
+{
+    auto& font = font_list_[usage];
+    if (font != nullptr)
+    {
+        return font.get();
+    }
+    return font_list_[DEFAULT].get();
+}
+
+DrawBatcher* Manager::GetFontBatch(FontType usage, Vector4 colour, RenderContext& context)
+{
+    FontCall call = { usage, colour };
+    auto index_match = font_batches_.find(call);
+    if (index_match != font_batches_.end())
+    {
+        return index_match->second.get();
+    }
+    else
+    {
+        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
+        font_batches_.insert(font_batches_.begin(),
+                             std::make_pair(call, std::move(batcher)));
+        return font_batches_.begin()->second.get();
+    }
+
+    return nullptr;
+}
+
 void Manager::Render(RenderContext& context)
 {
-    static DrawBatcher batchie(context);
-    auto render_text = [&](int x, int y, std::string words)
+    for (auto& label : temp_labels_)
     {
-        for (const auto& c : words)
-        {
-            batchie.Append(*font_list_.fallback->BuildSprite(c, x, y)->mesh());
-            x += font_list_.fallback->advance();
-        }
-    };
-    render_text(20, 527, "EVERY MORNING I WAKE UP AND OPEN PALM SLAM A VHS INTO ");
-    //for (int i = 0; i < 30; i++)
-    render_text(20, 492, "THE SLOT. ITS CHRONICLES OF RIDDICK AND RIGHT THEN ");
-    render_text(20, 457, "AND THERE I START DOING THE MOVES ALONGSIDE THE MAIN CHARACTER, RIDDICK. I D");
-    render_text(20, 422, "> _");
+        label.Render(context);
+    }
 
+    // Font pass
     ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
     ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
-    ui_shader_->SetInput("diffuse", font_list_.fallback->texture(), context);
-    ui_shader_->SetInput("text_colour", Vector3(1.0, 1.0, 1.0), context);
     ui_shader_->SetInput("is_text", true, context);
+    for (auto& batch : font_batches_)
+    {
+        auto font = GetFont(batch.first.usage);
+        ui_shader_->SetInput("diffuse", font->texture(), context);
+        ui_shader_->SetInput("text_colour", batch.first.colour, context);
 
-    batchie.Render(context);
-    ui_shader_->Render(batchie.index_count(), context);
+        batch.second->Render(context);
+        ui_shader_->Render(batch.second->index_count(), context);
+    }
 }
 } // namespace GUI
 } // namespace blons

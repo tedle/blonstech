@@ -4,6 +4,7 @@
 // Includes
 #include <map>
 // Local Includes
+#include "graphics/render/drawbatcher.h"
 #include "graphics/gui/font.h"
 #include "graphics/gui/label.h"
 #include "graphics/gui/button.h"
@@ -16,35 +17,54 @@ class Shader;
 
 namespace GUI
 {
+// Forward declarations
+class Label;
+
+enum FontType
+{
+    DEFAULT,
+    HEADING,
+    LABEL,
+    CONSOLE
+};
+
 class Manager
 {
 public:
-    enum FontType
-    {
-        DEFAULT,
-        HEADING,
-        LABEL,
-        CONSOLE
-    };
-public:
-    Manager(int screen_width, int screen_height, std::unique_ptr<Shader>, RenderContext& context);
+    Manager(int screen_width, int screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
     ~Manager();
 
     bool LoadFont(const char* filename, int pixel_size, RenderContext& context);
     bool LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context);
 
-    void Render(RenderContext&);
+    void Render(RenderContext& context);
 
 private:
-    struct
+    // Since we want this class to be accessed by user, we hide these functions
+    // despite widgets needing access to them. Kind of hacky to friend it up, but oh well
+    friend Label;
+    Font* GetFont(FontType usage);
+    DrawBatcher* GetFontBatch(FontType usage, Vector4 colour, RenderContext& context);
+
+    std::map<FontType, std::unique_ptr<Font>> font_list_;
+
+    struct FontCall
     {
-        std::unique_ptr<Font> fallback, heading, label, console;
-    } font_list_;
+        FontType usage;
+        Vector4 colour;
+        // needed for efficient std::map lookups
+        bool operator< (const FontCall call) const {return memcmp(this, &call, sizeof(FontCall))>0;}
+    };
+
+    // One draw batch per font per colour
+    std::map<FontCall, std::unique_ptr<DrawBatcher>> font_batches_;
 
     int width_, height_;
     Matrix ortho_matrix_;
 
     std::unique_ptr<Shader> ui_shader_;
+
+    std::vector<Label> temp_labels_;
 };
 } // namespace GUI
 } // namespace blons
