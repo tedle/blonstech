@@ -3,6 +3,7 @@
 
 // Local Includes
 #include "graphics/render/render.h"
+#include "graphics/gui/colourstring.h"
 
 namespace blons
 {
@@ -21,7 +22,7 @@ public:
 
 private:
     Vector2 pos_;
-    std::string text_;
+    ColourString text_;
 
     Manager* gui_;
 };

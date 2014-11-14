@@ -93,6 +93,7 @@
     <ClCompile Include="button.cpp" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="client.cpp" />
+    <ClCompile Include="colourstring.cpp" />
     <ClCompile Include="drawbatcher.cpp" />
     <ClCompile Include="font.cpp" />
     <ClCompile Include="glfuncloader.cpp" />
@@ -126,6 +127,7 @@
     <ClInclude Include="..\include\graphics\camera.h" />
     <ClInclude Include="..\include\graphics\graphics.h" />
     <ClInclude Include="..\include\graphics\gui\button.h" />
+    <ClInclude Include="..\include\graphics\gui\colourstring.h" />
     <ClInclude Include="..\include\graphics\gui\font.h" />
     <ClInclude Include="..\include\graphics\gui\gui.h" />
     <ClInclude Include="..\include\graphics\gui\label.h" />

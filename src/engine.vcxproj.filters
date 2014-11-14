@@ -97,6 +97,9 @@
     <ClCompile Include="label.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
+    <ClCompile Include="colourstring.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons.h">
@@ -181,6 +184,9 @@
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\include\graphics\gui\window.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\colourstring.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
   </ItemGroup>
