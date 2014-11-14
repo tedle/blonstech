@@ -18,10 +18,10 @@ public:
 
     void Render(RenderContext& context);
 
-    int index_count();
-    TextureResource* texture();
-    Vector3 pos();
-    Matrix world_matrix();
+    int index_count() const;
+    const TextureResource* texture() const;
+    Vector3 pos() const;
+    Matrix world_matrix() const;
 
     void set_pos(float x, float y, float z);
 

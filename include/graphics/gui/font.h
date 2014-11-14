@@ -26,8 +26,8 @@ public:
     // Return how far to advance horizontally after rendering a character in pixels
     // Resets to 0 after call
     int advance();
-    int index_count();
-    TextureResource* texture();
+    int index_count() const;
+    const TextureResource* texture() const;
 
 private:
     struct Glyph;

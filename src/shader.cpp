@@ -44,12 +44,12 @@ bool Shader::SetInput(const char* field, Vector4 value, RenderContext& context)
     return context->SetShaderInput(program_.get(), field, value);
 }
 
-bool Shader::SetInput(const char* field, TextureResource* value, RenderContext& context)
+bool Shader::SetInput(const char* field, const TextureResource* value, RenderContext& context)
 {
     return context->SetShaderInput(program_.get(), field, value);
 }
 
-ShaderResource* Shader::program()
+ShaderResource* Shader::program() const
 {
     return program_.get();
 }

@@ -123,16 +123,6 @@ std::unique_ptr<Sprite> Graphics::CreateSprite(const char* filename)
     return std::unique_ptr<Sprite>(sprite);
 }
 
-Camera* Graphics::camera()
-{
-    return camera_.get();
-}
-
-GUI::Manager* Graphics::gui()
-{
-    return gui_.get();
-}
-
 bool Graphics::Render()
 {
     Matrix world_matrix, view_matrix;
@@ -204,6 +194,16 @@ bool Graphics::Render()
     context_->EndScene();
 
     return true;
+}
+
+Camera* Graphics::camera() const
+{
+    return camera_.get();
+}
+
+GUI::Manager* Graphics::gui() const
+{
+    return gui_.get();
 }
 
 void Graphics::ManagedModel::Finish()

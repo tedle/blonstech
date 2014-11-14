@@ -49,23 +49,23 @@ void Sprite::Render(RenderContext& context)
     context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 }
 
-int Sprite::index_count()
+int Sprite::index_count() const
 {
     // 6, lol
     return mesh_.indices.size();
 }
 
-TextureResource* Sprite::texture()
+const TextureResource* Sprite::texture() const
 {
     return texture_->texture();
 }
 
-Vector2 Sprite::pos()
+Vector2 Sprite::pos() const
 {
     return Vector2(pos_.x, pos_.y);
 }
 
-Vector2 Sprite::dimensions()
+Vector2 Sprite::dimensions() const
 {
     return Vector2(pos_.w, pos_.h);
 }
@@ -112,7 +112,7 @@ void Sprite::set_subtexture(int x, int y, int w, int h)
                    static_cast<float>(h));
 }
 
-MeshData* Sprite::mesh()
+const MeshData* Sprite::mesh()
 {
     BuildQuad();
     return &mesh_;

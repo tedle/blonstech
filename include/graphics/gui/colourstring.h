@@ -31,7 +31,7 @@ public:
     ColourString(const char* text) : ColourString(std::string(text)) {}
     ~ColourString();
 
-    const std::vector<Fragment>& fragments();
+    const std::vector<Fragment>& fragments() const;
 
 private:
     std::vector<Fragment> text_fragments_;

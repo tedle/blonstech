@@ -5,12 +5,12 @@
 
 namespace blons
 {
-Mesh::Mesh(MeshImporter* mesh, RenderContext& context)
+Mesh::Mesh(const MeshImporter& mesh, RenderContext& context)
 {
     vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
     index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
-    mesh_data_.vertices = mesh->mesh_data()->vertices;
-    mesh_data_.indices = mesh->mesh_data()->indices;
+    mesh_data_.vertices = mesh.mesh_data()->vertices;
+    mesh_data_.indices = mesh.mesh_data()->indices;
 
     if (!context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(),
                                  mesh_data_.vertices.data(), mesh_data_.vertices.size(),
@@ -24,22 +24,22 @@ Mesh::~Mesh()
 {
 }
 
-BufferResource* Mesh::vertex_buffer()
+BufferResource* Mesh::vertex_buffer() const
 {
     return vertex_buffer_.get();
 }
 
-BufferResource* Mesh::index_buffer()
+BufferResource* Mesh::index_buffer() const
 {
     return index_buffer_.get();
 }
 
-int Mesh::vertex_count()
+int Mesh::vertex_count() const
 {
     return mesh_data_.vertices.size();
 }
 
-int Mesh::index_count()
+int Mesh::index_count() const
 {
     return mesh_data_.indices.size();
 }

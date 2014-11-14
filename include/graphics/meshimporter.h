@@ -24,14 +24,14 @@ public:
         Texture::Type type;
     };
 
-    unsigned int vertex_count();
-    unsigned int index_count();
-    unsigned int uv_count();
-    unsigned int normal_count();
-    unsigned int face_count();
+    unsigned int vertex_count() const;
+    unsigned int index_count() const;
+    unsigned int uv_count() const;
+    unsigned int normal_count() const;
+    unsigned int face_count() const;
     // Anything returned by these getters will be freed on class destruction
-    MeshData* mesh_data();
-    std::vector<TextureInfo>* textures();
+    const MeshData* mesh_data() const;
+    const std::vector<TextureInfo>* textures() const;
 
 private:
     bool Load(const char* filename, bool invert_y);

@@ -16,18 +16,18 @@ public:
     void KeyDown(unsigned int);
     void KeyUp(unsigned int);
 
-    bool IsKeyDown(unsigned int);
+    bool IsKeyDown(unsigned int) const;
 
     void MouseDown(unsigned int);
     void MouseUp(unsigned int);
 
-    bool IsMouseDown(unsigned int);
+    bool IsMouseDown(unsigned int) const;
 
     void MouseMove(int, int);
-    int MouseX();
-    int MouseY();
-    int MouseDeltaX();
-    int MouseDeltaY();
+    int MouseX() const;
+    int MouseY() const;
+    int MouseDeltaX() const;
+    int MouseDeltaY() const;
 
     bool Frame();
 

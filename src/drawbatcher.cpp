@@ -67,9 +67,8 @@ void DrawBatcher::Render(RenderContext& context)
     batch_index_ = 0;
 }
 
-int DrawBatcher::index_count()
+int DrawBatcher::index_count() const
 {
     return index_count_;
 }
-
-}
+} // namespace blons

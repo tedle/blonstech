@@ -78,7 +78,7 @@ bool Client::Frame()
     return quit;
 }
 
-Client::Info Client::screen_info()
+Client::Info Client::screen_info() const
 {
     return screen_info_;
 }
@@ -225,7 +225,7 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
     }
 }
 
-Input* Client::input()
+Input* Client::input() const
 {
     return input_.get();
 }

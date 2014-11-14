@@ -76,7 +76,7 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, Matrix value);
     bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value);
     bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value);
-    bool SetShaderInput(ShaderResource* program, const char* name, TextureResource* value);
+    bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value);
 
     bool SetDepthTesting(bool enable);
 

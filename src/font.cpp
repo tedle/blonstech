@@ -179,12 +179,12 @@ int Font::advance()
     return ret;
 }
 
-int Font::index_count()
+int Font::index_count() const
 {
     return fontsheet_->index_count();
 }
 
-TextureResource* Font::texture()
+const TextureResource* Font::texture() const
 {
     return fontsheet_->texture();
 }

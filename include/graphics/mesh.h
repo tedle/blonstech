@@ -17,13 +17,13 @@ struct MeshData
 class Mesh
 {
 public:
-    Mesh(class MeshImporter* mesh_data, RenderContext& context);
+    Mesh(const class MeshImporter& mesh_data, RenderContext& context);
     ~Mesh();
 
-    BufferResource* vertex_buffer();
-    BufferResource* index_buffer();
-    int vertex_count();
-    int index_count();
+    BufferResource* vertex_buffer() const;
+    BufferResource* index_buffer() const;
+    int vertex_count() const;
+    int index_count() const;
 
 private:
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;

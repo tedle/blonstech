@@ -28,7 +28,7 @@ void Input::KeyUp(unsigned int vk)
     return;
 }
 
-bool Input::IsKeyDown(unsigned int vk)
+bool Input::IsKeyDown(unsigned int vk) const
 {
     return keys_[vk];
 }
@@ -45,7 +45,7 @@ void Input::MouseUp(unsigned int vk)
     return;
 }
 
-bool Input::IsMouseDown(unsigned int vk)
+bool Input::IsMouseDown(unsigned int vk) const
 {
     return buttons_[vk];
 }
@@ -56,22 +56,22 @@ void Input::MouseMove(int x, int y)
     mouse_y_ = y;
 }
 
-int Input::MouseX()
+int Input::MouseX() const
 {
     return mouse_x_;
 }
 
-int Input::MouseY()
+int Input::MouseY() const
 {
     return mouse_y_;
 }
 
-int Input::MouseDeltaX()
+int Input::MouseDeltaX() const
 {
     return delta_mouse_x_;
 }
 
-int Input::MouseDeltaY()
+int Input::MouseDeltaY() const
 {
     return delta_mouse_y_;
 }

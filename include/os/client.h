@@ -29,11 +29,11 @@ public:
 
     bool Frame();
 
-    Info screen_info();
+    Info screen_info() const;
 
     // TODO: Temporary until Direct & Raw input are setup
     LRESULT CALLBACK MessageHandler(HWND, UINT, WPARAM, LPARAM);
-    Input* input();
+    Input* input() const;
 
 private:
     // Private functions

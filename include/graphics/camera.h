@@ -15,11 +15,11 @@ public:
     void set_rot(float pitch, float yaw, float roll);
     void LookAt(float x, float y, float z);
 
-    Vector3 pos();
-    Vector3 rot();
-
     void Render();
-    Matrix view_matrix();
+
+    Vector3 pos() const;
+    Vector3 rot() const;
+    Matrix view_matrix() const;
 
 private:
     Vector3 pos_;

@@ -43,16 +43,6 @@ void Camera::LookAt(float x, float y, float z)
     set_rot(rotation.x, rotation.y, rotation.z);
 }
 
-Vector3 Camera::pos()
-{
-    return pos_;
-}
-
-Vector3 Camera::rot()
-{
-    return rot_;
-}
-
 void Camera::Render()
 {
     view_matrix_ = MatrixView(pos_, rot_);
@@ -60,7 +50,17 @@ void Camera::Render()
     return;
 }
 
-Matrix Camera::view_matrix()
+Vector3 Camera::pos() const
+{
+    return pos_;
+}
+
+Vector3 Camera::rot() const
+{
+    return rot_;
+}
+
+Matrix Camera::view_matrix() const
 {
     return view_matrix_;
 }

@@ -101,7 +101,7 @@ ColourString::~ColourString()
 {
 }
 
-const std::vector<ColourString::Fragment>& ColourString::fragments()
+const std::vector<ColourString::Fragment>& ColourString::fragments() const
 {
     return text_fragments_;
 }

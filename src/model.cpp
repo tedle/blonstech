@@ -28,7 +28,7 @@ void Model::Init(const char* mesh_filename, RenderContext& context)
     DWORD64 end = GetTickCount64();
     g_log->Debug("[%ims]\n", end - start);
 
-    mesh_ = std::unique_ptr<Mesh>(new Mesh(&mesh_data, context));
+    mesh_ = std::unique_ptr<Mesh>(new Mesh(mesh_data, context));
 
     if (mesh_ == nullptr)
     {
@@ -97,23 +97,23 @@ void Model::Render(RenderContext& context)
     return;
 }
 
-int Model::index_count()
+int Model::index_count() const
 {
     return mesh_->index_count();
 }
 
-TextureResource* Model::texture()
+const TextureResource* Model::texture() const
 {
     // TODO: getters for all types of textures
     return diffuse_texture_->texture();
 }
 
-Vector3 Model::pos()
+Vector3 Model::pos() const
 {
     return pos_;
 }
 
-Matrix Model::world_matrix()
+Matrix Model::world_matrix() const
 {
     return world_matrix_;
 }

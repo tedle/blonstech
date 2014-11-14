@@ -47,8 +47,8 @@ public:
 
     bool Render();
 
-    Camera* camera();
-    GUI::Manager* gui();
+    Camera* camera() const;
+    GUI::Manager* gui() const;
 
 private:
     // Managed assets let this class create and track models & sprites.

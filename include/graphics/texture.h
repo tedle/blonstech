@@ -22,8 +22,8 @@ public:
     Texture(PixelData* pixels, Type type, RenderContext& context);
     ~Texture();
 
-    Info info();
-    TextureResource* texture();
+    Info info() const;
+    const TextureResource* texture() const;
 
 private:
     void Init(PixelData* pixels, Type type, RenderContext& context);

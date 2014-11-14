@@ -216,37 +216,37 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     return true;
 }
 
-unsigned int MeshImporter::vertex_count()
+unsigned int MeshImporter::vertex_count() const
 {
     return mesh_data_.vertices.size();
 }
 
-unsigned int MeshImporter::index_count()
+unsigned int MeshImporter::index_count() const
 {
     return mesh_data_.indices.size();
 }
 
-unsigned int MeshImporter::uv_count()
+unsigned int MeshImporter::uv_count() const
 {
     return uv_count_;
 }
 
-unsigned int MeshImporter::normal_count()
+unsigned int MeshImporter::normal_count() const
 {
     return normal_count_;
 }
 
-unsigned int MeshImporter::face_count()
+unsigned int MeshImporter::face_count() const
 {
     return face_count_;
 }
 
-MeshData* MeshImporter::mesh_data()
+const MeshData* MeshImporter::mesh_data() const
 {
     return &mesh_data_;
 }
 
-std::vector<MeshImporter::TextureInfo>* MeshImporter::textures()
+const std::vector<MeshImporter::TextureInfo>* MeshImporter::textures() const
 {
     return &textures_;
 }

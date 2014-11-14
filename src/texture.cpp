@@ -39,12 +39,12 @@ Texture::~Texture()
 {
 }
 
-Texture::Info Texture::info()
+Texture::Info Texture::info() const
 {
     return info_;
 }
 
-TextureResource* Texture::texture()
+const TextureResource* Texture::texture() const
 {
     return texture_.get();
 }

@@ -17,7 +17,7 @@ public:
     void Append(const MeshData& mesh_data);
     void Render(RenderContext& context);
 
-    int index_count();
+    int index_count() const;
 
 private:
     std::unique_ptr<BufferResource> vertex_buffer_;

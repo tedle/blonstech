@@ -17,8 +17,9 @@ public:
     bool SetInput(const char* field, Matrix value, RenderContext& context);
     bool SetInput(const char* field, Vector3 value, RenderContext& context);
     bool SetInput(const char* field, Vector4 value, RenderContext& context);
-    bool SetInput(const char* field, TextureResource* value, RenderContext& context);
-    ShaderResource* program();
+    bool SetInput(const char* field, const TextureResource* value, RenderContext& context);
+
+    ShaderResource* program() const;
 
 private:
     std::unique_ptr<ShaderResource> program_;
