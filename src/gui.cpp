@@ -24,10 +24,11 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
 
     ui_shader_ = std::move(ui_shader);
 
-    temp_labels_.push_back(Label(20, 527, "EVERY MORNING I WAKE UP AND OPEN PALM SLAM A VHS INTO ", this));
+    //temp_labels_.push_back(Label(20, 100, "$47A!$27C!$65A!$967!$AEFn$7D4i$D3Dc$EE8e$FB52$8BE01$7FA3", this));
+    temp_labels_.push_back(Label(20, 527, "EVERY MORNING $0f0I WAKE UP AND $000PALM SLAM A VHS INTO ", this));
     //for (int i = 0; i < 30; i++)
-    temp_labels_.push_back(Label(20, 492, "THE SLOT. ITS CHRONICLES OF RIDDICK AND RIGHT THEN ", this));
-    temp_labels_.push_back(Label(20, 457, "AND THERE I START DOING THE MOVES ALONGSIDE THE MAIN CHARACTER, RIDDICK. I D", this));
+    temp_labels_.push_back(Label(20, 492, "$700THE SLOT. ITS OF RIDDICK AND RIGHT THEN $aa", this));
+    temp_labels_.push_back(Label(20, 457, "$00fAND THERE I START MAIN $fffCHARACTER, RIDDICK. I D$aaa", this));
     temp_labels_.push_back(Label(20, 422, "> _", this));
 }
 

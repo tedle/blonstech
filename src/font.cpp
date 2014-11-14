@@ -161,7 +161,7 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
     }
     catch (...)
     {
-        return false;
+        return nullptr;
     }
     // Setup the character sprites position and texture
     fontsheet_->set_pos(x + g->x_offset, y + g->y_offset, g->width, g->height);

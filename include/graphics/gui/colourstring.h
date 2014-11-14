@@ -10,6 +10,8 @@ namespace blons
 {
 namespace GUI
 {
+// White
+const Vector4 kDefaultTextColour = Vector4(1.0, 1.0, 1.0, 1.0);
 // Formatting:
 //     $fff = hex colour code
 //         "white text$f00red text$0f0green text!"
@@ -22,6 +24,7 @@ public:
         Vector4 colour;
         std::string text;
     };
+
 public:
     ColourString();
     ColourString(std::string text);
