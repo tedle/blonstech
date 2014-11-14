@@ -10,6 +10,14 @@ namespace blons
 {
 namespace GUI
 {
+struct FontCall
+{
+    FontType usage;
+    Vector4 colour;
+    // needed for efficient std::map lookups
+    bool operator< (const FontCall call) const { return memcmp(this, &call, sizeof(FontCall))>0; }
+};
+
 Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
     font_list_[DEFAULT] = nullptr;

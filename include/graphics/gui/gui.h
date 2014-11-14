@@ -48,16 +48,8 @@ private:
 
     std::map<FontType, std::unique_ptr<Font>> font_list_;
 
-    struct FontCall
-    {
-        FontType usage;
-        Vector4 colour;
-        // needed for efficient std::map lookups
-        bool operator< (const FontCall call) const {return memcmp(this, &call, sizeof(FontCall))>0;}
-    };
-
     // One draw batch per font per colour
-    std::map<FontCall, std::unique_ptr<DrawBatcher>> font_batches_;
+    std::map<struct FontCall, std::unique_ptr<DrawBatcher>> font_batches_;
 
     int width_, height_;
     Matrix ortho_matrix_;
