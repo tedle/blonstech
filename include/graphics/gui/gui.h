@@ -4,6 +4,7 @@
 // Includes
 #include <map>
 // Local Includes
+#include "input/inputtemp.h"
 #include "graphics/render/drawbatcher.h"
 #include "graphics/gui/font.h"
 #include "graphics/gui/label.h"
@@ -19,6 +20,7 @@ namespace GUI
 {
 // Forward declarations
 class Label;
+class Window;
 
 enum FontType
 {
@@ -38,6 +40,7 @@ public:
     bool LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context);
 
     void Render(RenderContext& context);
+    void Update(const Input& input);
 
 private:
     // Since we want this class to be accessed by user, we hide these functions
@@ -56,6 +59,7 @@ private:
 
     std::unique_ptr<Shader> ui_shader_;
 
+    std::unique_ptr<Window> temp_window_;
     std::vector<Label> temp_labels_;
 };
 } // namespace GUI

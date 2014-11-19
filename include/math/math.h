@@ -8,6 +8,14 @@ using namespace DirectX;
 
 namespace blons
 {
+struct Box
+{
+    float x, y, w, h;
+
+    Box() {}
+    Box(float _x, float _y, float _w, float _h) : x(_x), y(_y), w(_w), h(_h) {}
+};
+
 struct Vector2
 {
     float x, y;

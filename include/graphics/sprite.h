@@ -13,15 +13,6 @@ namespace blons
 class Sprite
 {
 public:
-    struct Box
-    {
-        float x, y, w, h;
-
-        Box() {}
-        Box(float _x, float _y, float _w, float _h) : x(_x), y(_y), w(_w), h(_h) {}
-    };
-
-public:
     Sprite(const char* texture_filename, RenderContext& context);
     Sprite(PixelData* texture_data, RenderContext& context);
     virtual ~Sprite();

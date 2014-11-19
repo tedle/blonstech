@@ -35,6 +35,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         // TODO: THIS IS TEMP DELETE LATER
         // Handles mouselook and wasd movement
         blons::temp::noclip(client->input(), graphics->camera());
+        graphics->gui()->Update(*client->input());
         graphics->Render();
     }
     graphics.reset();

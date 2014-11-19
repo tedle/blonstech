@@ -32,6 +32,7 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
 
     ui_shader_ = std::move(ui_shader);
 
+    temp_window_ = std::unique_ptr<Window>(new Window(100, 100, 200, 200, WindowType::DRAGGABLE));
     //temp_labels_.push_back(Label(20, 100, "$47A!$27C!$65A!$967!$AEFn$7D4i$D3Dc$EE8e$FB52$8BE01$7FA3", this));
     temp_labels_.push_back(Label(20, 527, "EVERY MORNING $0f0I WAKE UP AND $000PALM SLAM A VHS INTO ", this));
     //for (int i = 0; i < 30; i++)
@@ -105,6 +106,11 @@ void Manager::Render(RenderContext& context)
         batch.second->Render(context);
         ui_shader_->Render(batch.second->index_count(), context);
     }
+}
+
+void Manager::Update(const Input& input)
+{
+    temp_window_->Update(input);
 }
 } // namespace GUI
 } // namespace blons
