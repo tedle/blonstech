@@ -9,13 +9,9 @@ namespace GUI
 {
 Label::Label(int x, int y, const char* text, Manager* parent_manager)
 {
-    pos_ = Vector2(static_cast<float>(x), static_cast<float>(y));
+    pos_ = Box(static_cast<float>(x), static_cast<float>(y), 0, 0);
     text_ = ColourString(text);
     gui_ = parent_manager;
-}
-
-Label::~Label()
-{
 }
 
 void Label::Render(RenderContext& context)

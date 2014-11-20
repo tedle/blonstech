@@ -6,6 +6,8 @@
 // Local Includes
 #include "input/inputtemp.h"
 #include "graphics/render/drawbatcher.h"
+#include "graphics/gui/control.h"
+#include "graphics/gui/skin.h"
 #include "graphics/gui/font.h"
 #include "graphics/gui/label.h"
 #include "graphics/gui/button.h"
@@ -48,19 +50,22 @@ private:
     friend Label;
     Font* GetFont(FontType usage);
     DrawBatcher* GetFontBatch(FontType usage, Vector4 colour, RenderContext& context);
+    DrawBatcher* control_batch() const;
+    Skin* skin() const;
 
     std::map<FontType, std::unique_ptr<Font>> font_list_;
 
     // One draw batch per font per colour
     std::map<struct FontCall, std::unique_ptr<DrawBatcher>> font_batches_;
+    std::unique_ptr<DrawBatcher> control_batch_;
 
     int width_, height_;
     Matrix ortho_matrix_;
 
     std::unique_ptr<Shader> ui_shader_;
 
+    std::unique_ptr<Skin> skin_;
     std::unique_ptr<Window> temp_window_;
-    std::vector<Label> temp_labels_;
 };
 } // namespace GUI
 } // namespace blons

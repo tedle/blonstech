@@ -1,12 +1,16 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_CONTROL_H_
 #define BLONSTECH_GRAPHICS_GUI_CONTROL_H_
 
-#include "graphics/gui/gui.h"
+#include "graphics/render/render.h"
+#include "input/inputtemp.h"
 
 namespace blons
 {
 namespace GUI
 {
+// Forward declarations
+class Manager;
+
 class Control
 {
 public:
@@ -15,6 +19,7 @@ public:
 
 protected:
     Box pos_;
+    Manager* gui_;
 };
 }
 }

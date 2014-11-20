@@ -103,6 +103,9 @@
     <ClCompile Include="control.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
+    <ClCompile Include="skin.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons.h">
@@ -193,6 +196,9 @@
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
     <ClInclude Include="..\include\graphics\gui\control.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\skin.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
   </ItemGroup>

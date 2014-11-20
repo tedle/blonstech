@@ -111,6 +111,7 @@
     <ClCompile Include="model.cpp" />
     <ClCompile Include="rendergl40.cpp" />
     <ClCompile Include="shader.cpp" />
+    <ClCompile Include="skin.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="temphelpers.cpp" />
     <ClCompile Include="texture.cpp" />
@@ -133,6 +134,7 @@
     <ClInclude Include="..\include\graphics\gui\font.h" />
     <ClInclude Include="..\include\graphics\gui\gui.h" />
     <ClInclude Include="..\include\graphics\gui\label.h" />
+    <ClInclude Include="..\include\graphics\gui\skin.h" />
     <ClInclude Include="..\include\graphics\gui\window.h" />
     <ClInclude Include="..\include\graphics\mesh.h" />
     <ClInclude Include="..\include\graphics\meshimporter.h" />
