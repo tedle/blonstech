@@ -20,11 +20,6 @@ struct FontCall
 
 Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
-    font_list_[DEFAULT] = nullptr;
-    font_list_[HEADING] = nullptr;
-    font_list_[LABEL] = nullptr;
-    font_list_[CONSOLE] = nullptr;
-
     width_ = width;
     height_ = height;
     ortho_matrix_ = MatrixOrthographic(static_cast<float>(width_), static_cast<float>(height_),
@@ -56,22 +51,10 @@ bool Manager::LoadFont(const char* filename, int pixel_size, RenderContext& cont
 
 bool Manager::LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context)
 {
-    font_list_[usage] = std::unique_ptr<Font>(new Font(filename, pixel_size, context));
-
-    return true;
+    return skin_->LoadFont(filename, usage, pixel_size, context);
 }
 
-Font* Manager::GetFont(FontType usage)
-{
-    auto& font = font_list_[usage];
-    if (font != nullptr)
-    {
-        return font.get();
-    }
-    return font_list_[DEFAULT].get();
-}
-
-DrawBatcher* Manager::GetFontBatch(FontType usage, Vector4 colour, RenderContext& context)
+DrawBatcher* Manager::font_batch(FontType usage, Vector4 colour, RenderContext& context)
 {
     FontCall call = { usage, colour };
     auto index_match = font_batches_.find(call);
@@ -104,13 +87,22 @@ void Manager::Render(RenderContext& context)
 {
     temp_window_->Render(context);
 
+    // Control pass
+    ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
+    ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
+    ui_shader_->SetInput("is_text", false, context);
+    ui_shader_->SetInput("diffuse", skin_->sprite()->texture(), context);
+
+    control_batch_->Render(context);
+    ui_shader_->Render(control_batch_->index_count(), context);
+
     // Font pass
     ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
     ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
     ui_shader_->SetInput("is_text", true, context);
     for (auto& batch : font_batches_)
     {
-        auto font = GetFont(batch.first.usage);
+        auto font = skin_->font(batch.first.usage);
         ui_shader_->SetInput("diffuse", font->texture(), context);
         ui_shader_->SetInput("text_colour", batch.first.colour, context);
 

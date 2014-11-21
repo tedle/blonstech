@@ -96,6 +96,11 @@ void Sprite::set_pos(int x, int y, int w, int h)
             static_cast<float>(h));
 }
 
+void Sprite::set_pos(Box pos)
+{
+    set_pos(pos.x, pos.y, pos.w, pos.h);
+}
+
 void Sprite::set_subtexture(float x, float y, float w, float h)
 {
     tex_map_.x = x;
@@ -110,6 +115,11 @@ void Sprite::set_subtexture(int x, int y, int w, int h)
                    static_cast<float>(y),
                    static_cast<float>(w),
                    static_cast<float>(h));
+}
+
+void Sprite::set_subtexture(Box subtexture)
+{
+    set_subtexture(subtexture.x, subtexture.y, subtexture.w, subtexture.h);
 }
 
 const MeshData* Sprite::mesh()

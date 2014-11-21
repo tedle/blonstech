@@ -1,5 +1,8 @@
 #include "graphics/gui/window.h"
 
+// Local Includes
+#include "graphics/gui/gui.h"
+
 namespace blons
 {
 namespace GUI
@@ -16,6 +19,15 @@ Window::Window(int x, int y, int width, int height, WindowType type, Manager* pa
 
 void Window::Render(RenderContext& context)
 {
+    // Render self
+    auto skin = gui_->skin();
+    auto layout = skin->layout();
+    auto sprite = skin->sprite();
+    sprite->set_pos(pos_);
+    sprite->set_subtexture(layout->window);
+    gui_->control_batch()->Append(*sprite->mesh());
+
+    // Render controls
     for (const auto& control : controls_)
     {
         control->Render(context);

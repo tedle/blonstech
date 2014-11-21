@@ -31,10 +31,12 @@ public:
     void set_pos(float x, float y, float w, float h);
     void set_pos(int x, int y);
     void set_pos(int x, int y, int w, int h);
+    void set_pos(Box pos);
     // Sets the subregion of sprite texture that is rendered
     // Measured in pixels of texture
     void set_subtexture(float x, float y, float w, float h);
     void set_subtexture(int x, int y, int w, int h);
+    void set_subtexture(Box subtexture);
 
 protected:
     void Init(RenderContext& context);

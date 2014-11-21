@@ -134,7 +134,7 @@ bool Graphics::Render()
     camera_->Render();
 
     // Get matrices
-    view_matrix       = camera_->view_matrix();
+    view_matrix = camera_->view_matrix();
 
     // 3D Rendering pass
     // Needed so models dont render over themselves

@@ -24,14 +24,6 @@ namespace GUI
 class Label;
 class Window;
 
-enum FontType
-{
-    DEFAULT,
-    HEADING,
-    LABEL,
-    CONSOLE
-};
-
 class Manager
 {
 public:
@@ -48,12 +40,10 @@ private:
     // Since we want this class to be accessed by user, we hide these functions
     // despite widgets needing access to them. Kind of hacky to friend it up, but oh well
     friend Label;
-    Font* GetFont(FontType usage);
-    DrawBatcher* GetFontBatch(FontType usage, Vector4 colour, RenderContext& context);
+    friend Window;
+    DrawBatcher* font_batch(FontType usage, Vector4 colour, RenderContext& context);
     DrawBatcher* control_batch() const;
     Skin* skin() const;
-
-    std::map<FontType, std::unique_ptr<Font>> font_list_;
 
     // One draw batch per font per colour
     std::map<struct FontCall, std::unique_ptr<DrawBatcher>> font_batches_;
