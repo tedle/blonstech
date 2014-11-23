@@ -134,8 +134,8 @@ void Sprite::BuildQuad()
     auto* vs = mesh_.vertices.data();
 
     vs[0].pos.x = pos_.x;          vs[0].pos.y = pos_.y;
-    vs[1].pos.x = pos_.x;          vs[1].pos.y = pos_.y + pos_.h;
-    vs[2].pos.x = pos_.x + pos_.w; vs[2].pos.y = pos_.y;
+    vs[1].pos.x = pos_.x + pos_.w; vs[1].pos.y = pos_.y;
+    vs[2].pos.x = pos_.x;          vs[2].pos.y = pos_.y + pos_.h;
     vs[3].pos.x = pos_.x + pos_.w; vs[3].pos.y = pos_.y + pos_.h;
 
     Texture::Info info = texture_->info();
@@ -144,9 +144,9 @@ void Sprite::BuildQuad()
                    tex_map_.w / info.width,
                    tex_map_.h / info.height);
 
-    vs[0].tex.x = normal_tex.x;                vs[0].tex.y = normal_tex.y + normal_tex.h;
-    vs[1].tex.x = normal_tex.x;                vs[1].tex.y = normal_tex.y;
-    vs[2].tex.x = normal_tex.x + normal_tex.w; vs[2].tex.y = normal_tex.y + normal_tex.h;
-    vs[3].tex.x = normal_tex.x + normal_tex.w; vs[3].tex.y = normal_tex.y;
+    vs[0].tex.x = normal_tex.x;                vs[0].tex.y = normal_tex.y;
+    vs[1].tex.x = normal_tex.x + normal_tex.w; vs[1].tex.y = normal_tex.y;
+    vs[2].tex.x = normal_tex.x;                vs[2].tex.y = normal_tex.y + normal_tex.h;
+    vs[3].tex.x = normal_tex.x + normal_tex.w; vs[3].tex.y = normal_tex.y + normal_tex.h;
 }
 } // namespace blons
