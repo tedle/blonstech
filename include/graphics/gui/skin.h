@@ -31,19 +31,19 @@ public:
         {
             struct TitleBarLayout
             {
-                Box left = Box(0, 0, 3, 5);
-                Box center = Box(4, 0, 3, 5);
-                Box right = Box(8, 0, 3, 5);
+                Box left = Box(0, 0, 5, 30);
+                Box center = Box(6, 0, 1, 30);
+                Box right = Box(8, 0, 5, 30);
             } title;
-            Box top_left = Box(0, 6, 5, 5);
-            Box top = Box(6, 6, 3, 5);
-            Box top_right = Box(10, 6, 5, 5);
-            Box left = Box(0, 12, 5, 3);
-            Box body = Box(6, 12, 3, 3);
-            Box right = Box(10, 12, 5, 3);
-            Box bottom_left = Box(0, 16, 5, 5);
-            Box bottom = Box(6, 16, 3, 5);
-            Box bottom_right = Box(10, 16, 5, 5);
+            Box top_left = Box(0, 31, 5, 5);
+            Box top = Box(6, 31, 1, 5);
+            Box top_right = Box(8, 31, 5, 5);
+            Box left = Box(0, 37, 5, 1);
+            Box body = Box(6, 37, 1, 1);
+            Box right = Box(8, 37, 5, 1);
+            Box bottom_left = Box(0, 39, 5, 5);
+            Box bottom = Box(6, 39, 1, 5);
+            Box bottom_right = Box(8, 39, 5, 5);
         } window;
         Box button = Box(0, 0, 100, 100);
     };
