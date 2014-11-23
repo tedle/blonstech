@@ -34,7 +34,7 @@ struct PixelData
     enum Format {
         AUTO, // Compresses to DXT5 & generates mipmaps
         DDS,  // Uses mipmaps & compression from image file
-        RAW   // Will not gen mipmaps, will not compress on GPU
+        RAW   // Will not gen mipmaps, will not compress on GPU, use nearest neighbour filtering
     } format;
 };
 

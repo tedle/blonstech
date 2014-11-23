@@ -25,6 +25,12 @@ void Texture::Init(PixelData* pixels, Type type, RenderContext& context)
         throw "Failed to load texture";
     }
 
+    if (type == Type::SPRITE)
+    {
+        // No DDS compression or mipmaps + nearest neighbour filtering
+        pixels->format = PixelData::RAW;
+    }
+
     if (!context->RegisterTexture(texture_.get(), pixels))
     {
         throw "Failed to load texture";

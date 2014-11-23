@@ -383,9 +383,12 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-    // Set the texture filtering (SOIL handles this currently)
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    // Raw textures use nearest neighbour filtering
+    if (pixel_data->format == PixelData::RAW)
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
 
     // TODO: attach this to a setting + safety check for max
     // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &float);
