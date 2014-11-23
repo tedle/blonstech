@@ -27,8 +27,25 @@ public:
     // Defined in the header file for all to see
     struct Layout
     {
+        struct WindowLayout
+        {
+            struct TitleBarLayout
+            {
+                Box left = Box(0, 0, 3, 5);
+                Box center = Box(4, 0, 3, 5);
+                Box right = Box(8, 0, 3, 5);
+            } title;
+            Box top_left = Box(0, 6, 5, 5);
+            Box top = Box(6, 6, 3, 5);
+            Box top_right = Box(10, 6, 5, 5);
+            Box left = Box(0, 12, 5, 3);
+            Box body = Box(6, 12, 3, 3);
+            Box right = Box(10, 12, 5, 3);
+            Box bottom_left = Box(0, 16, 5, 5);
+            Box bottom = Box(6, 16, 3, 5);
+            Box bottom_right = Box(10, 16, 5, 5);
+        } window;
         Box button = Box(0, 0, 100, 100);
-        Box window = Box(0, 200, 100, 100);
     };
 
 public:
