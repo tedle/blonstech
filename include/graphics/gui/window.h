@@ -22,7 +22,7 @@ public:
     ~Window() {}
 
     void Render(RenderContext& context);
-    void Update(const Input& input);
+    bool Update(const Input& input);
 
     Label* CreateLabel(int x, int y, const char* text);
 

@@ -25,8 +25,8 @@ void noclip(Input* input, Camera* camera)
     if (input->IsMouseDown(0))
     {
         Vector3 rot = camera->rot();
-        rot.x += input->MouseDeltaY() * 0.003f;
-        rot.y += input->MouseDeltaX() * 0.003f;
+        rot.x += input->mouse_delta_y() * 0.003f;
+        rot.y += input->mouse_delta_x() * 0.003f;
         camera->set_rot(rot.x, rot.y, 0.0);
     }
 

@@ -34,7 +34,8 @@ public:
     bool LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context);
 
     void Render(RenderContext& context);
-    void Update(const Input& input);
+    // Returns true if GUI had input to handle, false otherwise
+    bool Update(const Input& input);
 
 private:
     // Since we want this class to be accessed by user, we hide these functions
@@ -44,6 +45,8 @@ private:
     DrawBatcher* font_batch(FontType usage, Vector4 colour, RenderContext& context);
     DrawBatcher* control_batch() const;
     Skin* skin() const;
+    Window* active_window() const;
+    void set_active_window(Window* window);
 
     // One draw batch per font per colour
     std::map<struct FontCall, std::unique_ptr<DrawBatcher>> font_batches_;
@@ -55,7 +58,8 @@ private:
     std::unique_ptr<Shader> ui_shader_;
 
     std::unique_ptr<Skin> skin_;
-    std::unique_ptr<Window> temp_window_;
+    std::vector<std::unique_ptr<Window>> windows_;
+    std::unique_ptr<Window> main_window_;
 };
 } // namespace GUI
 } // namespace blons

@@ -140,9 +140,26 @@ void Window::Render(RenderContext& context)
     }
 }
 
-void Window::Update(const Input& input)
+bool Window::Update(const Input& input)
 {
-
+    for (const auto& e : input.event_queue())
+    {
+        if (e.type == Input::Event::MOUSE_DOWN)
+        {
+            int mx = input.mouse_x();
+            int my = input.mouse_y();
+            if (mx >= pos_.x && mx < pos_.x + pos_.w &&
+                my >= pos_.y && my < pos_.y + pos_.h)
+            {
+                if (type_ != INVISIBLE)
+                {
+                    gui_->set_active_window(this);
+                }
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 Label* Window::CreateLabel(int x, int y, const char* text)

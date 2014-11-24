@@ -42,13 +42,14 @@ public:
     bool IsMouseDown(unsigned int) const;
 
     void MouseMove(int, int);
-    int MouseX() const;
-    int MouseY() const;
-    int MouseDeltaX() const;
-    int MouseDeltaY() const;
-    const std::vector<Event>& Input::EventQueue() const;
 
     bool Frame();
+
+    int mouse_x() const;
+    int mouse_y() const;
+    int mouse_delta_x() const;
+    int mouse_delta_y() const;
+    const std::vector<Event>& Input::event_queue() const;
 
 private:
     bool keys_[256];

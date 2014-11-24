@@ -72,27 +72,27 @@ void Input::MouseMove(int x, int y)
     mouse_y_ = y;
 }
 
-int Input::MouseX() const
+int Input::mouse_x() const
 {
     return mouse_x_;
 }
 
-int Input::MouseY() const
+int Input::mouse_y() const
 {
     return mouse_y_;
 }
 
-int Input::MouseDeltaX() const
+int Input::mouse_delta_x() const
 {
     return delta_mouse_x_;
 }
 
-int Input::MouseDeltaY() const
+int Input::mouse_delta_y() const
 {
     return delta_mouse_y_;
 }
 
-const std::vector<Input::Event>& Input::EventQueue() const
+const std::vector<Input::Event>& Input::event_queue() const
 {
     return event_queue_;
 }

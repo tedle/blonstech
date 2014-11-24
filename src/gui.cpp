@@ -31,13 +31,15 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
 
     control_batch_ = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
 
-    temp_window_ = std::unique_ptr<Window>(new Window(0, 0, 200, 200, WindowType::DRAGGABLE, this));
+    main_window_ = std::unique_ptr<Window>(new Window(0, 0, width, height, WindowType::INVISIBLE, this));
+    windows_.push_back(std::unique_ptr<Window>(new Window(100, 100, 200, 200, WindowType::DRAGGABLE, this)));
+    windows_.push_back(std::unique_ptr<Window>(new Window(200, 200, 200, 200, WindowType::DRAGGABLE, this)));
     //temp_labels_.push_back(Label(20, 100, "$47A!$27C!$65A!$967!$AEFn$7D4i$D3Dc$EE8e$FB52$8BE01$7FA3", this));
-    temp_window_->CreateLabel(20, 527, "EVERY MORNING $0f0I WAKE_UP AND $000PALM SLAM A VHS INTO ");
+    /*temp_window_->CreateLabel(20, 527, "EVERY MORNING $0f0I WAKE_UP AND $000PALM SLAM A VHS INTO ");
     //for (int i = 0; i < 30; i++)
     temp_window_->CreateLabel(20, 492, "$700THE SLOT. ITS OF RIDDICK AND RIGHT THEN $aa");
     temp_window_->CreateLabel(20, 457, "$00fAND THERE I START MAIN $fffCHARACTER, RIDDICK. I D$aaa");
-    temp_window_->CreateLabel(20, 422, "> _");
+    temp_window_->CreateLabel(20, 422, "> _");*/
 }
 
 Manager::~Manager()
@@ -52,6 +54,79 @@ bool Manager::LoadFont(const char* filename, int pixel_size, RenderContext& cont
 bool Manager::LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context)
 {
     return skin_->LoadFont(filename, usage, pixel_size, context);
+}
+
+void Manager::Render(RenderContext& context)
+{
+    for (const auto& w : windows_)
+    {
+        w->Render(context);
+    }
+
+    // Control pass
+    ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
+    ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
+    ui_shader_->SetInput("is_text", false, context);
+    ui_shader_->SetInput("diffuse", skin_->sprite()->texture(), context);
+
+    control_batch_->Render(context);
+    ui_shader_->Render(control_batch_->index_count(), context);
+
+    // Font pass
+    ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
+    ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
+    ui_shader_->SetInput("is_text", true, context);
+    for (auto& batch : font_batches_)
+    {
+        auto font = skin_->font(batch.first.usage);
+        ui_shader_->SetInput("diffuse", font->texture(), context);
+        ui_shader_->SetInput("text_colour", batch.first.colour, context);
+
+        batch.second->Render(context);
+        ui_shader_->Render(batch.second->index_count(), context);
+    }
+}
+
+bool Manager::Update(const Input& input)
+{
+    /*auto eq = input.EventQueue();
+    for (auto& e : eq)
+    {
+        switch (e.type)
+        {
+        case Input::Event::KEY_DOWN:
+            g_log->Debug("KEY_DOWN:");
+            break;
+        case Input::Event::KEY_UP:
+            g_log->Debug("KEY_UP:");
+            break;
+        case Input::Event::MOUSE_DOWN:
+            g_log->Debug("MOUSE_DOWN:");
+            break;
+        case Input::Event::MOUSE_UP:
+            g_log->Debug("MOUSE_UP:");
+            break;
+        case Input::Event::MOUSE_MOVE_X:
+            return;
+            g_log->Debug("MOUSE_MOVE_X:");
+            break;
+        case Input::Event::MOUSE_MOVE_Y:
+            return;
+            g_log->Debug("MOUSE_MOVE_Y:");
+            break;
+        }
+        g_log->Debug("%i\n", e.value);
+    }*/
+    // Update backwards, since last element is top window
+    // We don't want input to be sent to windows underneath the one yr clickin on
+    for (auto w = windows_.rbegin(); w != windows_.rend(); w++)
+    {
+        if (w->get()->Update(input))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 DrawBatcher* Manager::font_batch(FontType usage, Vector4 colour, RenderContext& context)
@@ -83,65 +158,25 @@ Skin* Manager::skin() const
     return skin_.get();
 }
 
-void Manager::Render(RenderContext& context)
+Window* Manager::active_window() const
 {
-    temp_window_->Render(context);
-
-    // Control pass
-    ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
-    ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
-    ui_shader_->SetInput("is_text", false, context);
-    ui_shader_->SetInput("diffuse", skin_->sprite()->texture(), context);
-
-    control_batch_->Render(context);
-    ui_shader_->Render(control_batch_->index_count(), context);
-
-    // Font pass
-    ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
-    ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
-    ui_shader_->SetInput("is_text", true, context);
-    for (auto& batch : font_batches_)
+    if (windows_.size() > 0)
     {
-        auto font = skin_->font(batch.first.usage);
-        ui_shader_->SetInput("diffuse", font->texture(), context);
-        ui_shader_->SetInput("text_colour", batch.first.colour, context);
-
-        batch.second->Render(context);
-        ui_shader_->Render(batch.second->index_count(), context);
+        return windows_.back().get();
     }
+    return main_window_.get();
 }
 
-void Manager::Update(const Input& input)
+void Manager::set_active_window(Window* window)
 {
-    auto eq = input.EventQueue();
-    for (auto& e : eq)
+    // Finds function param in window vector, then swaps its place with last element
+    for (auto w = windows_.begin(); w < windows_.end() - 1; w++)
     {
-        switch (e.type)
+        if (w->get() == window)
         {
-        case Input::Event::KEY_DOWN:
-            g_log->Debug("KEY_DOWN:");
-            break;
-        case Input::Event::KEY_UP:
-            g_log->Debug("KEY_UP:");
-            break;
-        case Input::Event::MOUSE_DOWN:
-            g_log->Debug("MOUSE_DOWN:");
-            break;
-        case Input::Event::MOUSE_UP:
-            g_log->Debug("MOUSE_UP:");
-            break;
-        case Input::Event::MOUSE_MOVE_X:
-            return;
-            g_log->Debug("MOUSE_MOVE_X:");
-            break;
-        case Input::Event::MOUSE_MOVE_Y:
-            return;
-            g_log->Debug("MOUSE_MOVE_Y:");
-            break;
+            std::iter_swap(w, windows_.end() - 1);
         }
-        g_log->Debug("%i\n", e.value);
     }
-    temp_window_->Update(input);
 }
 } // namespace GUI
 } // namespace blons
