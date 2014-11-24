@@ -15,7 +15,7 @@ enum WindowType
     STATIC,
     INVISIBLE
 };
-class Window : public Control
+class Window
 {
 public:
     Window(int x, int y, int width, int height, WindowType type, Manager* parent_manager);
@@ -27,6 +27,8 @@ public:
     Label* CreateLabel(int x, int y, const char* text);
 
 private:
+    Box pos_;
+    Manager* gui_;
     WindowType type_;
     std::vector<std::unique_ptr<Control>> controls_;
 };
