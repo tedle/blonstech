@@ -113,6 +113,34 @@ void Manager::Render(RenderContext& context)
 
 void Manager::Update(const Input& input)
 {
+    auto eq = input.EventQueue();
+    for (auto& e : eq)
+    {
+        switch (e.type)
+        {
+        case Input::Event::KEY_DOWN:
+            g_log->Debug("KEY_DOWN:");
+            break;
+        case Input::Event::KEY_UP:
+            g_log->Debug("KEY_UP:");
+            break;
+        case Input::Event::MOUSE_DOWN:
+            g_log->Debug("MOUSE_DOWN:");
+            break;
+        case Input::Event::MOUSE_UP:
+            g_log->Debug("MOUSE_UP:");
+            break;
+        case Input::Event::MOUSE_MOVE_X:
+            return;
+            g_log->Debug("MOUSE_MOVE_X:");
+            break;
+        case Input::Event::MOUSE_MOVE_Y:
+            return;
+            g_log->Debug("MOUSE_MOVE_Y:");
+            break;
+        }
+        g_log->Debug("%i\n", e.value);
+    }
     temp_window_->Update(input);
 }
 } // namespace GUI

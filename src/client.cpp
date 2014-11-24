@@ -198,7 +198,16 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
     case WM_KEYUP:
         input_->KeyUp((unsigned int)wparam);
         return 0;
+    // I know Win32 is bad, but c'mon...
     case WM_MOUSEMOVE:
+    case WM_LBUTTONDOWN:
+    case WM_LBUTTONUP:
+    case WM_RBUTTONDOWN:
+    case WM_RBUTTONUP:
+    case WM_MBUTTONDOWN:
+    case WM_MBUTTONUP:
+    case WM_XBUTTONDOWN:
+    case WM_XBUTTONUP:
         if (wparam & MK_LBUTTON)
         {
             input_->MouseDown(0);
@@ -214,6 +223,30 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
         else
         {
             input_->MouseUp(1);
+        }
+        if (wparam & MK_MBUTTON)
+        {
+            input_->MouseDown(2);
+        }
+        else
+        {
+            input_->MouseUp(2);
+        }
+        if (wparam & MK_XBUTTON1)
+        {
+            input_->MouseDown(3);
+        }
+        else
+        {
+            input_->MouseUp(3);
+        }
+        if (wparam & MK_XBUTTON2)
+        {
+            input_->MouseDown(4);
+        }
+        else
+        {
+            input_->MouseUp(4);
         }
         input_->MouseMove(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
         /* g_log->Debug("pos(%i,%i), delta(%i,%i), down(%i, %i)\n",
