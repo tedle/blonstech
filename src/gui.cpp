@@ -10,14 +10,6 @@ namespace blons
 {
 namespace GUI
 {
-struct FontCall
-{
-    FontType usage;
-    Vector4 colour;
-    // needed for efficient std::map lookups
-    bool operator< (const FontCall call) const { return memcmp(this, &call, sizeof(FontCall))>0; }
-};
-
 Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
     screen_dimensions_ = Vector2(static_cast<float>(width), static_cast<float>(height));
@@ -27,8 +19,6 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
     ui_shader_ = std::move(ui_shader);
 
     skin_ = std::unique_ptr<Skin>(new Skin(context));
-
-    control_batch_ = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
 
     // TODO: move this out of constructor! font load included!
     LoadFont("../../notes/font stuff/test.ttf", 28, context);
@@ -61,28 +51,29 @@ void Manager::Render(RenderContext& context)
         w->Render(context);
     }
 
-    // Control pass
+    // Draw pass
     ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
     ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
-    ui_shader_->SetInput("is_text", false, context);
-    ui_shader_->SetInput("diffuse", skin_->sprite()->texture(), context);
-
-    control_batch_->Render(context);
-    ui_shader_->Render(control_batch_->index_count(), context);
-
-    // Font pass
-    ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
-    ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
-    ui_shader_->SetInput("is_text", true, context);
-    for (auto& batch : font_batches_)
+    for (auto& batch : draw_batches_)
     {
-        auto font = skin_->font(batch.first.usage);
-        ui_shader_->SetInput("diffuse", font->texture(), context);
-        ui_shader_->SetInput("text_colour", batch.first.colour, context);
+        if (batch.first.is_text)
+        {
+            auto font = skin_->font(batch.first.usage);
+            ui_shader_->SetInput("diffuse", font->texture(), context);
+            ui_shader_->SetInput("is_text", true, context);
+            ui_shader_->SetInput("text_colour", batch.first.colour, context);
+        }
+        else
+        {
+            ui_shader_->SetInput("is_text", false, context);
+            ui_shader_->SetInput("diffuse", skin_->sprite()->texture(), context);
+        }
 
         batch.second->Render(context);
         ui_shader_->Render(batch.second->index_count(), context);
     }
+
+    draw_batches_.clear();
 }
 
 bool Manager::Update(const Input& input)
@@ -99,28 +90,9 @@ bool Manager::Update(const Input& input)
     return false;
 }
 
-DrawBatcher* Manager::font_batch(FontType usage, Vector4 colour, RenderContext& context)
+void Manager::RegisterDrawCall(DrawCallInfo info, DrawBatcher* batch)
 {
-    FontCall call = { usage, colour };
-    auto index_match = font_batches_.find(call);
-    if (index_match != font_batches_.end())
-    {
-        return index_match->second.get();
-    }
-    else
-    {
-        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
-        font_batches_.insert(font_batches_.begin(),
-                             std::make_pair(call, std::move(batcher)));
-        return font_batches_.begin()->second.get();
-    }
-
-    return nullptr;
-}
-
-DrawBatcher* Manager::control_batch() const
-{
-    return control_batch_.get();
+    draw_batches_.push_back(std::make_pair(info, batch));
 }
 
 Skin* Manager::skin() const

@@ -1,7 +1,9 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_CONTROL_H_
 #define BLONSTECH_GRAPHICS_GUI_CONTROL_H_
 
-#include "graphics/render/render.h"
+// Local Includes
+#include "graphics/gui/skin.h"
+#include "graphics/render/drawbatcher.h"
 #include "input/inputtemp.h"
 
 namespace blons
@@ -11,6 +13,15 @@ namespace GUI
 // Forward declarations
 class Manager;
 class Window;
+
+struct DrawCallInfo
+{
+    bool is_text;
+    FontType usage;
+    Vector4 colour;
+    // needed for efficient std::map lookups
+    bool operator< (const DrawCallInfo call) const { return memcmp(this, &call, sizeof(DrawCallInfo))>0; }
+};
 
 class Control
 {
@@ -22,6 +33,16 @@ protected:
     Box pos_;
     Manager* gui_;
     Window* parent_;
+
+    // Order of draw calls is the same as order of calls to RegisterBatches()!!!
+    void RegisterBatches();
+
+    DrawBatcher* font_batch(FontType usage, Vector4 colour, RenderContext& context);
+    DrawBatcher* control_batch(RenderContext& context);
+
+private:
+    // One draw batch per font per colour per control
+    std::map<DrawCallInfo, std::unique_ptr<DrawBatcher>> draw_batches_;
 };
 }
 }

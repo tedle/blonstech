@@ -40,18 +40,17 @@ public:
 private:
     // Since we want this class to be accessed by user, we hide these functions
     // despite widgets needing access to them. Kind of hacky to friend it up, but oh well
+    friend Control;
     friend Label;
     friend Window;
-    DrawBatcher* font_batch(FontType usage, Vector4 colour, RenderContext& context);
-    DrawBatcher* control_batch() const;
+    void RegisterDrawCall(DrawCallInfo info, DrawBatcher* batch);
     Skin* skin() const;
     Window* active_window() const;
     void set_active_window(Window* window);
     Vector2 screen_dimensions();
 
-    // One draw batch per font per colour
-    std::map<struct FontCall, std::unique_ptr<DrawBatcher>> font_batches_;
-    std::unique_ptr<DrawBatcher> control_batch_;
+    // Raw pointers because cleared every frame
+    std::vector<std::pair<DrawCallInfo, DrawBatcher*>> draw_batches_;
 
     Vector2 screen_dimensions_;
     Matrix ortho_matrix_;

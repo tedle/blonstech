@@ -25,13 +25,15 @@ void Label::Render(RenderContext& context)
     for (const auto& frag : text_.fragments())
     {
         // One draw call per (colour,font) used across all labels combined
-        auto batcher = gui_->font_batch(FontType::LABEL, frag.colour, context);
+        auto batcher = font_batch(FontType::LABEL, frag.colour, context);
         for (const auto& c : frag.text)
         {
             batcher->Append(*font->BuildSprite(c, x, y)->mesh());
             x += font->advance();
         }
     }
+
+    RegisterBatches();
 }
 
 bool Label::Update(const Input& input)
