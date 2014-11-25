@@ -20,9 +20,8 @@ struct FontCall
 
 Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
-    width_ = width;
-    height_ = height;
-    ortho_matrix_ = MatrixOrthographic(static_cast<float>(width_), static_cast<float>(height_),
+    screen_dimensions_ = Vector2(static_cast<float>(width), static_cast<float>(height));
+    ortho_matrix_ = MatrixOrthographic(screen_dimensions_.x, screen_dimensions_.y,
                                        kScreenNear, kScreenDepth);
 
     ui_shader_ = std::move(ui_shader);
@@ -32,8 +31,8 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
     control_batch_ = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
 
     main_window_ = std::unique_ptr<Window>(new Window(0, 0, width, height, WindowType::INVISIBLE, this));
-    windows_.push_back(std::unique_ptr<Window>(new Window(100, 100, 200, 200, WindowType::DRAGGABLE, this)));
-    windows_.push_back(std::unique_ptr<Window>(new Window(200, 200, 200, 200, WindowType::DRAGGABLE, this)));
+    windows_.push_back(std::unique_ptr<Window>(new Window(100, 100, 400, 200, WindowType::DRAGGABLE, this)));
+    windows_.push_back(std::unique_ptr<Window>(new Window(200, 200, 300, 300, WindowType::DRAGGABLE, this)));
     //temp_labels_.push_back(Label(20, 100, "$47A!$27C!$65A!$967!$AEFn$7D4i$D3Dc$EE8e$FB52$8BE01$7FA3", this));
     /*temp_window_->CreateLabel(20, 527, "EVERY MORNING $0f0I WAKE_UP AND $000PALM SLAM A VHS INTO ");
     //for (int i = 0; i < 30; i++)
@@ -89,34 +88,6 @@ void Manager::Render(RenderContext& context)
 
 bool Manager::Update(const Input& input)
 {
-    /*auto eq = input.EventQueue();
-    for (auto& e : eq)
-    {
-        switch (e.type)
-        {
-        case Input::Event::KEY_DOWN:
-            g_log->Debug("KEY_DOWN:");
-            break;
-        case Input::Event::KEY_UP:
-            g_log->Debug("KEY_UP:");
-            break;
-        case Input::Event::MOUSE_DOWN:
-            g_log->Debug("MOUSE_DOWN:");
-            break;
-        case Input::Event::MOUSE_UP:
-            g_log->Debug("MOUSE_UP:");
-            break;
-        case Input::Event::MOUSE_MOVE_X:
-            return;
-            g_log->Debug("MOUSE_MOVE_X:");
-            break;
-        case Input::Event::MOUSE_MOVE_Y:
-            return;
-            g_log->Debug("MOUSE_MOVE_Y:");
-            break;
-        }
-        g_log->Debug("%i\n", e.value);
-    }*/
     // Update backwards, since last element is top window
     // We don't want input to be sent to windows underneath the one yr clickin on
     for (auto w = windows_.rbegin(); w != windows_.rend(); w++)
@@ -170,6 +141,7 @@ Window* Manager::active_window() const
 void Manager::set_active_window(Window* window)
 {
     // Finds function param in window vector, then swaps its place with last element
+    // Uses v.end()-1 bcus no point switchin last element with itself
     for (auto w = windows_.begin(); w < windows_.end() - 1; w++)
     {
         if (w->get() == window)
@@ -177,6 +149,11 @@ void Manager::set_active_window(Window* window)
             std::iter_swap(w, windows_.end() - 1);
         }
     }
+}
+
+Vector2 Manager::screen_dimensions()
+{
+    return screen_dimensions_;
 }
 } // namespace GUI
 } // namespace blons

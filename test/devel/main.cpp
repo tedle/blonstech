@@ -32,10 +32,13 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         }*/
         quit = client->Frame();
         blons::temp::FPS();
+        bool gui_used_input = graphics->gui()->Update(*client->input());
         // TODO: THIS IS TEMP DELETE LATER
         // Handles mouselook and wasd movement
-        blons::temp::noclip(client->input(), graphics->camera());
-        graphics->gui()->Update(*client->input());
+        if (!gui_used_input)
+        {
+            blons::temp::noclip(client->input(), graphics->camera());
+        }
         graphics->Render();
     }
     graphics.reset();

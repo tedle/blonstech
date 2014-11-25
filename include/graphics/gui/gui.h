@@ -47,12 +47,13 @@ private:
     Skin* skin() const;
     Window* active_window() const;
     void set_active_window(Window* window);
+    Vector2 screen_dimensions();
 
     // One draw batch per font per colour
     std::map<struct FontCall, std::unique_ptr<DrawBatcher>> font_batches_;
     std::unique_ptr<DrawBatcher> control_batch_;
 
-    int width_, height_;
+    Vector2 screen_dimensions_;
     Matrix ortho_matrix_;
 
     std::unique_ptr<Shader> ui_shader_;

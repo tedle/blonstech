@@ -15,6 +15,9 @@ Window::Window(int x, int y, int width, int height, WindowType type, Manager* pa
                static_cast<float>(height));
     type_ = type;
     gui_ = parent_manager;
+
+    dragging_ = false;
+    drag_offset_ = Vector2(0, 0);
 }
 
 void Window::Render(RenderContext& context)
@@ -142,12 +145,16 @@ void Window::Render(RenderContext& context)
 
 bool Window::Update(const Input& input)
 {
+    bool input_handled = false;
+
+    int mx = input.mouse_x();
+    int my = input.mouse_y();
+
     for (const auto& e : input.event_queue())
     {
         if (e.type == Input::Event::MOUSE_DOWN)
         {
-            int mx = input.mouse_x();
-            int my = input.mouse_y();
+            // Clicked inside window
             if (mx >= pos_.x && mx < pos_.x + pos_.w &&
                 my >= pos_.y && my < pos_.y + pos_.h)
             {
@@ -155,11 +162,28 @@ bool Window::Update(const Input& input)
                 {
                     gui_->set_active_window(this);
                 }
-                return true;
+                // Clicked inside title bar
+                if (type_ == DRAGGABLE &&
+                    my < pos_.y + gui_->skin()->layout()->window.title.center.h)
+                {
+                    dragging_ = true;
+                    drag_offset_.x = mx - pos_.x;
+                    drag_offset_.y = my - pos_.y;
+                }
+                input_handled = true;
             }
         }
+        else if (e.type == Input::Event::MOUSE_UP)
+        {
+            dragging_ = false;
+        }
     }
-    return false;
+    if (dragging_ && type_ == DRAGGABLE)
+    {
+        set_pos(mx - drag_offset_.x, my - drag_offset_.y);
+        input_handled = true;
+    }
+    return input_handled;
 }
 
 Label* Window::CreateLabel(int x, int y, const char* text)
@@ -167,6 +191,35 @@ Label* Window::CreateLabel(int x, int y, const char* text)
     std::unique_ptr<Label> label(new Label(x, y, text, gui_));
     controls_.push_back(std::move(label));
     return static_cast<Label*>(controls_.back().get());
+}
+
+void Window::set_pos(float x, float y)
+{
+    pos_.x = x;
+    pos_.y = y;
+
+    Vector2 screen = gui_->screen_dimensions();
+    if (pos_.x < 0)
+    {
+        pos_.x = 0;
+    }
+    if (pos_.x + pos_.w > screen.x)
+    {
+        pos_.x = screen.x - pos_.w;
+    }
+    if (pos_.y < 0)
+    {
+        pos_.y = 0;
+    }
+    if (pos_.y + pos_.h > screen.y)
+    {
+        pos_.y = screen.y - pos_.h;
+    }
+}
+
+Box Window::pos() const
+{
+    return pos_;
 }
 } // namespace GUI
 } // namespace blons

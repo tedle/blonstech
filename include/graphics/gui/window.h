@@ -26,11 +26,18 @@ public:
 
     Label* CreateLabel(int x, int y, const char* text);
 
+    void set_pos(float x, float y);
+    Box pos() const;
+
 private:
     Box pos_;
     Manager* gui_;
     WindowType type_;
     std::vector<std::unique_ptr<Control>> controls_;
+
+    // For moving draggable windows
+    bool dragging_;
+    Vector2 drag_offset_;
 };
 } // namepsace GUI
 } // namespace blons
