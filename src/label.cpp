@@ -31,5 +31,10 @@ void Label::Render(RenderContext& context)
         }
     }
 }
+
+bool Label::Update(const Input& input)
+{
+    return false;
+}
 } // namespace GUI
 } // namespace blons

@@ -3,6 +3,7 @@
 
 // Local Includes
 #include "graphics/gui/control.h"
+#include "graphics/gui/button.h"
 #include "graphics/gui/label.h"
 
 namespace blons
@@ -24,6 +25,7 @@ public:
     void Render(RenderContext& context);
     bool Update(const Input& input);
 
+    Button* CreateButton(int x, int y, int width, int height, const char* label);
     Label* CreateLabel(int x, int y, const char* text);
 
     void set_pos(float x, float y);

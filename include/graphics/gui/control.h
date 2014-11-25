@@ -15,7 +15,7 @@ class Control
 {
 public:
     virtual void Render(RenderContext& context)=0;
-    virtual void Update(const Input& input)=0;
+    virtual bool Update(const Input& input)=0;
 
 protected:
     Box pos_;

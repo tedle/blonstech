@@ -19,7 +19,7 @@ public:
     ~Label() {}
 
     void Render(RenderContext& context);
-    void Update(const Input& input) {}
+    bool Update(const Input& input);
 
 private:
     ColourString text_;

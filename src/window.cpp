@@ -183,7 +183,19 @@ bool Window::Update(const Input& input)
         set_pos(mx - drag_offset_.x, my - drag_offset_.y);
         input_handled = true;
     }
+
+    for (auto& c : controls_)
+    {
+        input_handled |= c.get()->Update(input);
+    }
     return input_handled;
+}
+
+Button* Window::CreateButton(int x, int y, int width, int height, const char* label)
+{
+    std::unique_ptr<Button> button(new Button(x, y, width, height, label, gui_));
+    controls_.push_back(std::move(button));
+    return static_cast<Button*>(controls_.back().get());
 }
 
 Label* Window::CreateLabel(int x, int y, const char* text)
