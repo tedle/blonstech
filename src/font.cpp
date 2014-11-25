@@ -73,6 +73,7 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture
 Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
 {
     fontsheet_ = nullptr;
+    letter_height_ = 0;
     pixel_size_ = pixel_size;
     // std::map would be a lot cleaner than a vector, but we need very fast access :)
     size_t largest_char = *std::max_element(kAvailableCharacters.begin(),
@@ -109,8 +110,13 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
         tex_width += g.width;
         // Funky parentheses to appease the lord of windows macros
         tex_height = (std::max)(g.height, tex_height);
+        if (c >= 'A' && c <= 'Z' && c != 'Q')
+        {
+            letter_height_ = (std::max)(g.height - 1, letter_height_);
+        }
     }
 
+    g_log->Debug("%i\n", letter_height_);
     // Generate a single texture containing every character
     std::unique_ptr<unsigned char> tex(new unsigned char[tex_width*tex_height]);
     // Zero the memory since not all glyphs have the same height
@@ -165,7 +171,7 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
     }
     // Setup the character sprites position and texture
     fontsheet_->set_pos(x + g->x_offset,
-                        y - g->y_offset - g->height + pixel_size_,
+                        y - g->y_offset - g->height,
                         g->width,
                         g->height);
     fontsheet_->set_subtexture(g->tex_offset, 0, g->width, g->height);
@@ -185,6 +191,16 @@ int Font::advance()
 int Font::index_count() const
 {
     return fontsheet_->index_count();
+}
+
+std::size_t Font::letter_height() const
+{
+    return letter_height_;
+}
+
+std::size_t Font::pixel_size() const
+{
+    return pixel_size_;
 }
 
 const TextureResource* Font::texture() const

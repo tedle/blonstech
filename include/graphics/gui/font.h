@@ -27,6 +27,8 @@ public:
     // Resets to 0 after call
     int advance();
     int index_count() const;
+    std::size_t letter_height() const;
+    std::size_t pixel_size() const;
     const TextureResource* texture() const;
 
 private:
@@ -34,6 +36,8 @@ private:
     std::vector<Glyph> charset_;
     std::unique_ptr<class Sprite> fontsheet_;
     std::size_t pixel_size_;
+    // Max letter height of chars A-Z, used for offsetting or centering text
+    std::size_t letter_height_;
     int advance_;
 };
 } // namespace GUI

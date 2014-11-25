@@ -30,10 +30,12 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
 
     control_batch_ = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
 
+    // TODO: move this out of constructor! font load included!
+    LoadFont("../../notes/font stuff/test.ttf", 28, context);
     main_window_ = std::unique_ptr<Window>(new Window(0, 0, width, height, WindowType::INVISIBLE, this));
     windows_.push_back(std::unique_ptr<Window>(new Window(100, 100, 400, 200, WindowType::DRAGGABLE, this)));
     windows_.push_back(std::unique_ptr<Window>(new Window(200, 200, 300, 300, WindowType::DRAGGABLE, this)));
-    windows_[0].get()->CreateLabel(10, 30, "Hello!");
+    windows_[0].get()->CreateLabel(10, 70, "HAello!");
     windows_[0].get()->CreateButton(10, 70, 100, 50, "Button!");
 }
 
@@ -53,6 +55,7 @@ bool Manager::LoadFont(const char* filename, FontType usage, int pixel_size, Ren
 
 void Manager::Render(RenderContext& context)
 {
+    main_window_->Render(context);
     for (const auto& w : windows_)
     {
         w->Render(context);

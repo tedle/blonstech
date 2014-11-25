@@ -37,9 +37,10 @@ private:
     WindowType type_;
     std::vector<std::unique_ptr<Control>> controls_;
 
-    // For moving draggable windows
+    // For draggable windows
     bool dragging_;
     Vector2 drag_offset_;
+    std::unique_ptr<Label> caption_;
 };
 } // namepsace GUI
 } // namespace blons

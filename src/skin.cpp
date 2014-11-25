@@ -11,6 +11,7 @@ Skin::Skin(RenderContext& context)
 {
     skin_ = std::unique_ptr<Sprite>(new Sprite("../../notes/skin.png", context));
 
+    // TODO: Ensure DEFAULT font is somehow not nullptr before being handed over to user
     font_list_[DEFAULT] = nullptr;
     font_list_[HEADING] = nullptr;
     font_list_[LABEL] = nullptr;
