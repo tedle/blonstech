@@ -33,12 +33,8 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
     main_window_ = std::unique_ptr<Window>(new Window(0, 0, width, height, WindowType::INVISIBLE, this));
     windows_.push_back(std::unique_ptr<Window>(new Window(100, 100, 400, 200, WindowType::DRAGGABLE, this)));
     windows_.push_back(std::unique_ptr<Window>(new Window(200, 200, 300, 300, WindowType::DRAGGABLE, this)));
-    //temp_labels_.push_back(Label(20, 100, "$47A!$27C!$65A!$967!$AEFn$7D4i$D3Dc$EE8e$FB52$8BE01$7FA3", this));
-    /*temp_window_->CreateLabel(20, 527, "EVERY MORNING $0f0I WAKE_UP AND $000PALM SLAM A VHS INTO ");
-    //for (int i = 0; i < 30; i++)
-    temp_window_->CreateLabel(20, 492, "$700THE SLOT. ITS OF RIDDICK AND RIGHT THEN $aa");
-    temp_window_->CreateLabel(20, 457, "$00fAND THERE I START MAIN $fffCHARACTER, RIDDICK. I D$aaa");
-    temp_window_->CreateLabel(20, 422, "> _");*/
+    windows_[0].get()->CreateLabel(10, 30, "Hello!");
+    windows_[0].get()->CreateButton(10, 70, 100, 50, "Button!");
 }
 
 Manager::~Manager()

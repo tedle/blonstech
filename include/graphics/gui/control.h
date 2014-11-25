@@ -10,6 +10,7 @@ namespace GUI
 {
 // Forward declarations
 class Manager;
+class Window;
 
 class Control
 {
@@ -20,6 +21,7 @@ public:
 protected:
     Box pos_;
     Manager* gui_;
+    Window* parent_;
 };
 }
 }

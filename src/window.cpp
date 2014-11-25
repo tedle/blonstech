@@ -184,23 +184,27 @@ bool Window::Update(const Input& input)
         input_handled = true;
     }
 
-    for (auto& c : controls_)
+    // Handle input for window controls, if top level
+    if (gui_->active_window() == this)
     {
-        input_handled |= c.get()->Update(input);
+        for (auto& c : controls_)
+        {
+            input_handled |= c.get()->Update(input);
+        }
     }
     return input_handled;
 }
 
 Button* Window::CreateButton(int x, int y, int width, int height, const char* label)
 {
-    std::unique_ptr<Button> button(new Button(x, y, width, height, label, gui_));
+    std::unique_ptr<Button> button(new Button(x, y, width, height, label, gui_, this));
     controls_.push_back(std::move(button));
     return static_cast<Button*>(controls_.back().get());
 }
 
 Label* Window::CreateLabel(int x, int y, const char* text)
 {
-    std::unique_ptr<Label> label(new Label(x, y, text, gui_));
+    std::unique_ptr<Label> label(new Label(x, y, text, gui_, this));
     controls_.push_back(std::move(label));
     return static_cast<Label*>(controls_.back().get());
 }

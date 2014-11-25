@@ -164,7 +164,10 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
         return nullptr;
     }
     // Setup the character sprites position and texture
-    fontsheet_->set_pos(x + g->x_offset, y - g->y_offset - g->height, g->width, g->height);
+    fontsheet_->set_pos(x + g->x_offset,
+                        y - g->y_offset - g->height + pixel_size_,
+                        g->width,
+                        g->height);
     fontsheet_->set_subtexture(g->tex_offset, 0, g->width, g->height);
     // How far to advance cursor for next letter
     advance_ = g->x_advance;
