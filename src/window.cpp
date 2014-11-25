@@ -110,7 +110,7 @@ void Window::Render(RenderContext& context)
 
         // Bottom left corner
         sprite->set_pos(pos_.x,
-                        pos_.y + pos_.w - b.bottom_left.h,
+                        pos_.y + pos_.h - b.bottom_left.h,
                         b.bottom_left.w,
                         b.bottom_left.h);
         sprite->set_subtexture(b.bottom_left);
@@ -118,7 +118,7 @@ void Window::Render(RenderContext& context)
 
         // Bottom edge
         sprite->set_pos(pos_.x + b.bottom_left.w,
-                        pos_.y + pos_.w - b.bottom.h,
+                        pos_.y + pos_.h - b.bottom.h,
                         pos_.w - (b.bottom_left.w + b.bottom_right.w),
                         b.bottom.h);
         sprite->set_subtexture(b.bottom);
@@ -126,7 +126,7 @@ void Window::Render(RenderContext& context)
 
         // Bottom right corner
         sprite->set_pos(pos_.x + pos_.w - b.bottom_right.w,
-                        pos_.y + pos_.w - b.bottom_right.h,
+                        pos_.y + pos_.h - b.bottom_right.h,
                         b.bottom_right.w,
                         b.bottom_right.h);
         sprite->set_subtexture(b.bottom_right);
