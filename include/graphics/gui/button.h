@@ -1,6 +1,8 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_BUTTON_H_
 #define BLONSTECH_GRAPHICS_GUI_BUTTON_H_
 
+// Includes
+#include <functional>
 // Local Includes
 #include "graphics/gui/control.h"
 
@@ -20,6 +22,9 @@ public:
 private:
     Box pos_;
     std::unique_ptr<class Label> label_;
+    std::function<void()> callback_;
+    bool hover_;
+    bool active_;
 };
 } // namespace GUI
 } // namespace blons

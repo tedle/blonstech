@@ -25,7 +25,7 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
     main_window_ = std::unique_ptr<Window>(new Window(0, 0, width, height, WindowType::INVISIBLE, this));
     windows_.push_back(std::unique_ptr<Window>(new Window(20, 80, 400, 200, WindowType::DRAGGABLE, this)));
     windows_.push_back(std::unique_ptr<Window>(new Window(450, 250, 300, 300, WindowType::DRAGGABLE, this)));
-    windows_[0].get()->CreateLabel(10, 70, "HAello! std::move(test);");
+    windows_[0].get()->CreateLabel(10, 70, "HAello! blonsUI in action!");
     windows_[0].get()->CreateButton(10, 100, 120, 60, "Button!");
 }
 
