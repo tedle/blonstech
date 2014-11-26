@@ -9,6 +9,16 @@ namespace GUI
 {
 Window::Window(int x, int y, int width, int height, WindowType type, Manager* parent_manager)
 {
+    Init(x, y, width, height, "", type, parent_manager);
+}
+
+Window::Window(int x, int y, int width, int height, const char* caption, Manager* parent_manager)
+{
+    Init(x, y, width, height, caption, DRAGGABLE, parent_manager);
+}
+
+void Window::Init(int x, int y, int width, int height, const char* caption, WindowType type, Manager* parent_manager)
+{
     pos_ = Box(static_cast<float>(x),
                static_cast<float>(y),
                static_cast<float>(width),
@@ -22,7 +32,7 @@ Window::Window(int x, int y, int width, int height, WindowType type, Manager* pa
     int title_bar_height = static_cast<int>(gui_->skin()->layout()->window.title.center.h);
     int letter_height = gui_->skin()->font(FontType::HEADING)->letter_height();
     int caption_offset = (title_bar_height + letter_height) / 2;
-    caption_ = std::unique_ptr<Label>(new Label(20, caption_offset, "Window Title", parent_manager, this));
+    caption_ = std::unique_ptr<Label>(new Label(20, caption_offset, caption, parent_manager, this));
 }
 
 void Window::Render(RenderContext& context)
