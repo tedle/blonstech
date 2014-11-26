@@ -3,7 +3,6 @@
 
 // Includes
 #include <vector>
-#include <windowsx.h>
 
 namespace blons
 {

@@ -1,5 +1,8 @@
 #include "input/inputtemp.h"
 
+// TODO: delete?
+//#include <windowsx.h>
+
 namespace blons
 {
 Input::Input()

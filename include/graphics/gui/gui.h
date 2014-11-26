@@ -30,12 +30,17 @@ public:
     Manager(int screen_width, int screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
     ~Manager();
 
-    bool LoadFont(const char* filename, int pixel_size, RenderContext& context);
-    bool LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context);
+    // Wanted to name these all Create*(), but macros are really mean
+    //Window* MakeWindow(std::string id, int x, int y, int width, int height);
+
+    bool LoadFont(std::string filename, int pixel_size, RenderContext& context);
+    bool LoadFont(std::string filename, FontType usage, int pixel_size, RenderContext& context);
 
     void Render(RenderContext& context);
     // Returns true if GUI had input to handle, false otherwise
     bool Update(const Input& input);
+
+    Window* window(std::string id);
 
 private:
     // Since we want this class to be accessed by user, we hide these functions

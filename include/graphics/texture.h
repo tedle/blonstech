@@ -18,7 +18,7 @@ public:
         Type type;
     };
 
-    Texture(const char* filename, Type type, RenderContext& context);
+    Texture(std::string filename, Type type, RenderContext& context);
     Texture(PixelData* pixels, Type type, RenderContext& context);
     ~Texture();
 

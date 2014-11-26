@@ -13,7 +13,7 @@ namespace GUI
 class Button : public Control
 {
 public:
-    Button(int x, int y, int width, int height, const char* label, Manager* parent_manager, Window* parent_window);
+    Button(Box pos, std::string label, Manager* parent_manager, Window* parent_window);
     ~Button() {}
 
     void Render(RenderContext& context);

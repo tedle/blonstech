@@ -58,9 +58,9 @@ public:
     void BeginScene();
     void EndScene();
 
-    BufferResource* CreateBufferResource();
-    TextureResource* CreateTextureResource();
-    ShaderResource* CreateShaderResource();
+    BufferResource* MakeBufferResource();
+    TextureResource* MakeTextureResource();
+    ShaderResource* MakeShaderResource();
 
     bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                       Vertex* vertices, unsigned int vert_count,

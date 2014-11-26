@@ -9,7 +9,7 @@ namespace blons
 class Shader
 {
 public:
-    Shader(const char* vertex_filename, const char* pixel_filename, ShaderAttributeList inputs, RenderContext& context);
+    Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs, RenderContext& context);
     ~Shader();
 
     bool Render(int index_count, RenderContext& context);

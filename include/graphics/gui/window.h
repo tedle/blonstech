@@ -20,19 +20,22 @@ class Window : public Control
 {
 public:
     // Only draggable windows can have a caption, so type is omitted for that constructor
-    Window(int x, int y, int width, int height, WindowType type, Manager* parent_manager);
-    Window(int x, int y, int width, int height, const char* caption, Manager* parent_manager);
+    Window(std::string id, Box pos, WindowType type, Manager* parent_manager);
+    Window(std::string id, Box pos, std::string caption, Manager* parent_manager);
     ~Window() {}
 
     void Render(RenderContext& context);
     bool Update(const Input& input);
 
-    Button* CreateButton(int x, int y, int width, int height, const char* label);
-    Label* CreateLabel(int x, int y, const char* text);
+    Button* MakeButton(int x, int y, int width, int height, std::string label);
+    Label* MakeLabel(int x, int y, std::string text);
+
+    const std::string id() const;
 
 private:
-    void Init(int x, int y, int width, int height, const char* caption, WindowType type, Manager* parent_manager);
+    void Init(Box pos, std::string caption, WindowType type, Manager* parent_manager);
 
+    const std::string id_;
     WindowType type_;
     std::vector<std::unique_ptr<Control>> controls_;
 

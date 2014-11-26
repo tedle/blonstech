@@ -7,9 +7,9 @@ namespace blons
 {
 namespace GUI
 {
-    Label::Label(int x, int y, const char* text, Manager* parent_manager, Window* parent_window)
+Label::Label(Vector2 pos, std::string text, Manager* parent_manager, Window* parent_window)
 {
-    pos_ = Box(static_cast<float>(x), static_cast<float>(y), 0, 0);
+    pos_ = Box(pos.x, pos.y, 0, 0);
     text_ = ColourString(text);
     gui_ = parent_manager;
     parent_ = parent_window;

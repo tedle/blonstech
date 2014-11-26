@@ -407,17 +407,17 @@ void RenderD3D11::EndScene()
     return;
 }
 
-BufferResource* RenderD3D11::CreateBufferResource()
+BufferResource* RenderD3D11::MakeBufferResource()
 {
     return new BufferResourceD3D11;
 }
 
-TextureResource* RenderD3D11::CreateTextureResource()
+TextureResource* RenderD3D11::MakeTextureResource()
 {
     return new TextureResourceD3D11;
 }
 
-ShaderResource* RenderD3D11::CreateShaderResource()
+ShaderResource* RenderD3D11::MakeShaderResource()
 {
     return new ShaderResourceD3D11;
 }
@@ -700,7 +700,7 @@ TextureResource* RenderD3D11::LoadPixelData(WCHAR* filename)
 {
     HRESULT result;
 
-    TextureResourceD3D11* texture = static_cast<TextureResourceD3D11*>(CreateTextureResource());
+    TextureResourceD3D11* texture = static_cast<TextureResourceD3D11*>(MakeTextureResource());
 
     result = -1;// DirectX::CreateDDSTextureFromFile(device_, filename, nullptr, &texture->p, 0);
     if (FAILED(result))

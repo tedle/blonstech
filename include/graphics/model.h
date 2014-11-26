@@ -13,7 +13,7 @@ namespace blons
 class Model
 {
 public:
-    Model(const char* mesh_filename, RenderContext& context);
+    Model(std::string mesh_filename, RenderContext& context);
     virtual ~Model();
 
     void Render(RenderContext& context);
@@ -26,7 +26,7 @@ public:
     void set_pos(float x, float y, float z);
 
 protected:
-    void Init(const char* mesh_filename, RenderContext& context);
+    void Init(std::string mesh_filename, RenderContext& context);
 
     std::unique_ptr<class Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;

@@ -103,7 +103,7 @@ public:
     Skin(RenderContext& context);
     ~Skin();
 
-    bool LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context);
+    bool LoadFont(std::string filename, FontType usage, int pixel_size, RenderContext& context);
     Font* font(FontType usage);
     Sprite* sprite() const;
     const Layout* layout() const;

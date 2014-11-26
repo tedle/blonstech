@@ -2,7 +2,7 @@
 
 namespace blons
 {
-Texture::Texture(const char* filename, Type type, RenderContext& context)
+Texture::Texture(std::string filename, Type type, RenderContext& context)
 {
     std::unique_ptr<PixelData> tex_data(new PixelData);
     if (!context->LoadPixelData(filename, tex_data.get()))
@@ -19,7 +19,7 @@ Texture::Texture(PixelData* pixels, Type type, RenderContext& context)
 
 void Texture::Init(PixelData* pixels, Type type, RenderContext& context)
 {
-    texture_ = std::unique_ptr<TextureResource>(context->CreateTextureResource());
+    texture_ = std::unique_ptr<TextureResource>(context->MakeTextureResource());
     if (texture_ == nullptr)
     {
         throw "Failed to load texture";

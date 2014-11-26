@@ -22,23 +22,24 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
 
     // TODO: move this out of constructor! font load included!
     LoadFont("../../notes/font stuff/test.ttf", 28, context);
-    main_window_ = std::unique_ptr<Window>(new Window(0, 0, width, height, WindowType::INVISIBLE, this));
-    windows_.push_back(std::unique_ptr<Window>(new Window(20, 80, 400, 200, "Friendly window", this)));
-    windows_.push_back(std::unique_ptr<Window>(new Window(450, 250, 300, 300, "Amicable window", this)));
-    windows_[0].get()->CreateLabel(10, 70, "HAello! blonsUI in action!");
-    windows_[0].get()->CreateButton(10, 100, 120, 60, "Button!")->set_callback([](){g_log->Debug("hi hi!\n");});
+    // TODO: get rid of main_window... i think
+    main_window_ = std::unique_ptr<Window>(new Window("main", Box(0, 0, screen_dimensions_.x, screen_dimensions_.y), WindowType::INVISIBLE, this));
+    windows_.push_back(std::unique_ptr<Window>(new Window("test", Box(20, 80, 400, 200), "Friendly window", this)));
+    windows_.push_back(std::unique_ptr<Window>(new Window("yoyo", Box(450, 250, 300, 300), "Amicable window", this)));
+    windows_[0].get()->MakeLabel(10, 70, "HAello! blonsUI in action!");
+    windows_[0].get()->MakeButton(10, 100, 120, 60, "Button!")->set_callback([](){g_log->Debug("hi hi!\n");});
 }
 
 Manager::~Manager()
 {
 }
 
-bool Manager::LoadFont(const char* filename, int pixel_size, RenderContext& context)
+bool Manager::LoadFont(std::string filename, int pixel_size, RenderContext& context)
 {
     return LoadFont(filename, FontType::DEFAULT, pixel_size, context);
 }
 
-bool Manager::LoadFont(const char* filename, FontType usage, int pixel_size, RenderContext& context)
+bool Manager::LoadFont(std::string filename, FontType usage, int pixel_size, RenderContext& context)
 {
     return skin_->LoadFont(filename, usage, pixel_size, context);
 }

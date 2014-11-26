@@ -70,7 +70,7 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture
     }
 }
 
-Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
+Font::Font(std::string font_filename, int pixel_size, RenderContext& context)
 {
     fontsheet_ = nullptr;
     letter_height_ = 0;
@@ -88,7 +88,7 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
         throw "Couldn't initialize font library";
     }
 
-    if (FT_New_Face(library, font_filename, 0, &face) != 0)
+    if (FT_New_Face(library, font_filename.c_str(), 0, &face) != 0)
     {
         throw "Couldn't load font file";
     }
@@ -193,11 +193,6 @@ int Font::cursor_offset(unsigned char letter) const
     {
         return 0;
     }
-}
-
-int Font::string_width(const char* string) const
-{
-    return string_width(std::string(string));
 }
 
 int Font::string_width(std::string string) const

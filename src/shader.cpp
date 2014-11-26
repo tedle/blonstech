@@ -2,9 +2,9 @@
 
 namespace blons
 {
-Shader::Shader(const char* vertex_filename, const char* pixel_filename, ShaderAttributeList inputs, RenderContext& context)
+Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs, RenderContext& context)
 {
-    program_ = std::unique_ptr<ShaderResource>(context->CreateShaderResource());
+    program_ = std::unique_ptr<ShaderResource>(context->MakeShaderResource());
 
     if (!context->RegisterShader(program_.get(), vertex_filename, pixel_filename, inputs))
     {

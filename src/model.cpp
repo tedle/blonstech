@@ -1,5 +1,9 @@
 #include "graphics/model.h"
 
+// Includes
+// TODO: remove this, only used for timing
+#include <Windows.h>
+
 // Local Includes
 #include "graphics/mesh.h"
 #include "graphics/meshimporter.h"
@@ -7,12 +11,12 @@
 
 namespace blons
 {
-Model::Model(const char* mesh_filename, RenderContext& context)
+Model::Model(std::string mesh_filename, RenderContext& context)
 {
     Init(mesh_filename, context);
 }
 
-void Model::Init(const char* mesh_filename, RenderContext& context)
+void Model::Init(std::string mesh_filename, RenderContext& context)
 {
     mesh_ = nullptr;
     diffuse_texture_ = nullptr;

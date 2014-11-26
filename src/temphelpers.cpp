@@ -149,7 +149,7 @@ void FPS()
 }
 
 
-std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<std::unique_ptr<Model>> models, Graphics* graphics)
+std::vector<std::unique_ptr<Model>> load_codmap(std::string folder, std::vector<std::unique_ptr<Model>> models, Graphics* graphics)
 {
     DWORD64 start = GetTickCount64();
     std::string csv_file = folder;
@@ -176,7 +176,7 @@ std::vector<std::unique_ptr<Model>> load_codmap(const char* folder, std::vector<
             throw "csv read problem";
         }
 
-        models.push_back(graphics->CreateModel(mesh_file.c_str()));
+        models.push_back(graphics->MakeModel(mesh_file.c_str()));
         if (models.back() == nullptr)
         {
             throw "model problem";

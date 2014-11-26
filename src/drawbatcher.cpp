@@ -4,8 +4,8 @@ namespace blons
 {
 DrawBatcher::DrawBatcher(RenderContext& context)
 {
-    vertex_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
-    index_buffer_ = std::unique_ptr<BufferResource>(context->CreateBufferResource());
+    vertex_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
+    index_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
     context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0);
     batch_.resize(1000);
     batch_index_ = 0;

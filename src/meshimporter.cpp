@@ -5,7 +5,7 @@
 
 namespace blons
 {
-MeshImporter::MeshImporter(const char* filename)
+MeshImporter::MeshImporter(std::string filename)
 {
     uv_count_ = 0;
     normal_count_ = 0;
@@ -17,7 +17,7 @@ MeshImporter::MeshImporter(const char* filename)
     }
 }
 
-MeshImporter::MeshImporter(const char* filename, bool invert_y)
+MeshImporter::MeshImporter(std::string filename, bool invert_y)
 {
     uv_count_ = 0;
     normal_count_ = 0;
@@ -33,7 +33,7 @@ MeshImporter::~MeshImporter()
 {
 }
 
-bool MeshImporter::Load(const char* filename, bool invert_y)
+bool MeshImporter::Load(std::string filename, bool invert_y)
 {
     FILE* file;
     std::vector<Vector3> vertices, normals;
@@ -42,7 +42,7 @@ bool MeshImporter::Load(const char* filename, bool invert_y)
     unsigned int vertex_count = 0;
     unsigned int index_count = 0;
 
-    fopen_s(&file, filename, "rb");
+    fopen_s(&file, filename.c_str(), "rb");
     if (file == nullptr)
     {
         return false;

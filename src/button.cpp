@@ -7,12 +7,9 @@ namespace blons
 {
 namespace GUI
 {
-Button::Button(int x, int y, int width, int height, const char* label, Manager* parent_manager, Window* parent_window)
+Button::Button(Box pos, std::string label, Manager* parent_manager, Window* parent_window)
 {
-    pos_ = Box(static_cast<float>(x),
-               static_cast<float>(y),
-               static_cast<float>(width),
-               static_cast<float>(height));
+    pos_ = pos;
     gui_ = parent_manager;
     parent_ = parent_window;
     hover_ = false;
@@ -20,16 +17,16 @@ Button::Button(int x, int y, int width, int height, const char* label, Manager* 
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](){};
 
-    if (strlen(label) > 0)
+    if (label.length() > 0)
     {
         const auto& font = gui_->skin()->font(FontType::LABEL);
         int caption_width = font->string_width(label);
         int letter_height = font->letter_height();
         // For centering the button caption
-        int caption_x_offset = (width - caption_width) / 2 - font->cursor_offset(label[0]);
-        int caption_y_offset = (height + letter_height) / 2;
-        label_ = std::unique_ptr<Label>(new Label(x + caption_x_offset, y + caption_y_offset,
-                                                  label, parent_manager, parent_window));
+        Vector2 caption_pos;
+        caption_pos.x = pos.x + floor((pos.w - caption_width) / 2 - font->cursor_offset(label[0]));
+        caption_pos.y = pos.y + floor((pos.h + letter_height) / 2);
+        label_ = std::unique_ptr<Label>(new Label(caption_pos, label, parent_manager, parent_window));
     }
 }
 

@@ -42,8 +42,8 @@ public:
     Graphics(int screen_width, int screen_height, HWND hwnd);
     ~Graphics();
 
-    std::unique_ptr<Model> CreateModel(const char* filename);
-    std::unique_ptr<Sprite> CreateSprite(const char* filename);
+    std::unique_ptr<Model> MakeModel(std::string filename);
+    std::unique_ptr<Sprite> MakeSprite(std::string filename);
 
     bool Render();
 
@@ -57,7 +57,7 @@ private:
     class ManagedModel : public Model
     {
     public:
-        ManagedModel(const char* filename, RenderContext& context) : Model(filename, context) {}
+        ManagedModel(std::string filename, RenderContext& context) : Model(filename, context) {}
         ~ManagedModel();
     private:
         friend Graphics;
@@ -68,7 +68,7 @@ private:
     class ManagedSprite : public Sprite
     {
     public:
-        ManagedSprite(const char* filename, RenderContext& context) : Sprite(filename, context) {}
+        ManagedSprite(std::string filename, RenderContext& context) : Sprite(filename, context) {}
         ~ManagedSprite();
     private:
         friend Graphics;

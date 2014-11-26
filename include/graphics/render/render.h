@@ -5,7 +5,6 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <Windows.h>
 // Local Includes
 #include "math/math.h"
 #include "debug/loggeride.h"
@@ -70,9 +69,9 @@ public:
     virtual void BeginScene()=0;
     virtual void EndScene()=0;
 
-    virtual BufferResource* CreateBufferResource()=0;
-    virtual TextureResource* CreateTextureResource()=0;
-    virtual ShaderResource* CreateShaderResource()=0;
+    virtual BufferResource* MakeBufferResource()=0;
+    virtual TextureResource* MakeTextureResource()=0;
+    virtual ShaderResource* MakeShaderResource()=0;
 
     virtual bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
@@ -82,7 +81,7 @@ public:
                                 unsigned int* indices, unsigned int index_count)=0;
     virtual bool RegisterTexture(TextureResource* texture, PixelData* pixel_data)=0;
     virtual bool RegisterShader(ShaderResource* program,
-                                const char* vertex_filename, const char* pixel_filename,
+                                std::string vertex_filename, std::string pixel_filename,
                                 ShaderAttributeList inputs)=0;
 
     virtual void RenderShader(ShaderResource* program, int index_count)=0;
@@ -91,6 +90,7 @@ public:
     virtual void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                              Vertex* vertices, unsigned int vert_count,
                              unsigned int* indices, unsigned int index_count)=0;
+    // Using const char* instead of std::string here is noticably faster
     virtual bool SetShaderInput(ShaderResource* program, const char* name, int value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Matrix value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value)=0;
@@ -102,7 +102,7 @@ public:
     virtual void GetVideoCardInfo(char* buffer, int& len_buffer)=0;
 
     // TODO: do this MANULLY in texture class later
-    virtual bool LoadPixelData(const char* filename, PixelData* pixel_data)=0;
+    virtual bool LoadPixelData(std::string filename, PixelData* pixel_data)=0;
 
 protected:
     bool vsync_;

@@ -7,22 +7,19 @@ namespace blons
 {
 namespace GUI
 {
-Window::Window(int x, int y, int width, int height, WindowType type, Manager* parent_manager)
+Window::Window(std::string id, Box pos, WindowType type, Manager* parent_manager) : id_(id)
 {
-    Init(x, y, width, height, "", type, parent_manager);
+    Init(pos, "", type, parent_manager);
 }
 
-Window::Window(int x, int y, int width, int height, const char* caption, Manager* parent_manager)
+Window::Window(std::string id, Box pos, std::string caption, Manager* parent_manager) : id_(id)
 {
-    Init(x, y, width, height, caption, DRAGGABLE, parent_manager);
+    Init(pos, caption, DRAGGABLE, parent_manager);
 }
 
-void Window::Init(int x, int y, int width, int height, const char* caption, WindowType type, Manager* parent_manager)
+void Window::Init(Box pos, std::string caption, WindowType type, Manager* parent_manager)
 {
-    pos_ = Box(static_cast<float>(x),
-               static_cast<float>(y),
-               static_cast<float>(width),
-               static_cast<float>(height));
+    pos_ = pos;
     type_ = type;
     gui_ = parent_manager;
 
@@ -31,8 +28,9 @@ void Window::Init(int x, int y, int width, int height, const char* caption, Wind
 
     int title_bar_height = static_cast<int>(gui_->skin()->layout()->window.title.center.h);
     int letter_height = gui_->skin()->font(FontType::HEADING)->letter_height();
-    int caption_offset = (title_bar_height + letter_height) / 2;
-    caption_ = std::unique_ptr<Label>(new Label(20, caption_offset, caption, parent_manager, this));
+    float caption_offset = static_cast<float>((title_bar_height + letter_height) / 2);
+    Vector2 caption_pos(20, caption_offset);
+    caption_ = std::unique_ptr<Label>(new Label(caption_pos, caption, parent_manager, this));
 }
 
 void Window::Render(RenderContext& context)
@@ -236,18 +234,29 @@ bool Window::Update(const Input& input)
     return input_handled;
 }
 
-Button* Window::CreateButton(int x, int y, int width, int height, const char* label)
+Button* Window::MakeButton(int x, int y, int width, int height, std::string label)
 {
-    std::unique_ptr<Button> button(new Button(x, y, width, height, label, gui_, this));
+    Box pos(static_cast<float>(x),
+            static_cast<float>(y),
+            static_cast<float>(width),
+            static_cast<float>(height));
+    std::unique_ptr<Button> button(new Button(pos, label, gui_, this));
     controls_.push_back(std::move(button));
     return static_cast<Button*>(controls_.back().get());
 }
 
-Label* Window::CreateLabel(int x, int y, const char* text)
+Label* Window::MakeLabel(int x, int y, std::string text)
 {
-    std::unique_ptr<Label> label(new Label(x, y, text, gui_, this));
+    Vector2 pos(static_cast<float>(x),
+                static_cast<float>(y));
+    std::unique_ptr<Label> label(new Label(pos, text, gui_, this));
     controls_.push_back(std::move(label));
     return static_cast<Label*>(controls_.back().get());
+}
+
+const std::string Window::id() const
+{
+    return id_;
 }
 } // namespace GUI
 } // namespace blons

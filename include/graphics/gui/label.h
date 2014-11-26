@@ -15,7 +15,7 @@ class Manager;
 class Label : public Control
 {
 public:
-    Label(int x, int y, const char* text, Manager* parent_manager, Window* parent_window);
+    Label(Vector2 pos, std::string text, Manager* parent_manager, Window* parent_window);
     ~Label() {}
 
     void Render(RenderContext& context);

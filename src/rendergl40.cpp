@@ -222,17 +222,17 @@ void RenderGL40::EndScene()
     SwapBuffers(device_context_);
 }
 
-BufferResource* RenderGL40::CreateBufferResource()
+BufferResource* RenderGL40::MakeBufferResource()
 {
     return new BufferResourceGL40;
 }
 
-TextureResource* RenderGL40::CreateTextureResource()
+TextureResource* RenderGL40::MakeTextureResource()
 {
     return new TextureResourceGL40;
 }
 
-ShaderResource* RenderGL40::CreateShaderResource()
+ShaderResource* RenderGL40::MakeShaderResource()
 {
     return new ShaderResourceGL40;
 }
@@ -401,7 +401,7 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data
 }
 
 bool RenderGL40::RegisterShader(ShaderResource* program,
-                                const char* vertex_filename, const char* pixel_filename,
+                                std::string vertex_filename, std::string pixel_filename,
                                 ShaderAttributeList inputs)
 {
     ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
@@ -608,11 +608,11 @@ void RenderGL40::GetVideoCardInfo(char* name, int& memory)
     return;
 }
 
-bool RenderGL40::LoadPixelData(const char* filename, PixelData* data)
+bool RenderGL40::LoadPixelData(std::string filename, PixelData* data)
 {
     std::string filetype(filename);
     int channels = 0;
-    unsigned char* pixel_data = SOIL_load_image(filename, &data->width, &data->height,
+    unsigned char* pixel_data = SOIL_load_image(filename.c_str(), &data->width, &data->height,
                                                 &channels, SOIL_LOAD_AUTO);
     if (pixel_data == nullptr)
     {

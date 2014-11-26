@@ -51,9 +51,9 @@ public:
     void BeginScene();
     void EndScene();
 
-    BufferResource* CreateBufferResource();
-    TextureResource* CreateTextureResource();
-    ShaderResource* CreateShaderResource();
+    BufferResource* MakeBufferResource();
+    TextureResource* MakeTextureResource();
+    ShaderResource* MakeShaderResource();
 
     bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                         Vertex* vertices, unsigned int vert_count,
@@ -63,7 +63,7 @@ public:
                         unsigned int* indices, unsigned int index_count);
     bool RegisterTexture(TextureResource* texture, PixelData* pixel_data);
     bool RegisterShader(ShaderResource* program,
-                        const char* vertex_filename, const char* pixel_filename,
+                        std::string vertex_filename, std::string pixel_filename,
                         ShaderAttributeList inputs);
 
     void RenderShader(ShaderResource* program, int index_count);
@@ -83,7 +83,7 @@ public:
     void GetVideoCardInfo(char* buffer, int& len_buffer);
 
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
-    bool LoadPixelData(const char* filename, PixelData* pixel_data);
+    bool LoadPixelData(std::string filename, PixelData* pixel_data);
 
 private:
     void LogCompileErrors(GLuint resource, bool is_shader);

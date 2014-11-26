@@ -101,7 +101,7 @@ Graphics::~Graphics()
     }
 }
 
-std::unique_ptr<Model> Graphics::CreateModel(const char* filename)
+std::unique_ptr<Model> Graphics::MakeModel(std::string filename)
 {
     auto model = new ManagedModel(filename, context_);
     model->deleter_ = [&](ManagedModel* m)
@@ -112,7 +112,7 @@ std::unique_ptr<Model> Graphics::CreateModel(const char* filename)
     return std::unique_ptr<Model>(model);
 }
 
-std::unique_ptr<Sprite> Graphics::CreateSprite(const char* filename)
+std::unique_ptr<Sprite> Graphics::MakeSprite(std::string filename)
 {
     auto sprite = new ManagedSprite(filename, context_);
     sprite->deleter_ = [&](ManagedSprite* s)

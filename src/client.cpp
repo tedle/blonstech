@@ -1,5 +1,7 @@
 #include "os/client.h"
 
+// Includes
+#include <windowsx.h>
 // Local Includes
 #include "debug/loggeride.h"
 #include "graphics/graphics.h"

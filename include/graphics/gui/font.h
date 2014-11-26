@@ -13,7 +13,7 @@ namespace GUI
 class Font
 {
 public:
-    Font(const char* font_filename, int pixel_size, RenderContext& context);
+    Font(std::string font_filename, int pixel_size, RenderContext& context);
     ~Font();
 
     const std::string kAvailableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -24,7 +24,7 @@ public:
     Sprite* BuildSprite(unsigned char letter, int x, int y);
 
     int cursor_offset(unsigned char letter) const;
-    int string_width(const char* string) const;
+    // TODO: Might need to make this const char* for perf later, if its used a lot
     int string_width(std::string string) const;
     // Return how far to advance horizontally after rendering a character in pixels
     // Resets to 0 after call

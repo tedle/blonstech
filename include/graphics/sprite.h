@@ -13,7 +13,7 @@ namespace blons
 class Sprite
 {
 public:
-    Sprite(const char* texture_filename, RenderContext& context);
+    Sprite(std::string texture_filename, RenderContext& context);
     Sprite(PixelData* texture_data, RenderContext& context);
     virtual ~Sprite();
 
