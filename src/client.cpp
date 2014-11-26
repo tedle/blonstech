@@ -61,12 +61,12 @@ bool Client::Frame()
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
-    }
 
-    // Is someone trying to X out
-    if (msg.message == WM_QUIT)
-    {
-        quit = true;
+        // Is someone trying to X out
+        if (msg.message == WM_QUIT)
+        {
+            quit = true;
+        }
     }
 
     // Esc = exit
