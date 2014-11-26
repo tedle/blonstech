@@ -29,6 +29,9 @@ public:
     virtual void Render(RenderContext& context)=0;
     virtual bool Update(const Input& input)=0;
 
+    void set_pos(float x, float y);
+    Box pos() const;
+
 protected:
     Box pos_;
     Manager* gui_;
@@ -44,6 +47,6 @@ private:
     // One draw batch per font per colour per control
     std::map<DrawCallInfo, std::unique_ptr<DrawBatcher>> draw_batches_;
 };
-}
-}
+} // namespace GUI
+} // namespace blons
 #endif

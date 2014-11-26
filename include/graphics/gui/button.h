@@ -19,6 +19,8 @@ public:
     void Render(RenderContext& context);
     bool Update(const Input& input);
 
+    void set_callback(std::function<void()> callback);
+
 private:
     Box pos_;
     std::unique_ptr<class Label> label_;

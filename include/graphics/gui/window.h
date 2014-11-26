@@ -28,9 +28,6 @@ public:
     Button* CreateButton(int x, int y, int width, int height, const char* label);
     Label* CreateLabel(int x, int y, const char* text);
 
-    void set_pos(float x, float y);
-    Box pos() const;
-
 private:
     WindowType type_;
     std::vector<std::unique_ptr<Control>> controls_;

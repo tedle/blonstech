@@ -185,6 +185,11 @@ bool Button::Update(const Input& input)
 
     return input_handled;
 }
+
+void Button::set_callback(std::function<void()> callback)
+{
+    callback_ = callback;
+}
 } // namespace GUI
 } // namespace blons
 

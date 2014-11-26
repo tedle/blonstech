@@ -7,6 +7,17 @@ namespace blons
 {
 namespace GUI
 {
+void Control::set_pos(float x, float y)
+{
+    pos_.x = x;
+    pos_.y = y;
+}
+
+Box Control::pos() const
+{
+    return pos_;
+}
+
 void Control::RegisterBatches()
 {
     for (const auto& batch : draw_batches_)
@@ -14,6 +25,7 @@ void Control::RegisterBatches()
         gui_->RegisterDrawCall(batch.first, batch.second.get());
     }
 }
+
 // TODO: Make font_batch + control_batch more DRY
 DrawBatcher* Control::font_batch(FontType usage, Vector4 colour, RenderContext& context)
 {

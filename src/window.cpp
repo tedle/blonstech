@@ -197,6 +197,24 @@ bool Window::Update(const Input& input)
     if (dragging_ && type_ == DRAGGABLE)
     {
         set_pos(mx - drag_offset_.x, my - drag_offset_.y);
+
+        Vector2 screen = gui_->screen_dimensions();
+        if (pos_.x < 0)
+        {
+            pos_.x = 0;
+        }
+        if (pos_.x + pos_.w > screen.x)
+        {
+            pos_.x = screen.x - pos_.w;
+        }
+        if (pos_.y < 0)
+        {
+            pos_.y = 0;
+        }
+        if (pos_.y + pos_.h > screen.y)
+        {
+            pos_.y = screen.y - pos_.h;
+        }
         input_handled = true;
     }
 
@@ -220,35 +238,6 @@ Label* Window::CreateLabel(int x, int y, const char* text)
     std::unique_ptr<Label> label(new Label(x, y, text, gui_, this));
     controls_.push_back(std::move(label));
     return static_cast<Label*>(controls_.back().get());
-}
-
-void Window::set_pos(float x, float y)
-{
-    pos_.x = x;
-    pos_.y = y;
-
-    Vector2 screen = gui_->screen_dimensions();
-    if (pos_.x < 0)
-    {
-        pos_.x = 0;
-    }
-    if (pos_.x + pos_.w > screen.x)
-    {
-        pos_.x = screen.x - pos_.w;
-    }
-    if (pos_.y < 0)
-    {
-        pos_.y = 0;
-    }
-    if (pos_.y + pos_.h > screen.y)
-    {
-        pos_.y = screen.y - pos_.h;
-    }
-}
-
-Box Window::pos() const
-{
-    return pos_;
 }
 } // namespace GUI
 } // namespace blons
