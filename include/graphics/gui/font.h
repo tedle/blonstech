@@ -23,6 +23,9 @@ public:
 
     Sprite* BuildSprite(unsigned char letter, int x, int y);
 
+    int cursor_offset(unsigned char letter) const;
+    int string_width(const char* string) const;
+    int string_width(std::string string) const;
     // Return how far to advance horizontally after rendering a character in pixels
     // Resets to 0 after call
     int advance();

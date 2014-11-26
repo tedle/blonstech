@@ -45,7 +45,45 @@ public:
             Box bottom = Box(6, 39, 1, 5);
             Box bottom_right = Box(8, 39, 5, 5);
         } window;
-        Box button = Box(0, 0, 100, 100);
+        struct ButtonLayout
+        {
+            struct ButtonNormalLayout
+            {
+                Box top_left = Box(0, 45, 5, 5);
+                Box top = Box(6, 45, 1, 5);
+                Box top_right = Box(8, 45, 5, 5);
+                Box left = Box(0, 51, 5, 1);
+                Box body = Box(6, 51, 1, 1);
+                Box right = Box(8, 51, 5, 1);
+                Box bottom_left = Box(0, 53, 5, 5);
+                Box bottom = Box(6, 53, 1, 5);
+                Box bottom_right = Box(8, 53, 5, 5);
+            } normal;
+            struct ButtonHoverLayout
+            {
+                Box top_left = Box(0, 59, 5, 5);
+                Box top = Box(6, 59, 1, 5);
+                Box top_right = Box(8, 59, 5, 5);
+                Box left = Box(0, 65, 5, 1);
+                Box body = Box(6, 65, 1, 1);
+                Box right = Box(8, 65, 5, 1);
+                Box bottom_left = Box(0, 67, 5, 5);
+                Box bottom = Box(6, 67, 1, 5);
+                Box bottom_right = Box(8, 67, 5, 5);
+            } hover;
+            struct ButtonActiveLayout
+            {
+                Box top_left = Box(0, 73, 5, 5);
+                Box top = Box(6, 73, 1, 5);
+                Box top_right = Box(8, 73, 5, 5);
+                Box left = Box(0, 79, 5, 1);
+                Box body = Box(6, 79, 1, 1);
+                Box right = Box(8, 79, 5, 1);
+                Box bottom_left = Box(0, 81, 5, 5);
+                Box bottom = Box(6, 81, 1, 5);
+                Box bottom_right = Box(8, 81, 5, 5);
+            } active;
+        } button;
     };
 
 public:

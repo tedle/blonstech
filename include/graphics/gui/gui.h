@@ -41,6 +41,7 @@ private:
     // Since we want this class to be accessed by user, we hide these functions
     // despite widgets needing access to them. Kind of hacky to friend it up, but oh well
     friend Control;
+    friend Button;
     friend Label;
     friend Window;
     void RegisterDrawCall(DrawCallInfo info, DrawBatcher* batch);

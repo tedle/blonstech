@@ -116,7 +116,6 @@ Font::Font(const char* font_filename, int pixel_size, RenderContext& context)
         }
     }
 
-    g_log->Debug("%i\n", letter_height_);
     // Generate a single texture containing every character
     std::unique_ptr<unsigned char> tex(new unsigned char[tex_width*tex_height]);
     // Zero the memory since not all glyphs have the same height
@@ -159,7 +158,7 @@ Font::~Font()
 Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
 {
     // Pointer to avoid expensive copying
-    Glyph* g;
+    const Glyph* g;
     // In case someone tries to render a string using chars we dont have
     try
     {
@@ -179,6 +178,60 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
     advance_ = g->x_advance;
 
     return fontsheet_.get();
+}
+
+int Font::cursor_offset(unsigned char letter) const
+{
+    // In case someone tries to calculate a string using chars we dont have
+    try
+    {
+        // Pointer to avoid expensive copying
+        const Glyph* g = &charset_[letter];
+        return g->x_offset;
+    }
+    catch (...)
+    {
+        return 0;
+    }
+}
+
+int Font::string_width(const char* string) const
+{
+    return string_width(std::string(string));
+}
+
+int Font::string_width(std::string string) const
+{
+    int pixel_width = 0;
+    //                                               vvv lol
+    for (auto c = string.begin(); c != string.end(); c++)
+    {
+        // Pointer to avoid expensive copying
+        const Glyph* g;
+        // In case someone tries to calculate a string using chars we dont have
+        try
+        {
+            g = &charset_[*c];
+        }
+        catch (...)
+        {
+            return 0;
+        }
+        // How far to advance cursor for next letter
+        pixel_width += g->x_advance;
+
+        // Trim the whitespace
+        if (c == string.begin())
+        {
+            pixel_width -= g->x_offset;
+        }
+        if (c == string.end() - 1)
+        {
+            pixel_width -= g->x_advance - (g->x_offset + g->width);
+        }
+    }
+
+    return pixel_width;
 }
 
 int Font::advance()
