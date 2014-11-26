@@ -24,10 +24,6 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
     LoadFont("../../notes/font stuff/test.ttf", 28, context);
     // TODO: get rid of main_window... i think
     main_window_ = std::unique_ptr<Window>(new Window("main", Box(0, 0, screen_dimensions_.x, screen_dimensions_.y), WindowType::INVISIBLE, this));
-    windows_.push_back(std::unique_ptr<Window>(new Window("test", Box(20, 80, 400, 200), "Friendly window", this)));
-    windows_.push_back(std::unique_ptr<Window>(new Window("yoyo", Box(450, 250, 300, 300), "Amicable window", this)));
-    windows_[0].get()->MakeLabel(10, 70, "HAello! blonsUI in action!");
-    windows_[0].get()->MakeButton(10, 100, 120, 60, "Button!")->set_callback([](){g_log->Debug("hi hi!\n");});
 }
 
 Manager::~Manager()
@@ -42,6 +38,46 @@ bool Manager::LoadFont(std::string filename, int pixel_size, RenderContext& cont
 bool Manager::LoadFont(std::string filename, FontType usage, int pixel_size, RenderContext& context)
 {
     return skin_->LoadFont(filename, usage, pixel_size, context);
+}
+
+Window* Manager::MakeWindow(std::string id, int x, int y, int width, int height, std::string caption)
+{
+    return MakeWindow(id, x, y, width, height, caption, WindowType::DRAGGABLE);
+}
+
+Window* Manager::MakeWindow(std::string id, int x, int y, int width, int height, WindowType type)
+{
+    return MakeWindow(id, x, y, width, height, "", type);
+}
+
+Window* Manager::MakeWindow(std::string id, int x, int y, int width, int height, std::string caption, WindowType type)
+{
+
+    Box win_pos(static_cast<float>(x),
+                static_cast<float>(y),
+                static_cast<float>(width),
+                static_cast<float>(height));
+    Window* temp_win;
+    if (type == WindowType::DRAGGABLE)
+    {
+        temp_win = new Window(id, win_pos, caption, this);
+    }
+    else
+    {
+        temp_win = new Window(id, win_pos, type, this);
+    }
+    auto new_window = std::unique_ptr<Window>(temp_win);
+
+    for (auto& w : windows_)
+    {
+        if (w->id() == id)
+        {
+            w = std::move(new_window);
+            return w.get();
+        }
+    }
+    windows_.push_back(std::move(new_window));
+    return windows_.back().get();
 }
 
 void Manager::Render(RenderContext& context)
@@ -89,6 +125,18 @@ bool Manager::Update(const Input& input)
         }
     }
     return false;
+}
+
+Window* Manager::window(std::string id)
+{
+    for (auto& w : windows_)
+    {
+        if (w->id() == id)
+        {
+            return w.get();
+        }
+    }
+    return nullptr;
 }
 
 void Manager::RegisterDrawCall(DrawCallInfo info, DrawBatcher* batch)

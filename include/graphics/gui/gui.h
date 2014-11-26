@@ -30,11 +30,14 @@ public:
     Manager(int screen_width, int screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
     ~Manager();
 
-    // Wanted to name these all Create*(), but macros are really mean
-    //Window* MakeWindow(std::string id, int x, int y, int width, int height);
-
     bool LoadFont(std::string filename, int pixel_size, RenderContext& context);
     bool LoadFont(std::string filename, FontType usage, int pixel_size, RenderContext& context);
+
+    // TODO: Maybe simplify these prototypes somehow?
+    // Wanted to name these all Create*(), but macros are really mean
+    Window* MakeWindow(std::string id, int x, int y, int width, int height, std::string caption);
+    Window* MakeWindow(std::string id, int x, int y, int width, int height, WindowType type);
+    Window* MakeWindow(std::string id, int x, int y, int width, int height, std::string caption, WindowType type);
 
     void Render(RenderContext& context);
     // Returns true if GUI had input to handle, false otherwise
