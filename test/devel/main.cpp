@@ -3,7 +3,7 @@
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
-    blons::Client* client = new blons::Client;
+    auto client = std::unique_ptr<blons::Client>(new blons::Client);
     auto info = client->screen_info();
     auto graphics = std::unique_ptr<blons::Graphics>(new blons::Graphics(info.width, info.height, info.hwnd));
     auto gui = graphics->gui();
@@ -26,16 +26,9 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     gui->window("test")->MakeLabel(10, 70, "HAello! blonsUI in action!");
     gui->window("test")->MakeButton(10, 100, 120, 60, "Button!")->set_callback([](){blons::g_log->Debug("hi hi!\n");});
 
-    auto start = GetTickCount64() + 5000;
     bool quit = false;
     while (!quit)
     {
-        /*if (GetTickCount64() > start + 100 && models.size() > 0)
-        {
-            models.pop_back();
-            start = GetTickCount64();
-            sprite.reset();
-        }*/
         quit = client->Frame();
         blons::temp::FPS();
         bool gui_used_input = gui->Update(*client->input());
@@ -47,9 +40,6 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         }
         graphics->Render();
     }
-    graphics.reset();
-
-    delete client;
 
     return 0;
 }
