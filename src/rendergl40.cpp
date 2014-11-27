@@ -462,7 +462,8 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
     glGetProgramiv(shader->program_, GL_LINK_STATUS, &link_result);
     if (!link_result)
     {
-        LogCompileErrors(shader->program_, true);
+        LogCompileErrors(shader->program_, false);
+        return false;
     }
 
     return true;
