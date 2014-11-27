@@ -22,7 +22,6 @@ public:
     void set_callback(std::function<void()> callback);
 
 private:
-    Box pos_;
     std::unique_ptr<class Label> label_;
     std::function<void()> callback_;
     bool hover_;

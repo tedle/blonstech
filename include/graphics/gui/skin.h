@@ -27,24 +27,6 @@ public:
     // Defined in the header file for all to see
     struct Layout
     {
-        struct WindowLayout
-        {
-            struct TitleBarLayout
-            {
-                Box left = Box(0, 0, 5, 30);
-                Box center = Box(6, 0, 1, 30);
-                Box right = Box(8, 0, 5, 30);
-            } title;
-            Box top_left = Box(0, 31, 5, 5);
-            Box top = Box(6, 31, 1, 5);
-            Box top_right = Box(8, 31, 5, 5);
-            Box left = Box(0, 37, 5, 1);
-            Box body = Box(6, 37, 1, 1);
-            Box right = Box(8, 37, 5, 1);
-            Box bottom_left = Box(0, 39, 5, 5);
-            Box bottom = Box(6, 39, 1, 5);
-            Box bottom_right = Box(8, 39, 5, 5);
-        } window;
         struct ButtonSetLayout
         {
             struct ButtonLayout
@@ -97,6 +79,65 @@ public:
                 Box(8, 81, 5, 5)  // bottom_right
             };
         } button;
+
+        struct TextboxSetLayout
+        {
+            struct TextboxLayout
+            {
+                Box top_left;
+                Box top;
+                Box top_right;
+                Box left;
+                Box body;
+                Box right;
+                Box bottom_left;
+                Box bottom;
+                Box bottom_right;
+            };
+            TextboxLayout normal = TextboxLayout
+            {
+                Box(14, 0, 5, 5), // top_left
+                Box(20, 0, 1, 5), // top
+                Box(22, 0, 5, 5), // top_right
+                Box(14, 6, 5, 1), // left
+                Box(20, 6, 1, 1), // body
+                Box(22, 6, 5, 1), // right
+                Box(14, 8, 5, 5), // bottom_left
+                Box(20, 8, 1, 5), // bottom
+                Box(22, 8, 5, 5)  // bottom_right
+            };
+            TextboxLayout active = TextboxLayout
+            {
+                Box(14, 14, 5, 5), // top_left
+                Box(20, 14, 1, 5), // top
+                Box(22, 14, 5, 5), // top_right
+                Box(14, 20, 5, 1), // left
+                Box(20, 20, 1, 1), // body
+                Box(22, 20, 5, 1), // right
+                Box(14, 22, 5, 5), // bottom_left
+                Box(20, 22, 1, 5), // bottom
+                Box(22, 22, 5, 5)  // bottom_right
+            };
+        } textbox;
+
+        struct WindowLayout
+        {
+            struct TitleBarLayout
+            {
+                Box left = Box(0, 0, 5, 30);
+                Box center = Box(6, 0, 1, 30);
+                Box right = Box(8, 0, 5, 30);
+            } title;
+            Box top_left = Box(0, 31, 5, 5);
+            Box top = Box(6, 31, 1, 5);
+            Box top_right = Box(8, 31, 5, 5);
+            Box left = Box(0, 37, 5, 1);
+            Box body = Box(6, 37, 1, 1);
+            Box right = Box(8, 37, 5, 1);
+            Box bottom_left = Box(0, 39, 5, 5);
+            Box bottom = Box(6, 39, 1, 5);
+            Box bottom_right = Box(8, 39, 5, 5);
+        } window;
     };
 
 public:

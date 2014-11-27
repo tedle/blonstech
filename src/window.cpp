@@ -254,6 +254,17 @@ Label* Window::MakeLabel(int x, int y, std::string text)
     return static_cast<Label*>(controls_.back().get());
 }
 
+Textbox* Window::MakeTextbox(int x, int y, int width, int height)
+{
+    Box pos(static_cast<float>(x),
+            static_cast<float>(y),
+            static_cast<float>(width),
+            static_cast<float>(height));
+    std::unique_ptr<Textbox> textbox(new Textbox(pos, gui_, this));
+    controls_.push_back(std::move(textbox));
+    return static_cast<Textbox*>(controls_.back().get());
+}
+
 const std::string Window::id() const
 {
     return id_;

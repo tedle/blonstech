@@ -9,8 +9,9 @@
 #include "graphics/gui/control.h"
 #include "graphics/gui/skin.h"
 #include "graphics/gui/font.h"
-#include "graphics/gui/label.h"
 #include "graphics/gui/button.h"
+#include "graphics/gui/label.h"
+#include "graphics/gui/textbox.h"
 #include "graphics/gui/window.h"
 
 namespace blons
@@ -51,6 +52,7 @@ private:
     friend Control;
     friend Button;
     friend Label;
+    friend Textbox;
     friend Window;
     void RegisterDrawCall(DrawCallInfo info, DrawBatcher* batch);
     Skin* skin() const;

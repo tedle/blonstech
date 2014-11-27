@@ -52,7 +52,6 @@ Window* Manager::MakeWindow(std::string id, int x, int y, int width, int height,
 
 Window* Manager::MakeWindow(std::string id, int x, int y, int width, int height, std::string caption, WindowType type)
 {
-
     Box win_pos(static_cast<float>(x),
                 static_cast<float>(y),
                 static_cast<float>(width),

@@ -5,6 +5,7 @@
 #include "graphics/gui/control.h"
 #include "graphics/gui/button.h"
 #include "graphics/gui/label.h"
+#include "graphics/gui/textbox.h"
 
 namespace blons
 {
@@ -29,6 +30,7 @@ public:
 
     Button* MakeButton(int x, int y, int width, int height, std::string label);
     Label* MakeLabel(int x, int y, std::string text);
+    Textbox* MakeTextbox(int x, int y, int width, int height);
 
     const std::string id() const;
 

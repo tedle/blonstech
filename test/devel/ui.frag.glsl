@@ -2,6 +2,7 @@
 
 // Ins n outs
 in vec2 tex_coord;
+layout(origin_upper_left) in vec4 gl_FragCoord;
 
 out vec4 frag_colour;
 
@@ -21,4 +22,10 @@ void main(void)
 	{
 		frag_colour = texture(diffuse, tex_coord);
 	}
+	// Cropping!
+	/* if (gl_FragCoord.x < 100)
+	{
+		float alpha = max(0, (gl_FragCoord.x - 70) / 30);
+		frag_colour.a *= alpha;
+	} */
 }
