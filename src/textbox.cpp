@@ -14,6 +14,7 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
     parent_ = parent_window;
 
     active_ = false;
+    text_ = "";
 
     // For vertically centering the text
     const auto& font = gui_->skin()->font(FontType::LABEL);
@@ -21,7 +22,7 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
     Vector2 text_pos;
     text_pos.x = pos.x + gui_->skin()->layout()->textbox.normal.left.w * 2;
     text_pos.y = pos.y + floor((pos.h + letter_height) / 2);
-    text_ = std::unique_ptr<Label>(new Label(text_pos, "Hello!", gui_, parent_));
+    text_label_ = std::unique_ptr<Label>(new Label(text_pos, text_, gui_, parent_));
 }
 
 void Textbox::Render(RenderContext& context)
@@ -119,7 +120,7 @@ void Textbox::Render(RenderContext& context)
     RegisterBatches();
 
     // Button text yall
-    text_->Render(context);
+    text_label_->Render(context);
 }
 
 bool Textbox::Update(const Input& input)
@@ -132,6 +133,8 @@ bool Textbox::Update(const Input& input)
 
     int mx = input.mouse_x();
     int my = input.mouse_y();
+
+    bool shift = input.IsKeyDown(Input::SHIFT);
 
     for (const auto& e : input.event_queue())
     {
@@ -149,7 +152,36 @@ bool Textbox::Update(const Input& input)
                 active_ = false;
             }
         }
+        if (active_)
+        {
+            auto key = static_cast<Input::KeyCode>(e.value);
+
+            if (e.type == Input::Event::KEY_DOWN)
+            {
+                if (input.IsPrintable(key))
+                {
+                    text_ += input.ToAscii(key, shift);
+                }
+                else if (key == Input::BACKSPACE)
+                {
+                    text_ = text_.substr(0, text_.size() - 1);
+                }
+                else if (key == Input::SHIFT)
+                {
+                    shift = true;
+                }
+                text_label_->set_text(text_);
+            }
+            else if (e.type == Input::Event::KEY_UP)
+            {
+                if (key == Input::SHIFT)
+                {
+                    shift = false;
+                }
+            }
+        }
     }
+    input_handled |= active_;
 
     return input_handled;
 }

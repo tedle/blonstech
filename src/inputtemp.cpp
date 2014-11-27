@@ -1,7 +1,66 @@
 #include "input/inputtemp.h"
 
-// TODO: delete?
-//#include <windowsx.h>
+// Includes
+#include <map>
+
+namespace
+{
+using namespace blons;
+static const std::map<Input::KeyCode, std::pair<unsigned char, unsigned char>> kAsciiMap =
+{
+    { Input::CHAR_0, { '0', ')' } },
+    { Input::CHAR_1, { '1', '!' } },
+    { Input::CHAR_2, { '2', '@' } },
+    { Input::CHAR_3, { '3', '#' } },
+    { Input::CHAR_4, { '4', '$' } },
+    { Input::CHAR_5, { '5', '%' } },
+    { Input::CHAR_6, { '6', '^' } },
+    { Input::CHAR_7, { '7', '&' } },
+    { Input::CHAR_8, { '8', '*' } },
+    { Input::CHAR_9, { '9', '(' } },
+
+    { Input::CHAR_A, { 'a', 'A' } },
+    { Input::CHAR_B, { 'b', 'B' } },
+    { Input::CHAR_C, { 'c', 'C' } },
+    { Input::CHAR_D, { 'd', 'D' } },
+    { Input::CHAR_E, { 'e', 'E' } },
+    { Input::CHAR_F, { 'f', 'F' } },
+    { Input::CHAR_G, { 'g', 'G' } },
+    { Input::CHAR_H, { 'h', 'H' } },
+    { Input::CHAR_I, { 'i', 'I' } },
+    { Input::CHAR_J, { 'j', 'J' } },
+    { Input::CHAR_K, { 'k', 'K' } },
+    { Input::CHAR_L, { 'l', 'L' } },
+    { Input::CHAR_M, { 'm', 'M' } },
+    { Input::CHAR_N, { 'n', 'N' } },
+    { Input::CHAR_O, { 'o', 'O' } },
+    { Input::CHAR_P, { 'p', 'P' } },
+    { Input::CHAR_Q, { 'q', 'Q' } },
+    { Input::CHAR_R, { 'r', 'R' } },
+    { Input::CHAR_S, { 's', 'S' } },
+    { Input::CHAR_T, { 't', 'T' } },
+    { Input::CHAR_U, { 'u', 'U' } },
+    { Input::CHAR_V, { 'v', 'V' } },
+    { Input::CHAR_W, { 'w', 'W' } },
+    { Input::CHAR_X, { 'x', 'X' } },
+    { Input::CHAR_Y, { 'y', 'Y' } },
+    { Input::CHAR_Z, { 'z', 'Z' } },
+
+    { Input::SYMBOL_LEFT_BRACKET,  { '[', '{' } },
+    { Input::SYMBOL_RIGHT_BRACKET, { ']', '}' } },
+    { Input::SYMBOL_GRAVE_ACCENT,  { '`', '~' } },
+    { Input::SYMBOL_BACKSLASH,     { '\\','|' } },
+    { Input::SYMBOL_SEMICOLON,     { ';', ':' } },
+    { Input::SYMBOL_QUOTE,         { '\'','"' } },
+    { Input::SYMBOL_COMMA,         { ',', '<' } },
+    { Input::SYMBOL_PERIOD,        { '.', '>' } },
+    { Input::SYMBOL_SLASH,         { '/', '?' } },
+    { Input::SYMBOL_MINUS,         { '-', '_' } },
+    { Input::SYMBOL_EQUALS,        { '=', '+' } },
+
+    { Input::SPACE, { ' ', ' ' } }
+};
+} // namespace
 
 namespace blons
 {
@@ -73,6 +132,35 @@ void Input::MouseMove(int x, int y)
 {
     mouse_x_ = x;
     mouse_y_ = y;
+}
+
+bool Input::IsPrintable(KeyCode key_code) const
+{
+    return (key_code >= KeyCode::PRINTABLE_START && key_code <= KeyCode::PRINTABLE_END);
+}
+
+unsigned char Input::ToAscii(KeyCode key_code) const
+{
+    return ToAscii(key_code, false);
+}
+
+unsigned char Input::ToAscii(KeyCode key_code, bool shift) const
+{
+    try
+    {
+        if (shift)
+        {
+            return kAsciiMap.at(key_code).second;
+        }
+        else
+        {
+            return kAsciiMap.at(key_code).first;
+        }
+    }
+    catch (...)
+    {
+        return 0;
+    }
 }
 
 int Input::mouse_x() const

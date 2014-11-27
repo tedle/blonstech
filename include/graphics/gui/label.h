@@ -21,6 +21,8 @@ public:
     void Render(RenderContext& context);
     bool Update(const Input& input);
 
+    void set_text(std::string text);
+
 private:
     ColourString text_;
 };

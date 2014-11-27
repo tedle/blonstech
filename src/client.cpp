@@ -72,7 +72,7 @@ bool Client::Frame()
     }
 
     // Esc = exit
-    if (!input_->Frame() || input_->IsKeyDown(VK_ESCAPE))
+    if (!input_->Frame() || input_->IsKeyDown(Input::ESCAPE))
     {
         return true;
     }
@@ -194,12 +194,88 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
 {
     switch(umsg)
     {
+    case WM_SYSKEYDOWN:
+    case WM_SYSKEYUP:
     case WM_KEYDOWN:
-        input_->KeyDown((unsigned int)wparam);
-        return 0;
     case WM_KEYUP:
-        input_->KeyUp((unsigned int)wparam);
+    {
+        bool is_down = ((lparam & (1 << 31)) == 0);
+        unsigned char key_code = static_cast<unsigned char>(wparam);
+        // Translate key_code
+        {
+            if (key_code >= '0' && key_code <= '9')
+            {
+                key_code = key_code - '0' + Input::CHAR_0;
+            }
+            else if (key_code >= 'A' && key_code <= 'Z')
+            {
+                key_code = key_code - 'A' + Input::CHAR_A;
+            }
+            else
+            {
+                switch (key_code)
+                {
+                case VK_OEM_4:
+                    key_code = Input::SYMBOL_LEFT_BRACKET;
+                    break;
+                case VK_OEM_6:
+                    key_code = Input::SYMBOL_RIGHT_BRACKET;
+                    break;
+                case VK_OEM_3:
+                    key_code = Input::SYMBOL_GRAVE_ACCENT;
+                    break;
+                case VK_OEM_5:
+                    key_code = Input::SYMBOL_BACKSLASH;
+                    break;
+                case VK_OEM_1:
+                    key_code = Input::SYMBOL_SEMICOLON;
+                    break;
+                case VK_OEM_7:
+                    key_code = Input::SYMBOL_QUOTE;
+                    break;
+                case VK_OEM_COMMA:
+                    key_code = Input::SYMBOL_COMMA;
+                    break;
+                case VK_OEM_PERIOD:
+                    key_code = Input::SYMBOL_PERIOD;
+                    break;
+                case VK_OEM_2:
+                    key_code = Input::SYMBOL_SLASH;
+                    break;
+                case VK_OEM_MINUS:
+                    key_code = Input::SYMBOL_MINUS;
+                    break;
+                case VK_OEM_PLUS:
+                    key_code = Input::SYMBOL_EQUALS;
+                    break;
+                case VK_SPACE:
+                    key_code = Input::SPACE;
+                    break;
+                case VK_SHIFT:
+                    key_code = Input::SHIFT;
+                    break;
+                case VK_BACK:
+                    key_code = Input::BACKSPACE;
+                    break;
+                case VK_ESCAPE:
+                    key_code = Input::ESCAPE;
+                    break;
+                default:
+                    key_code = Input::BAD;
+                    break;
+                }
+            }
+        }
+        if (is_down)
+        {
+            input_->KeyDown(key_code);
+        }
+        else
+        {
+            input_->KeyUp(key_code);
+        }
         return 0;
+    }
     // I know Win32 is bad, but c'mon...
     case WM_MOUSEMOVE:
     case WM_LBUTTONDOWN:

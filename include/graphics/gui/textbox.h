@@ -18,7 +18,8 @@ public:
     bool Update(const Input& input);
 
 private:
-    std::unique_ptr<class Label> text_;
+    std::string text_;
+    std::unique_ptr<class Label> text_label_;
     bool active_;
 };
 } // namespace GUI
