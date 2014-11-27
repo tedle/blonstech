@@ -176,6 +176,13 @@ bool Button::Update(const Input& input)
                 input_handled = true;
             }
         }
+        else
+        {
+            if (e.type == Input::Event::MOUSE_UP)
+            {
+                active_ = false;
+            }
+        }
     }
     // Swallow input while button is held
     input_handled |= active_;
