@@ -504,7 +504,6 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
     // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
-
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, int value)
