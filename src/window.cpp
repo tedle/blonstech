@@ -22,7 +22,6 @@ void Window::Init(Box pos, std::string caption, WindowType type, Manager* parent
     pos_ = pos;
     type_ = type;
     gui_ = parent_manager;
-
     dragging_ = false;
     drag_offset_ = Vector2(0, 0);
 
@@ -30,7 +29,12 @@ void Window::Init(Box pos, std::string caption, WindowType type, Manager* parent
     int letter_height = gui_->skin()->font(FontType::HEADING)->letter_height();
     float caption_offset = static_cast<float>((title_bar_height + letter_height) / 2);
     Vector2 caption_pos(20, caption_offset);
-    caption_ = std::unique_ptr<Label>(new Label(caption_pos, caption, parent_manager, this));
+    for (auto& c : caption)
+    {
+        c = toupper(c);
+    }
+    caption = "$444" + caption;
+    caption_ = std::unique_ptr<Label>(new Label(caption_pos, caption, FontType::HEADING, parent_manager, this));
 }
 
 void Window::Render(RenderContext& context)

@@ -78,7 +78,6 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 
     // GUI
     gui_ = std::unique_ptr<GUI::Manager>(new GUI::Manager(screen_width, screen_height, std::move(ui_shader), context_));
-    gui_->LoadFont("../../notes/font stuff/test.ttf", 28, context_);
 }
 
 Graphics::~Graphics()

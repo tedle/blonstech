@@ -110,9 +110,9 @@ Font::Font(std::string font_filename, int pixel_size, RenderContext& context)
         tex_width += g.width;
         // Funky parentheses to appease the lord of windows macros
         tex_height = (std::max)(g.height, tex_height);
-        if (c >= 'A' && c <= 'Z' && c != 'Q')
+        if (c >= 'A' && c <= 'Z' && c != 'J' && c != 'Q')
         {
-            letter_height_ = (std::max)(g.height - 1, letter_height_);
+            letter_height_ = (std::max)(g.height, letter_height_);
         }
     }
 

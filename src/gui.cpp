@@ -21,7 +21,10 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
     skin_ = std::unique_ptr<Skin>(new Skin(context));
 
     // TODO: move this out of constructor! font load included!
-    LoadFont("../../notes/font stuff/test.ttf", 28, context);
+    LoadFont("../../notes/font stuff/test-console.ttf", 28, FontType::DEFAULT, context);
+    LoadFont("../../notes/font stuff/test-heading.ttf", 14, FontType::HEADING, context);
+    LoadFont("../../notes/font stuff/test-label.ttf", 20, FontType::LABEL, context);
+    LoadFont("../../notes/font stuff/test-console.ttf", 28, FontType::CONSOLE, context);
     // TODO: get rid of main_window... i think
     main_window_ = std::unique_ptr<Window>(new Window("main", Box(0, 0, screen_dimensions_.x, screen_dimensions_.y), WindowType::INVISIBLE, this));
 }
@@ -32,10 +35,10 @@ Manager::~Manager()
 
 bool Manager::LoadFont(std::string filename, int pixel_size, RenderContext& context)
 {
-    return LoadFont(filename, FontType::DEFAULT, pixel_size, context);
+    return LoadFont(filename, pixel_size, FontType::DEFAULT, context);
 }
 
-bool Manager::LoadFont(std::string filename, FontType usage, int pixel_size, RenderContext& context)
+bool Manager::LoadFont(std::string filename, int pixel_size, FontType usage, RenderContext& context)
 {
     return skin_->LoadFont(filename, usage, pixel_size, context);
 }

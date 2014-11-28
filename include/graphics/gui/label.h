@@ -16,6 +16,7 @@ class Label : public Control
 {
 public:
     Label(Vector2 pos, std::string text, Manager* parent_manager, Window* parent_window);
+    Label(Vector2 pos, std::string text, FontType font_type, Manager* parent_manager, Window* parent_window);
     ~Label() {}
 
     void Render(RenderContext& context);
@@ -24,6 +25,9 @@ public:
     void set_text(std::string text);
 
 private:
+    void Init(Vector2 pos, std::string text, FontType font_type, Manager* parent_manager, Window* parent_window);
+
+    FontType font_type_;
     ColourString text_;
 };
 } // namespace GUI
