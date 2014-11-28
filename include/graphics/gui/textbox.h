@@ -17,9 +17,14 @@ public:
     void Render(RenderContext& context);
     bool Update(const Input& input);
 
+    void set_callback(std::function<void()> callback);
+    std::string text();
+    void set_text(std::string text);
+
 private:
     std::string text_;
     std::unique_ptr<class Label> text_label_;
+    std::function<void()> callback_;
     bool active_;
 };
 } // namespace GUI

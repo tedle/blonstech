@@ -70,9 +70,10 @@ public:
         PRINTABLE_END        = 0x30,
 
         SHIFT                = 0x31,
-        BACKSPACE            = 0x32,
-        ESCAPE               = 0x33,
-        RETURN               = 0x34
+        CONTROL              = 0x32,
+        BACKSPACE            = 0x33,
+        ESCAPE               = 0x34,
+        RETURN               = 0x35
     };
 
     struct Event
@@ -94,12 +95,12 @@ public:
 
 public:
     Input();
-    ~Input();
+    ~Input() {}
 
-    void KeyDown(unsigned int);
-    void KeyUp(unsigned int);
+    void KeyDown(KeyCode key_code);
+    void KeyUp(KeyCode key_code);
 
-    bool IsKeyDown(unsigned int) const;
+    bool IsKeyDown(KeyCode key_code) const;
 
     void MouseDown(unsigned int);
     void MouseUp(unsigned int);

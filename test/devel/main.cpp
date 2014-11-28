@@ -24,8 +24,14 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     gui->MakeWindow("test", 20, 80, 400, 200, "Friendly window");
     gui->MakeWindow("yoyo", 450, 250, 300, 300, "Amicable window");
     gui->window("test")->MakeLabel(10, 70, "HAello! blonsUI in action!");
-    gui->window("test")->MakeButton(10, 100, 120, 60, "Button!")->set_callback([](){blons::g_log->Debug("hi hi!\n");});
-    gui->window("test")->MakeTextbox(150, 100, 200, 60);
+    auto textbox = gui->window("test")->MakeTextbox(150, 100, 200, 60);
+    auto print = [textbox]()
+    {
+        blons::g_log->Debug("%s\n", textbox->text().c_str());
+        textbox->set_text("");
+    };
+    textbox->set_callback(print);
+    gui->window("test")->MakeButton(10, 100, 120, 60, "Print!")->set_callback(print);
     gui->window("yoyo")->MakeButton(10, 250, 280, 40, "Other button!")->set_callback([](){blons::g_log->Debug("whats up?\n");});
 
     bool quit = false;

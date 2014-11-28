@@ -1,8 +1,6 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_BUTTON_H_
 #define BLONSTECH_GRAPHICS_GUI_BUTTON_H_
 
-// Includes
-#include <functional>
 // Local Includes
 #include "graphics/gui/control.h"
 

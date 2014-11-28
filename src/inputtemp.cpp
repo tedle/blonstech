@@ -74,33 +74,27 @@ Input::Input()
     mouse_x_ = mouse_y_ = old_mouse_x_ = old_mouse_y_ = delta_mouse_x_ = delta_mouse_y_ = 0;
 }
 
-Input::~Input()
+void Input::KeyDown(KeyCode key_code)
 {
-}
-
-void Input::KeyDown(unsigned int vk)
-{
-    if (!IsKeyDown(vk))
+    if (!IsKeyDown(key_code))
     {
-        event_queue_buffer_.push_back(Event(Event::KEY_DOWN, vk));
+        event_queue_buffer_.push_back(Event(Event::KEY_DOWN, key_code));
     }
-    keys_[vk] = true;
-    return;
+    keys_[key_code] = true;
 }
 
-void Input::KeyUp(unsigned int vk)
+void Input::KeyUp(KeyCode key_code)
 {
-    if (IsKeyDown(vk))
+    if (IsKeyDown(key_code))
     {
-        event_queue_buffer_.push_back(Event(Event::KEY_UP, vk));
+        event_queue_buffer_.push_back(Event(Event::KEY_UP, key_code));
     }
-    keys_[vk] = false;
-    return;
+    keys_[key_code] = false;
 }
 
-bool Input::IsKeyDown(unsigned int vk) const
+bool Input::IsKeyDown(KeyCode key_code) const
 {
-    return keys_[vk];
+    return keys_[key_code];
 }
 
 void Input::MouseDown(unsigned int vk)

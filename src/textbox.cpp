@@ -15,6 +15,8 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
 
     active_ = false;
     text_ = "";
+    // Empty lambda is easier than worrying about nullptrs
+    callback_ = [](){};
 
     // For vertically centering the text
     const auto& font = gui_->skin()->font(FontType::LABEL);
@@ -170,6 +172,10 @@ bool Textbox::Update(const Input& input)
                 {
                     shift = true;
                 }
+                else if (key == Input::RETURN)
+                {
+                    callback_();
+                }
                 text_label_->set_text(text_);
             }
             else if (e.type == Input::Event::KEY_UP)
@@ -184,6 +190,22 @@ bool Textbox::Update(const Input& input)
     input_handled |= active_;
 
     return input_handled;
+}
+
+void Textbox::set_callback(std::function<void()> callback)
+{
+    callback_ = callback;
+}
+
+std::string Textbox::text()
+{
+    return text_;
+}
+
+void Textbox::set_text(std::string text)
+{
+    text_ = text;
+    text_label_->set_text(text_);
 }
 } // namespace GUI
 } // namespace blons

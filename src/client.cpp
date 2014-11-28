@@ -200,20 +200,20 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
     case WM_KEYUP:
     {
         bool is_down = ((lparam & (1 << 31)) == 0);
-        unsigned char key_code = static_cast<unsigned char>(wparam);
+        Input::KeyCode key_code = Input::BAD;
         // Translate key_code
         {
-            if (key_code >= '0' && key_code <= '9')
+            if (wparam >= '0' && wparam <= '9')
             {
-                key_code = key_code - '0' + Input::CHAR_0;
+                key_code = static_cast<Input::KeyCode>(wparam - '0' + Input::CHAR_0);
             }
-            else if (key_code >= 'A' && key_code <= 'Z')
+            else if (wparam >= 'A' && wparam <= 'Z')
             {
-                key_code = key_code - 'A' + Input::CHAR_A;
+                key_code = static_cast<Input::KeyCode>(wparam - 'A' + Input::CHAR_A);
             }
             else
             {
-                switch (key_code)
+                switch (wparam)
                 {
                 case VK_OEM_4:
                     key_code = Input::SYMBOL_LEFT_BRACKET;
@@ -259,6 +259,9 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
                     break;
                 case VK_ESCAPE:
                     key_code = Input::ESCAPE;
+                    break;
+                case VK_RETURN:
+                    key_code = Input::RETURN;
                     break;
                 default:
                     key_code = Input::BAD;
@@ -327,9 +330,6 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
             input_->MouseUp(4);
         }
         input_->MouseMove(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
-        /* g_log->Debug("pos(%i,%i), delta(%i,%i), down(%i, %i)\n",
-                     input_->MouseX(), input_->MouseY(), input_->MouseDeltaX(), input_->MouseDeltaY(),
-                     input_->IsMouseDown(0), input_->IsMouseDown(1)); */
         return 0;
     default:
         return DefWindowProc(hwnd, umsg, wparam, lparam);

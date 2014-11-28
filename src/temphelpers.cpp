@@ -35,11 +35,11 @@ void noclip(Input* input, Camera* camera)
     if (GetTickCount64() > last_move + 10)
     {
         float velocity = 0.2f;
-        if (input->IsKeyDown(VK_SHIFT))
+        if (input->IsKeyDown(Input::SHIFT))
         {
             velocity *= 0.25f;
         }
-        if (input->IsKeyDown(VK_CONTROL))
+        if (input->IsKeyDown(Input::CONTROL))
         {
             velocity *= 4.0f;
         }
@@ -49,19 +49,19 @@ void noclip(Input* input, Camera* camera)
         int ud = 0, lr = 0;
 
         // Figure out which way we wanna move, to be plugged into atan2
-        if (input->IsKeyDown('W'))
+        if (input->IsKeyDown(Input::CHAR_W))
         {
             ud += 1;
         }
-        if (input->IsKeyDown('S'))
+        if (input->IsKeyDown(Input::CHAR_S))
         {
             ud -= 1;
         }
-        if (input->IsKeyDown('A'))
+        if (input->IsKeyDown(Input::CHAR_A))
         {
             lr -= 1;
         }
-        if (input->IsKeyDown('D'))
+        if (input->IsKeyDown(Input::CHAR_D))
         {
             lr += 1;
         }
@@ -86,11 +86,11 @@ void noclip(Input* input, Camera* camera)
         new_z += velocity * cos(yaw) * hacky * (float)(lr != 0);
 
         // in case we wanna go up/down w/o flailing mouse around
-        if (input->IsKeyDown('E'))
+        if (input->IsKeyDown(Input::CHAR_E))
         {
             new_y += velocity;
         }
-        if (input->IsKeyDown('Q'))
+        if (input->IsKeyDown(Input::CHAR_Q))
         {
             new_y -= velocity;
         }
