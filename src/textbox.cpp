@@ -145,145 +145,33 @@ void Textbox::Render(RenderContext& context)
 
 bool Textbox::Update(const Input& input)
 {
-    bool input_handled = false;
-
-    auto parent_pos = parent_->pos();
-    auto x = pos_.x + parent_pos.x;
-    auto y = pos_.y + parent_pos.y;
-
-    int mx = input.mouse_x();
-    int my = input.mouse_y();
-
-    bool shift = input.IsKeyDown(Input::SHIFT);
-    bool ctrl = input.IsKeyDown(Input::CONTROL);
-
-    // Make a mutable copy so we can inject repeated key presses
-    auto events(input.event_queue());
-    if (key_repeat_.timer.ms() > 500)
-    {
-        auto code = key_repeat_.code;
-        if (input.IsPrintable(code) ||
-            code == Input::BACKSPACE ||
-            code == Input::DEL ||
-            code == Input::LEFT ||
-            code == Input::RIGHT)
-        {
-            Input::Event repeat(Input::Event::KEY_DOWN, code);
-            events.push_back(repeat);
-            // How long before next repeated key press
-            key_repeat_.timer.rewind(50);
-        }
-    }
+    auto mods = input.modifiers();
+    auto events = GetEventsWithRepeats(input);
 
     for (const auto& e : events)
     {
         if (e.type == Input::Event::MOUSE_DOWN)
         {
-            // Clicked inside textbox
-            if (mx >= x && mx < x + pos_.w &&
-                my >= y && my < y + pos_.h)
-            {
-                active_ = true;
-                cursor_ = text_.end();
-                input_handled = true;
-                cursor_blink_.start();
-            }
-            else
-            {
-                active_ = false;
-                cursor_blink_.stop();
-                key_repeat_.timer.stop();
-                key_repeat_.code = Input::BAD;
-            }
+            OnMouseDown(input);
         }
         if (active_)
         {
             auto key = static_cast<Input::KeyCode>(e.value);
+            mods.Update(e);
 
             if (e.type == Input::Event::KEY_DOWN)
             {
-                // Easier to follow when it's moving around
-                cursor_blink_.start();
-
-                if (key != key_repeat_.code)
-                {
-                    key_repeat_.timer.start();
-                    key_repeat_.code = key;
-                }
-
-                if (input.IsPrintable(key) && !ctrl)
-                {
-                    cursor_ = text_.insert(cursor_, input.ToAscii(key, shift)) + 1;
-                }
-                else if (key == Input::BACKSPACE)
-                {
-                    if (cursor_ > text_.begin())
-                    {
-                        cursor_ = text_.erase(cursor_ - 1);
-                    }
-                }
-                else if (key == Input::DEL)
-                {
-                    if (cursor_ < text_.end())
-                    {
-                        cursor_ = text_.erase(cursor_);
-                    }
-                }
-                else if (key == Input::LEFT)
-                {
-                    if (cursor_ > text_.begin())
-                    {
-                        cursor_--;
-                    }
-                }
-                else if (key == Input::RIGHT)
-                {
-                    if (cursor_ < text_.end())
-                    {
-                        cursor_++;
-                    }
-                }
-                else if (key == Input::SHIFT)
-                {
-                    shift = true;
-                }
-                else if (key == Input::CONTROL)
-                {
-                    ctrl = true;
-                }
-                else if (key == Input::RETURN)
-                {
-                    callback_();
-                }
-                text_label_->set_text(text_);
+                OnKeyDown(input, key, mods);
             }
             else if (e.type == Input::Event::KEY_UP)
             {
-                if (key == key_repeat_.code)
-                {
-                    key_repeat_.timer.stop();
-                    key_repeat_.code = Input::BAD;
-                }
-                // Restart timer if we let up a key that's not being repeated
-                else
-                {
-                    key_repeat_.timer.start();
-                }
-
-                if (key == Input::SHIFT)
-                {
-                    shift = false;
-                }
-                else if (key == Input::CONTROL)
-                {
-                    ctrl = false;
-                }
+                OnKeyUp(input, key, mods);
             }
         }
     }
-    input_handled |= active_;
 
-    return input_handled;
+    // Consume input while active
+    return active_;
 }
 
 void Textbox::set_callback(std::function<void()> callback)
@@ -301,6 +189,118 @@ void Textbox::set_text(std::string text)
     text_ = text;
     text_label_->set_text(text_);
     cursor_ = text_.end();
+}
+
+std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input)
+{
+    // Make a mutable copy so we can inject repeated key presses
+    auto events(input.event_queue());
+    if (key_repeat_.timer.ms() > 500)
+    {
+        auto code = key_repeat_.code;
+        if (input.IsPrintable(code) ||
+            code == Input::BACKSPACE ||
+            code == Input::DEL ||
+            code == Input::LEFT ||
+            code == Input::RIGHT)
+        {
+            Input::Event repeat(Input::Event::KEY_DOWN, code);
+            events.push_back(repeat);
+            // How long before next repeated key press
+            key_repeat_.timer.rewind(50);
+        }
+    }
+    return std::move(events);
+}
+
+void Textbox::OnMouseDown(const Input& input)
+{
+    auto parent_pos = parent_->pos();
+    auto x = pos_.x + parent_pos.x;
+    auto y = pos_.y + parent_pos.y;
+
+    int mx = input.mouse_x();
+    int my = input.mouse_y();
+
+    // Clicked inside textbox
+    if (mx >= x && mx < x + pos_.w &&
+        my >= y && my < y + pos_.h)
+    {
+        active_ = true;
+        cursor_blink_.start();
+        cursor_ = text_.end();
+    }
+    else
+    {
+        active_ = false;
+        cursor_blink_.stop();
+        key_repeat_.timer.stop();
+        key_repeat_.code = Input::BAD;
+    }
+}
+
+void Textbox::OnKeyDown(const Input& input, const Input::KeyCode key, Input::Modifiers mods)
+{
+    // Easier to follow when it's moving around
+    cursor_blink_.start();
+
+    if (key != key_repeat_.code)
+    {
+        key_repeat_.timer.start();
+        key_repeat_.code = key;
+    }
+
+    if (input.IsPrintable(key) && !mods.ctrl && !mods.alt)
+    {
+        cursor_ = text_.insert(cursor_, input.ToAscii(key, mods.shift)) + 1;
+    }
+    else if (key == Input::BACKSPACE)
+    {
+        if (cursor_ > text_.begin())
+        {
+            cursor_ = text_.erase(cursor_ - 1);
+        }
+    }
+    else if (key == Input::DEL)
+    {
+        if (cursor_ < text_.end())
+        {
+            cursor_ = text_.erase(cursor_);
+        }
+    }
+    else if (key == Input::LEFT)
+    {
+        if (cursor_ > text_.begin())
+        {
+            cursor_--;
+        }
+    }
+    else if (key == Input::RIGHT)
+    {
+        if (cursor_ < text_.end())
+        {
+            cursor_++;
+        }
+    }
+    else if (key == Input::RETURN)
+    {
+        callback_();
+    }
+    text_label_->set_text(text_);
+}
+
+void Textbox::OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modifiers mods)
+{
+    if (key == key_repeat_.code)
+    {
+        key_repeat_.timer.stop();
+        key_repeat_.code = Input::BAD;
+    }
+    // Restart timer if we let up a key that's not being repeated
+    else
+    {
+        key_repeat_.timer.start();
+    }
 }
 } // namespace GUI
 } // namespace blons

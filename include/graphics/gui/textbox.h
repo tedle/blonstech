@@ -34,6 +34,12 @@ private:
     std::unique_ptr<class Label> text_label_;
     std::function<void()> callback_;
     bool active_;
+
+    // Helper functions
+    std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input);
+    void OnMouseDown(const Input& input);
+    void OnKeyDown(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
+    void OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
 };
 } // namespace GUI
 } // namespace blons
