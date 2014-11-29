@@ -120,18 +120,21 @@ void Textbox::Render(RenderContext& context)
         sprite->set_subtexture(t->bottom_right);
         batch->Append(*sprite->mesh());
 
-        // Text cursor!
-        const auto& font = gui_->skin()->font(FontType::LABEL);
-        auto cursor_width = 1.0f;
-        auto cursor_height = font->letter_height() + 6.0f;
-        auto x_offset = font->string_width(std::string(text_.begin(), cursor_), false) + layout->textbox.normal.left.w * 2;
-        auto y_offset = floor((pos_.h - cursor_height) / 2);
-        sprite->set_pos(x + x_offset,
-                        y + y_offset,
-                        cursor_width,
-                        cursor_height);
-        sprite->set_subtexture(layout->textbox.cursor);
-        batch->Append(*sprite->mesh());
+        if (active_ && cursor_blink_.ms() % 1000 < 500)
+        {
+            // Text cursor!
+            const auto& font = gui_->skin()->font(FontType::LABEL);
+            auto cursor_width = 1.0f;
+            auto cursor_height = font->letter_height() + 6.0f;
+            auto x_offset = font->string_width(std::string(text_.begin(), cursor_), false) + layout->textbox.normal.left.w * 2;
+            auto y_offset = floor((pos_.h - cursor_height) / 2);
+            sprite->set_pos(x + x_offset,
+                y + y_offset,
+                cursor_width,
+                cursor_height);
+            sprite->set_subtexture(layout->textbox.cursor);
+            batch->Append(*sprite->mesh());
+        }
     }
 
     RegisterBatches();
@@ -163,11 +166,14 @@ bool Textbox::Update(const Input& input)
                 my >= y && my < y + pos_.h)
             {
                 active_ = true;
+                cursor_ = text_.end();
                 input_handled = true;
+                cursor_blink_.start();
             }
             else
             {
                 active_ = false;
+                cursor_blink_.stop();
             }
         }
         if (active_)

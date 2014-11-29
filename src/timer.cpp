@@ -7,9 +7,7 @@ namespace blons
 {
 Timer::Timer()
 {
-    milliseconds_ = 0;
-    time_offset_ = 0;
-    paused_ = true;
+    stop();
 }
 
 void Timer::start()
@@ -33,8 +31,11 @@ void Timer::stop()
 
 time_t Timer::ms()
 {
-    milliseconds_ += GetTickCount64() - time_offset_;
-    time_offset_ = GetTickCount64();
+    if (!paused_)
+    {
+        milliseconds_ += GetTickCount64() - time_offset_;
+        time_offset_ = GetTickCount64();
+    }
     return milliseconds_;
 }
 } // namespace blons

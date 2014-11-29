@@ -3,6 +3,7 @@
 
 // Local Includes
 #include "graphics/gui/control.h"
+#include "os/timer.h"
 
 namespace blons
 {
@@ -24,6 +25,7 @@ public:
 private:
     std::string text_;
     std::string::iterator cursor_;
+    Timer cursor_blink_;
     std::unique_ptr<class Label> text_label_;
     std::function<void()> callback_;
     bool active_;
