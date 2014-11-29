@@ -12,6 +12,11 @@ Timer::Timer()
 
 void Timer::start()
 {
+    // Restart if not paused
+    if (!paused_)
+    {
+        milliseconds_ = 0;
+    }
     paused_ = false;
     time_offset_ = GetTickCount64();
 }
@@ -27,6 +32,11 @@ void Timer::stop()
     paused_ = true;
     milliseconds_ = 0;
     time_offset_ = 0;
+}
+
+void Timer::rewind(time_t ms)
+{
+    milliseconds_ -= ms;
 }
 
 time_t Timer::ms()

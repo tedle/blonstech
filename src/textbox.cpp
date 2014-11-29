@@ -157,7 +157,25 @@ bool Textbox::Update(const Input& input)
     bool shift = input.IsKeyDown(Input::SHIFT);
     bool ctrl = input.IsKeyDown(Input::CONTROL);
 
-    for (const auto& e : input.event_queue())
+    // Make a mutable copy so we can inject repeated key presses
+    auto events(input.event_queue());
+    if (key_repeat_.timer.ms() > 500)
+    {
+        auto code = key_repeat_.code;
+        if (input.IsPrintable(code) ||
+            code == Input::BACKSPACE ||
+            code == Input::DEL ||
+            code == Input::LEFT ||
+            code == Input::RIGHT)
+        {
+            Input::Event repeat(Input::Event::KEY_DOWN, code);
+            events.push_back(repeat);
+            // How long before next repeated key press
+            key_repeat_.timer.rewind(50);
+        }
+    }
+
+    for (const auto& e : events)
     {
         if (e.type == Input::Event::MOUSE_DOWN)
         {
@@ -174,6 +192,8 @@ bool Textbox::Update(const Input& input)
             {
                 active_ = false;
                 cursor_blink_.stop();
+                key_repeat_.timer.stop();
+                key_repeat_.code = Input::BAD;
             }
         }
         if (active_)
@@ -182,6 +202,15 @@ bool Textbox::Update(const Input& input)
 
             if (e.type == Input::Event::KEY_DOWN)
             {
+                // Easier to follow when it's moving around
+                cursor_blink_.start();
+
+                if (key != key_repeat_.code)
+                {
+                    key_repeat_.timer.start();
+                    key_repeat_.code = key;
+                }
+
                 if (input.IsPrintable(key) && !ctrl)
                 {
                     cursor_ = text_.insert(cursor_, input.ToAscii(key, shift)) + 1;
@@ -230,6 +259,17 @@ bool Textbox::Update(const Input& input)
             }
             else if (e.type == Input::Event::KEY_UP)
             {
+                if (key == key_repeat_.code)
+                {
+                    key_repeat_.timer.stop();
+                    key_repeat_.code = Input::BAD;
+                }
+                // Restart timer if we let up a key that's not being repeated
+                else
+                {
+                    key_repeat_.timer.start();
+                }
+
                 if (key == Input::SHIFT)
                 {
                     shift = false;

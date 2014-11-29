@@ -15,6 +15,7 @@ public:
     void start();
     void pause();
     void stop();
+    void rewind(time_t ms);
 
     time_t ms();
 

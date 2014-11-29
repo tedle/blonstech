@@ -26,6 +26,11 @@ private:
     std::string text_;
     std::string::iterator cursor_;
     Timer cursor_blink_;
+    struct
+    {
+        Timer timer;
+        Input::KeyCode code;
+    } key_repeat_;
     std::unique_ptr<class Label> text_label_;
     std::function<void()> callback_;
     bool active_;
