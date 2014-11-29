@@ -109,6 +109,9 @@
     <ClCompile Include="textbox.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
+    <ClCompile Include="timer.cpp">
+      <Filter>src\os</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons.h">
@@ -206,6 +209,9 @@
     </ClInclude>
     <ClInclude Include="..\include\graphics\gui\textbox.h">
       <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\os\timer.h">
+      <Filter>src\os</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

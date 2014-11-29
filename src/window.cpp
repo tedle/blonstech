@@ -26,7 +26,7 @@ void Window::Init(Box pos, std::string caption, WindowType type, Manager* parent
     drag_offset_ = Vector2(0, 0);
 
     int title_bar_height = static_cast<int>(gui_->skin()->layout()->window.title.center.h);
-    int letter_height = gui_->skin()->font(FontType::HEADING)->letter_height();
+    size_t letter_height = gui_->skin()->font(FontType::HEADING)->letter_height();
     float caption_offset = static_cast<float>((title_bar_height + letter_height) / 2);
     Vector2 caption_pos(20, caption_offset);
     for (auto& c : caption)

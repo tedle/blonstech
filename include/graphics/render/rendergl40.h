@@ -66,7 +66,7 @@ public:
                         std::string vertex_filename, std::string pixel_filename,
                         ShaderAttributeList inputs);
 
-    void RenderShader(ShaderResource* program, int index_count);
+    void RenderShader(ShaderResource* program, unsigned int index_count);
 
     void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
     void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,

@@ -14,7 +14,7 @@ public:
     enum Type {DIFFUSE, NORMAL, LIGHT, SPRITE};
     struct Info
     {
-        std::size_t width, height;
+        int width, height;
         Type type;
     };
 

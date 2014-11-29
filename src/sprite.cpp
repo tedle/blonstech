@@ -29,8 +29,8 @@ void Sprite::Init(RenderContext& context)
     BuildQuad();
 
     if (!context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(),
-                                 mesh_.vertices.data(), mesh_.vertices.size(),
-                                 mesh_.indices.data(), mesh_.indices.size()))
+                                 mesh_.vertices.data(), vertex_count(),
+                                 mesh_.indices.data(), index_count()))
     {
         throw "Failed to register sprite";
     }
@@ -44,15 +44,30 @@ void Sprite::Render(RenderContext& context)
 {
     BuildQuad();
     context->SetMeshData(vertex_buffer_.get(), index_buffer_.get(),
-                         mesh_.vertices.data(), mesh_.vertices.size(),
-                         mesh_.indices.data(), mesh_.indices.size());
+                         mesh_.vertices.data(), vertex_count(),
+                         mesh_.indices.data(), index_count());
     context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 }
 
-int Sprite::index_count() const
+unsigned int Sprite::vertex_count() const
+{
+    std::size_t vertex_count = mesh_.vertices.size();
+    if (vertex_count >= ULONG_MAX)
+    {
+        throw "Too many vertices!";
+    }
+    return static_cast<unsigned int>(vertex_count);
+}
+
+unsigned int Sprite::index_count() const
 {
     // 6, lol
-    return mesh_.indices.size();
+    std::size_t index_count = mesh_.indices.size();
+    if (index_count >= ULONG_MAX)
+    {
+        throw "Too many indices!";
+    }
+    return static_cast<unsigned int>(index_count);
 }
 
 const TextureResource* Sprite::texture() const

@@ -19,7 +19,8 @@ public:
 
     void Render(RenderContext& context);
 
-    int index_count() const;
+    unsigned int vertex_count() const;
+    unsigned int index_count() const;
     const TextureResource* texture() const;
     Vector2 pos() const;
     Vector2 dimensions() const;

@@ -256,17 +256,17 @@ int Font::advance()
     return ret;
 }
 
-int Font::index_count() const
+unsigned int Font::index_count() const
 {
     return fontsheet_->index_count();
 }
 
-std::size_t Font::letter_height() const
+unsigned int Font::letter_height() const
 {
     return letter_height_;
 }
 
-std::size_t Font::pixel_size() const
+unsigned int Font::pixel_size() const
 {
     return pixel_size_;
 }

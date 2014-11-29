@@ -48,10 +48,10 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
         return false;
     }
 
-    size_t vertices_read, uvs_read, normals_read, faces_read, texture_count;
+    unsigned int vertices_read, uvs_read, normals_read, faces_read, texture_count;
 
     fseek(file, 0, SEEK_END);
-    size_t file_size = ftell(file);
+    std::size_t file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
     // Get the header info
@@ -80,20 +80,33 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
     // The seems like the most efficient way to read a lot of data straight into a vector...
     // Kinda gross really
     vertices.resize(vertex_count);
-    vertices_read = fread(vertices.data(), sizeof(Vector3), vertex_count, file);
+    std::size_t large_vertices_read = fread(vertices.data(), sizeof(Vector3), vertex_count, file);
 
     uvs.resize(uv_count_);
-    uvs_read = fread(uvs.data(), sizeof(Vector2), uv_count_, file);
+    std::size_t large_uvs_read = fread(uvs.data(), sizeof(Vector2), uv_count_, file);
 
     normals.resize(normal_count_);
-    normals_read = fread(normals.data(), sizeof(Vector3), normal_count_, file);
+    std::size_t large_normals_read = fread(normals.data(), sizeof(Vector3), normal_count_, file);
 
     // Allocate 3 uints per face for each type of mesh data supplied
     unsigned int face_size = 3 * (vertex_count > 0) +
                              3 * (uv_count_ > 0) +
                              3 * (normal_count_ > 0);
     faces.resize(face_count_ * face_size);
-    faces_read = fread(faces.data(), sizeof(unsigned int)*face_size, face_count_, file);
+    std::size_t large_faces_read = fread(faces.data(), sizeof(unsigned int)*face_size, face_count_, file);
+
+    // Make sure we can safely convert our mesh data to 32-bit
+    if (large_vertices_read >= ULONG_MAX ||
+        large_uvs_read      >= ULONG_MAX ||
+        large_normals_read  >= ULONG_MAX ||
+        large_faces_read    >= ULONG_MAX)
+    {
+        throw "Too much mesh data!";
+    }
+    vertices_read = static_cast<unsigned int>(large_vertices_read);
+    uvs_read = static_cast<unsigned int>(large_uvs_read);
+    normals_read = static_cast<unsigned int>(large_normals_read);
+    faces_read = static_cast<unsigned int>(large_faces_read);
 
     // Load in texture data
     for (unsigned int i = 0; i < texture_count; i++)
@@ -200,14 +213,14 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
             else
             {
                 mesh_data_.vertices.push_back(new_vert);
-                mesh_data_.indices[i] = mesh_data_.vertices.size() - 1;
+                mesh_data_.indices[i] = static_cast<unsigned int>(mesh_data_.vertices.size()) - 1;
                 vert_lookup[new_vert] = mesh_data_.indices[i];
             }
         }
         else
         {
             mesh_data_.vertices.push_back(new_vert);
-            mesh_data_.indices[i] = mesh_data_.vertices.size()-1;
+            mesh_data_.indices[i] = static_cast<unsigned int>(mesh_data_.vertices.size()) - 1;
         }
     }
     // Update vertex count to account for removed duplicates
@@ -218,12 +231,22 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
 
 unsigned int MeshImporter::vertex_count() const
 {
-    return mesh_data_.vertices.size();
+    std::size_t vertex_count = mesh_data_.vertices.size();
+    if (vertex_count >= ULONG_MAX)
+    {
+        throw "Too many vertices!";
+    }
+    return static_cast<unsigned int>(vertex_count);
 }
 
 unsigned int MeshImporter::index_count() const
 {
-    return mesh_data_.indices.size();
+    std::size_t index_count = mesh_data_.indices.size();
+    if (index_count >= ULONG_MAX)
+    {
+        throw "Too many indices!";
+    }
+    return static_cast<unsigned int>(index_count);
 }
 
 unsigned int MeshImporter::uv_count() const

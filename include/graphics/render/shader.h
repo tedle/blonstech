@@ -12,7 +12,7 @@ public:
     Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs, RenderContext& context);
     ~Shader();
 
-    bool Render(int index_count, RenderContext& context);
+    bool Render(unsigned int index_count, RenderContext& context);
     bool SetInput(const char* field, int value, RenderContext& context);
     bool SetInput(const char* field, Matrix value, RenderContext& context);
     bool SetInput(const char* field, Vector3 value, RenderContext& context);

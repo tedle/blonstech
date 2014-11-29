@@ -17,7 +17,7 @@ Shader::~Shader()
 {
 }
 
-bool Shader::Render(int index_count, RenderContext& context)
+bool Shader::Render(unsigned int index_count, RenderContext& context)
 {
     context->RenderShader(program_.get(), index_count);
 

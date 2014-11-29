@@ -23,8 +23,8 @@ DrawBatcher::DrawBatcher(RenderContext& context)
 
 void DrawBatcher::Append(const MeshData& mesh_data)
 {
-    const std::size_t vert_size = mesh_data.vertices.size();
-    const std::size_t index_size = mesh_data.indices.size();
+    const unsigned int vert_size = static_cast<unsigned int>(mesh_data.vertices.size());
+    const unsigned int index_size = static_cast<unsigned int>(mesh_data.indices.size());
 
     // Dynamically resize our arrays as needed
     if (vertex_idx_ + vert_size > array_size_ ||

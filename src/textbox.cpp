@@ -21,7 +21,7 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
 
     // For vertically centering the text
     const auto& font = gui_->skin()->font(FontType::LABEL);
-    int letter_height = font->letter_height();
+    std::size_t letter_height = font->letter_height();
     Vector2 text_pos;
     text_pos.x = pos.x + gui_->skin()->layout()->textbox.normal.left.w * 2;
     text_pos.y = pos.y + floor((pos.h + letter_height) / 2);

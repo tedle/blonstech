@@ -71,7 +71,8 @@ RenderD3D11::RenderD3D11(int screen_width, int screen_height, bool vsync,
     IDXGIFactory* factory;
     IDXGIAdapter* adapter;
     IDXGIOutput* adapter_out;
-    unsigned int num_modes, numerator, denominator, string_len;
+    unsigned int num_modes, numerator, denominator;
+    std::size_t string_len;
     DXGI_MODE_DESC* display_modes;
     DXGI_ADAPTER_DESC adapter_desc;
     DXGI_SWAP_CHAIN_DESC swapchain_desc;
@@ -714,7 +715,7 @@ TextureResource* RenderD3D11::LoadPixelData(WCHAR* filename)
 void RenderD3D11::OutputShaderErrorMessage(ID3D10Blob* error_message)
 {
     char* compile_errors;
-    unsigned long buffer_size;
+    std::size_t buffer_size;
     std::ofstream fout;
 
     compile_errors = (char*)(error_message->GetBufferPointer());

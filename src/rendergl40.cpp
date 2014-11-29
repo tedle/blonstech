@@ -469,7 +469,7 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
     return true;
 }
 
-void RenderGL40::RenderShader(ShaderResource* program, int index_count)
+void RenderGL40::RenderShader(ShaderResource* program, unsigned int index_count)
 {
     ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
 

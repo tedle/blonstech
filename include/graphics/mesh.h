@@ -22,8 +22,8 @@ public:
 
     BufferResource* vertex_buffer() const;
     BufferResource* index_buffer() const;
-    int vertex_count() const;
-    int index_count() const;
+    unsigned int vertex_count() const;
+    unsigned int index_count() const;
 
 private:
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
