@@ -257,6 +257,9 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
                 case VK_CONTROL:
                     key_code = Input::CONTROL;
                     break;
+                case VK_MENU:
+                    key_code = Input::ALT;
+                    break;
                 case VK_BACK:
                     key_code = Input::BACKSPACE;
                     break;
