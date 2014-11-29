@@ -251,7 +251,7 @@ void Textbox::set_callback(std::function<void()> callback)
     callback_ = callback;
 }
 
-std::string Textbox::text()
+std::string Textbox::text() const
 {
     return text_;
 }

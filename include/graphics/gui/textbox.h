@@ -19,7 +19,7 @@ public:
     bool Update(const Input& input);
 
     void set_callback(std::function<void()> callback);
-    std::string text();
+    std::string text() const;
     void set_text(std::string text);
 
 private:
