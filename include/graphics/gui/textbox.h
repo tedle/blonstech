@@ -23,6 +23,7 @@ public:
 
 private:
     std::string text_;
+    std::string::iterator cursor_;
     std::unique_ptr<class Label> text_label_;
     std::function<void()> callback_;
     bool active_;

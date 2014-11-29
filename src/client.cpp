@@ -254,14 +254,32 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
                 case VK_SHIFT:
                     key_code = Input::SHIFT;
                     break;
+                case VK_CONTROL:
+                    key_code = Input::CONTROL;
+                    break;
                 case VK_BACK:
                     key_code = Input::BACKSPACE;
+                    break;
+                case VK_DELETE:
+                    key_code = Input::DEL;
                     break;
                 case VK_ESCAPE:
                     key_code = Input::ESCAPE;
                     break;
                 case VK_RETURN:
                     key_code = Input::RETURN;
+                    break;
+                case VK_LEFT:
+                    key_code = Input::LEFT;
+                    break;
+                case VK_RIGHT:
+                    key_code = Input::RIGHT;
+                    break;
+                case VK_DOWN:
+                    key_code = Input::DOWN;
+                    break;
+                case VK_UP:
+                    key_code = Input::UP;
                     break;
                 default:
                     key_code = Input::BAD;

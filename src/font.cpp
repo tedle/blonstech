@@ -197,6 +197,23 @@ int Font::cursor_offset(unsigned char letter) const
 
 int Font::string_width(std::string string) const
 {
+    return string_width(string, true);
+}
+
+int Font::string_width(std::string string, bool trim_whitespace) const
+{
+    if (trim_whitespace)
+    {
+        while (string.size() > 0 && *string.begin() == ' ')
+        {
+            string.erase(string.begin());
+        }
+        while (string.size() > 0 && *(string.end()-1) == ' ')
+        {
+            string.erase(string.end()-1);
+        }
+    }
+
     int pixel_width = 0;
     //                                               vvv lol
     for (auto c = string.begin(); c != string.end(); c++)
@@ -216,13 +233,16 @@ int Font::string_width(std::string string) const
         pixel_width += g->x_advance;
 
         // Trim the whitespace
-        if (c == string.begin())
+        if (trim_whitespace)
         {
-            pixel_width -= g->x_offset;
-        }
-        if (c == string.end() - 1)
-        {
-            pixel_width -= g->x_advance - (g->x_offset + g->width);
+            if (c == string.begin())
+            {
+                pixel_width -= g->x_offset;
+            }
+            if (c == string.end() - 1)
+            {
+                pixel_width -= g->x_advance - (g->x_offset + g->width);
+            }
         }
     }
 

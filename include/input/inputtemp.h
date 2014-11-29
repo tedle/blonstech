@@ -72,8 +72,15 @@ public:
         SHIFT                = 0x31,
         CONTROL              = 0x32,
         BACKSPACE            = 0x33,
-        ESCAPE               = 0x34,
-        RETURN               = 0x35
+        // Shoutouts to a certain company that loves #define!
+        DEL                  = 0x34,
+        ESCAPE               = 0x35,
+        RETURN               = 0x36,
+
+        LEFT                 = 0x37,
+        RIGHT                = 0x38,
+        UP                   = 0x39,
+        DOWN                 = 0x3A
     };
 
     struct Event

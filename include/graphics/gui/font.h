@@ -25,7 +25,9 @@ public:
 
     int cursor_offset(unsigned char letter) const;
     // TODO: Might need to make this const char* for perf later, if its used a lot
+    // Defaults trim_whitespace to true
     int string_width(std::string string) const;
+    int string_width(std::string string, bool trim_whitespace) const;
     // Return how far to advance horizontally after rendering a character in pixels
     // Resets to 0 after call
     int advance();

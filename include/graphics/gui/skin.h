@@ -118,6 +118,7 @@ public:
                 Box(20, 22, 1, 5), // bottom
                 Box(22, 22, 5, 5)  // bottom_right
             };
+            Box cursor = Box(28, 0, 1, 1);
         } textbox;
 
         struct WindowLayout

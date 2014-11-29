@@ -15,6 +15,7 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
 
     active_ = false;
     text_ = "";
+    cursor_ = text_.end();
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](){};
 
@@ -29,20 +30,21 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
 
 void Textbox::Render(RenderContext& context)
 {
-    const Skin::Layout::TextboxSetLayout::TextboxLayout* t;
-    if (active_)
-    {
-        t = &gui_->skin()->layout()->textbox.active;
-    }
-    else
-    {
-        t = &gui_->skin()->layout()->textbox.normal;
-    }
+    auto layout = gui_->skin()->layout();
     auto sprite = gui_->skin()->sprite();
     auto batch = control_batch(context);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
+    const Skin::Layout::TextboxSetLayout::TextboxLayout* t;
+    if (active_)
+    {
+        t = &layout->textbox.active;
+    }
+    else
+    {
+        t = &layout->textbox.normal;
+    }
 
     // Render time
     {
@@ -117,6 +119,19 @@ void Textbox::Render(RenderContext& context)
                         t->bottom_right.h);
         sprite->set_subtexture(t->bottom_right);
         batch->Append(*sprite->mesh());
+
+        // Text cursor!
+        const auto& font = gui_->skin()->font(FontType::LABEL);
+        auto cursor_width = 1.0f;
+        auto cursor_height = font->letter_height() + 6.0f;
+        auto x_offset = font->string_width(std::string(text_.begin(), cursor_), false) + layout->textbox.normal.left.w * 2;
+        auto y_offset = floor((pos_.h - cursor_height) / 2);
+        sprite->set_pos(x + x_offset,
+                        y + y_offset,
+                        cursor_width,
+                        cursor_height);
+        sprite->set_subtexture(layout->textbox.cursor);
+        batch->Append(*sprite->mesh());
     }
 
     RegisterBatches();
@@ -137,6 +152,7 @@ bool Textbox::Update(const Input& input)
     int my = input.mouse_y();
 
     bool shift = input.IsKeyDown(Input::SHIFT);
+    bool ctrl = input.IsKeyDown(Input::CONTROL);
 
     for (const auto& e : input.event_queue())
     {
@@ -160,17 +176,45 @@ bool Textbox::Update(const Input& input)
 
             if (e.type == Input::Event::KEY_DOWN)
             {
-                if (input.IsPrintable(key))
+                if (input.IsPrintable(key) && !ctrl)
                 {
-                    text_ += input.ToAscii(key, shift);
+                    cursor_ = text_.insert(cursor_, input.ToAscii(key, shift)) + 1;
                 }
                 else if (key == Input::BACKSPACE)
                 {
-                    text_ = text_.substr(0, text_.size() - 1);
+                    if (cursor_ > text_.begin())
+                    {
+                        cursor_ = text_.erase(cursor_ - 1);
+                    }
+                }
+                else if (key == Input::DEL)
+                {
+                    if (cursor_ < text_.end())
+                    {
+                        cursor_ = text_.erase(cursor_);
+                    }
+                }
+                else if (key == Input::LEFT)
+                {
+                    if (cursor_ > text_.begin())
+                    {
+                        cursor_--;
+                    }
+                }
+                else if (key == Input::RIGHT)
+                {
+                    if (cursor_ < text_.end())
+                    {
+                        cursor_++;
+                    }
                 }
                 else if (key == Input::SHIFT)
                 {
                     shift = true;
+                }
+                else if (key == Input::CONTROL)
+                {
+                    ctrl = true;
                 }
                 else if (key == Input::RETURN)
                 {
@@ -183,6 +227,10 @@ bool Textbox::Update(const Input& input)
                 if (key == Input::SHIFT)
                 {
                     shift = false;
+                }
+                else if (key == Input::CONTROL)
+                {
+                    ctrl = false;
                 }
             }
         }
@@ -206,6 +254,7 @@ void Textbox::set_text(std::string text)
 {
     text_ = text;
     text_label_->set_text(text_);
+    cursor_ = text_.end();
 }
 } // namespace GUI
 } // namespace blons
