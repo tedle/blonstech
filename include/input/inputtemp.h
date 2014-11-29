@@ -101,6 +101,16 @@ public:
         Event(Type t, int v) : type(t), value(v) {}
     };
 
+    // Helper class for looping thru event queues
+    struct Modifiers
+    {
+        void Update(Event e);
+
+        bool alt;
+        bool ctrl;
+        bool shift;
+    };
+
 public:
     Input();
     ~Input() {}
@@ -122,6 +132,8 @@ public:
     bool IsPrintable(KeyCode key_code) const;
     unsigned char ToAscii(KeyCode key_code) const;
     unsigned char ToAscii(KeyCode key_code, bool shift) const;
+
+    Modifiers modifiers() const;
 
     int mouse_x() const;
     int mouse_y() const;

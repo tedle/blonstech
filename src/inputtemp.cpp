@@ -157,6 +157,15 @@ unsigned char Input::ToAscii(KeyCode key_code, bool shift) const
     }
 }
 
+Input::Modifiers Input::modifiers() const
+{
+    Modifiers mods;
+    mods.alt = IsKeyDown(KeyCode::ALT);
+    mods.ctrl = IsKeyDown(KeyCode::CONTROL);
+    mods.shift = IsKeyDown(KeyCode::SHIFT);
+    return std::move(mods);
+}
+
 int Input::mouse_x() const
 {
     return mouse_x_;
@@ -203,5 +212,24 @@ bool Input::Frame()
     event_queue_buffer_.clear();
 
     return true;
+}
+
+void Input::Modifiers::Update(Event e)
+{
+    if (e.type == Event::KEY_DOWN || e.type == Event::KEY_UP)
+    {
+        if (e.value == KeyCode::ALT)
+        {
+            alt = (e.type == Event::KEY_DOWN);
+        }
+        else if (e.value == KeyCode::CONTROL)
+        {
+            ctrl = (e.type == Event::KEY_DOWN);
+        }
+        else if (e.value == KeyCode::SHIFT)
+        {
+            shift = (e.type == Event::KEY_DOWN);
+        }
+    }
 }
 } // namespace blons
