@@ -55,7 +55,7 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
     fseek(file, 0, SEEK_SET);
 
     // Get the header info
-    fread(&vertex_count, sizeof(unsigned int), 1, file);
+    fread(&vertex_count,  sizeof(unsigned int), 1, file);
     fread(&uv_count_,     sizeof(unsigned int), 1, file);
     fread(&normal_count_, sizeof(unsigned int), 1, file);
     fread(&face_count_,   sizeof(unsigned int), 1, file);
