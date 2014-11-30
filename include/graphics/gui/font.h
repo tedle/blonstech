@@ -22,6 +22,8 @@ public:
                                              " ,./<>?;':\"[]\\{}|-=_+";
 
     Sprite* BuildSprite(unsigned char letter, int x, int y);
+    // Returns nullptr for completely cropped sprites
+    Sprite* BuildSprite(unsigned char letter, int x, int y, Box crop);
 
     int cursor_offset(unsigned char letter) const;
     // TODO: Might need to make this const char* for perf later, if its used a lot

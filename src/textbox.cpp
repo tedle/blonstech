@@ -120,9 +120,9 @@ void Textbox::Render(RenderContext& context)
         sprite->set_subtexture(t->bottom_right);
         batch->Append(*sprite->mesh());
 
+        // Text cursor!
         if (active_ && cursor_blink_.ms() % 1000 < 500)
         {
-            // Text cursor!
             const auto& font = gui_->skin()->font(FontType::LABEL);
             auto cursor_width = 1.0f;
             auto cursor_height = font->letter_height() + 6.0f;

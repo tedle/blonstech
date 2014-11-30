@@ -39,7 +39,11 @@ void Label::Render(RenderContext& context)
         auto batcher = font_batch(font_type_, frag.colour, context);
         for (const auto& c : frag.text)
         {
-            batcher->Append(*font->BuildSprite(c, x, y)->mesh());
+            auto sprite = font->BuildSprite(c, x, y);
+            if (sprite != nullptr)
+            {
+                batcher->Append(*sprite->mesh());
+            }
             x += font->advance();
         }
     }

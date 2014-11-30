@@ -157,6 +157,12 @@ Font::~Font()
 
 Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
 {
+    static const Box no_crop = Box(0, 0, 0, 0);
+    return BuildSprite(letter, x, y, no_crop);
+}
+
+Sprite* Font::BuildSprite(unsigned char letter, int x, int y, Box crop)
+{
     // Pointer to avoid expensive copying
     const Glyph* g;
     // In case someone tries to render a string using chars we dont have
@@ -168,14 +174,57 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
     {
         return nullptr;
     }
-    // Setup the character sprites position and texture
-    fontsheet_->set_pos(x + g->x_offset,
-                        y - g->y_offset - g->height,
-                        g->width,
-                        g->height);
-    fontsheet_->set_subtexture(g->tex_offset, 0, g->width, g->height);
+
     // How far to advance cursor for next letter
     advance_ = g->x_advance;
+
+    // Sprite dimensions
+    Box s(static_cast<float>(x + g->x_offset),
+          static_cast<float>(y - g->y_offset - g->height),
+          static_cast<float>(g->width),
+          static_cast<float>(g->height));
+    // Texture dimensions
+    Box t(static_cast<float>(g->tex_offset),
+          0.0f,
+          static_cast<float>(g->width),
+          static_cast<float>(g->height));
+
+    // TODO: Refactor these? Kind of annoying since they access diff struct members
+    if (crop.w != 0)
+    {
+        // Is this letter completely cropped?
+        if (s.x + s.w <= crop.x || s.x >= crop.x + crop.w)
+        {
+            return nullptr;
+        }
+        float crop_left = crop.x - s.x;
+        float crop_right = (s.x + s.w) - (crop.x + crop.w);
+        float crop_max = std::max(crop_left, crop_right);
+        s.x = std::max(s.x, crop.x);
+        s.w = s.w - std::max(0.0f, crop_max);
+        t.x = t.x + std::max(0.0f, crop_left);
+        t.w = s.w;
+    }
+
+    if (crop.h != 0)
+    {
+        // Is this letter completely cropped?
+        if (s.y + s.h <= crop.y || s.y >= crop.y + crop.h)
+        {
+            return nullptr;
+        }
+        float crop_top = crop.y - s.y;
+        float crop_bottom = (s.y + s.h) - (crop.y + crop.h);
+        float crop_max = std::max(crop_top, crop_bottom);
+        s.y = std::max(s.y, crop.y);
+        s.h = s.h - std::max(0.0f, crop_max);
+        t.y = t.y + std::max(0.0f, crop_top);
+        t.h = s.h;
+    }
+
+    // Setup the character sprites position and texture
+    fontsheet_->set_pos(s);
+    fontsheet_->set_subtexture(t);
 
     return fontsheet_.get();
 }
