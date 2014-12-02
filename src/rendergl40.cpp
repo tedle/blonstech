@@ -10,8 +10,67 @@
 #include "math/math.h"
 #include "graphics/render/glfuncloader.h"
 
+namespace
+{
+static unsigned int HashString(const char* str)
+{
+    static const unsigned int kPrime = 16777619;
+    static const unsigned int kOffset = 2166136261;
+    unsigned int hash = kOffset;
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        hash ^= str[i];
+        hash *= kPrime;
+    }
+    return hash;
+}
+// Should be thread safe to make this global, since OpenGL context
+// cannot be used from multiple threads anyway.
+static GLuint g_active_shader;
+} //namespace
+
 namespace blons
 {
+class BufferResourceGL40 : public BufferResource
+{
+public:
+    ~BufferResourceGL40();
+
+    GLuint buffer_, vertex_array_id_;
+    enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
+};
+
+class TextureResourceGL40 : public TextureResource
+{
+public:
+    ~TextureResourceGL40();
+
+    GLuint texture_, texture_unit_;
+};
+
+class ShaderResourceGL40 : public ShaderResource
+{
+public:
+    ~ShaderResourceGL40();
+
+    GLuint program_;
+    GLuint vertex_shader_;
+    GLuint frag_shader_;
+
+    GLint UniformLocation(const char* name);
+
+private:
+    // NOTE: Use this unordered map if we need >kMaxArraySize uniforms or cleaner + slower code
+    //std::unordered_map<unsigned int, GLint> uniform_location_cache_;
+
+    // We do this sloppy C style cus its faster and these are thrashed every frame
+    typedef std::pair<unsigned int, GLint> Location;
+    typedef std::unique_ptr<Location[]> LocationArray;
+    static const int kMaxUniformSize = 32;
+    LocationArray uniform_location_cache_ = LocationArray(new Location[kMaxUniformSize]);
+    std::size_t uniform_count_ = 0;
+};
+
 BufferResourceGL40::~BufferResourceGL40()
 {
     if (type_ == BufferResourceGL40::VERTEX_BUFFER)
@@ -42,13 +101,33 @@ ShaderResourceGL40::~ShaderResourceGL40()
     glDeleteShader(frag_shader_);
 
     glDeleteProgram(program_);
+
+    g_active_shader = 0;
+}
+
+GLint ShaderResourceGL40::UniformLocation(const char* name)
+{
+    auto hash = HashString(name);
+    for (int i = 0; i < uniform_count_; i++)
+    {
+        if (uniform_location_cache_[i].first == hash)
+        {
+            return uniform_location_cache_[i].second;
+        }
+    }
+    if (uniform_count_ == kMaxUniformSize)
+    {
+        throw "Exceeded max number of uniform vars allowed in a shader";
+    }
+    auto location = glGetUniformLocation(program_, name);
+    uniform_location_cache_[uniform_count_++] = std::make_pair(hash, location);
+    return location;
 }
 
 RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwnd, bool fullscreen)
 {
-    // TODO: this is a bad solution, cus shader deletion doesnt reset this
     // Mitigates repeated calls to glUseProgram
-    active_shader_ = 0;
+    g_active_shader = 0;
 
     // Defining the pixel format we want OpenGL to use
     const int color_depth = 24;
@@ -209,6 +288,8 @@ RenderGL40::~RenderGL40()
     // Reset the current context before deleting it
     wglMakeCurrent(device_context_, nullptr);
     wglDeleteContext(render_context_);
+
+    g_active_shader = 0;
 }
 
 void RenderGL40::BeginScene()
@@ -509,72 +590,80 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, int value)
 {
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-    GLuint loc;
 
     BindShader(prog->program_);
 
     // Bind our uniform variables to the shader
-    loc = glGetUniformLocation(prog->program_, name);
+    auto loc = prog->UniformLocation(name);
     if (loc < 0)
     {
         return false;
     }
     glUniform1i(loc, value);
-
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return false;
+    }
     return true;
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matrix value)
 {
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-    GLuint loc;
 
     BindShader(prog->program_);
 
     // Bind our uniform variables to the shader
-    loc = glGetUniformLocation(prog->program_, name);
+    auto loc = prog->UniformLocation(name);
     if (loc < 0)
     {
         return false;
     }
     glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)value.m);
-
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return false;
+    }
     return true;
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector3 value)
 {
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-    GLuint loc;
 
     BindShader(prog->program_);
 
     // Bind our uniform variables to the shader
-    loc = glGetUniformLocation(prog->program_, name);
+    auto loc = prog->UniformLocation(name);
     if (loc < 0)
     {
         return false;
     }
     glUniform3fv(loc, 1, &value.x);
-
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return false;
+    }
     return true;
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector4 value)
 {
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-    GLuint loc;
 
     BindShader(prog->program_);
 
     // Bind our uniform variables to the shader
-    loc = glGetUniformLocation(prog->program_, name);
+    auto loc = prog->UniformLocation(name);
     if (loc < 0)
     {
         return false;
     }
     glUniform4fv(loc, 1, &value.x);
-
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return false;
+    }
     return true;
 }
 
@@ -681,10 +770,10 @@ void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
 void RenderGL40::BindShader(GLuint shader)
 {
     // Avoid repeated calls to glUseProgram (perf boost)
-    if (shader != active_shader_)
+    if (shader != g_active_shader)
     {
         glUseProgram(shader);
     }
-    active_shader_ = shader;
+    g_active_shader = shader;
 }
 } // namespace blons

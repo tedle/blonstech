@@ -12,34 +12,6 @@
 
 namespace blons
 {
-class BufferResourceGL40 : public BufferResource
-{
-public:
-    ~BufferResourceGL40();
-
-    GLuint buffer_, vertex_array_id_;
-    enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
-};
-
-class TextureResourceGL40 : public TextureResource
-{
-public:
-    ~TextureResourceGL40();
-
-    GLuint texture_, texture_unit_;
-};
-
-class ShaderResourceGL40 : public ShaderResource
-{
-public:
-    ~ShaderResourceGL40();
-
-    GLuint program_;
-    GLuint vertex_shader_;
-    GLuint frag_shader_;
-};
-
-
 class RenderGL40 : public RenderAPI
 {
     
@@ -95,7 +67,6 @@ private:
     HDC device_context_;
     HGLRC render_context_;
     void BindShader(GLuint shader);
-    GLuint active_shader_;
 };
 } // namespace blons
     
