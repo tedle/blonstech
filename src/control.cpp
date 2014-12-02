@@ -26,11 +26,12 @@ void Control::set_crop(Box crop, int feather)
 
 void Control::RegisterBatches()
 {
-    for (const auto& batch : draw_batches_)
+    for (std::size_t i = 0; i < batch_index_; i++)
     {
+        const auto& batch = draw_batches_[i];
         // Since crop boxes are volatile we don't wanna overpopulate batch cache
         // Cropping info is injected into a new copy here
-        DrawCallInfo batch_info =
+        DrawCallInputs batch_info =
         {
             batch.first.is_text,
             batch.first.usage,
@@ -40,42 +41,44 @@ void Control::RegisterBatches()
         };
         gui_->RegisterDrawCall(batch_info, batch.second.get());
     }
+    batch_index_ = 0;
 }
 
 void Control::ClearBatches()
 {
     draw_batches_.clear();
+    batch_index_ = 0;
 }
 
-// TODO: Make font_batch + control_batch more DRY
-DrawBatcher* Control::font_batch(FontType usage, Vector4 colour, RenderContext& context)
+DrawBatcher* Control::batch(StaticDrawCallInputs inputs, RenderContext& context)
 {
-    StaticDrawCallInfo call = { true, usage, colour };
-    auto index_match = draw_batches_.find(call);
-    if (index_match != draw_batches_.end())
+    DrawBatcher* batch;
+    if (batch_index_ < draw_batches_.size())
     {
-        return index_match->second.get();
+        draw_batches_[batch_index_].first = inputs;
+        batch = draw_batches_[batch_index_].second.get();
+    }
+    else
+    {
+        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
+        draw_batches_.push_back(std::make_pair(inputs, std::move(batcher)));
+        batch = draw_batches_.back().second.get();
     }
 
-    auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
-    draw_batches_.insert(draw_batches_.begin(),
-                         std::make_pair(call, std::move(batcher)));
-    return draw_batches_.begin()->second.get();
+    batch_index_++;
+    return batch;
+}
+
+DrawBatcher* Control::font_batch(FontType usage, Vector4 colour, RenderContext& context)
+{
+    StaticDrawCallInputs inputs = { true, usage, colour };
+    return batch(inputs, context);
 }
 
 DrawBatcher* Control::control_batch(RenderContext& context)
 {
-    StaticDrawCallInfo call = { false, FontType::DEFAULT, Vector4(0, 0, 0, 0) };
-    auto index_match = draw_batches_.find(call);
-    if (index_match != draw_batches_.end())
-    {
-        return index_match->second.get();
-    }
-
-    auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
-    draw_batches_.insert(draw_batches_.begin(),
-                         std::make_pair(call, std::move(batcher)));
-    return draw_batches_.begin()->second.get();
+    StaticDrawCallInputs inputs = { false, FontType::DEFAULT, Vector4(0, 0, 0, 0) };
+    return batch(inputs, context);
 }
 } // namespace GUI
 } // namespace blons

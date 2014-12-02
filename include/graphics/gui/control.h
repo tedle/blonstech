@@ -15,7 +15,7 @@ class Manager;
 class Window;
 
 // Full draw call info for rendering
-struct DrawCallInfo
+struct DrawCallInputs
 {
     bool is_text;
     FontType usage;
@@ -25,13 +25,13 @@ struct DrawCallInfo
 };
 
 // Cacheable draw call info
-struct StaticDrawCallInfo
+struct StaticDrawCallInputs
 {
     bool is_text;
     FontType usage;
     Vector4 colour;
     // needed for efficient std::map lookups
-    bool operator< (const StaticDrawCallInfo call) const { return memcmp(this, &call, sizeof(StaticDrawCallInfo))>0; }
+    bool operator< (const StaticDrawCallInputs call) const { return memcmp(this, &call, sizeof(StaticDrawCallInputs))>0; }
 };
 
 class Control
@@ -57,12 +57,14 @@ protected:
     void RegisterBatches();
     void ClearBatches();
 
+    DrawBatcher* batch(StaticDrawCallInputs inputs, RenderContext& context);
     DrawBatcher* font_batch(FontType usage, Vector4 colour, RenderContext& context);
     DrawBatcher* control_batch(RenderContext& context);
 
 private:
-    // One draw batch per font per colour per control
-    std::map<StaticDrawCallInfo, std::unique_ptr<DrawBatcher>> draw_batches_;
+    // Vector + batch index stored to recycle as much memory as we can
+    std::vector<std::pair<StaticDrawCallInputs, std::unique_ptr<DrawBatcher>>> draw_batches_;
+    std::size_t batch_index_ = 0;
 };
 } // namespace GUI
 } // namespace blons

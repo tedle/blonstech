@@ -54,14 +54,14 @@ private:
     friend Label;
     friend Textbox;
     friend Window;
-    void RegisterDrawCall(DrawCallInfo info, DrawBatcher* batch);
+    void RegisterDrawCall(DrawCallInputs info, DrawBatcher* batch);
     Skin* skin() const;
     Window* active_window() const;
     void set_active_window(Window* window);
     Vector2 screen_dimensions();
 
     // Raw pointers because cleared every frame
-    std::vector<std::pair<DrawCallInfo, DrawBatcher*>> draw_batches_;
+    std::vector<std::pair<DrawCallInputs, DrawBatcher*>> draw_batches_;
 
     Vector2 screen_dimensions_;
     Matrix ortho_matrix_;

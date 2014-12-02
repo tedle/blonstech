@@ -147,7 +147,7 @@ Window* Manager::window(std::string id)
     return nullptr;
 }
 
-void Manager::RegisterDrawCall(DrawCallInfo info, DrawBatcher* batch)
+void Manager::RegisterDrawCall(DrawCallInputs info, DrawBatcher* batch)
 {
     draw_batches_.push_back(std::make_pair(info, batch));
 }
