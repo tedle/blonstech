@@ -123,15 +123,14 @@ void Textbox::Render(RenderContext& context)
         // Text cursor!
         if (active_ && cursor_blink_.ms() % 1000 < 500)
         {
-            const auto& font = gui_->skin()->font(FontType::LABEL);
             auto cursor_width = 1.0f;
-            auto cursor_height = font->letter_height() + 6.0f;
-            auto x_offset = font->string_width(std::string(text_.begin(), cursor_), false) + layout->textbox.normal.left.w * 2;
+            auto cursor_height = gui_->skin()->font(FontType::LABEL)->letter_height() + 6.0f;
+            auto x_offset = CursorOffset();
             auto y_offset = floor((pos_.h - cursor_height) / 2);
             sprite->set_pos(x + x_offset,
-                y + y_offset,
-                cursor_width,
-                cursor_height);
+                            y + y_offset,
+                            cursor_width,
+                            cursor_height);
             sprite->set_subtexture(layout->textbox.cursor);
             batch->Append(*sprite->mesh());
         }
@@ -252,34 +251,34 @@ void Textbox::OnKeyDown(const Input& input, const Input::KeyCode key, Input::Mod
 
     if (input.IsPrintable(key) && !mods.ctrl && !mods.alt)
     {
-        cursor_ = text_.insert(cursor_, input.ToAscii(key, mods.shift)) + 1;
+        SetCursorPos(text_.insert(cursor_, input.ToAscii(key, mods.shift)) + 1);
     }
     else if (key == Input::BACKSPACE)
     {
         if (cursor_ > text_.begin())
         {
-            cursor_ = text_.erase(cursor_ - 1);
+            SetCursorPos(text_.erase(cursor_ - 1));
         }
     }
     else if (key == Input::DEL)
     {
         if (cursor_ < text_.end())
         {
-            cursor_ = text_.erase(cursor_);
+            SetCursorPos(text_.erase(cursor_));
         }
     }
     else if (key == Input::LEFT)
     {
         if (cursor_ > text_.begin())
         {
-            cursor_--;
+            SetCursorPos(cursor_ - 1);
         }
     }
     else if (key == Input::RIGHT)
     {
         if (cursor_ < text_.end())
         {
-            cursor_++;
+            SetCursorPos(cursor_ + 1);
         }
     }
     else if (key == Input::RETURN)
@@ -301,6 +300,36 @@ void Textbox::OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modif
     {
         key_repeat_.timer.start();
     }
+}
+
+void Textbox::SetCursorPos(std::string::iterator cursor)
+{
+    cursor_ = cursor;
+    const auto skin_offset = gui_->skin()->layout()->textbox.normal.left.w * 2;
+    const auto label_pos = text_label_->pos();
+    const auto cursor_offset = CursorOffset();
+    // Cursor out of bounds right side
+    if (cursor_offset >= pos_.w - skin_offset)
+    {
+        auto label_diff = cursor_offset - (pos_.w - skin_offset) + 1;
+        text_label_->set_pos(label_pos.x - label_diff, label_pos.y);
+    }
+    // Cursor out of bounds left side
+    else if (cursor_offset < skin_offset)
+    {
+        auto label_diff = cursor_offset - skin_offset;
+        text_label_->set_pos(label_pos.x - label_diff, label_pos.y);
+    }
+}
+
+float Textbox::CursorOffset()
+{
+    const auto font = gui_->skin()->font(FontType::LABEL);
+    const auto layout = gui_->skin()->layout();
+    const auto skin_offset = layout->textbox.normal.left.w * 2;
+    const auto label_offset = text_label_->pos().x - (pos_.x + skin_offset);
+    const auto cursor_offset = font->string_width(std::string(text_.begin(), cursor_), false) + label_offset + skin_offset;
+    return cursor_offset;
 }
 } // namespace GUI
 } // namespace blons

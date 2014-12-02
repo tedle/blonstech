@@ -40,6 +40,8 @@ private:
     void OnMouseDown(const Input& input);
     void OnKeyDown(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
     void OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
+    void SetCursorPos(std::string::iterator cursor);
+    float CursorOffset();
 };
 } // namespace GUI
 } // namespace blons
