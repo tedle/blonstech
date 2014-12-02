@@ -69,6 +69,8 @@ struct Matrix
         memcpy(this->m, xm.m, sizeof(float)*4*4);
         return *this;
     }
+    bool operator== (const Matrix& matrix) {return memcmp(m, matrix.m, sizeof(float)*4*4) == 0;}
+    bool operator!= (const Matrix& matrix) {return !(*this == matrix);}
 };
 
 Matrix MatrixIdentity();
