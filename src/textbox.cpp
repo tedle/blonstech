@@ -36,6 +36,7 @@ void Textbox::Render(RenderContext& context)
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
+
     const Skin::Layout::TextboxSetLayout::TextboxLayout* t;
     if (active_)
     {
@@ -139,6 +140,10 @@ void Textbox::Render(RenderContext& context)
     RegisterBatches();
 
     // Button text yall
+    text_label_->set_crop(Box(x + t->left.w,
+                              0,
+                              pos_.w - t->left.w * 2,
+                              0));
     text_label_->Render(context);
 }
 

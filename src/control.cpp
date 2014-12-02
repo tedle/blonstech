@@ -18,6 +18,16 @@ Box Control::pos() const
     return pos_;
 }
 
+void Control::set_crop(Box crop)
+{
+    crop_ = crop;
+}
+
+Box Control::crop() const
+{
+    return crop_;
+}
+
 void Control::RegisterBatches()
 {
     for (const auto& batch : draw_batches_)

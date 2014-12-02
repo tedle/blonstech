@@ -32,8 +32,12 @@ public:
     void set_pos(float x, float y);
     Box pos() const;
 
+    void set_crop(Box crop);
+    Box crop() const;
+
 protected:
     Box pos_;
+    Box crop_;
     Manager* gui_;
     Window* parent_;
 
