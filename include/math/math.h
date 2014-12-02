@@ -12,7 +12,7 @@ struct Box
 {
     float x, y, w, h;
 
-    Box() : x(0), y(0), w(0), h(0) {}
+    Box() {}
     Box(float _x, float _y, float _w, float _h) : x(_x), y(_y), w(_w), h(_h) {}
 };
 
@@ -20,7 +20,7 @@ struct Vector2
 {
     float x, y;
 
-    Vector2() : x(0), y(0) {}
+    Vector2() {}
     Vector2(float _x, float _y) : x(_x), y(_y) {}
 
     Vector2& operator= (const Vector2& vec) {x = vec.x; y = vec.y; return *this;}
@@ -34,7 +34,7 @@ struct Vector3
 {
     float x, y, z;
 
-    Vector3() : x(0), y(0), z(0) {}
+    Vector3() {}
     Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
 
     Vector3& operator= (const Vector3& vec) {x = vec.x; y = vec.y; z = vec.z; return *this;}
@@ -48,7 +48,7 @@ struct Vector4
 {
     float x, y, z, w;
 
-    Vector4() : x(0), y(0), z(0), w(0) {}
+    Vector4() {}
     Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
 
     Vector4& operator= (const Vector4& vec) {x = vec.x; y = vec.y; z = vec.z; w = vec.w; return *this;}

@@ -14,13 +14,24 @@ namespace GUI
 class Manager;
 class Window;
 
+// Full draw call info for rendering
 struct DrawCallInfo
 {
     bool is_text;
     FontType usage;
     Vector4 colour;
+    Box crop;
+    int crop_feather;
+};
+
+// Cacheable draw call info
+struct StaticDrawCallInfo
+{
+    bool is_text;
+    FontType usage;
+    Vector4 colour;
     // needed for efficient std::map lookups
-    bool operator< (const DrawCallInfo call) const { return memcmp(this, &call, sizeof(DrawCallInfo))>0; }
+    bool operator< (const StaticDrawCallInfo call) const { return memcmp(this, &call, sizeof(StaticDrawCallInfo))>0; }
 };
 
 class Control
@@ -32,24 +43,26 @@ public:
     void set_pos(float x, float y);
     Box pos() const;
 
-    void set_crop(Box crop);
-    Box crop() const;
+    void set_crop(Box crop, int feather);
 
 protected:
-    Box pos_;
-    Box crop_;
-    Manager* gui_;
-    Window* parent_;
+    // Feel kinda dirty doing all this initialization here
+    Box pos_ = Box(0, 0, 0, 0);
+    Box crop_ = Box(0, 0, 0, 0);
+    int feather_ = 0;
+    Manager* gui_ = nullptr;
+    Window* parent_ = nullptr;
 
     // Order of draw calls is the same as order of calls to RegisterBatches()!!!
     void RegisterBatches();
+    void ClearBatches();
 
     DrawBatcher* font_batch(FontType usage, Vector4 colour, RenderContext& context);
     DrawBatcher* control_batch(RenderContext& context);
 
 private:
     // One draw batch per font per colour per control
-    std::map<DrawCallInfo, std::unique_ptr<DrawBatcher>> draw_batches_;
+    std::map<StaticDrawCallInfo, std::unique_ptr<DrawBatcher>> draw_batches_;
 };
 } // namespace GUI
 } // namespace blons

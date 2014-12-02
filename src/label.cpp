@@ -59,6 +59,7 @@ bool Label::Update(const Input& input)
 void Label::set_text(std::string text)
 {
     text_ = ColourString(text);
+    ClearBatches();
 }
 } // namespace GUI
 } // namespace blons

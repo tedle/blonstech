@@ -140,10 +140,8 @@ void Textbox::Render(RenderContext& context)
     RegisterBatches();
 
     // Button text yall
-    text_label_->set_crop(Box(x + t->left.w,
-                              0,
-                              pos_.w - t->left.w * 2,
-                              0));
+    auto border = t->left.w;
+    text_label_->set_crop(Box(x + border, 0, pos_.w - border * 2, 0), static_cast<int>(border));
     text_label_->Render(context);
 }
 
@@ -211,7 +209,7 @@ std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input)
             Input::Event repeat(Input::Event::KEY_DOWN, code);
             events.push_back(repeat);
             // How long before next repeated key press
-            key_repeat_.timer.rewind(50);
+            key_repeat_.timer.rewind(40);
         }
     }
     return std::move(events);

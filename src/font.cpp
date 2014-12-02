@@ -264,15 +264,15 @@ int Font::string_width(std::string string, bool trim_whitespace) const
     }
 
     int pixel_width = 0;
-    //                                               vvv lol
-    for (auto c = string.begin(); c != string.end(); c++)
+    // Faster when done old way
+    for (auto i = 0; i < string.length(); i++)
     {
         // Pointer to avoid expensive copying
         const Glyph* g;
         // In case someone tries to calculate a string using chars we dont have
         try
         {
-            g = &charset_[*c];
+            g = &charset_[string[i]];
         }
         catch (...)
         {
@@ -284,11 +284,11 @@ int Font::string_width(std::string string, bool trim_whitespace) const
         // Trim the whitespace
         if (trim_whitespace)
         {
-            if (c == string.begin())
+            if (i == 0)
             {
                 pixel_width -= g->x_offset;
             }
-            if (c == string.end() - 1)
+            if (i == string.length() - 1)
             {
                 pixel_width -= g->x_advance - (g->x_offset + g->width);
             }

@@ -10,6 +10,8 @@ out vec4 frag_colour;
 uniform sampler2D diffuse;
 uniform vec4 text_colour;
 uniform int is_text;
+uniform vec4 crop;
+uniform int feather;
 
 void main(void)
 {
@@ -23,9 +25,33 @@ void main(void)
 		frag_colour = texture(diffuse, tex_coord);
 	}
 	// Cropping!
-	/* if (gl_FragCoord.x < 100)
+	if (feather > 0)
 	{
-		float alpha = max(0, (gl_FragCoord.x - 70) / 30);
-		frag_colour.a *= alpha;
-	} */
+		if (crop.z != 0)
+		{
+			if (gl_FragCoord.x < crop.x + feather)
+			{
+				float alpha = max(0, (gl_FragCoord.x - crop.x) / feather);
+				frag_colour.a *= alpha;
+			}
+			else if (gl_FragCoord.x > crop.x + crop.z - feather)
+			{
+				float alpha = max(0, (crop.x + crop.z - gl_FragCoord.x) / feather);
+				frag_colour.a *= alpha;
+			}
+		}
+		if (crop.w != 0)
+		{
+			if (gl_FragCoord.y < crop.x + feather)
+			{
+				float alpha = max(0, (gl_FragCoord.y - crop.y) / feather);
+				frag_colour.a *= alpha;
+			}
+			else if (gl_FragCoord.y > crop.y + crop.w - feather)
+			{
+				float alpha = max(0, (crop.y + crop.w - gl_FragCoord.y) / feather);
+				frag_colour.a *= alpha;
+			}
+		}
+	}
 }
