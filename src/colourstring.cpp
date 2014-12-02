@@ -3,13 +3,13 @@
 // Helper functions
 namespace
 {
-std::size_t FindColourCode(std::string text)
+std::size_t FindColourCode(const char* text)
 {
     // Simple parser to find '$fff' hex colour codes in strings
     static const std::string kFormatChars = "abcdefABCDEF0123456789";
     std::size_t code_pos = std::string::npos;
     int format_matches = 0;
-    for (std::size_t i = 0; i < text.length(); i++)
+    for (std::size_t i = 0; text[i] != '\0'; i++)
     {
         if (text[i] == '$')
         {
@@ -30,14 +30,8 @@ std::size_t FindColourCode(std::string text)
         {
             return code_pos;
         }
-
-        // Incase we get something like "hello world$ff"
-        if (i == text.length() - 1)
-        {
-            return std::string::npos;
-        }
     }
-    return code_pos;
+    return std::string::npos;
 }
 
 int HexToInt(unsigned char c)
@@ -73,7 +67,7 @@ ColourString::ColourString(std::string text)
     next_frag.colour = kDefaultTextColour;
     while (text.length() > 0)
     {
-        std::size_t code_pos = FindColourCode(text);
+        std::size_t code_pos = FindColourCode(text.c_str());
         next_frag.text = text.substr(0, code_pos);
         if (next_frag.text.length() > 0)
         {
