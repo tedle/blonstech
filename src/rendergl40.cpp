@@ -2,6 +2,7 @@
 
 
 // Includes
+#include <unordered_map>
 #include <memory>
 #include <fstream>
 // OpenGL image loader
@@ -60,15 +61,11 @@ public:
     GLint UniformLocation(const char* name);
 
 private:
-    // NOTE: Use this unordered map if we need >kMaxArraySize uniforms or cleaner + slower code
-    //std::unordered_map<unsigned int, GLint> uniform_location_cache_;
-
-    // We do this sloppy C style cus its faster and these are thrashed every frame
-    typedef std::pair<unsigned int, GLint> Location;
-    typedef std::unique_ptr<Location[]> LocationArray;
-    static const int kMaxUniformSize = 32;
-    LocationArray uniform_location_cache_ = LocationArray(new Location[kMaxUniformSize]);
-    std::size_t uniform_count_ = 0;
+    struct HashFunc
+    {
+        unsigned int operator()(const char* s){ return HashString(s); }
+    };
+    std::unordered_map<const char*, GLint, HashFunc> uniform_location_cache_;
 };
 
 BufferResourceGL40::~BufferResourceGL40()
@@ -107,21 +104,14 @@ ShaderResourceGL40::~ShaderResourceGL40()
 
 GLint ShaderResourceGL40::UniformLocation(const char* name)
 {
-    auto hash = HashString(name);
-    for (int i = 0; i < uniform_count_; i++)
+    auto it = uniform_location_cache_.find(name);
+    if (it == uniform_location_cache_.end())
     {
-        if (uniform_location_cache_[i].first == hash)
-        {
-            return uniform_location_cache_[i].second;
-        }
+        auto location = glGetUniformLocation(program_, name);
+        uniform_location_cache_[name] = location;
+        return location;
     }
-    if (uniform_count_ == kMaxUniformSize)
-    {
-        throw "Exceeded max number of uniform vars allowed in a shader";
-    }
-    auto location = glGetUniformLocation(program_, name);
-    uniform_location_cache_[uniform_count_++] = std::make_pair(hash, location);
-    return location;
+    return it->second;
 }
 
 RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwnd, bool fullscreen)
