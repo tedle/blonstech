@@ -166,22 +166,22 @@ Input::Modifiers Input::modifiers() const
     return std::move(mods);
 }
 
-int Input::mouse_x() const
+units::pixel Input::mouse_x() const
 {
     return mouse_x_;
 }
 
-int Input::mouse_y() const
+units::pixel Input::mouse_y() const
 {
     return mouse_y_;
 }
 
-int Input::mouse_delta_x() const
+units::pixel Input::mouse_delta_x() const
 {
     return delta_mouse_x_;
 }
 
-int Input::mouse_delta_y() const
+units::pixel Input::mouse_delta_y() const
 {
     return delta_mouse_y_;
 }

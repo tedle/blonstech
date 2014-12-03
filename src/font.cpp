@@ -16,20 +16,20 @@ struct Font::Glyph
     // Needed for std::map storage
     Glyph() = default;
     // This constructor's really just for refactoring code into smaller functions
-    Glyph(unsigned char letter, FT_Face font_face, unsigned int texture_offset);
+    Glyph(unsigned char letter, FT_Face font_face, units::pixel texture_offset);
     // 8-bit monochrome bitmap of character data
     std::vector<unsigned char> pixels;
     // Width and height of bitmap
-    unsigned int width, height;
+    units::pixel width, height;
     // Offset from origin in fontsheet texture
-    unsigned int tex_offset;
+    units::pixel tex_offset;
     // Offset from cursor,line respectively
-    int x_offset, y_offset;
+    units::pixel x_offset, y_offset;
     // Offset from previously rendered character
-    int x_advance;
+    units::pixel x_advance;
 };
 
-Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture_offset)
+Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, units::pixel texture_offset)
 {
     unsigned int glyph_index = FT_Get_Char_Index(font_face, letter);
     if (!glyph_index)
@@ -59,9 +59,9 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture
     x_offset = font_face->glyph->metrics.horiBearingX / 64;
     y_offset = font_face->glyph->metrics.horiBearingY / 64 - height;
 
-    for (int y = 0; y < bitmap.rows; y++)
+    for (units::pixel y = 0; y < bitmap.rows; y++)
     {
-        for (int x = 0; x < bitmap.width; x++)
+        for (units::pixel x = 0; x < bitmap.width; x++)
         {
             pixels.push_back(*(bitmap.buffer++));
         }
@@ -70,7 +70,7 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, unsigned int texture
     }
 }
 
-Font::Font(std::string font_filename, int pixel_size, RenderContext& context)
+Font::Font(std::string font_filename, units::pixel pixel_size, RenderContext& context)
 {
     fontsheet_ = nullptr;
     letter_height_ = 0;
@@ -99,9 +99,9 @@ Font::Font(std::string font_filename, int pixel_size, RenderContext& context)
     }
 
     // Used to find glyph in texture fontsheet later
-    unsigned int tex_width = 0;
+    units::pixel tex_width = 0;
     // Used to determine how tall font texture must be
-    unsigned int tex_height = 0;
+    units::pixel tex_height = 0;
     // For every drawable character, get a bitmap rendering of the letter and store it
     for (const auto& c : kAvailableCharacters)
     {
@@ -126,8 +126,8 @@ Font::Font(std::string font_filename, int pixel_size, RenderContext& context)
     {
         for (unsigned int i = 0; i < glyph.pixels.size(); i++)
         {
-            int x = glyph.tex_offset + i % glyph.width;
-            int y = i / glyph.width;
+            units::pixel x = glyph.tex_offset + i % glyph.width;
+            units::pixel y = i / glyph.width;
             tex.get()[x + y * tex_width] = glyph.pixels[i];
         }
     }
@@ -155,13 +155,13 @@ Font::~Font()
 {
 }
 
-Sprite* Font::BuildSprite(unsigned char letter, int x, int y)
+Sprite* Font::BuildSprite(unsigned char letter, units::subpixel x, units::subpixel y)
 {
     static const Box no_crop = Box(0, 0, 0, 0);
     return BuildSprite(letter, x, y, no_crop);
 }
 
-Sprite* Font::BuildSprite(unsigned char letter, int x, int y, Box crop)
+Sprite* Font::BuildSprite(unsigned char letter, units::subpixel x, units::subpixel y, Box crop)
 {
     // Pointer to avoid expensive copying
     const Glyph* g;
@@ -179,15 +179,12 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y, Box crop)
     advance_ = g->x_advance;
 
     // Sprite dimensions
-    Box s(static_cast<float>(x + g->x_offset),
-          static_cast<float>(y - g->y_offset - g->height),
-          static_cast<float>(g->width),
-          static_cast<float>(g->height));
+    Box s(x + units::pixel_to_subpixel(g->x_offset),
+          y - units::pixel_to_subpixel(g->y_offset + g->height),
+          units::pixel_to_subpixel(g->width),
+          units::pixel_to_subpixel(g->height));
     // Texture dimensions
-    Box t(static_cast<float>(g->tex_offset),
-          0.0f,
-          static_cast<float>(g->width),
-          static_cast<float>(g->height));
+    Box t(g->tex_offset, 0, g->width, g->height);
 
     // TODO: Refactor these? Kind of annoying since they access diff struct members
     if (crop.w != 0)
@@ -197,9 +194,9 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y, Box crop)
         {
             return nullptr;
         }
-        float crop_left = crop.x - s.x;
-        float crop_right = (s.x + s.w) - (crop.x + crop.w);
-        float crop_max = std::max(crop_left, crop_right);
+        units::subpixel crop_left = crop.x - s.x;
+        units::subpixel crop_right = (s.x + s.w) - (crop.x + crop.w);
+        units::subpixel crop_max = std::max(crop_left, crop_right);
         s.x = std::max(s.x, crop.x);
         s.w = s.w - std::max(0.0f, crop_max);
         t.x = t.x + std::max(0.0f, crop_left);
@@ -213,9 +210,9 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y, Box crop)
         {
             return nullptr;
         }
-        float crop_top = crop.y - s.y;
-        float crop_bottom = (s.y + s.h) - (crop.y + crop.h);
-        float crop_max = std::max(crop_top, crop_bottom);
+        units::subpixel crop_top = crop.y - s.y;
+        units::subpixel crop_bottom = (s.y + s.h) - (crop.y + crop.h);
+        units::subpixel crop_max = std::max(crop_top, crop_bottom);
         s.y = std::max(s.y, crop.y);
         s.h = s.h - std::max(0.0f, crop_max);
         t.y = t.y + std::max(0.0f, crop_top);
@@ -229,7 +226,7 @@ Sprite* Font::BuildSprite(unsigned char letter, int x, int y, Box crop)
     return fontsheet_.get();
 }
 
-int Font::cursor_offset(unsigned char letter) const
+units::pixel Font::cursor_offset(unsigned char letter) const
 {
     // In case someone tries to calculate a string using chars we dont have
     try
@@ -244,12 +241,12 @@ int Font::cursor_offset(unsigned char letter) const
     }
 }
 
-int Font::string_width(std::string string) const
+units::pixel Font::string_width(std::string string) const
 {
     return string_width(string, true);
 }
 
-int Font::string_width(std::string string, bool trim_whitespace) const
+units::pixel Font::string_width(std::string string, bool trim_whitespace) const
 {
     if (trim_whitespace)
     {
@@ -263,7 +260,7 @@ int Font::string_width(std::string string, bool trim_whitespace) const
         }
     }
 
-    int pixel_width = 0;
+    units::pixel pixel_width = 0;
     // Faster when done old way
     for (auto i = 0; i < string.length(); i++)
     {
@@ -300,7 +297,7 @@ int Font::string_width(std::string string, bool trim_whitespace) const
 
 int Font::advance()
 {
-    int ret = advance_;
+    units::pixel ret = advance_;
     advance_ = 0;
     return ret;
 }
@@ -310,12 +307,12 @@ unsigned int Font::index_count() const
     return fontsheet_->index_count();
 }
 
-unsigned int Font::letter_height() const
+units::pixel Font::letter_height() const
 {
     return letter_height_;
 }
 
-unsigned int Font::pixel_size() const
+units::pixel Font::pixel_size() const
 {
     return pixel_size_;
 }

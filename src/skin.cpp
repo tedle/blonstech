@@ -23,7 +23,7 @@ Skin::~Skin()
 
 }
 
-bool Skin::LoadFont(std::string filename, FontType usage, int pixel_size, RenderContext& context)
+bool Skin::LoadFont(std::string filename, FontType usage, units::pixel pixel_size, RenderContext& context)
 {
     font_list_[usage] = std::unique_ptr<Font>(new Font(filename, pixel_size, context));
     return true;

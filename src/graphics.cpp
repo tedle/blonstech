@@ -14,7 +14,7 @@
 
 namespace blons
 {
-Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
+Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND hwnd)
 {
     context_ = nullptr;
     camera_ = nullptr;
@@ -35,12 +35,13 @@ Graphics::Graphics(int screen_width, int screen_height, HWND hwnd)
 
     // Projection matrix (3D space->2D screen)
     float fov = kPi / 4.0f;
-    float screen_aspect = (float)screen_width / (float)screen_height;
+    float screen_aspect = static_cast<float>(screen_width) / static_cast<float>(screen_height);
 
     proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, kScreenNear, kScreenDepth);
 
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
-    ortho_matrix_ = MatrixOrthographic((float)screen_width, (float)screen_height, kScreenNear, kScreenDepth);
+    ortho_matrix_ = MatrixOrthographic(units::pixel_to_subpixel(screen_width), units::pixel_to_subpixel(screen_height),
+                                       kScreenNear, kScreenDepth);
 
     // Camera
     camera_ = std::unique_ptr<Camera>(new Camera);

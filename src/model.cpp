@@ -117,7 +117,7 @@ Matrix Model::world_matrix() const
     return world_matrix_;
 }
 
-void Model::set_pos(float x, float y, float z)
+void Model::set_pos(units::world x, units::world y, units::world z)
 {
     pos_ = Vector3(x, y, z);
 }

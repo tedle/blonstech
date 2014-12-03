@@ -5,23 +5,30 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 #include <string.h>
+// Local Includes
+#include "math/units.h"
 
 namespace blons
 {
 struct Box
 {
-    float x, y, w, h;
+    units::subpixel x, y, w, h;
 
     Box() : x(0), y(0), w(0), h(0) {}
-    Box(float _x, float _y, float _w, float _h) : x(_x), y(_y), w(_w), h(_h) {}
+    Box(units::subpixel _x, units::subpixel _y, units::subpixel _w, units::subpixel _h) : x(_x), y(_y), w(_w), h(_h) {}
+    Box(units::pixel _x, units::pixel _y, units::pixel _w, units::pixel _h) :
+        x(units::pixel_to_subpixel(_x)),
+        y(units::pixel_to_subpixel(_y)),
+        w(units::pixel_to_subpixel(_w)),
+        h(units::pixel_to_subpixel(_h)) {}
 };
 
 struct Vector2
 {
-    float x, y;
+    units::world x, y;
 
     Vector2() : x(0), y(0) {}
-    Vector2(float _x, float _y) : x(_x), y(_y) {}
+    Vector2(units::world _x, units::world _y) : x(_x), y(_y) {}
 
     Vector2& operator= (const Vector2& vec) {x = vec.x; y = vec.y; return *this;}
     Vector2& operator+ (const Vector2& vec) {x += vec.x; y += vec.y; return *this;}
@@ -32,10 +39,10 @@ struct Vector2
 
 struct Vector3
 {
-    float x, y, z;
+    units::world x, y, z;
 
     Vector3() : x(0), y(0), z(0) {}
-    Vector3(float _x, float _y, float _z) : x(_x), y(_y), z(_z) {}
+    Vector3(units::world _x, units::world _y, units::world _z) : x(_x), y(_y), z(_z) {}
 
     Vector3& operator= (const Vector3& vec) {x = vec.x; y = vec.y; z = vec.z; return *this;}
     Vector3& operator+ (const Vector3& vec) {x += vec.x; y += vec.y; z += vec.z; return *this;}
@@ -46,10 +53,10 @@ struct Vector3
 
 struct Vector4
 {
-    float x, y, z, w;
+    units::world x, y, z, w;
 
     Vector4() : x(0), y(0), z(0), w(0) {}
-    Vector4(float _x, float _y, float _z, float _w) : x(_x), y(_y), z(_z), w(_w) {}
+    Vector4(units::world _x, units::world _y, units::world _z, units::world _w) : x(_x), y(_y), z(_z), w(_w) {}
 
     Vector4& operator= (const Vector4& vec) {x = vec.x; y = vec.y; z = vec.z; w = vec.w; return *this;}
     Vector4& operator+ (const Vector4& vec) {x += vec.x; y += vec.y; z += vec.z; w = vec.w; return *this;}
@@ -60,26 +67,26 @@ struct Vector4
 
 struct Matrix
 {
-    float m[4][4];
+    units::world m[4][4];
 
     // TODO: add overloaded * for muls
     // TODO: get rid of this lmao
     Matrix& operator=(const XMFLOAT4X4 & xm)
     {
-        memcpy(this->m, xm.m, sizeof(float)*4*4);
+        memcpy(this->m, xm.m, sizeof(units::world)*4*4);
         return *this;
     }
-    bool operator== (const Matrix& matrix) {return memcmp(m, matrix.m, sizeof(float)*4*4) == 0;}
+    bool operator== (const Matrix& matrix) {return memcmp(m, matrix.m, sizeof(units::world)*4*4) == 0;}
     bool operator!= (const Matrix& matrix) {return !(*this == matrix);}
 };
 
 Matrix MatrixIdentity();
 Matrix MatrixLookAt(Vector3 pos, Vector3 look, Vector3 up);
 Matrix MatrixMultiply(Matrix first, Matrix second);
-Matrix MatrixOrthographic(float screen_width, float screen_height,
-                          float screen_near, float screen_depth);
+Matrix MatrixOrthographic(units::subpixel screen_width, units::subpixel screen_height,
+                          units::world screen_near, units::world screen_depth);
 Matrix MatrixPerspectiveFov(float fov, float screen_aspect,
-                            float screen_near, float screen_depth);
+                            units::world screen_near, units::world screen_depth);
 Matrix MatrixTranslation(float x, float y, float z);
 Matrix MatrixTranspose(Matrix in);
 Matrix MatrixView(Vector3 pos, Vector3 rot);

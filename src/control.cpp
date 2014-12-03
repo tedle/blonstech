@@ -7,7 +7,7 @@ namespace blons
 {
 namespace GUI
 {
-void Control::set_pos(float x, float y)
+void Control::set_pos(units::subpixel x, units::subpixel y)
 {
     pos_.x = x;
     pos_.y = y;
@@ -18,7 +18,7 @@ Box Control::pos() const
     return pos_;
 }
 
-void Control::set_crop(Box crop, int feather)
+void Control::set_crop(Box crop, units::pixel feather)
 {
     crop_ = crop;
     feather_ = feather;

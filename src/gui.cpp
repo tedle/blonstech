@@ -10,10 +10,10 @@ namespace blons
 {
 namespace GUI
 {
-Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
+Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
-    screen_dimensions_ = Vector2(static_cast<float>(width), static_cast<float>(height));
-    ortho_matrix_ = MatrixOrthographic(screen_dimensions_.x, screen_dimensions_.y,
+    screen_dimensions_ = Box(0, 0, width, height);
+    ortho_matrix_ = MatrixOrthographic(screen_dimensions_.w, screen_dimensions_.h,
                                        kScreenNear, kScreenDepth);
 
     ui_shader_ = std::move(ui_shader);
@@ -26,39 +26,36 @@ Manager::Manager(int width, int height, std::unique_ptr<Shader> ui_shader, Rende
     LoadFont("../../notes/font stuff/test-label.ttf", 20, FontType::LABEL, context);
     LoadFont("../../notes/font stuff/test-console.ttf", 28, FontType::CONSOLE, context);
     // TODO: get rid of main_window... i think
-    main_window_ = std::unique_ptr<Window>(new Window("main", Box(0, 0, screen_dimensions_.x, screen_dimensions_.y), WindowType::INVISIBLE, this));
+    main_window_ = std::unique_ptr<Window>(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), WindowType::INVISIBLE, this));
 }
 
 Manager::~Manager()
 {
 }
 
-bool Manager::LoadFont(std::string filename, int pixel_size, RenderContext& context)
+bool Manager::LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context)
 {
     return LoadFont(filename, pixel_size, FontType::DEFAULT, context);
 }
 
-bool Manager::LoadFont(std::string filename, int pixel_size, FontType usage, RenderContext& context)
+bool Manager::LoadFont(std::string filename, units::pixel pixel_size, FontType usage, RenderContext& context)
 {
     return skin_->LoadFont(filename, usage, pixel_size, context);
 }
 
-Window* Manager::MakeWindow(std::string id, int x, int y, int width, int height, std::string caption)
+Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
 {
     return MakeWindow(id, x, y, width, height, caption, WindowType::DRAGGABLE);
 }
 
-Window* Manager::MakeWindow(std::string id, int x, int y, int width, int height, WindowType type)
+Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, WindowType type)
 {
     return MakeWindow(id, x, y, width, height, "", type);
 }
 
-Window* Manager::MakeWindow(std::string id, int x, int y, int width, int height, std::string caption, WindowType type)
+Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, WindowType type)
 {
-    Box win_pos(static_cast<float>(x),
-                static_cast<float>(y),
-                static_cast<float>(width),
-                static_cast<float>(height));
+    Box win_pos(x, y, width, height);
     Window* temp_win;
     if (type == WindowType::DRAGGABLE)
     {
@@ -179,7 +176,7 @@ void Manager::set_active_window(Window* window)
     }
 }
 
-Vector2 Manager::screen_dimensions()
+Box Manager::screen_dimensions()
 {
     return screen_dimensions_;
 }

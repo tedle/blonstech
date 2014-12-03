@@ -4,6 +4,7 @@
 // Includes
 #include <vector>
 // Local Includes
+#include "math/units.h"
 #include "graphics/sprite.h"
 
 namespace blons
@@ -13,7 +14,7 @@ namespace GUI
 class Font
 {
 public:
-    Font(std::string font_filename, int pixel_size, RenderContext& context);
+    Font(std::string font_filename, units::pixel pixel_size, RenderContext& context);
     ~Font();
 
     const std::string kAvailableCharacters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -21,31 +22,31 @@ public:
                                              "`~0123456789!@#$%^&*()"
                                              " ,./<>?;':\"[]\\{}|-=_+";
 
-    Sprite* BuildSprite(unsigned char letter, int x, int y);
+    Sprite* BuildSprite(unsigned char letter, units::subpixel x, units::subpixel y);
     // Returns nullptr for completely cropped sprites
-    Sprite* BuildSprite(unsigned char letter, int x, int y, Box crop);
+    Sprite* BuildSprite(unsigned char letter, units::subpixel x, units::subpixel y, Box crop);
 
-    int cursor_offset(unsigned char letter) const;
+    units::pixel cursor_offset(unsigned char letter) const;
     // TODO: Might need to make this const char* for perf later, if its used a lot
     // Defaults trim_whitespace to true
-    int string_width(std::string string) const;
-    int string_width(std::string string, bool trim_whitespace) const;
+    units::pixel string_width(std::string string) const;
+    units::pixel string_width(std::string string, bool trim_whitespace) const;
     // Return how far to advance horizontally after rendering a character in pixels
     // Resets to 0 after call
-    int advance();
+    units::pixel advance();
     unsigned int index_count() const;
-    unsigned int letter_height() const;
-    unsigned int pixel_size() const;
+    units::pixel letter_height() const;
+    units::pixel pixel_size() const;
     const TextureResource* texture() const;
 
 private:
     struct Glyph;
     std::vector<Glyph> charset_;
     std::unique_ptr<class Sprite> fontsheet_;
-    unsigned int pixel_size_;
+    units::pixel pixel_size_;
     // Max letter height of chars A-Z, used for offsetting or centering text
-    unsigned int letter_height_;
-    int advance_;
+    units::pixel letter_height_;
+    units::pixel advance_;
 };
 } // namespace GUI
 } // namespace blons

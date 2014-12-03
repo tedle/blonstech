@@ -20,8 +20,8 @@ Button::Button(Box pos, std::string label, Manager* parent_manager, Window* pare
     if (label.length() > 0)
     {
         const auto& font = gui_->skin()->font(FontType::LABEL);
-        int caption_width = font->string_width(label);
-        int letter_height = font->letter_height();
+        units::pixel caption_width = font->string_width(label);
+        units::pixel letter_height = font->letter_height();
         // For centering the button caption
         Vector2 caption_pos;
         caption_pos.x = pos.x + floor((pos.w - caption_width) / 2 - font->cursor_offset(label[0]));
@@ -141,8 +141,8 @@ bool Button::Update(const Input& input)
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
-    int mx = input.mouse_x();
-    int my = input.mouse_y();
+    units::pixel mx = input.mouse_x();
+    units::pixel my = input.mouse_y();
 
     // Cursor inside button
     if (mx >= x && mx < x + pos_.w &&

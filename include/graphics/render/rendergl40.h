@@ -16,7 +16,7 @@ class RenderGL40 : public RenderAPI
 {
     
 public:
-    RenderGL40(int screen_width, int screen_height, bool vsync,
+    RenderGL40(units::pixel screen_width, units::pixel screen_height, bool vsync,
                HWND hwnd, bool fullscreen);
     ~RenderGL40();
 

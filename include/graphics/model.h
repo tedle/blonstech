@@ -23,7 +23,7 @@ public:
     Vector3 pos() const;
     Matrix world_matrix() const;
 
-    void set_pos(float x, float y, float z);
+    void set_pos(units::world x, units::world y, units::world z);
 
 protected:
     std::unique_ptr<class Mesh> mesh_;

@@ -15,37 +15,42 @@ void Timer::start()
     // Restart if not paused
     if (!paused_)
     {
-        milliseconds_ = 0;
+        microseconds_ = 0;
     }
     paused_ = false;
-    time_offset_ = GetTickCount64();
+    time_offset_ = units::time::ms_to_us(GetTickCount64());
 }
 
 void Timer::pause()
 {
     paused_ = true;
-    milliseconds_ += GetTickCount64() - time_offset_;
+    microseconds_ += units::time::ms_to_us(GetTickCount64()) - time_offset_;
 }
 
 void Timer::stop()
 {
     paused_ = true;
-    milliseconds_ = 0;
+    microseconds_ = 0;
     time_offset_ = 0;
 }
 
 void Timer::rewind(units::time::ms ms)
 {
-    milliseconds_ -= ms;
+    microseconds_ -= units::time::ms_to_us(ms);
 }
 
 units::time::ms Timer::ms()
 {
+    return units::time::us_to_ms(us());
+}
+
+units::time::us Timer::us()
+{
     if (!paused_)
     {
-        milliseconds_ += GetTickCount64() - time_offset_;
-        time_offset_ = GetTickCount64();
+        microseconds_ += units::time::ms_to_us(GetTickCount64()) - time_offset_;
+        time_offset_ = units::time::ms_to_us(GetTickCount64());
     }
-    return milliseconds_;
+    return microseconds_;
 }
 } // namespace blons

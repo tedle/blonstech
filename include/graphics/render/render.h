@@ -23,8 +23,8 @@ struct Vertex
 struct PixelData
 {
     std::unique_ptr<unsigned char> pixels;
-    int width;
-    int height;
+    units::pixel width;
+    units::pixel height;
     enum BitDepth {
         A8       = 8,
         R8G8B8   = 24,

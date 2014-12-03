@@ -19,7 +19,7 @@ class Client{
 public:
     struct Info
     {
-        int width, height;
+        units::pixel width, height;
         HWND hwnd;
     };
 
@@ -37,7 +37,7 @@ public:
 
 private:
     // Private functions
-    void InitWindow(int* width, int* height);
+    void InitWindow(units::pixel* width, units::pixel* height);
 
     // Private members
     LPCWSTR app_name_;

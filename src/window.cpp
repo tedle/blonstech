@@ -15,9 +15,9 @@ Window::Window(std::string id, Box pos, std::string caption, WindowType type, Ma
     dragging_ = false;
     drag_offset_ = Vector2(0, 0);
 
-    int title_bar_height = static_cast<int>(gui_->skin()->layout()->window.title.center.h);
-    size_t letter_height = gui_->skin()->font(FontType::HEADING)->letter_height();
-    float caption_offset = static_cast<float>((title_bar_height + letter_height) / 2);
+    units::subpixel title_bar_height = gui_->skin()->layout()->window.title.center.h;
+    units::subpixel letter_height = units::pixel_to_subpixel(gui_->skin()->font(FontType::HEADING)->letter_height());
+    units::subpixel caption_offset = (title_bar_height + letter_height) / 2;
     Vector2 caption_pos(20, caption_offset);
     for (auto& c : caption)
     {
@@ -65,7 +65,7 @@ void Window::Render(RenderContext& context)
         // Body
         {
             // Add offset if window has a title bar
-            float t_off = 0.0;
+            units::subpixel t_off = 0.0;
             if (type_ == WindowType::DRAGGABLE)
             {
                 t_off = layout->window.title.center.h;
@@ -165,8 +165,8 @@ bool Window::Update(const Input& input)
 {
     bool input_handled = false;
 
-    int mx = input.mouse_x();
-    int my = input.mouse_y();
+    units::pixel mx = input.mouse_x();
+    units::pixel my = input.mouse_y();
 
     for (const auto& e : input.event_queue())
     {
@@ -200,22 +200,22 @@ bool Window::Update(const Input& input)
     {
         set_pos(mx - drag_offset_.x, my - drag_offset_.y);
 
-        Vector2 screen = gui_->screen_dimensions();
+        Box screen = gui_->screen_dimensions();
         if (pos_.x < 0)
         {
             pos_.x = 0;
         }
-        if (pos_.x + pos_.w > screen.x)
+        if (pos_.x + pos_.w > screen.w)
         {
-            pos_.x = screen.x - pos_.w;
+            pos_.x = screen.w - pos_.w;
         }
         if (pos_.y < 0)
         {
             pos_.y = 0;
         }
-        if (pos_.y + pos_.h > screen.y)
+        if (pos_.y + pos_.h > screen.h)
         {
-            pos_.y = screen.y - pos_.h;
+            pos_.y = screen.h - pos_.h;
         }
         input_handled = true;
     }
@@ -228,32 +228,26 @@ bool Window::Update(const Input& input)
     return input_handled;
 }
 
-Button* Window::MakeButton(int x, int y, int width, int height, std::string label)
+Button* Window::MakeButton(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string label)
 {
-    Box pos(static_cast<float>(x),
-            static_cast<float>(y),
-            static_cast<float>(width),
-            static_cast<float>(height));
+    Box pos(x, y, width, height);
     std::unique_ptr<Button> button(new Button(pos, label, gui_, this));
     controls_.push_back(std::move(button));
     return static_cast<Button*>(controls_.back().get());
 }
 
-Label* Window::MakeLabel(int x, int y, std::string text)
+Label* Window::MakeLabel(units::pixel x, units::pixel y, std::string text)
 {
-    Vector2 pos(static_cast<float>(x),
-                static_cast<float>(y));
+    Vector2 pos(units::pixel_to_subpixel(x),
+                units::pixel_to_subpixel(y));
     std::unique_ptr<Label> label(new Label(pos, text, gui_, this));
     controls_.push_back(std::move(label));
     return static_cast<Label*>(controls_.back().get());
 }
 
-Textbox* Window::MakeTextbox(int x, int y, int width, int height)
+Textbox* Window::MakeTextbox(units::pixel x, units::pixel y, units::pixel width, units::pixel height)
 {
-    Box pos(static_cast<float>(x),
-            static_cast<float>(y),
-            static_cast<float>(width),
-            static_cast<float>(height));
+    Box pos(x, y, width, height);
     std::unique_ptr<Textbox> textbox(new Textbox(pos, gui_, this));
     controls_.push_back(std::move(textbox));
     return static_cast<Textbox*>(controls_.back().get());

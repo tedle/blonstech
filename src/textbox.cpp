@@ -19,7 +19,7 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](){};
 
-    padding_ = static_cast<int>(gui_->skin()->layout()->textbox.normal.left.w * 2);
+    padding_ = units::subpixel_to_pixel(gui_->skin()->layout()->textbox.normal.left.w * 2);
     // For vertically centering the text
     const auto& font = gui_->skin()->font(FontType::LABEL);
     std::size_t letter_height = font->letter_height();
@@ -142,7 +142,7 @@ void Textbox::Render(RenderContext& context)
     RegisterBatches();
 
     // Input text yall
-    text_label_->set_crop(Box(x + padding_ / 2, 0, pos_.w - padding_, 0), padding_ / 2);
+    text_label_->set_crop(Box(x + padding_ / 2, 0.0f, pos_.w - padding_, 0.0f), padding_ / 2);
     text_label_->Render(context);
 }
 
@@ -222,8 +222,8 @@ void Textbox::OnMouseDown(const Input& input)
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
-    int mx = input.mouse_x();
-    int my = input.mouse_y();
+    units::pixel mx = input.mouse_x();
+    units::pixel my = input.mouse_y();
 
     // Clicked inside textbox
     if (mx >= x && mx < x + pos_.w &&
@@ -325,7 +325,7 @@ void Textbox::SetCursorPos(std::string::iterator cursor)
     }
 }
 
-float Textbox::CursorOffset()
+units::subpixel Textbox::CursorOffset()
 {
     const auto font = gui_->skin()->font(FontType::LABEL);
     const auto layout = gui_->skin()->layout();

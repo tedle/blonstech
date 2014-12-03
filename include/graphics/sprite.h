@@ -28,15 +28,15 @@ public:
 
     // The set the position and/or size of sprite
     // as rendered on screen in pixels
-    void set_pos(float x, float y);
-    void set_pos(float x, float y, float w, float h);
-    void set_pos(int x, int y);
-    void set_pos(int x, int y, int w, int h);
+    void set_pos(units::subpixel x, units::subpixel y);
+    void set_pos(units::subpixel x, units::subpixel y, units::subpixel w, units::subpixel h);
+    void set_pos(units::pixel x, units::pixel y);
+    void set_pos(units::pixel x, units::pixel y, units::pixel w, units::pixel h);
     void set_pos(Box pos);
     // Sets the subregion of sprite texture that is rendered
     // Measured in pixels of texture
-    void set_subtexture(float x, float y, float w, float h);
-    void set_subtexture(int x, int y, int w, int h);
+    void set_subtexture(units::subpixel x, units::subpixel y, units::subpixel w, units::subpixel h);
+    void set_subtexture(units::pixel x, units::pixel y, units::pixel w, units::pixel h);
     void set_subtexture(Box subtexture);
 
 protected:

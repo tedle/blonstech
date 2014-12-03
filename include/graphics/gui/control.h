@@ -2,6 +2,7 @@
 #define BLONSTECH_GRAPHICS_GUI_CONTROL_H_
 
 // Local Includes
+#include "math/units.h"
 #include "graphics/gui/skin.h"
 #include "graphics/render/drawbatcher.h"
 #include "input/inputtemp.h"
@@ -21,7 +22,7 @@ struct DrawCallInputs
     FontType usage;
     Vector4 colour;
     Box crop;
-    int crop_feather;
+    units::pixel crop_feather;
 };
 
 // Cacheable draw call info
@@ -40,16 +41,16 @@ public:
     virtual void Render(RenderContext& context)=0;
     virtual bool Update(const Input& input)=0;
 
-    void set_pos(float x, float y);
+    void set_pos(units::subpixel x, units::subpixel y);
     Box pos() const;
 
-    void set_crop(Box crop, int feather);
+    void set_crop(Box crop, units::pixel feather);
 
 protected:
     // Feel kinda dirty doing all this initialization here
     Box pos_ = Box(0, 0, 0, 0);
     Box crop_ = Box(0, 0, 0, 0);
-    int feather_ = 0;
+    units::pixel feather_ = 0;
     Manager* gui_ = nullptr;
     Window* parent_ = nullptr;
 

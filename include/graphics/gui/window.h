@@ -30,9 +30,9 @@ public:
     void Render(RenderContext& context);
     bool Update(const Input& input);
 
-    Button* MakeButton(int x, int y, int width, int height, std::string label);
-    Label* MakeLabel(int x, int y, std::string text);
-    Textbox* MakeTextbox(int x, int y, int width, int height);
+    Button* MakeButton(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string label);
+    Label* MakeLabel(units::pixel x, units::pixel y, std::string text);
+    Textbox* MakeTextbox(units::pixel x, units::pixel y, units::pixel width, units::pixel height);
 
     const std::string id() const;
 

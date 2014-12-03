@@ -14,7 +14,7 @@ public:
     enum Type {DIFFUSE, NORMAL, LIGHT, SPRITE};
     struct Info
     {
-        int width, height;
+        units::pixel width, height;
         Type type;
     };
 

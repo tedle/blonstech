@@ -19,10 +19,10 @@ enum RenderMode
     BORDERLESS_WINDOW
 };
 
-const RenderMode kRenderMode  = RenderMode::WINDOW;
-const bool       kEnableVsync = false;
-const float      kScreenDepth = 10000.0f;
-const float      kScreenNear  = 0.1f;
+const RenderMode   kRenderMode  = RenderMode::WINDOW;
+const bool         kEnableVsync = false;
+const units::world kScreenDepth = 10000.0f;
+const units::world kScreenNear  = 0.1f;
 
 // Forward declarations
 namespace GUI { class Manager; }
@@ -39,7 +39,7 @@ class Shader;
 class Graphics
 {
 public:
-    Graphics(int screen_width, int screen_height, HWND hwnd);
+    Graphics(units::pixel screen_width, units::pixel screen_height, HWND hwnd);
     ~Graphics();
 
     std::unique_ptr<Model> MakeModel(std::string filename);

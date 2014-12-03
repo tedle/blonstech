@@ -114,7 +114,7 @@ GLint ShaderResourceGL40::UniformLocation(const char* name)
     return it->second;
 }
 
-RenderGL40::RenderGL40(int screen_width, int screen_height, bool vsync, HWND hwnd, bool fullscreen)
+RenderGL40::RenderGL40(units::pixel screen_width, units::pixel screen_height, bool vsync, HWND hwnd, bool fullscreen)
 {
     // Mitigates repeated calls to glUseProgram
     g_active_shader = 0;

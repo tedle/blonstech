@@ -3,6 +3,8 @@
 
 // Includes
 #include <vector>
+// Local Includes
+#include "math/units.h"
 
 namespace blons
 {
@@ -135,15 +137,15 @@ public:
 
     Modifiers modifiers() const;
 
-    int mouse_x() const;
-    int mouse_y() const;
-    int mouse_delta_x() const;
-    int mouse_delta_y() const;
+    units::pixel mouse_x() const;
+    units::pixel mouse_y() const;
+    units::pixel mouse_delta_x() const;
+    units::pixel mouse_delta_y() const;
     const std::vector<Event>& Input::event_queue() const;
 
 private:
     bool keys_[256];
-    int mouse_x_, mouse_y_, old_mouse_x_, old_mouse_y_, delta_mouse_x_, delta_mouse_y_;
+    units::pixel mouse_x_, mouse_y_, old_mouse_x_, old_mouse_y_, delta_mouse_x_, delta_mouse_y_;
     bool buttons_[5];
 
     std::vector<Event> event_queue_;

@@ -19,7 +19,7 @@ Client::Client()
     // Initialize logger
     g_log = std::unique_ptr<LoggerAPI>(new LoggerIDE(LoggerAPI::Level::DEBUG));
 
-    int screen_width, screen_height;
+    units::pixel screen_width, screen_height;
     screen_width = screen_height = 0;
 
     // Open window and get w+h
@@ -85,12 +85,12 @@ Client::Info Client::screen_info() const
     return screen_info_;
 }
 
-void Client::InitWindow(int* screen_width, int* screen_height)
+void Client::InitWindow(units::pixel* screen_width, units::pixel* screen_height)
 {
     WNDCLASSEX wc = {};
     DEVMODE screen_settings;
-    int pos_x, pos_y;
-    int r_width, r_height;
+    units::pixel pos_x, pos_y;
+    units::pixel r_width, r_height;
     DWORD style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
 
     // TODO: Temporary until Direct & Raw input are setup

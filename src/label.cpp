@@ -9,7 +9,7 @@ namespace GUI
 {
 Label::Label(Vector2 pos, std::string text, FontType font_type, Manager* parent_manager, Window* parent_window)
 {
-    pos_ = Box(pos.x, pos.y, 0, 0);
+    pos_ = Box(pos.x, pos.y, 0.0f, 0.0f);
     text_ = ColourString(text);
     colour_parsing_ = true;
     font_type_ = font_type;
@@ -22,8 +22,8 @@ void Label::Render(RenderContext& context)
     auto font = gui_->skin()->font(font_type_);
 
     auto parent_pos = parent_->pos();
-    int x = static_cast<int>(pos_.x + parent_pos.x);
-    int y = static_cast<int>(pos_.y + parent_pos.y);
+    units::subpixel x = pos_.x + parent_pos.x;
+    units::subpixel y = pos_.y + parent_pos.y;
     if (colour_parsing_)
     {
         for (const auto& frag : text_.fragments())

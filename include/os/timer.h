@@ -18,10 +18,11 @@ public:
     void rewind(units::time::ms ms);
 
     units::time::ms ms();
+    units::time::us us();
 
 private:
-    units::time::ms milliseconds_;
-    units::time::ms time_offset_;
+    units::time::us microseconds_;
+    units::time::us time_offset_;
     bool paused_;
 };
 } // namespace blons

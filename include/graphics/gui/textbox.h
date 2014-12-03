@@ -35,7 +35,7 @@ private:
     std::function<void()> callback_;
     bool active_;
     // Padding between edge of textbox and text
-    int padding_;
+    units::pixel padding_;
 
     // Helper functions
     std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input);
@@ -43,7 +43,7 @@ private:
     void OnKeyDown(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
     void OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
     void SetCursorPos(std::string::iterator cursor);
-    float CursorOffset();
+    units::subpixel CursorOffset();
 };
 } // namespace GUI
 } // namespace blons

@@ -11,9 +11,9 @@ public:
     Camera();
     ~Camera();
 
-    void set_pos(float x, float y, float z);
-    void set_rot(float pitch, float yaw, float roll);
-    void LookAt(float x, float y, float z);
+    void set_pos(units::world x, units::world y, units::world z);
+    void set_rot(units::world pitch, units::world yaw, units::world roll);
+    void LookAt(units::world x, units::world y, units::world z);
 
     void Render();
 

@@ -85,12 +85,12 @@ Vector2 Sprite::dimensions() const
     return Vector2(pos_.w, pos_.h);
 }
 
-void Sprite::set_pos(float x, float y)
+void Sprite::set_pos(units::subpixel x, units::subpixel y)
 {
     set_pos(x, y, pos_.w, pos_.h);
 }
 
-void Sprite::set_pos(float x, float y, float w, float h)
+void Sprite::set_pos(units::subpixel x, units::subpixel y, units::subpixel w, units::subpixel h)
 {
     pos_.x = x;
     pos_.y = y;
@@ -98,17 +98,17 @@ void Sprite::set_pos(float x, float y, float w, float h)
     pos_.h = h;
 }
 
-void Sprite::set_pos(int x, int y)
+void Sprite::set_pos(units::pixel x, units::pixel y)
 {
-    set_pos(static_cast<float>(x), static_cast<float>(y));
+    set_pos(units::pixel_to_subpixel(x), units::pixel_to_subpixel(y));
 }
 
-void Sprite::set_pos(int x, int y, int w, int h)
+void Sprite::set_pos(units::pixel x, units::pixel y, units::pixel w, units::pixel h)
 {
-    set_pos(static_cast<float>(x),
-            static_cast<float>(y),
-            static_cast<float>(w),
-            static_cast<float>(h));
+    set_pos(units::pixel_to_subpixel(x),
+            units::pixel_to_subpixel(y),
+            units::pixel_to_subpixel(w),
+            units::pixel_to_subpixel(h));
 }
 
 void Sprite::set_pos(Box pos)
@@ -116,7 +116,7 @@ void Sprite::set_pos(Box pos)
     set_pos(pos.x, pos.y, pos.w, pos.h);
 }
 
-void Sprite::set_subtexture(float x, float y, float w, float h)
+void Sprite::set_subtexture(units::subpixel x, units::subpixel y, units::subpixel w, units::subpixel h)
 {
     tex_map_.x = x;
     tex_map_.y = y;
@@ -124,12 +124,12 @@ void Sprite::set_subtexture(float x, float y, float w, float h)
     tex_map_.h = h;
 }
 
-void Sprite::set_subtexture(int x, int y, int w, int h)
+void Sprite::set_subtexture(units::pixel x, units::pixel y, units::pixel w, units::pixel h)
 {
-    set_subtexture(static_cast<float>(x),
-                   static_cast<float>(y),
-                   static_cast<float>(w),
-                   static_cast<float>(h));
+    set_subtexture(units::pixel_to_subpixel(x),
+                   units::pixel_to_subpixel(y),
+                   units::pixel_to_subpixel(w),
+                   units::pixel_to_subpixel(h));
 }
 
 void Sprite::set_subtexture(Box subtexture)
