@@ -34,6 +34,8 @@ private:
     std::unique_ptr<class Label> text_label_;
     std::function<void()> callback_;
     bool active_;
+    // Padding between edge of textbox and text
+    int padding_;
 
     // Helper functions
     std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input);

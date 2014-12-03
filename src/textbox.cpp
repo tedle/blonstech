@@ -19,11 +19,12 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](){};
 
+    padding_ = static_cast<int>(gui_->skin()->layout()->textbox.normal.left.w * 2);
     // For vertically centering the text
     const auto& font = gui_->skin()->font(FontType::LABEL);
     std::size_t letter_height = font->letter_height();
     Vector2 text_pos;
-    text_pos.x = pos.x + gui_->skin()->layout()->textbox.normal.left.w * 2;
+    text_pos.x = pos.x + padding_;
     text_pos.y = pos.y + floor((pos.h + letter_height) / 2);
     text_label_ = std::unique_ptr<Label>(new Label(text_pos, text_, gui_, parent_));
     text_label_->set_colour_parsing(false);
@@ -140,9 +141,8 @@ void Textbox::Render(RenderContext& context)
 
     RegisterBatches();
 
-    // Button text yall
-    auto border = t->left.w;
-    text_label_->set_crop(Box(x + border, 0, pos_.w - border * 2, 0), static_cast<int>(border));
+    // Input text yall
+    text_label_->set_crop(Box(x + padding_ / 2, 0, pos_.w - padding_, 0), padding_ / 2);
     text_label_->Render(context);
 }
 
@@ -309,19 +309,18 @@ void Textbox::OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modif
 void Textbox::SetCursorPos(std::string::iterator cursor)
 {
     cursor_ = cursor;
-    const auto skin_offset = gui_->skin()->layout()->textbox.normal.left.w * 2;
     const auto label_pos = text_label_->pos();
     const auto cursor_offset = CursorOffset();
     // Cursor out of bounds right side
-    if (cursor_offset >= pos_.w - skin_offset)
+    if (cursor_offset >= pos_.w - padding_)
     {
-        auto label_diff = cursor_offset - (pos_.w - skin_offset) + 1;
+        auto label_diff = cursor_offset - (pos_.w - padding_) + 1;
         text_label_->set_pos(label_pos.x - label_diff, label_pos.y);
     }
     // Cursor out of bounds left side
-    else if (cursor_offset < skin_offset)
+    else if (cursor_offset < padding_)
     {
-        auto label_diff = cursor_offset - skin_offset;
+        auto label_diff = cursor_offset - padding_;
         text_label_->set_pos(label_pos.x - label_diff, label_pos.y);
     }
 }
@@ -330,9 +329,8 @@ float Textbox::CursorOffset()
 {
     const auto font = gui_->skin()->font(FontType::LABEL);
     const auto layout = gui_->skin()->layout();
-    const auto skin_offset = layout->textbox.normal.left.w * 2;
-    const auto label_offset = text_label_->pos().x - (pos_.x + skin_offset);
-    const auto cursor_offset = font->string_width(std::string(text_.begin(), cursor_), false) + label_offset + skin_offset;
+    const auto label_offset = text_label_->pos().x - (pos_.x + padding_);
+    const auto cursor_offset = font->string_width(std::string(text_.begin(), cursor_), false) + label_offset + padding_;
     return cursor_offset;
 }
 } // namespace GUI
