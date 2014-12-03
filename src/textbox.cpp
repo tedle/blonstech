@@ -190,7 +190,7 @@ void Textbox::set_text(std::string text)
 {
     text_ = text;
     text_label_->set_text(text_);
-    cursor_ = text_.end();
+    SetCursorPos(text_.end());
 }
 
 std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input)
