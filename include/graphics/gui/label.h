@@ -23,12 +23,15 @@ public:
     bool Update(const Input& input);
 
     void set_text(std::string text);
+    // True if you want $fff colour codes parsed, default true
+    void set_colour_parsing(bool colour_parsing);
 
 private:
     void Init(Vector2 pos, std::string text, FontType font_type, Manager* parent_manager, Window* parent_window);
 
     FontType font_type_;
     ColourString text_;
+    bool colour_parsing_;
 };
 } // namespace GUI
 } // namespace blons

@@ -21,6 +21,7 @@ void Label::Init(Vector2 pos, std::string text, FontType font_type, Manager* par
 {
     pos_ = Box(pos.x, pos.y, 0, 0);
     text_ = ColourString(text);
+    colour_parsing_ = true;
     font_type_ = font_type;
     gui_ = parent_manager;
     parent_ = parent_window;
@@ -33,11 +34,27 @@ void Label::Render(RenderContext& context)
     auto parent_pos = parent_->pos();
     int x = static_cast<int>(pos_.x + parent_pos.x);
     int y = static_cast<int>(pos_.y + parent_pos.y);
-    for (const auto& frag : text_.fragments())
+    if (colour_parsing_)
     {
-        // One draw call per (colour,font) used across all labels combined
-        auto batcher = font_batch(font_type_, frag.colour, context);
-        for (const auto& c : frag.text)
+        for (const auto& frag : text_.fragments())
+        {
+            // One draw call per (colour,font) used across all labels combined
+            auto batcher = font_batch(font_type_, frag.colour, context);
+            for (const auto& c : frag.text)
+            {
+                auto sprite = font->BuildSprite(c, x, y, crop_);
+                if (sprite != nullptr)
+                {
+                    batcher->Append(*sprite->mesh());
+                }
+                x += font->advance();
+            }
+        }
+    }
+    else
+    {
+        auto batcher = font_batch(font_type_, kDefaultTextColour, context);
+        for (const auto& c : text_.raw_str())
         {
             auto sprite = font->BuildSprite(c, x, y, crop_);
             if (sprite != nullptr)
@@ -59,6 +76,11 @@ bool Label::Update(const Input& input)
 void Label::set_text(std::string text)
 {
     text_ = ColourString(text);
+}
+
+void Label::set_colour_parsing(bool colour_parsing)
+{
+    colour_parsing_ = colour_parsing;
 }
 } // namespace GUI
 } // namespace blons

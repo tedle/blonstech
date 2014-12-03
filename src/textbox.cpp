@@ -26,6 +26,7 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
     text_pos.x = pos.x + gui_->skin()->layout()->textbox.normal.left.w * 2;
     text_pos.y = pos.y + floor((pos.h + letter_height) / 2);
     text_label_ = std::unique_ptr<Label>(new Label(text_pos, text_, gui_, parent_));
+    text_label_->set_colour_parsing(false);
 }
 
 void Textbox::Render(RenderContext& context)
