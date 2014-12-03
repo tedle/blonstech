@@ -7,17 +7,7 @@ namespace blons
 {
 namespace GUI
 {
-Label::Label(Vector2 pos, std::string text, Manager* parent_manager, Window* parent_window)
-{
-    Init(pos, text, FontType::LABEL, parent_manager, parent_window);
-}
-
 Label::Label(Vector2 pos, std::string text, FontType font_type, Manager* parent_manager, Window* parent_window)
-{
-    Init(pos, text, font_type, parent_manager, parent_window);
-}
-
-void Label::Init(Vector2 pos, std::string text, FontType font_type, Manager* parent_manager, Window* parent_window)
 {
     pos_ = Box(pos.x, pos.y, 0, 0);
     text_ = ColourString(text);

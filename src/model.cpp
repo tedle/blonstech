@@ -13,11 +13,6 @@ namespace blons
 {
 Model::Model(std::string mesh_filename, RenderContext& context)
 {
-    Init(mesh_filename, context);
-}
-
-void Model::Init(std::string mesh_filename, RenderContext& context)
-{
     mesh_ = nullptr;
     diffuse_texture_ = nullptr;
     normal_texture_ = nullptr;

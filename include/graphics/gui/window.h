@@ -20,9 +20,11 @@ enum WindowType
 class Window : public Control
 {
 public:
-    // Only draggable windows can have a caption, so type is omitted for that constructor
-    Window(std::string id, Box pos, WindowType type, Manager* parent_manager);
-    Window(std::string id, Box pos, std::string caption, Manager* parent_manager);
+    Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager);
+    Window(std::string id, Box pos, WindowType type, Manager* parent_manager)
+        : Window(id, pos, "", type, parent_manager) {}
+    Window(std::string id, Box pos, std::string caption, Manager* parent_manager)
+        : Window(id, pos, caption, WindowType::DRAGGABLE, parent_manager) {}
     ~Window() {}
 
     void Render(RenderContext& context);
@@ -35,8 +37,6 @@ public:
     const std::string id() const;
 
 private:
-    void Init(Box pos, std::string caption, WindowType type, Manager* parent_manager);
-
     const std::string id_;
     WindowType type_;
     std::vector<std::unique_ptr<Control>> controls_;

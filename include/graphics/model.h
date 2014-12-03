@@ -26,8 +26,6 @@ public:
     void set_pos(float x, float y, float z);
 
 protected:
-    void Init(std::string mesh_filename, RenderContext& context);
-
     std::unique_ptr<class Mesh> mesh_;
     std::unique_ptr<Texture> diffuse_texture_;
     std::unique_ptr<Texture> normal_texture_;
