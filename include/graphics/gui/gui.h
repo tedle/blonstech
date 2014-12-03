@@ -4,6 +4,7 @@
 // Includes
 #include <map>
 // Local Includes
+#include "math/animation.h"
 #include "input/inputtemp.h"
 #include "graphics/render/drawbatcher.h"
 #include "graphics/gui/control.h"

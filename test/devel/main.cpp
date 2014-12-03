@@ -18,9 +18,11 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models[1]->set_pos(10.0, 0.0, 20.0);
     //models = blons::load_codmap("../../notes/bms_test", std::move(models), graphics.get());
 
+    // Sprite 1
     auto sprite = graphics->MakeSprite("../../notes/me.dds");
     sprite->set_pos(0, 0, 32, 32);
 
+    // GUI testing
     gui->MakeWindow("test", 20, 80, 400, 200, "Friendly window");
     gui->MakeWindow("yoyo", 450, 250, 300, 300, "Amicable window");
     gui->window("test")->MakeLabel(10, 70, "HAello! blonsUI in action!");
@@ -34,6 +36,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     gui->window("test")->MakeButton(10, 150, 120, 40, "Print!")->set_callback(print);
     gui->window("yoyo")->MakeButton(10, 250, 280, 40, "Other button!")->set_callback([](){blons::g_log->Debug("whats up?\n");});
 
+    // Animation testing
+    blons::Animation::Callback cb = [](float d){ blons::g_log->Debug("%.4f\n", d); };
+    blons::Animation animate(1000, cb);
+
     bool quit = false;
     while (!quit)
     {
@@ -46,6 +52,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         {
             blons::temp::noclip(client->input(), graphics->camera());
         }
+        animate.Update();
         graphics->Render();
     }
 
