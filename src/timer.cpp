@@ -34,12 +34,12 @@ void Timer::stop()
     time_offset_ = 0;
 }
 
-void Timer::rewind(time_t ms)
+void Timer::rewind(units::time::ms ms)
 {
     milliseconds_ -= ms;
 }
 
-time_t Timer::ms()
+units::time::ms Timer::ms()
 {
     if (!paused_)
     {

@@ -1,8 +1,8 @@
 #ifndef BLONSTECH_OS_TIMER_H_
 #define BLONSTECH_OS_TIMER_H_
 
-// Includes
-#include <cstddef>
+// Local Includes
+#include "math/units.h"
 
 namespace blons
 {
@@ -15,13 +15,13 @@ public:
     void start();
     void pause();
     void stop();
-    void rewind(time_t ms);
+    void rewind(units::time::ms ms);
 
-    time_t ms();
+    units::time::ms ms();
 
 private:
-    time_t milliseconds_;
-    time_t time_offset_;
+    units::time::ms milliseconds_;
+    units::time::ms time_offset_;
     bool paused_;
 };
 } // namespace blons
