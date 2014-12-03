@@ -63,6 +63,8 @@ ColourString::ColourString()
 
 ColourString::ColourString(std::string text)
 {
+    raw_text_ = text;
+
     Fragment next_frag;
     next_frag.colour = kDefaultTextColour;
     while (text.length() > 0)
@@ -71,6 +73,7 @@ ColourString::ColourString(std::string text)
         next_frag.text = text.substr(0, code_pos);
         if (next_frag.text.length() > 0)
         {
+            text_ += next_frag.text;
             text_fragments_.push_back(next_frag);
         }
         if (code_pos != std::string::npos)
@@ -98,6 +101,16 @@ ColourString::~ColourString()
 const std::vector<ColourString::Fragment>& ColourString::fragments() const
 {
     return text_fragments_;
+}
+
+const std::string& ColourString::str() const
+{
+    return text_;
+}
+
+const std::string& ColourString::raw_str() const
+{
+    return raw_text_;
 }
 } // namespace GUI
 } // namespace blons

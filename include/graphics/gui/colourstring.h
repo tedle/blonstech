@@ -32,9 +32,14 @@ public:
     ~ColourString();
 
     const std::vector<Fragment>& fragments() const;
+    const std::string& str() const;
+    // Unparsed colour string
+    const std::string& raw_str() const;
 
 private:
     std::vector<Fragment> text_fragments_;
+    std::string text_;
+    std::string raw_text_;
 };
 } // namespace GUI
 } // namespace blons
