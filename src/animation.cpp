@@ -19,15 +19,15 @@ bool Animation::Update()
         return true;
     }
 
-    auto elapsed = timer_.ms();
-    if (elapsed > duration_)
+    auto elapsed = timer_.us();
+    if (elapsed > units::time::ms_to_us(duration_))
     {
         completed_ = true;
         callback_(1.0f);
     }
     else
     {
-        float completion = static_cast<float>(elapsed) / duration_;
+        float completion = static_cast<float>(elapsed) / units::time::ms_to_us(duration_);
         callback_(completion);
     }
     return completed_;
