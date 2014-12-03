@@ -18,9 +18,9 @@ static unsigned int HashString(const char* str)
     static const unsigned int kPrime = 16777619;
     static const unsigned int kOffset = 2166136261;
     unsigned int hash = kOffset;
-    for (int i = 0; str[i] != '\0'; i++)
+    while (*str != '\0')
     {
-        hash ^= str[i];
+        hash ^= *str++;
         hash *= kPrime;
     }
     return hash;
