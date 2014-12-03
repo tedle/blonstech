@@ -13,7 +13,14 @@ class Animation
 public:
     enum TweenType
     {
-        LINEAR
+        LINEAR,
+        QUAD_IN,
+        QUAD_OUT,
+        QUAD_IN_OUT,
+        QUINT_IN,
+        QUINT_OUT,
+        QUINT_IN_OUT,
+        SMOOTHSTEP
     };
     typedef std::function<void(float)> Callback;
 
@@ -24,6 +31,8 @@ public:
         : Animation(duration, callback, LINEAR) {}
     ~Animation() {};
 
+    // Restarts animation from beginning
+    void Reset();
     // Returns true on completion
     bool Update();
 

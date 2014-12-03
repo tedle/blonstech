@@ -23,8 +23,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     sprite->set_pos(0, 0, 32, 32);
 
     // GUI testing
-    gui->MakeWindow("test", 20, 80, 400, 200, "Friendly window");
     gui->MakeWindow("yoyo", 450, 250, 300, 300, "Amicable window");
+    gui->MakeWindow("test", 20, 80, 400, 200, "Friendly window");
     gui->window("test")->MakeLabel(10, 70, "HAello! blonsUI in action!");
     auto textbox = gui->window("test")->MakeTextbox(135, 150, 255, 40);
     auto print = [textbox]()
@@ -34,11 +34,15 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     };
     textbox->set_callback(print);
     gui->window("test")->MakeButton(10, 150, 120, 40, "Print!")->set_callback(print);
-    gui->window("yoyo")->MakeButton(10, 250, 280, 40, "Other button!")->set_callback([](){blons::g_log->Debug("whats up?\n");});
 
     // Animation testing
-    blons::Animation::Callback cb = [](float d){ blons::g_log->Debug("%.4f\n", d); };
-    blons::Animation animate(1000, cb);
+    blons::Animation::Callback cbd = [](float d){ blons::g_log->Debug("%.4f\n", d); };
+    blons::Animation::Callback cbx = [&](float d){ gui->window("test")->set_pos(d * 600 - 500, gui->window("test")->pos().y); };
+    blons::Animation::Callback cby = [&](float d){ gui->window("test")->set_pos(gui->window("test")->pos().x, 362 - d * 300); };
+    blons::Animation animatex(800, cbx, blons::Animation::QUINT_OUT);
+    //blons::Animation animatey(500, cby, blons::Animation::QUINT_OUT);
+
+    gui->window("yoyo")->MakeButton(10, 250, 280, 40, "New window!")->set_callback([&animatex](){ animatex.Reset(); });
 
     bool quit = false;
     while (!quit)
@@ -52,7 +56,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         {
             blons::temp::noclip(client->input(), graphics->camera());
         }
-        animate.Update();
+        animatex.Update();
+        //animatey.Update();
         graphics->Render();
     }
 
