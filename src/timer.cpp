@@ -1,7 +1,19 @@
 #include "os/timer.h"
 
-// Includes
+// Stop gap platform isolation
+namespace
+{
+// Quarantine this sucker
 #include <Windows.h>
+
+blons::units::time::us GetMicroseconds()
+{
+    static LARGE_INTEGER ticks, frequency;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&ticks);
+    return (ticks.QuadPart * 1000 * 1000) / frequency.QuadPart;
+}
+} // namespace
 
 namespace blons
 {
@@ -18,13 +30,13 @@ void Timer::start()
         microseconds_ = 0;
     }
     paused_ = false;
-    time_offset_ = units::time::ms_to_us(GetTickCount64());
+    time_offset_ = GetMicroseconds();
 }
 
 void Timer::pause()
 {
     paused_ = true;
-    microseconds_ += units::time::ms_to_us(GetTickCount64()) - time_offset_;
+    microseconds_ += GetMicroseconds() - time_offset_;
 }
 
 void Timer::stop()
@@ -48,8 +60,8 @@ units::time::us Timer::us()
 {
     if (!paused_)
     {
-        microseconds_ += units::time::ms_to_us(GetTickCount64()) - time_offset_;
-        time_offset_ = units::time::ms_to_us(GetTickCount64());
+        microseconds_ += GetMicroseconds() - time_offset_;
+        time_offset_ = GetMicroseconds();
     }
     return microseconds_;
 }
