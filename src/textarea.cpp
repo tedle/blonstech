@@ -22,14 +22,10 @@ Textarea::Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* pa
     padding_ = units::subpixel_to_pixel(gui_->skin()->layout()->textarea.left.w * 2);
 
     scroll_offset_ = 0;
-    scroll_start_ = 0;
     scroll_destination_ = 0;
 
-    Animation::Callback callback = [this](float y)
-    {
-        scroll_offset_ = scroll_start_ + units::subpixel_to_pixel((scroll_destination_ - scroll_start_) * y);
-    };
-    scroll_animation_ = std::unique_ptr<Animation>(new Animation(250, callback, Animation::CUBIC_OUT));
+    Animation::Callback dummy_callback = [](float){};
+    scroll_animation_ = std::unique_ptr<Animation>(new Animation(0, dummy_callback, Animation::CUBIC_OUT));
 
     scroll_timer_.start();
 }
@@ -230,7 +226,6 @@ void Textarea::Clear()
     history_.clear();
     lines_.clear();
 
-    scroll_start_ = 0;
     scroll_offset_ = 0;
     scroll_destination_ = 0;
 }
@@ -243,9 +238,15 @@ void Textarea::MoveScrollOffset(units::pixel delta)
                             + font->letter_height()
                             - padding_ / 2;
 
-    scroll_start_ = scroll_offset_;
     scroll_destination_ = std::max(0, std::min(scroll_destination_ + delta, max_offset));
-    scroll_animation_->Reset();
+
+    // Create smooth scroll animation
+    auto scroll_start = scroll_offset_;
+    Animation::Callback callback = [this, scroll_start](float y)
+    {
+        scroll_offset_ = scroll_start + units::subpixel_to_pixel((scroll_destination_ - scroll_start) * y);
+    };
+    scroll_animation_ = std::unique_ptr<Animation>(new Animation(250, callback, Animation::CUBIC_OUT));
 }
 } // namespace GUI
 } // namespace blons

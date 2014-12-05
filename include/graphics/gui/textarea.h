@@ -46,7 +46,6 @@ private:
     // What is rendered
     units::pixel scroll_offset_;
     // For animations (scroll_offset_ approaches scroll_destination_)
-    units::pixel scroll_start_;
     units::pixel scroll_destination_;
     std::unique_ptr<Animation> scroll_animation_;
     Timer scroll_timer_;
