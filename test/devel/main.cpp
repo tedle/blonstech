@@ -29,7 +29,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     auto textarea = gui->window("yoyo")->MakeTextarea(10, 40, 280, 205);
     for (int i = 0; i < 20; i++)
     {
-        textarea->AddLine("Simple test line that isn't too short,\nmaybe even a little long, thanks for the friendly test!");
+        //textarea->AddLine("Simple test line that isn't too short,\nmaybe even a little long, thanks for the friendly test!");
     }
 
     textarea->AddLine("HAello! blonsUI in action!");
@@ -40,13 +40,21 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         blons::g_log->Debug("%s\n", textbox->text().c_str());
         textbox->set_text("");
     };
-    auto textareatest = [textarea, textbox]()
+    auto textareaclear = [textarea]()
     {
         textarea->Clear();
-        textarea->AddLine(textbox->text());
     };
-    textbox->set_callback(textareatest);
-    gui->window("test")->MakeButton(10, 150, 120, 40, "Print!")->set_callback(print);
+    auto textareaprint = [textarea, textbox]()
+    {
+        for (int i = 0; i < 5; i++)
+        {
+            textarea->AddLine(textbox->text());
+        }
+        textbox->set_text("");
+    };
+    textbox->set_callback(textareaprint);
+    gui->window("test")->MakeButton(10, 150, 120, 40, "Print 5!")->set_callback(print);
+    gui->window("test")->MakeButton(10, 105, 380, 40, "Clear!")->set_callback(textareaclear);
 
     // Animation testing
     blons::Animation::Callback cbd = [](float d){ blons::g_log->Debug("%.4f\n", d); };
