@@ -19,7 +19,7 @@ Button::Button(Box pos, std::string label, Manager* parent_manager, Window* pare
 
     if (label.length() > 0)
     {
-        const auto& font = gui_->skin()->font(FontType::LABEL);
+        const auto& font = gui_->skin()->font(FontStyle::LABEL);
         units::pixel caption_width = font->string_width(label);
         units::pixel letter_height = font->letter_height();
         // For centering the button caption

@@ -33,7 +33,7 @@ public:
     ~Manager();
 
     bool LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context);
-    bool LoadFont(std::string filename, units::pixel pixel_size, FontType usage, RenderContext& context);
+    bool LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context);
 
     // TODO: Maybe simplify these prototypes somehow?
     // Wanted to name these all Create*(), but macros are really mean

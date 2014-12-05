@@ -19,7 +19,7 @@ class Window;
 struct DrawCallInputs
 {
     bool is_text;
-    FontType usage;
+    FontStyle font_style;
     Vector4 colour;
     Box crop;
     units::pixel crop_feather;
@@ -29,7 +29,7 @@ struct DrawCallInputs
 struct StaticDrawCallInputs
 {
     bool is_text;
-    FontType usage;
+    FontStyle font_style;
     Vector4 colour;
     // needed for efficient std::map lookups
     bool operator< (const StaticDrawCallInputs call) const { return memcmp(this, &call, sizeof(StaticDrawCallInputs))>0; }
@@ -59,7 +59,7 @@ protected:
     void ClearBatches();
 
     DrawBatcher* batch(StaticDrawCallInputs inputs, RenderContext& context);
-    DrawBatcher* font_batch(FontType usage, Vector4 colour, RenderContext& context);
+    DrawBatcher* font_batch(FontStyle style, Vector4 colour, RenderContext& context);
     DrawBatcher* control_batch(RenderContext& context);
 
 private:

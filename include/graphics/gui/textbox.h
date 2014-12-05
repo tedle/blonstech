@@ -12,7 +12,9 @@ namespace GUI
 class Textbox : public Control
 {
 public:
-    Textbox(Box pos, Manager* parent_manager, Window* parent_window);
+    Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window);
+    Textbox(Box pos, Manager* parent_manager, Window* parent_window)
+        : Textbox(pos, FontStyle::LABEL, parent_manager, parent_window) {}
     ~Textbox() {}
 
     void Render(RenderContext& context);
@@ -24,6 +26,7 @@ public:
 
 private:
     std::string text_;
+    FontStyle font_style_;
     std::string::iterator cursor_;
     Timer cursor_blink_;
     struct

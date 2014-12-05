@@ -16,7 +16,7 @@ Window::Window(std::string id, Box pos, std::string caption, WindowType type, Ma
     drag_offset_ = Vector2(0, 0);
 
     units::subpixel title_bar_height = gui_->skin()->layout()->window.title.center.h;
-    units::subpixel letter_height = units::pixel_to_subpixel(gui_->skin()->font(FontType::HEADING)->letter_height());
+    units::subpixel letter_height = units::pixel_to_subpixel(gui_->skin()->font(FontStyle::HEADING)->letter_height());
     units::subpixel caption_offset = (title_bar_height + letter_height) / 2;
     Vector2 caption_pos(20, caption_offset);
     for (auto& c : caption)
@@ -24,7 +24,7 @@ Window::Window(std::string id, Box pos, std::string caption, WindowType type, Ma
         c = toupper(c);
     }
     caption = "$444" + caption;
-    caption_ = std::unique_ptr<Label>(new Label(caption_pos, caption, FontType::HEADING, parent_manager, this));
+    caption_ = std::unique_ptr<Label>(new Label(caption_pos, caption, FontStyle::HEADING, parent_manager, this));
 }
 
 void Window::Render(RenderContext& context)

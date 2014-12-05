@@ -14,7 +14,7 @@ namespace blons
 class Sprite;
 namespace GUI
 {
-enum FontType
+enum FontStyle
 {
     DEFAULT,
     HEADING,
@@ -145,15 +145,15 @@ public:
     Skin(RenderContext& context);
     ~Skin();
 
-    bool LoadFont(std::string filename, FontType usage, units::pixel pixel_size, RenderContext& context);
-    Font* font(FontType usage);
+    bool LoadFont(std::string filename, FontStyle style, units::pixel pixel_size, RenderContext& context);
+    Font* font(FontStyle style);
     Sprite* sprite() const;
     const Layout* layout() const;
 
 protected:
     Layout layout_;
     std::unique_ptr<Sprite> skin_;
-    std::map<FontType, std::unique_ptr<Font>> font_list_;
+    std::map<FontStyle, std::unique_ptr<Font>> font_list_;
 
 };
 } // namespace GUI

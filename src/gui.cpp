@@ -21,10 +21,10 @@ Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader
     skin_ = std::unique_ptr<Skin>(new Skin(context));
 
     // TODO: move this out of constructor! font load included!
-    LoadFont("../../notes/font stuff/test-console.ttf", 28, FontType::DEFAULT, context);
-    LoadFont("../../notes/font stuff/test-heading.ttf", 14, FontType::HEADING, context);
-    LoadFont("../../notes/font stuff/test-label.ttf", 20, FontType::LABEL, context);
-    LoadFont("../../notes/font stuff/test-console.ttf", 28, FontType::CONSOLE, context);
+    LoadFont("../../notes/font stuff/test-console.ttf", 28, FontStyle::DEFAULT, context);
+    LoadFont("../../notes/font stuff/test-heading.ttf", 14, FontStyle::HEADING, context);
+    LoadFont("../../notes/font stuff/test-label.ttf", 20, FontStyle::LABEL, context);
+    LoadFont("../../notes/font stuff/test-console.ttf", 28, FontStyle::CONSOLE, context);
     // TODO: get rid of main_window... i think
     main_window_ = std::unique_ptr<Window>(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), WindowType::INVISIBLE, this));
 }
@@ -35,12 +35,12 @@ Manager::~Manager()
 
 bool Manager::LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context)
 {
-    return LoadFont(filename, pixel_size, FontType::DEFAULT, context);
+    return LoadFont(filename, pixel_size, FontStyle::DEFAULT, context);
 }
 
-bool Manager::LoadFont(std::string filename, units::pixel pixel_size, FontType usage, RenderContext& context)
+bool Manager::LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context)
 {
-    return skin_->LoadFont(filename, usage, pixel_size, context);
+    return skin_->LoadFont(filename, style, pixel_size, context);
 }
 
 Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
@@ -94,7 +94,7 @@ void Manager::Render(RenderContext& context)
     {
         if (batch.first.is_text)
         {
-            auto font = skin_->font(batch.first.usage);
+            auto font = skin_->font(batch.first.font_style);
             ui_shader_->SetInput("diffuse", font->texture(), context);
             ui_shader_->SetInput("is_text", true, context);
             ui_shader_->SetInput("text_colour", batch.first.colour, context);

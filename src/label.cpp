@@ -7,19 +7,19 @@ namespace blons
 {
 namespace GUI
 {
-Label::Label(Vector2 pos, std::string text, FontType font_type, Manager* parent_manager, Window* parent_window)
+Label::Label(Vector2 pos, std::string text, FontStyle style, Manager* parent_manager, Window* parent_window)
 {
     pos_ = Box(pos.x, pos.y, 0.0f, 0.0f);
     text_ = ColourString(text);
     colour_parsing_ = true;
-    font_type_ = font_type;
+    font_style_ = style;
     gui_ = parent_manager;
     parent_ = parent_window;
 }
 
 void Label::Render(RenderContext& context)
 {
-    auto font = gui_->skin()->font(font_type_);
+    auto font = gui_->skin()->font(font_style_);
 
     auto parent_pos = parent_->pos();
     units::subpixel x = pos_.x + parent_pos.x;
@@ -29,7 +29,7 @@ void Label::Render(RenderContext& context)
         for (const auto& frag : text_.fragments())
         {
             // One draw call per (colour,font) used across all labels combined
-            auto batcher = font_batch(font_type_, frag.colour, context);
+            auto batcher = font_batch(font_style_, frag.colour, context);
             for (const auto& c : frag.text)
             {
                 auto sprite = font->BuildSprite(c, x, y, crop_);
@@ -43,7 +43,7 @@ void Label::Render(RenderContext& context)
     }
     else
     {
-        auto batcher = font_batch(font_type_, kDefaultTextColour, context);
+        auto batcher = font_batch(font_style_, kDefaultTextColour, context);
         for (const auto& c : text_.raw_str())
         {
             auto sprite = font->BuildSprite(c, x, y, crop_);

@@ -7,7 +7,7 @@ namespace blons
 {
 namespace GUI
 {
-Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
+Textbox::Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
 {
     pos_ = pos;
     gui_ = parent_manager;
@@ -15,13 +15,14 @@ Textbox::Textbox(Box pos, Manager* parent_manager, Window* parent_window)
 
     active_ = false;
     text_ = "";
+    font_style_ = style;
     cursor_ = text_.end();
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](){};
 
     padding_ = units::subpixel_to_pixel(gui_->skin()->layout()->textbox.normal.left.w * 2);
     // For vertically centering the text
-    const auto& font = gui_->skin()->font(FontType::LABEL);
+    const auto& font = gui_->skin()->font(font_style_);
     std::size_t letter_height = font->letter_height();
     Vector2 text_pos;
     text_pos.x = pos.x + padding_;
@@ -127,7 +128,7 @@ void Textbox::Render(RenderContext& context)
         if (active_ && cursor_blink_.ms() % 1000 < 500)
         {
             auto cursor_width = 1.0f;
-            auto cursor_height = gui_->skin()->font(FontType::LABEL)->letter_height() + 6.0f;
+            auto cursor_height = gui_->skin()->font(font_style_)->letter_height() + 6.0f;
             auto x_offset = CursorOffset();
             auto y_offset = floor((pos_.h - cursor_height) / 2);
             sprite->set_pos(x + x_offset,
@@ -327,7 +328,7 @@ void Textbox::SetCursorPos(std::string::iterator cursor)
 
 units::subpixel Textbox::CursorOffset()
 {
-    const auto font = gui_->skin()->font(FontType::LABEL);
+    const auto font = gui_->skin()->font(font_style_);
     const auto layout = gui_->skin()->layout();
     const auto label_offset = text_label_->pos().x - (pos_.x + padding_);
     const auto cursor_offset = font->string_width(std::string(text_.begin(), cursor_), false) + label_offset + padding_;
