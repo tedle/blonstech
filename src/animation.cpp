@@ -40,6 +40,31 @@ inline float quad_in_out(float x)
     }
 }
 
+inline float cubic_in(float x)
+{
+    return x * x * x;
+}
+
+inline float cubic_out(float x)
+{
+    x--;
+    return (x * x * x + 1);
+}
+
+inline float cubic_in_out(float x)
+{
+    x *= 2;
+    if (x < 1)
+    {
+        return 0.5f * x * x * x;
+    }
+    else
+    {
+        x -= 2;
+        return 0.5f * (x * x * x + 2);
+    }
+}
+
 inline float quint_in(float x)
 {
     return x * x * x * x * x;
@@ -113,6 +138,15 @@ bool Animation::Update()
             break;
         case QUAD_IN_OUT:
             completion = quad_in_out(completion);
+            break;
+        case CUBIC_IN:
+            completion = cubic_in(completion);
+            break;
+        case CUBIC_OUT:
+            completion = cubic_out(completion);
+            break;
+        case CUBIC_IN_OUT:
+            completion = cubic_in_out(completion);
             break;
         case QUINT_IN:
             completion = quint_in(completion);
