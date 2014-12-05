@@ -80,6 +80,19 @@ public:
             };
         } button;
 
+        struct TextareaLayout
+        {
+            Box top_left = Box(14, 28, 5, 5);
+            Box top = Box(20, 28, 1, 5);
+            Box top_right = Box(22, 28, 5, 5);
+            Box left = Box(14, 34, 5, 1);
+            Box body = Box(20, 34, 1, 1);
+            Box right = Box(22, 34, 5, 1);
+            Box bottom_left = Box(14, 36, 5, 5);
+            Box bottom = Box(20, 36, 1, 5);
+            Box bottom_right = Box(22, 36, 5, 5);
+        } textarea;
+
         struct TextboxSetLayout
         {
             struct TextboxLayout

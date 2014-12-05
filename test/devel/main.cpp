@@ -26,7 +26,12 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     gui->MakeWindow("yoyo", 450, 250, 300, 300, "Amicable window");
     gui->MakeWindow("test", 20, 80, 400, 200, "Friendly window");
 
-    auto textarea = gui->window("test")->MakeTextarea(10, 70, 380, 100);
+    auto textarea = gui->window("yoyo")->MakeTextarea(10, 40, 280, 205);
+    for (int i = 0; i < 20; i++)
+    {
+        textarea->AddLine("Simple test line that isn't too short,\nmaybe even a little long, thanks for the friendly test!");
+    }
+
     textarea->AddLine("HAello! blonsUI in action!");
 
     auto textbox = gui->window("test")->MakeTextbox(135, 150, 255, 40);

@@ -32,12 +32,12 @@ public:
     void set_pos(units::subpixel x, units::subpixel y, units::subpixel w, units::subpixel h);
     void set_pos(units::pixel x, units::pixel y);
     void set_pos(units::pixel x, units::pixel y, units::pixel w, units::pixel h);
-    void set_pos(Box pos);
+    void set_pos(const Box& pos);
     // Sets the subregion of sprite texture that is rendered
     // Measured in pixels of texture
     void set_subtexture(units::subpixel x, units::subpixel y, units::subpixel w, units::subpixel h);
     void set_subtexture(units::pixel x, units::pixel y, units::pixel w, units::pixel h);
-    void set_subtexture(Box subtexture);
+    void set_subtexture(const Box& subtexture);
 
 protected:
     void Init(RenderContext& context);

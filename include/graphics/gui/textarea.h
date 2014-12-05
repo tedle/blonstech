@@ -3,9 +3,13 @@
 
 // Local Includes
 #include "graphics/gui/control.h"
+#include "os/timer.h"
 
 namespace blons
 {
+// Forward declarations
+class Animation;
+
 namespace GUI
 {
 // Forward declarations
@@ -27,12 +31,25 @@ public:
     void Clear();
 
 private:
+    void MoveScrollOffset(units::pixel delta);
+
     FontStyle font_style_;
 
+    // New lines appear on the top, or bottom
+    bool newest_top_;
     void GenLabel(std::string text);
     std::vector<std::string> history_;
     std::vector<std::unique_ptr<Label>> lines_;
     units::pixel line_height_;
+    units::pixel padding_;
+
+    // What is rendered
+    units::pixel scroll_offset_;
+    // For animations (scroll_offset_ approaches scroll_destination_)
+    units::pixel scroll_start_;
+    units::pixel scroll_destination_;
+    std::unique_ptr<Animation> scroll_animation_;
+    Timer scroll_timer_;
 };
 } // namespace GUI
 } // namespace blons

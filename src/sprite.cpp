@@ -111,7 +111,7 @@ void Sprite::set_pos(units::pixel x, units::pixel y, units::pixel w, units::pixe
             units::pixel_to_subpixel(h));
 }
 
-void Sprite::set_pos(Box pos)
+void Sprite::set_pos(const Box& pos)
 {
     set_pos(pos.x, pos.y, pos.w, pos.h);
 }
@@ -132,7 +132,7 @@ void Sprite::set_subtexture(units::pixel x, units::pixel y, units::pixel w, unit
                    units::pixel_to_subpixel(h));
 }
 
-void Sprite::set_subtexture(Box subtexture)
+void Sprite::set_subtexture(const Box& subtexture)
 {
     set_subtexture(subtexture.x, subtexture.y, subtexture.w, subtexture.h);
 }
