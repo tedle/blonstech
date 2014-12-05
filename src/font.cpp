@@ -13,8 +13,8 @@ namespace GUI
 {
 struct Font::Glyph
 {
-    // Needed for std::map storage
-    Glyph() = default;
+    // Needed for vector.resize()
+    Glyph() : width(0), height(0), tex_offset(0), x_offset(0), y_offset(0), x_advance(0) {}
     // This constructor's really just for refactoring code into smaller functions
     Glyph(unsigned char letter, FT_Face font_face, units::pixel texture_offset);
     // 8-bit monochrome bitmap of character data
