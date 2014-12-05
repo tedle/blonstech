@@ -175,6 +175,24 @@ bool Textarea::Update(const Input& input)
 
             }
         }
+        // Handle these even when unfocused, so long as mouse pointer is inside textarea
+        if (e.type == Input::Event::MOUSE_SCROLL)
+        {
+            auto parent_pos = parent_->pos();
+            auto x = pos_.x + parent_pos.x;
+            auto y = pos_.y + parent_pos.y;
+
+            units::pixel mx = input.mouse_x();
+            units::pixel my = input.mouse_y();
+
+            // Mouse inside textarea
+            if (mx >= x && mx < x + pos_.w &&
+                my >= y && my < y + pos_.h)
+            {
+                const auto& font = gui_->skin()->font(font_style_);
+                MoveScrollOffset(font->line_height() * e.value * 3);
+            }
+        }
     }
     return input_handled;
 }
@@ -211,6 +229,10 @@ void Textarea::Clear()
 {
     history_.clear();
     lines_.clear();
+
+    scroll_start_ = 0;
+    scroll_offset_ = 0;
+    scroll_destination_ = 0;
 }
 
 void Textarea::MoveScrollOffset(units::pixel delta)
