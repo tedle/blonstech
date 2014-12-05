@@ -98,6 +98,8 @@ Font::Font(std::string font_filename, units::pixel pixel_size, RenderContext& co
         throw "Couldn't set pixel size";
     }
 
+    line_height_ = face->size->metrics.height / 64;
+
     // Used to find glyph in texture fontsheet later
     units::pixel tex_width = 0;
     // Used to determine how tall font texture must be
@@ -295,6 +297,50 @@ units::pixel Font::string_width(std::string string, bool trim_whitespace) const
     return pixel_width;
 }
 
+std::vector<std::string> Font::string_wrap(std::string string, units::pixel max_width)
+{
+    std::vector<std::string> broken_strings;
+
+    units::pixel pixel_width = 0;
+    std::size_t last_break = 0;
+    // Faster when done old way
+    for (auto i = 0; i < string.length(); i++)
+    {
+        // Pointer to avoid expensive copying
+        const Glyph* g;
+        // In case someone tries to calculate a string using chars we dont have
+        try
+        {
+            g = &charset_[string[i]];
+        }
+        catch (...)
+        {
+            return std::vector<std::string>();
+        }
+        // Out of bounds or newline, slice the string
+        if ((pixel_width + g->x_advance > max_width && pixel_width > 0) ||
+            string[i] == '\n')
+        {
+            broken_strings.push_back(string.substr(last_break, i - last_break));
+            pixel_width = 0;
+            last_break = i;
+        }
+        else
+        {
+            // How far to advance cursor for next letter
+            pixel_width += g->x_advance;
+        }
+    }
+
+    // Still some left over string to append
+    if (last_break < string.length())
+    {
+        broken_strings.push_back(string.substr(last_break));
+    }
+
+    return broken_strings;
+}
+
 int Font::advance()
 {
     units::pixel ret = advance_;
@@ -310,6 +356,11 @@ unsigned int Font::index_count() const
 units::pixel Font::letter_height() const
 {
     return letter_height_;
+}
+
+units::pixel Font::line_height() const
+{
+    return line_height_;
 }
 
 units::pixel Font::pixel_size() const

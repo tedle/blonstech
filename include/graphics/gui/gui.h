@@ -53,6 +53,7 @@ private:
     friend Control;
     friend Button;
     friend Label;
+    friend Textarea;
     friend Textbox;
     friend Window;
     void RegisterDrawCall(DrawCallInputs info, DrawBatcher* batch);

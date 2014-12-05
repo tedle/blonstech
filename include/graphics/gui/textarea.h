@@ -10,6 +10,7 @@ namespace GUI
 {
 // Forward declarations
 class Label;
+
 // Currently immutable to user
 class Textarea : public Control
 {
@@ -23,10 +24,13 @@ public:
     bool Update(const Input& input);
 
     void AddLine(std::string text);
+    void Clear();
 
 private:
     FontStyle font_style_;
 
+    void GenLabel(std::string text);
+    std::vector<std::string> history_;
     std::vector<std::unique_ptr<Label>> lines_;
     units::pixel line_height_;
 };

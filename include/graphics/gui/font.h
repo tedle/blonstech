@@ -31,11 +31,14 @@ public:
     // Defaults trim_whitespace to true
     units::pixel string_width(std::string string) const;
     units::pixel string_width(std::string string, bool trim_whitespace) const;
+    // Breaks string into an array of strings guranteed to each be shorter than max_width
+    std::vector<std::string> string_wrap(std::string string, units::pixel max_width);
     // Return how far to advance horizontally after rendering a character in pixels
     // Resets to 0 after call
     units::pixel advance();
     unsigned int index_count() const;
     units::pixel letter_height() const;
+    units::pixel line_height() const;
     units::pixel pixel_size() const;
     const TextureResource* texture() const;
 
@@ -46,6 +49,8 @@ private:
     units::pixel pixel_size_;
     // Max letter height of chars A-Z, used for offsetting or centering text
     units::pixel letter_height_;
+    // How much to advance y on newline
+    units::pixel line_height_;
     units::pixel advance_;
 };
 } // namespace GUI

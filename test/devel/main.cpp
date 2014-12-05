@@ -35,7 +35,12 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         blons::g_log->Debug("%s\n", textbox->text().c_str());
         textbox->set_text("");
     };
-    textbox->set_callback(print);
+    auto textareatest = [textarea, textbox]()
+    {
+        textarea->Clear();
+        textarea->AddLine(textbox->text());
+    };
+    textbox->set_callback(textareatest);
     gui->window("test")->MakeButton(10, 150, 120, 40, "Print!")->set_callback(print);
 
     // Animation testing
