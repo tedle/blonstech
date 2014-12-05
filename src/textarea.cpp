@@ -29,7 +29,7 @@ Textarea::Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* pa
     {
         scroll_offset_ = scroll_start_ + units::subpixel_to_pixel((scroll_destination_ - scroll_start_) * y);
     };
-    scroll_animation_ = std::unique_ptr<Animation>(new Animation(150, callback, Animation::QUAD_OUT));
+    scroll_animation_ = std::unique_ptr<Animation>(new Animation(250, callback, Animation::CUBIC_OUT));
 
     scroll_timer_.start();
 }
@@ -148,25 +148,35 @@ void Textarea::Render(RenderContext& context)
 
 bool Textarea::Update(const Input& input)
 {
+    bool input_handled = false;
+
     scroll_animation_->Update();
     auto us = scroll_timer_.us();
     for (const auto& e : input.event_queue())
     {
-        if (e.type == Input::Event::KEY_DOWN)
+        // TODO: Make a more sensible if block
+        if (gui_->active_window() == parent_)
         {
-            const auto& font = gui_->skin()->font(font_style_);
-            if (e.value == Input::KeyCode::UP)
+            if (e.type == Input::Event::KEY_DOWN)
             {
-                MoveScrollOffset(font->line_height());
-            }
-            else if (e.value == Input::KeyCode::DOWN)
-            {
-                MoveScrollOffset(-font->line_height());
-            }
+                const auto& font = gui_->skin()->font(font_style_);
+                const auto ph = units::subpixel_to_pixel(pos_.h);
+                auto page_offset = std::max(font->line_height(), ph - (ph % font->line_height()));
+                if (e.value == Input::KeyCode::PG_UP)
+                {
+                    MoveScrollOffset(page_offset);
+                    input_handled = true;
+                }
+                else if (e.value == Input::KeyCode::PG_DOWN)
+                {
+                    MoveScrollOffset(-page_offset);
+                    input_handled = true;
+                }
 
+            }
         }
     }
-    return false;
+    return input_handled;
 }
 
 void Textarea::GenLabel(std::string text)
