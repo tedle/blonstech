@@ -358,6 +358,9 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
         }
         input_->MouseMove(GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
         return 0;
+    case WM_MOUSEWHEEL:
+        input_->MouseScroll(GET_WHEEL_DELTA_WPARAM(wparam) / 120);
+        return 0;
     default:
         return DefWindowProc(hwnd, umsg, wparam, lparam);
     }

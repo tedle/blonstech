@@ -97,6 +97,7 @@ public:
             MOUSE_UP,
             MOUSE_MOVE_X,
             MOUSE_MOVE_Y,
+            MOUSE_SCROLL,
             KEY_DOWN,
             KEY_UP
         } type;
@@ -131,6 +132,7 @@ public:
     bool IsMouseDown(unsigned int) const;
 
     void MouseMove(int, int);
+    void MouseScroll(int delta);
 
     bool Frame();
 
@@ -144,11 +146,13 @@ public:
     units::pixel mouse_y() const;
     units::pixel mouse_delta_x() const;
     units::pixel mouse_delta_y() const;
+    int mouse_scroll_delta() const;
     const std::vector<Event>& Input::event_queue() const;
 
 private:
     bool keys_[256];
     units::pixel mouse_x_, mouse_y_, old_mouse_x_, old_mouse_y_, delta_mouse_x_, delta_mouse_y_;
+    int mouse_scroll_delta_, mouse_scroll_delta_old_;
     bool buttons_[5];
 
     std::vector<Event> event_queue_;

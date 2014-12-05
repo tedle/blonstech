@@ -72,6 +72,7 @@ Input::Input()
         buttons_[i] = false;
 
     mouse_x_ = mouse_y_ = old_mouse_x_ = old_mouse_y_ = delta_mouse_x_ = delta_mouse_y_ = 0;
+    mouse_scroll_delta_ = 0;
 }
 
 void Input::KeyDown(KeyCode key_code)
@@ -126,6 +127,12 @@ void Input::MouseMove(int x, int y)
 {
     mouse_x_ = x;
     mouse_y_ = y;
+}
+
+void Input::MouseScroll(int delta)
+{
+    event_queue_buffer_.push_back(Event(Event::MOUSE_SCROLL, delta));
+    mouse_scroll_delta_ += delta;
 }
 
 bool Input::IsPrintable(KeyCode key_code) const
@@ -186,6 +193,11 @@ units::pixel Input::mouse_delta_y() const
     return delta_mouse_y_;
 }
 
+int Input::mouse_scroll_delta() const
+{
+    return mouse_scroll_delta_old_;
+}
+
 const std::vector<Input::Event>& Input::event_queue() const
 {
     return event_queue_;
@@ -206,6 +218,9 @@ bool Input::Frame()
     {
         event_queue_buffer_.push_back(Event(Event::MOUSE_MOVE_Y, delta_mouse_y_));
     }
+
+    mouse_scroll_delta_old_ = mouse_scroll_delta_;
+    mouse_scroll_delta_ = 0;
 
     // Since event polling is done before frame is called
     event_queue_ = event_queue_buffer_;
