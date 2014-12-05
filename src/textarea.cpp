@@ -146,7 +146,6 @@ bool Textarea::Update(const Input& input)
 {
     bool input_handled = false;
 
-    scroll_animation_->Update();
     auto us = scroll_timer_.us();
     for (const auto& e : input.event_queue())
     {
@@ -190,6 +189,9 @@ bool Textarea::Update(const Input& input)
             }
         }
     }
+
+    scroll_animation_->Update();
+
     return input_handled;
 }
 
@@ -244,9 +246,11 @@ void Textarea::MoveScrollOffset(units::pixel delta)
     auto scroll_start = scroll_offset_;
     Animation::Callback callback = [this, scroll_start](float y)
     {
-        scroll_offset_ = scroll_start + units::subpixel_to_pixel((scroll_destination_ - scroll_start) * y);
+        scroll_offset_ = scroll_start + units::subpixel_to_pixel(round((scroll_destination_ - scroll_start) * y));
     };
-    scroll_animation_ = std::unique_ptr<Animation>(new Animation(250, callback, Animation::CUBIC_OUT));
+    // Duration becomes linearly shorter when less than 30 pixels from completion
+    units::time::ms duration = static_cast<units::time::ms>(300 * (std::min(abs(scroll_destination_ - scroll_offset_), 30) / 30.0f));
+    scroll_animation_ = std::unique_ptr<Animation>(new Animation(duration, callback, Animation::CUBIC_OUT));
 }
 } // namespace GUI
 } // namespace blons
