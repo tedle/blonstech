@@ -115,6 +115,9 @@
     <ClCompile Include="animation.cpp">
       <Filter>src\math</Filter>
     </ClCompile>
+    <ClCompile Include="textarea.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons.h">
@@ -221,6 +224,9 @@
     </ClInclude>
     <ClInclude Include="..\include\math\units.h">
       <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\textarea.h">
+      <Filter>src\graphics\gui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

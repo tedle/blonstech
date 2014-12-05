@@ -192,6 +192,7 @@
     <ClCompile Include="skin.cpp" />
     <ClCompile Include="sprite.cpp" />
     <ClCompile Include="temphelpers.cpp" />
+    <ClCompile Include="textarea.cpp" />
     <ClCompile Include="textbox.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="timer.cpp" />
@@ -215,6 +216,7 @@
     <ClInclude Include="..\include\graphics\gui\gui.h" />
     <ClInclude Include="..\include\graphics\gui\label.h" />
     <ClInclude Include="..\include\graphics\gui\skin.h" />
+    <ClInclude Include="..\include\graphics\gui\textarea.h" />
     <ClInclude Include="..\include\graphics\gui\textbox.h" />
     <ClInclude Include="..\include\graphics\gui\window.h" />
     <ClInclude Include="..\include\graphics\mesh.h" />

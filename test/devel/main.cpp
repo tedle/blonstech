@@ -25,7 +25,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     // GUI testing
     gui->MakeWindow("yoyo", 450, 250, 300, 300, "Amicable window");
     gui->MakeWindow("test", 20, 80, 400, 200, "Friendly window");
-    gui->window("test")->MakeLabel(10, 70, "HAello! blonsUI in action!");
+
+    auto textarea = gui->window("test")->MakeTextarea(10, 70, 380, 100);
+    textarea->AddLine("HAello! blonsUI in action!");
+
     auto textbox = gui->window("test")->MakeTextbox(135, 150, 255, 40);
     auto print = [textbox]()
     {

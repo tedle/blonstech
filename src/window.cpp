@@ -245,6 +245,14 @@ Label* Window::MakeLabel(units::pixel x, units::pixel y, std::string text)
     return static_cast<Label*>(controls_.back().get());
 }
 
+Textarea* Window::MakeTextarea(units::pixel x, units::pixel y, units::pixel width, units::pixel height)
+{
+    Box pos(x, y, width, height);
+    std::unique_ptr<Textarea> textarea(new Textarea(pos, gui_, this));
+    controls_.push_back(std::move(textarea));
+    return static_cast<Textarea*>(controls_.back().get());
+}
+
 Textbox* Window::MakeTextbox(units::pixel x, units::pixel y, units::pixel width, units::pixel height)
 {
     Box pos(x, y, width, height);
