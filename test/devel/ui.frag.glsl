@@ -42,7 +42,7 @@ void main(void)
 		}
 		if (crop.w != 0)
 		{
-			if (gl_FragCoord.y < crop.x + feather)
+			if (gl_FragCoord.y < crop.y + feather)
 			{
 				float alpha = max(0, (gl_FragCoord.y - crop.y) / feather);
 				frag_colour.a *= alpha;
