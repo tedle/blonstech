@@ -272,6 +272,12 @@ LRESULT CALLBACK Client::MessageHandler(HWND hwnd, UINT umsg, WPARAM wparam, LPA
                 case VK_RETURN:
                     key_code = Input::RETURN;
                     break;
+                case VK_PRIOR:
+                    key_code = Input::PG_UP;
+                    break;
+                case VK_NEXT:
+                    key_code = Input::PG_DOWN;
+                    break;
                 case VK_LEFT:
                     key_code = Input::LEFT;
                     break;

@@ -80,10 +80,13 @@ public:
         ESCAPE               = 0x36,
         RETURN               = 0x37,
 
-        LEFT                 = 0x38,
-        RIGHT                = 0x39,
-        UP                   = 0x3A,
-        DOWN                 = 0x3B
+        PG_UP                = 0x38,
+        PG_DOWN              = 0x39,
+
+        LEFT                 = 0x3A,
+        RIGHT                = 0x3B,
+        UP                   = 0x3C,
+        DOWN                 = 0x3D
     };
 
     struct Event
