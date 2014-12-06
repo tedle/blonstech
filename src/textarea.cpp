@@ -24,9 +24,6 @@ Textarea::Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* pa
     scroll_offset_ = 0;
     scroll_destination_ = 0;
 
-    Animation::Callback dummy_callback = [](float){};
-    scroll_animation_ = std::unique_ptr<Animation>(new Animation(0, dummy_callback, Animation::CUBIC_OUT));
-
     scroll_timer_.start();
 }
 
@@ -117,6 +114,9 @@ void Textarea::Render(RenderContext& context)
 
     RegisterBatches();
 
+    // Update scroll position
+    scroll_animation_.Update();
+
     // Render the text, only grab lines that are at visible
     const auto& font = gui_->skin()->font(font_style_);
     auto line_offset = scroll_offset_ / font->line_height();
@@ -159,12 +159,12 @@ bool Textarea::Update(const Input& input)
                 auto page_offset = std::max(font->line_height(), ph - (ph % font->line_height()));
                 if (e.value == Input::KeyCode::PG_UP)
                 {
-                    MoveScrollOffset(page_offset);
+                    MoveScrollOffset(page_offset, true);
                     input_handled = true;
                 }
                 else if (e.value == Input::KeyCode::PG_DOWN)
                 {
-                    MoveScrollOffset(-page_offset);
+                    MoveScrollOffset(-page_offset, true);
                     input_handled = true;
                 }
 
@@ -185,12 +185,10 @@ bool Textarea::Update(const Input& input)
                 my >= y && my < y + pos_.h)
             {
                 const auto& font = gui_->skin()->font(font_style_);
-                MoveScrollOffset(font->line_height() * e.value * 3);
+                MoveScrollOffset(font->line_height() * e.value * 3, true);
             }
         }
     }
-
-    scroll_animation_->Update();
 
     return input_handled;
 }
@@ -220,7 +218,19 @@ void Textarea::GenLabel(std::string text)
 void Textarea::AddLine(std::string text)
 {
     history_.push_back(text);
+    auto old_size = lines_.size();
     GenLabel(text);
+
+    bool at_origin = scroll_destination_ == 0;
+    auto line_height = gui_->skin()->font(font_style_)->line_height();
+    // Set current scroll offset to look the same as before lines were added
+    MoveScrollOffset(static_cast<units::pixel>((lines_.size() - old_size) * line_height), false);
+    if (at_origin)
+    {
+        // If we were at 0 before AddLine was called, smoothly animate in the new lines
+        scroll_offset_ = line_height;
+        MoveScrollOffset(-scroll_offset_, true);
+    }
 }
 
 void Textarea::Clear()
@@ -230,9 +240,10 @@ void Textarea::Clear()
 
     scroll_offset_ = 0;
     scroll_destination_ = 0;
+    scroll_animation_.Stop();
 }
 
-void Textarea::MoveScrollOffset(units::pixel delta)
+void Textarea::MoveScrollOffset(units::pixel delta, bool smooth)
 {
     const auto& font = gui_->skin()->font(font_style_);
     units::pixel max_offset = font->line_height() * static_cast<units::pixel>(lines_.size())
@@ -242,6 +253,10 @@ void Textarea::MoveScrollOffset(units::pixel delta)
 
     scroll_destination_ = std::max(0, std::min(scroll_destination_ + delta, max_offset));
 
+    if (!smooth)
+    {
+        scroll_offset_ = scroll_destination_;
+    }
     // Create smooth scroll animation
     auto scroll_start = scroll_offset_;
     Animation::Callback callback = [this, scroll_start](float y)
@@ -250,7 +265,11 @@ void Textarea::MoveScrollOffset(units::pixel delta)
     };
     // Duration becomes linearly shorter when less than 30 pixels from completion
     units::time::ms duration = static_cast<units::time::ms>(300 * (std::min(abs(scroll_destination_ - scroll_offset_), 30) / 30.0f));
-    scroll_animation_ = std::unique_ptr<Animation>(new Animation(duration, callback, Animation::CUBIC_OUT));
+    if (!smooth)
+    {
+        duration = 0;
+    }
+    scroll_animation_ = Animation(duration, callback, Animation::CUBIC_OUT);
 }
 } // namespace GUI
 } // namespace blons

@@ -46,14 +46,14 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     };
     auto textareaprint = [textarea, textbox]()
     {
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 1; i++)
         {
             textarea->AddLine(textbox->text());
         }
         textbox->set_text("");
     };
     textbox->set_callback(textareaprint);
-    gui->window("test")->MakeButton(10, 150, 120, 40, "Print 5!")->set_callback(print);
+    gui->window("test")->MakeButton(10, 150, 120, 40, "Print!")->set_callback(print);
     gui->window("test")->MakeButton(10, 105, 380, 40, "Clear!")->set_callback(textareaclear);
 
     // Animation testing
