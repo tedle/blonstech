@@ -38,10 +38,12 @@ public:
 
     const std::string id() const;
 
+protected:
+    std::vector<std::unique_ptr<Control>> controls_;
+
 private:
     const std::string id_;
     WindowType type_;
-    std::vector<std::unique_ptr<Control>> controls_;
 
     // For draggable windows
     bool dragging_;

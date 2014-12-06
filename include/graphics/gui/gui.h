@@ -7,13 +7,10 @@
 #include "math/animation.h"
 #include "input/inputtemp.h"
 #include "graphics/render/drawbatcher.h"
-#include "graphics/gui/control.h"
 #include "graphics/gui/skin.h"
 #include "graphics/gui/font.h"
-#include "graphics/gui/button.h"
-#include "graphics/gui/label.h"
-#include "graphics/gui/textbox.h"
 #include "graphics/gui/window.h"
+#include "graphics/gui/consolewindow.h"
 
 namespace blons
 {
@@ -73,6 +70,7 @@ private:
     std::unique_ptr<Skin> skin_;
     std::vector<std::unique_ptr<Window>> windows_;
     std::unique_ptr<Window> main_window_;
+    std::unique_ptr<Window> console_window_;
 };
 } // namespace GUI
 } // namespace blons

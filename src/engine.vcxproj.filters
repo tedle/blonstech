@@ -118,6 +118,15 @@
     <ClCompile Include="textarea.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
+    <ClCompile Include="consoletextbox.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="consoletextarea.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="consolewindow.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons.h">
@@ -226,6 +235,15 @@
       <Filter>src\math</Filter>
     </ClInclude>
     <ClInclude Include="..\include\graphics\gui\textarea.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\consoletextarea.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\consoletextbox.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\graphics\gui\consolewindow.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
   </ItemGroup>

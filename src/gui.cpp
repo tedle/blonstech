@@ -27,6 +27,7 @@ Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader
     LoadFont("../../notes/font stuff/test-console.ttf", 28, FontStyle::CONSOLE, context);
     // TODO: get rid of main_window... i think
     main_window_ = std::unique_ptr<Window>(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), WindowType::INVISIBLE, this));
+    console_window_ = std::unique_ptr<Window>(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), WindowType::STATIC, this));
 }
 
 Manager::~Manager()
@@ -86,6 +87,7 @@ void Manager::Render(RenderContext& context)
     {
         w->Render(context);
     }
+    console_window_->Render(context);
 
     // Draw pass
     ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
@@ -122,6 +124,10 @@ bool Manager::Update(const Input& input)
 {
     // Update backwards, since last element is top window
     // We don't want input to be sent to windows underneath the one yr clickin on
+    if (console_window_->Update(input))
+    {
+        return true;
+    }
     for (auto w = windows_.rbegin(); w != windows_.rend(); w++)
     {
         if (w->get()->Update(input))
