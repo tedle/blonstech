@@ -223,12 +223,13 @@ void Textarea::AddLine(std::string text)
 
     bool at_origin = scroll_destination_ == 0;
     auto line_height = gui_->skin()->font(font_style_)->line_height();
+    auto new_lines_height = static_cast<units::pixel>((lines_.size() - old_size) * line_height);
     // Set current scroll offset to look the same as before lines were added
-    MoveScrollOffset(static_cast<units::pixel>((lines_.size() - old_size) * line_height), false);
+    MoveScrollOffset(new_lines_height, false);
     if (at_origin)
     {
         // If we were at 0 before AddLine was called, smoothly animate in the new lines
-        scroll_offset_ = line_height;
+        scroll_offset_ = new_lines_height;
         MoveScrollOffset(-scroll_offset_, true);
     }
 }
