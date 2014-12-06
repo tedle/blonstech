@@ -51,7 +51,9 @@ private:
     friend Button;
     friend Label;
     friend Textarea;
+    friend ConsoleTextarea;
     friend Textbox;
+    friend ConsoleTextbox;
     friend Window;
     void RegisterDrawCall(DrawCallInputs info, DrawBatcher* batch);
     Skin* skin() const;

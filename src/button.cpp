@@ -32,105 +32,108 @@ Button::Button(Box pos, std::string label, Manager* parent_manager, Window* pare
 
 void Button::Render(RenderContext& context)
 {
-    const Skin::Layout::ButtonSetLayout::ButtonLayout* b;
+    auto layout = gui_->skin()->layout();
+
+    const Skin::Layout::ButtonSet::Button* b;
     if (active_ && hover_)
     {
-        b = &gui_->skin()->layout()->button.active;
+        b = &layout->button.active;
     }
     else if (hover_)
     {
-        b = &gui_->skin()->layout()->button.hover;
+        b = &layout->button.hover;
     }
     else
     {
-        b = &gui_->skin()->layout()->button.normal;
+        b = &layout->button.normal;
     }
 
+    RenderBody(*b, context);
+    RegisterBatches();
+
+    // Button text yall
+    label_->Render(context);
+}
+
+void Button::RenderBody(const Skin::Layout::ButtonSet::Button& b, RenderContext& context)
+{
     auto sprite = gui_->skin()->sprite();
     auto batch = control_batch(context);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
-    // Render time
-    {
-        // Top left corner
-        sprite->set_pos(x,
-                        y,
-                        b->top_left.w,
-                        b->top_left.h);
-        sprite->set_subtexture(b->top_left);
-        batch->Append(*sprite->mesh());
+    // Top left corner
+    sprite->set_pos(x,
+                    y,
+                    b.top_left.w,
+                    b.top_left.h);
+    sprite->set_subtexture(b.top_left);
+    batch->Append(*sprite->mesh());
 
-        // Top edge
-        sprite->set_pos(x + b->top_left.w,
-                        y,
-                        pos_.w - (b->top_left.w + b->top_right.w),
-                        b->top.h);
-        sprite->set_subtexture(b->top);
-        batch->Append(*sprite->mesh());
+    // Top edge
+    sprite->set_pos(x + b.top_left.w,
+                    y,
+                    pos_.w - (b.top_left.w + b.top_right.w),
+                    b.top.h);
+    sprite->set_subtexture(b.top);
+    batch->Append(*sprite->mesh());
 
-        // Top right corner
-        sprite->set_pos(x + pos_.w - b->top_right.w,
-                        y,
-                        b->top_right.w,
-                        b->top_right.h);
-        sprite->set_subtexture(b->top_right);
-        batch->Append(*sprite->mesh());
+    // Top right corner
+    sprite->set_pos(x + pos_.w - b.top_right.w,
+                    y,
+                    b.top_right.w,
+                    b.top_right.h);
+    sprite->set_subtexture(b.top_right);
+    batch->Append(*sprite->mesh());
 
-        // Left edge
-        sprite->set_pos(x,
-                        y + b->top_left.h,
-                        b->left.w,
-                        pos_.h - (b->top_left.h + b->bottom_right.h));
-        sprite->set_subtexture(b->left);
-        batch->Append(*sprite->mesh());
+    // Left edge
+    sprite->set_pos(x,
+                    y + b.top_left.h,
+                    b.left.w,
+                    pos_.h - (b.top_left.h + b.bottom_right.h));
+    sprite->set_subtexture(b.left);
+    batch->Append(*sprite->mesh());
 
-        // Body
-        sprite->set_pos(x + b->left.w,
-                        y + b->top.h,
-                        pos_.w - (b->left.w + b->right.w),
-                        pos_.h - (b->top.h + b->bottom.h));
-        sprite->set_subtexture(b->body);
-        batch->Append(*sprite->mesh());
+    // Body
+    sprite->set_pos(x + b.left.w,
+                    y + b.top.h,
+                    pos_.w - (b.left.w + b.right.w),
+                    pos_.h - (b.top.h + b.bottom.h));
+    sprite->set_subtexture(b.body);
+    batch->Append(*sprite->mesh());
 
-        // Right edge
-        sprite->set_pos(x + pos_.w - b->right.w,
-                        y + b->top_right.h,
-                        b->right.w,
-                        pos_.h - (b->top_right.h + b->bottom_right.h));
-        sprite->set_subtexture(b->right);
-        batch->Append(*sprite->mesh());
+    // Right edge
+    sprite->set_pos(x + pos_.w - b.right.w,
+                    y + b.top_right.h,
+                    b.right.w,
+                    pos_.h - (b.top_right.h + b.bottom_right.h));
+    sprite->set_subtexture(b.right);
+    batch->Append(*sprite->mesh());
 
-        // Bottom left corner
-        sprite->set_pos(x,
-                        y + pos_.h - b->bottom_left.h,
-                        b->bottom_left.w,
-                        b->bottom_left.h);
-        sprite->set_subtexture(b->bottom_left);
-        batch->Append(*sprite->mesh());
+    // Bottom left corner
+    sprite->set_pos(x,
+                    y + pos_.h - b.bottom_left.h,
+                    b.bottom_left.w,
+                    b.bottom_left.h);
+    sprite->set_subtexture(b.bottom_left);
+    batch->Append(*sprite->mesh());
 
-        // Bottom edge
-        sprite->set_pos(x + b->bottom_left.w,
-                        y + pos_.h - b->bottom.h,
-                        pos_.w - (b->bottom_left.w + b->bottom_right.w),
-                        b->bottom.h);
-        sprite->set_subtexture(b->bottom);
-        batch->Append(*sprite->mesh());
+    // Bottom edge
+    sprite->set_pos(x + b.bottom_left.w,
+                    y + pos_.h - b.bottom.h,
+                    pos_.w - (b.bottom_left.w + b.bottom_right.w),
+                    b.bottom.h);
+    sprite->set_subtexture(b.bottom);
+    batch->Append(*sprite->mesh());
 
-        // Bottom right corner
-        sprite->set_pos(x + pos_.w - b->bottom_right.w,
-                        y + pos_.h - b->bottom_right.h,
-                        b->bottom_right.w,
-                        b->bottom_right.h);
-        sprite->set_subtexture(b->bottom_right);
-        batch->Append(*sprite->mesh());
-    }
-
-    RegisterBatches();
-
-    // Button text yall
-    label_->Render(context);
+    // Bottom right corner
+    sprite->set_pos(x + pos_.w - b.bottom_right.w,
+                    y + pos_.h - b.bottom_right.h,
+                    b.bottom_right.w,
+                    b.bottom_right.h);
+    sprite->set_subtexture(b.bottom_right);
+    batch->Append(*sprite->mesh());
 }
 
 bool Button::Update(const Input& input)

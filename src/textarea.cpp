@@ -30,89 +30,98 @@ Textarea::Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* pa
 void Textarea::Render(RenderContext& context)
 {
     auto layout = gui_->skin()->layout();
+
+    RenderBody(layout->textarea, context);
+    RegisterBatches();
+
+    RenderText(context);
+}
+
+void Textarea::RenderBody(const Skin::Layout::Textarea& t, RenderContext& context)
+{
     auto sprite = gui_->skin()->sprite();
     auto batch = control_batch(context);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
-    const auto& t = layout->textarea;
-    // Render time
-    {
-        // Top left corner
-        sprite->set_pos(x,
-                        y,
-                        t.top_left.w,
-                        t.top_left.h);
-        sprite->set_subtexture(t.top_left);
-        batch->Append(*sprite->mesh());
+    // Top left corner
+    sprite->set_pos(x,
+                    y,
+                    t.top_left.w,
+                    t.top_left.h);
+    sprite->set_subtexture(t.top_left);
+    batch->Append(*sprite->mesh());
 
-        // Top edge
-        sprite->set_pos(x + t.top_left.w,
-                        y,
-                        pos_.w - (t.top_left.w + t.top_right.w),
-                        t.top.h);
-        sprite->set_subtexture(t.top);
-        batch->Append(*sprite->mesh());
+    // Top edge
+    sprite->set_pos(x + t.top_left.w,
+                    y,
+                    pos_.w - (t.top_left.w + t.top_right.w),
+                    t.top.h);
+    sprite->set_subtexture(t.top);
+    batch->Append(*sprite->mesh());
 
-        // Top right corner
-        sprite->set_pos(x + pos_.w - t.top_right.w,
-                        y,
-                        t.top_right.w,
-                        t.top_right.h);
-        sprite->set_subtexture(t.top_right);
-        batch->Append(*sprite->mesh());
+    // Top right corner
+    sprite->set_pos(x + pos_.w - t.top_right.w,
+                    y,
+                    t.top_right.w,
+                    t.top_right.h);
+    sprite->set_subtexture(t.top_right);
+    batch->Append(*sprite->mesh());
 
-        // Left edge
-        sprite->set_pos(x,
-                        y + t.top_left.h,
-                        t.left.w,
-                        pos_.h - (t.top_left.h + t.bottom_right.h));
-        sprite->set_subtexture(t.left);
-        batch->Append(*sprite->mesh());
+    // Left edge
+    sprite->set_pos(x,
+                    y + t.top_left.h,
+                    t.left.w,
+                    pos_.h - (t.top_left.h + t.bottom_right.h));
+    sprite->set_subtexture(t.left);
+    batch->Append(*sprite->mesh());
 
-        // Body
-        sprite->set_pos(x + t.left.w,
-                        y + t.top.h,
-                        pos_.w - (t.left.w + t.right.w),
-                        pos_.h - (t.top.h + t.bottom.h));
-        sprite->set_subtexture(t.body);
-        batch->Append(*sprite->mesh());
+    // Body
+    sprite->set_pos(x + t.left.w,
+                    y + t.top.h,
+                    pos_.w - (t.left.w + t.right.w),
+                    pos_.h - (t.top.h + t.bottom.h));
+    sprite->set_subtexture(t.body);
+    batch->Append(*sprite->mesh());
 
-        // Right edge
-        sprite->set_pos(x + pos_.w - t.right.w,
-                        y + t.top_right.h,
-                        t.right.w,
-                        pos_.h - (t.top_right.h + t.bottom_right.h));
-        sprite->set_subtexture(t.right);
-        batch->Append(*sprite->mesh());
+    // Right edge
+    sprite->set_pos(x + pos_.w - t.right.w,
+                    y + t.top_right.h,
+                    t.right.w,
+                    pos_.h - (t.top_right.h + t.bottom_right.h));
+    sprite->set_subtexture(t.right);
+    batch->Append(*sprite->mesh());
 
-        // Bottom left corner
-        sprite->set_pos(x,
-                        y + pos_.h - t.bottom_left.h,
-                        t.bottom_left.w,
-                        t.bottom_left.h);
-        sprite->set_subtexture(t.bottom_left);
-        batch->Append(*sprite->mesh());
+    // Bottom left corner
+    sprite->set_pos(x,
+                    y + pos_.h - t.bottom_left.h,
+                    t.bottom_left.w,
+                    t.bottom_left.h);
+    sprite->set_subtexture(t.bottom_left);
+    batch->Append(*sprite->mesh());
 
-        // Bottom edge
-        sprite->set_pos(x + t.bottom_left.w,
-                        y + pos_.h - t.bottom.h,
-                        pos_.w - (t.bottom_left.w + t.bottom_right.w),
-                        t.bottom.h);
-        sprite->set_subtexture(t.bottom);
-        batch->Append(*sprite->mesh());
+    // Bottom edge
+    sprite->set_pos(x + t.bottom_left.w,
+                    y + pos_.h - t.bottom.h,
+                    pos_.w - (t.bottom_left.w + t.bottom_right.w),
+                    t.bottom.h);
+    sprite->set_subtexture(t.bottom);
+    batch->Append(*sprite->mesh());
 
-        // Bottom right corner
-        sprite->set_pos(x + pos_.w - t.bottom_right.w,
-                        y + pos_.h - t.bottom_right.h,
-                        t.bottom_right.w,
-                        t.bottom_right.h);
-        sprite->set_subtexture(t.bottom_right);
-        batch->Append(*sprite->mesh());
-    }
+    // Bottom right corner
+    sprite->set_pos(x + pos_.w - t.bottom_right.w,
+                    y + pos_.h - t.bottom_right.h,
+                    t.bottom_right.w,
+                    t.bottom_right.h);
+    sprite->set_subtexture(t.bottom_right);
+    batch->Append(*sprite->mesh());
+}
 
-    RegisterBatches();
+void Textarea::RenderText(RenderContext& context)
+{
+    auto parent_pos = parent_->pos();
+    auto y = pos_.y + parent_pos.y;
 
     // Update scroll position
     scroll_animation_.Update();
@@ -167,7 +176,6 @@ bool Textarea::Update(const Input& input)
                     MoveScrollOffset(-page_offset, true);
                     input_handled = true;
                 }
-
             }
         }
         // Handle these even when unfocused, so long as mouse pointer is inside textarea

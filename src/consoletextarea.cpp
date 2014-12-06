@@ -1,12 +1,20 @@
 #include "graphics/gui/consoletextarea.h"
 
 // Local Includes
-#include "graphics/gui/label.h"
+#include "graphics/gui/gui.h"
 
 namespace blons
 {
 namespace GUI
 {
+void ConsoleTextarea::Render(RenderContext& context)
+{
+    auto layout = gui_->skin()->layout();
 
+    RenderBody(layout->textarea, context);
+    RegisterBatches();
+
+    RenderText(context);
+}
 } // namespace GUI
 } // namespace blons

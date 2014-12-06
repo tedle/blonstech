@@ -15,16 +15,16 @@ ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, Windo
     auto conarea = std::unique_ptr<ConsoleTextarea>(new ConsoleTextarea(textarea_pos, font_style, parent_manager, this));
     auto conbox = std::unique_ptr<ConsoleTextbox>(new ConsoleTextbox(textbox_pos, font_style, parent_manager, this));
 
-    controls_.push_back(std::move(conarea));
-    auto conareaptr = static_cast<ConsoleTextarea*>(controls_.back().get());
-    controls_.push_back(std::move(conbox));
-    auto conboxptr = static_cast<ConsoleTextbox*>(controls_.back().get());
-
-    conboxptr->set_callback([=]()
+    auto conareaptr = conarea.get();
+    auto conboxptr = conbox.get();
+    conbox->set_callback([=]()
     {
         conareaptr->AddLine(conboxptr->text());
         conboxptr->set_text("");
     });
+
+    controls_.push_back(std::move(conarea));
+    controls_.push_back(std::move(conbox));
 }
-}
-}
+} // namespace GUI
+} // namespace blons

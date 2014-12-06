@@ -41,6 +41,8 @@ public:
 protected:
     std::vector<std::unique_ptr<Control>> controls_;
 
+    void RenderBody(RenderContext& context);
+
 private:
     const std::string id_;
     WindowType type_;

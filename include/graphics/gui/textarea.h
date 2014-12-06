@@ -28,6 +28,10 @@ public:
     void AddLine(std::string text);
     void Clear();
 
+protected:
+    void RenderBody(const Skin::Layout::Textarea& t, RenderContext& context);
+    void RenderText(RenderContext& context);
+
 private:
     void MoveScrollOffset(units::pixel delta, bool smooth);
 

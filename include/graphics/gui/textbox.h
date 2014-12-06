@@ -24,6 +24,11 @@ public:
     std::string text() const;
     void set_text(std::string text);
 
+protected:
+    void RenderBody(const Skin::Layout::TextboxSet::Textbox& t, RenderContext& context);
+    void RenderCursor(const Box& cursor, RenderContext& context);
+    void RenderText(RenderContext& context);
+
 private:
     std::string text_;
     FontStyle font_style_;

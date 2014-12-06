@@ -27,9 +27,9 @@ public:
     // Defined in the header file for all to see
     struct Layout
     {
-        struct ButtonSetLayout
+        struct ButtonSet
         {
-            struct ButtonLayout
+            struct Button
             {
                 Box top_left;
                 Box top;
@@ -42,7 +42,7 @@ public:
                 Box bottom_right;
             };
             // Wish initializers didnt suck so much...
-            ButtonLayout normal = ButtonLayout 
+            Button normal = Button
             {
                 Box(0, 45, 5, 5), // top_left
                 Box(6, 45, 1, 5), // top
@@ -54,7 +54,7 @@ public:
                 Box(6, 53, 1, 5), // bottom
                 Box(8, 53, 5, 5)  // bottom_right
             };
-            ButtonLayout hover = ButtonLayout
+            Button hover = Button
             {
                 Box(0, 59, 5, 5), // top_left
                 Box(6, 59, 1, 5), // top
@@ -66,7 +66,7 @@ public:
                 Box(6, 67, 1, 5), // bottom
                 Box(8, 67, 5, 5)  // bottom_right
             };
-            ButtonLayout active = ButtonLayout
+            Button active = Button
             {
                 Box(0, 73, 5, 5), // top_left
                 Box(6, 73, 1, 5), // top
@@ -80,7 +80,7 @@ public:
             };
         } button;
 
-        struct TextareaLayout
+        struct Textarea
         {
             Box top_left = Box(14, 28, 5, 5);
             Box top = Box(20, 28, 1, 5);
@@ -93,9 +93,9 @@ public:
             Box bottom_right = Box(22, 36, 5, 5);
         } textarea;
 
-        struct TextboxSetLayout
+        struct TextboxSet
         {
-            struct TextboxLayout
+            struct Textbox
             {
                 Box top_left;
                 Box top;
@@ -107,7 +107,7 @@ public:
                 Box bottom;
                 Box bottom_right;
             };
-            TextboxLayout normal = TextboxLayout
+            Textbox normal = Textbox
             {
                 Box(14, 0, 5, 5), // top_left
                 Box(20, 0, 1, 5), // top
@@ -119,7 +119,7 @@ public:
                 Box(20, 8, 1, 5), // bottom
                 Box(22, 8, 5, 5)  // bottom_right
             };
-            TextboxLayout active = TextboxLayout
+            Textbox active = Textbox
             {
                 Box(14, 14, 5, 5), // top_left
                 Box(20, 14, 1, 5), // top
@@ -134,9 +134,9 @@ public:
             Box cursor = Box(28, 0, 1, 1);
         } textbox;
 
-        struct WindowLayout
+        struct Window
         {
-            struct TitleBarLayout
+            struct Titlebar
             {
                 Box left = Box(0, 0, 5, 30);
                 Box center = Box(6, 0, 1, 30);

@@ -16,6 +16,8 @@ public:
     ConsoleTextbox(Box pos, Manager* parent_manager, Window* parent_window)
         : ConsoleTextbox(pos, FontStyle::LABEL, parent_manager, parent_window) {}
     ~ConsoleTextbox() {}
+
+    void ConsoleTextbox::Render(RenderContext& context);
 };
 } // namespace GUI
 } // namespace blons

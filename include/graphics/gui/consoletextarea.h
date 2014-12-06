@@ -16,6 +16,8 @@ public:
     ConsoleTextarea(Box pos, Manager* parent_manager, Window* parent_window)
         : ConsoleTextarea(pos, FontStyle::LABEL, parent_manager, parent_window) {}
     ~ConsoleTextarea() {}
+
+    void Render(RenderContext& context);
 };
 } // namespace GUI
 } // namespace blons
