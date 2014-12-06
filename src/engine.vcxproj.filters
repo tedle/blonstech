@@ -28,107 +28,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="temphelpers.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="logger.cpp">
-      <Filter>src\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="loggeride.cpp">
-      <Filter>src\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="drawbatcher.cpp">
-      <Filter>src\graphics\render</Filter>
-    </ClCompile>
-    <ClCompile Include="glfuncloader.cpp">
-      <Filter>src\graphics\render</Filter>
-    </ClCompile>
-    <ClCompile Include="renderd3d11.cpp">
-      <Filter>src\graphics\render</Filter>
-    </ClCompile>
-    <ClCompile Include="rendergl40.cpp">
-      <Filter>src\graphics\render</Filter>
-    </ClCompile>
-    <ClCompile Include="shader.cpp">
-      <Filter>src\graphics\render</Filter>
-    </ClCompile>
-    <ClCompile Include="camera.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="client.cpp">
-      <Filter>src\os</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="texture.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="sprite.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="model.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="meshimporter.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="mesh.cpp">
-      <Filter>src\graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="inputtemp.cpp">
-      <Filter>src\input</Filter>
-    </ClCompile>
-    <ClCompile Include="math.cpp">
-      <Filter>src\math</Filter>
-    </ClCompile>
-    <ClCompile Include="font.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="gui.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="button.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="window.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="label.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="colourstring.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="control.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="skin.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="textbox.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="timer.cpp">
-      <Filter>src\os</Filter>
-    </ClCompile>
-    <ClCompile Include="animation.cpp">
-      <Filter>src\math</Filter>
-    </ClCompile>
-    <ClCompile Include="textarea.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="consoletextbox.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="consoletextarea.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="consolewindow.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="..\include\blons.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -246,5 +145,106 @@
     <ClInclude Include="..\include\graphics\gui\consolewindow.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="debug\logger.cpp">
+      <Filter>src\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\loggeride.cpp">
+      <Filter>src\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\button.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\colourstring.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\consoletextarea.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\consoletextbox.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\consolewindow.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\control.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\font.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\label.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\skin.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\textarea.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\textbox.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\window.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\gui.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\drawbatcher.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\glfuncloader.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\renderd3d11.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\rendergl40.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\shader.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\camera.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\graphics.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\mesh.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\meshimporter.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\model.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\sprite.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\texture.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="input\inputtemp.cpp">
+      <Filter>src\input</Filter>
+    </ClCompile>
+    <ClCompile Include="math\animation.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
+    <ClCompile Include="math\math.cpp">
+      <Filter>src\math</Filter>
+    </ClCompile>
+    <ClCompile Include="os\client.cpp">
+      <Filter>src\os</Filter>
+    </ClCompile>
+    <ClCompile Include="os\timer.cpp">
+      <Filter>src\os</Filter>
+    </ClCompile>
+    <ClCompile Include="temphelpers.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
