@@ -32,10 +32,14 @@ public:
     Animation(units::time::ms duration, Callback callback, TweenType tween_method);
     Animation(units::time::ms duration, Callback callback)
         : Animation(duration, callback, LINEAR) {}
+    Animation()
+        : Animation(0, [](float){}) {}
     ~Animation() {};
 
     // Restarts animation from beginning
     void Reset();
+    // Completely halts animation
+    void Stop();
     // Returns true on completion
     bool Update();
 

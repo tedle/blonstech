@@ -109,6 +109,11 @@ void Animation::Reset()
     timer_.start();
 }
 
+void Animation::Stop()
+{
+    completed_ = true;
+}
+
 bool Animation::Update()
 {
     if (completed_)
