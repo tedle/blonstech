@@ -27,7 +27,7 @@ Textbox::Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* pare
     Vector2 text_pos;
     text_pos.x = pos.x + padding_;
     text_pos.y = pos.y + floor((pos.h + letter_height) / 2);
-    text_label_ = std::unique_ptr<Label>(new Label(text_pos, text_, gui_, parent_));
+    text_label_ = std::unique_ptr<Label>(new Label(text_pos, text_, style, gui_, parent_));
     text_label_->set_colour_parsing(false);
 }
 
