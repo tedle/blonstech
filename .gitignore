@@ -5,8 +5,7 @@ notes/
 *.swp
 
 # Build folders
-[Dd]ebug/
-[Rr]elease/
+x64/
 
 # Visual Studio
 *.opensdf
