@@ -55,6 +55,7 @@ private:
     friend Textbox;
     friend ConsoleTextbox;
     friend Window;
+    friend ConsoleWindow;
     void RegisterDrawCall(DrawCallInputs info, DrawBatcher* batch);
     Skin* skin() const;
     Window* active_window() const;

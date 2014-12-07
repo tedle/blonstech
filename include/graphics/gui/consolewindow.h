@@ -21,6 +21,8 @@ public:
     ConsoleWindow(std::string id, Box pos, std::string caption, Manager* parent_manager)
         : ConsoleWindow(id, pos, caption, WindowType::INVISIBLE, parent_manager) {}
     ~ConsoleWindow() {}
+
+    void Render(RenderContext& context);
 };
 } // namepsace GUI
 } // namespace blons

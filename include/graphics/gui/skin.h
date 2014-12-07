@@ -182,23 +182,27 @@ public:
                 Box(67, 35, 1, 10), // bottom
                 Box(69, 35, 10, 10)  // bottom_right
             };
-            // TODO: This textbox has a drop shadow, so ConsoleTextbox classes ignore
-            // the top and bottom 40 pixels of this layout while still rendering them
-            // This is hacky and should be reworked
             Textbox textbox = Textbox
             {
-                Box(30, 0, 10, 50), // top_left
-                Box(41, 0, 1, 50), // top
-                Box(43, 0, 10, 50), // top_right
-                Box(30, 51, 10, 1), // left
-                Box(41, 51, 1, 1), // body
-                Box(43, 51, 10, 1), // right
-                Box(30, 53, 10, 50), // bottom_left
-                Box(41, 53, 1, 50), // bottom
-                Box(43, 53, 10, 50)  // bottom_right
+                Box(30, 0, 10, 10), // top_left
+                Box(41, 0, 1, 10), // top
+                Box(43, 0, 10, 10), // top_right
+                Box(30, 11, 10, 1), // left
+                Box(41, 11, 1, 1), // body
+                Box(43, 11, 10, 1), // right
+                Box(30, 13, 10, 10), // bottom_left
+                Box(41, 13, 1, 10), // bottom
+                Box(43, 13, 10, 10)  // bottom_right
             };
             Box cursor = Box(56, 48, 1, 1);
         } console;
+
+        struct Dropshadow
+        {
+            Box bottom_left = Box(82, 0, 10, 40);
+            Box bottom = Box(93, 0, 1, 40);
+            Box bottom_right = Box(95, 0, 10, 40);
+        } dropshadow;
     };
 
 public:
