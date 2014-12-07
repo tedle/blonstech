@@ -19,7 +19,7 @@ public:
     ConsoleWindow(std::string id, Box pos, WindowType type, Manager* parent_manager)
         : ConsoleWindow(id, pos, "", type, parent_manager) {}
     ConsoleWindow(std::string id, Box pos, std::string caption, Manager* parent_manager)
-        : ConsoleWindow(id, pos, caption, WindowType::DRAGGABLE, parent_manager) {}
+        : ConsoleWindow(id, pos, caption, WindowType::INVISIBLE, parent_manager) {}
     ~ConsoleWindow() {}
 };
 } // namepsace GUI

@@ -146,7 +146,7 @@ public:
                 Box(20, 22, 1, 5), // bottom
                 Box(22, 22, 5, 5)  // bottom_right
             };
-            Box cursor = Box(28, 0, 1, 1);
+            Box cursor = Box(14, 42, 1, 1);
         } textbox;
 
         struct Window
@@ -172,29 +172,32 @@ public:
         {
             Textarea textarea = Textarea
             {
-                Box(14, 42, 5, 5), // top_left
-                Box(20, 42, 1, 5), // top
-                Box(22, 42, 5, 5), // top_right
-                Box(14, 48, 5, 1), // left
-                Box(20, 48, 1, 1), // body
-                Box(22, 48, 5, 1), // right
-                Box(14, 50, 5, 5), // bottom_left
-                Box(20, 50, 1, 5), // bottom
-                Box(22, 50, 5, 5)  // bottom_right
+                Box(56, 0, 10, 10), // top_left
+                Box(67, 0, 1, 10), // top
+                Box(69, 0, 10, 10), // top_right
+                Box(56, 11, 10, 23), // left
+                Box(67, 11, 1, 23), // body
+                Box(69, 11, 10, 23), // right
+                Box(56, 35, 10, 10), // bottom_left
+                Box(67, 35, 1, 10), // bottom
+                Box(69, 35, 10, 10)  // bottom_right
             };
+            // TODO: This textbox has a drop shadow, so ConsoleTextbox classes ignore
+            // the top and bottom 40 pixels of this layout while still rendering them
+            // This is hacky and should be reworked
             Textbox textbox = Textbox
             {
-                Box(14, 56, 5, 5), // top_left
-                Box(20, 56, 1, 5), // top
-                Box(22, 56, 5, 5), // top_right
-                Box(14, 62, 5, 1), // left
-                Box(20, 62, 1, 1), // body
-                Box(22, 62, 5, 1), // right
-                Box(14, 64, 5, 5), // bottom_left
-                Box(20, 64, 1, 5), // bottom
-                Box(22, 64, 5, 5)  // bottom_right
+                Box(30, 0, 10, 50), // top_left
+                Box(41, 0, 1, 50), // top
+                Box(43, 0, 10, 50), // top_right
+                Box(30, 51, 10, 1), // left
+                Box(41, 51, 1, 1), // body
+                Box(43, 51, 10, 1), // right
+                Box(30, 53, 10, 50), // bottom_left
+                Box(41, 53, 1, 50), // bottom
+                Box(43, 53, 10, 50)  // bottom_right
             };
-            Box cursor = Box(28, 2, 1, 1);
+            Box cursor = Box(56, 48, 1, 1);
         } console;
     };
 
