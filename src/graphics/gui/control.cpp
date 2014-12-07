@@ -7,6 +7,21 @@ namespace blons
 {
 namespace GUI
 {
+void Control::hide()
+{
+    hidden_ = true;
+}
+
+void Control::show()
+{
+    hidden_ = false;
+}
+
+bool Control::hidden()
+{
+    return hidden_;
+}
+
 void Control::set_pos(units::subpixel x, units::subpixel y)
 {
     pos_.x = x;

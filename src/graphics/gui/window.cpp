@@ -44,7 +44,10 @@ void Window::Render(RenderContext& context)
     // Render controls
     for (const auto& control : controls_)
     {
-        control->Render(context);
+        if (!control->hidden())
+        {
+            control->Render(context);
+        }
     }
 }
 
@@ -227,7 +230,10 @@ bool Window::Update(const Input& input)
     // Handle input for window controls
     for (auto& c : controls_)
     {
-        input_handled |= c.get()->Update(input);
+        if (!c->hidden())
+        {
+            input_handled |= c->Update(input);
+        }
     }
     return input_handled;
 }

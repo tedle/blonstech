@@ -85,9 +85,15 @@ void Manager::Render(RenderContext& context)
     main_window_->Render(context);
     for (const auto& w : windows_)
     {
-        w->Render(context);
+        if (!w->hidden())
+        {
+            w->Render(context);
+        }
     }
-    console_window_->Render(context);
+    if (!console_window_->hidden())
+    {
+        console_window_->Render(context);
+    }
 
     // Draw pass
     ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
@@ -124,13 +130,13 @@ bool Manager::Update(const Input& input)
 {
     // Update backwards, since last element is top window
     // We don't want input to be sent to windows underneath the one yr clickin on
-    if (console_window_->Update(input))
+    if (!console_window_->hidden() && console_window_->Update(input))
     {
         return true;
     }
     for (auto w = windows_.rbegin(); w != windows_.rend(); w++)
     {
-        if (w->get()->Update(input))
+        if (!w->get()->hidden() && w->get()->Update(input))
         {
             return true;
         }

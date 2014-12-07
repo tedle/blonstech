@@ -41,16 +41,21 @@ public:
     virtual void Render(RenderContext& context)=0;
     virtual bool Update(const Input& input)=0;
 
-    void set_pos(units::subpixel x, units::subpixel y);
-    Box pos() const;
+    virtual void hide();
+    virtual void show();
+    virtual bool hidden();
 
-    void set_crop(Box crop, units::pixel feather);
+    virtual void set_pos(units::subpixel x, units::subpixel y);
+    virtual Box pos() const;
+
+    virtual void set_crop(Box crop, units::pixel feather);
 
 protected:
     // Feel kinda dirty doing all this initialization here
     Box pos_ = Box(0, 0, 0, 0);
     Box crop_ = Box(0, 0, 0, 0);
     units::pixel feather_ = 0;
+    bool hidden_ = false;
     Manager* gui_ = nullptr;
     Window* parent_ = nullptr;
 
