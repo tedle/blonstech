@@ -20,7 +20,7 @@ public:
     void set_callback(std::function<void()> callback);
 
 protected:
-    void RenderBody(const Skin::Layout::ButtonSet::Button& b, RenderContext& context);
+    void RenderBody(const Skin::Layout::Button& b, RenderContext& context);
 
 private:
     std::unique_ptr<class Label> label_;

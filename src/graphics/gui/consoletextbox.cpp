@@ -11,8 +11,8 @@ void ConsoleTextbox::Render(RenderContext& context)
 {
     auto layout = gui_->skin()->layout();
 
-    RenderBody(layout->textbox.active, context);
-    RenderCursor(layout->textbox.cursor, context);
+    RenderBody(layout->console.textbox, context);
+    RenderCursor(layout->console.cursor, context);
 
     RegisterBatches();
 

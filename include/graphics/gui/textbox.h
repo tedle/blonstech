@@ -25,7 +25,7 @@ public:
     void set_text(std::string text);
 
 protected:
-    void RenderBody(const Skin::Layout::TextboxSet::Textbox& t, RenderContext& context);
+    void RenderBody(const Skin::Layout::Textbox& t, RenderContext& context);
     void RenderCursor(const Box& cursor, RenderContext& context);
     void RenderText(RenderContext& context);
 

@@ -35,7 +35,7 @@ void Textbox::Render(RenderContext& context)
 {
     auto layout = gui_->skin()->layout();
 
-    const Skin::Layout::TextboxSet::Textbox* textbox_layout;
+    const Skin::Layout::Textbox* textbox_layout;
     if (active_)
     {
         textbox_layout = &layout->textbox.active;
@@ -53,7 +53,7 @@ void Textbox::Render(RenderContext& context)
     RenderText(context);
 }
 
-void Textbox::RenderBody(const Skin::Layout::TextboxSet::Textbox& t, RenderContext& context)
+void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
 {
     auto sprite = gui_->skin()->sprite();
     auto batch = control_batch(context);

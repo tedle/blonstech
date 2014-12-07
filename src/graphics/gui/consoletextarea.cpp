@@ -11,7 +11,7 @@ void ConsoleTextarea::Render(RenderContext& context)
 {
     auto layout = gui_->skin()->layout();
 
-    RenderBody(layout->textarea, context);
+    RenderBody(layout->console.textarea, context);
     RegisterBatches();
 
     RenderText(context);

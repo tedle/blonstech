@@ -34,7 +34,7 @@ void Button::Render(RenderContext& context)
 {
     auto layout = gui_->skin()->layout();
 
-    const Skin::Layout::ButtonSet::Button* b;
+    const Skin::Layout::Button* b;
     if (active_ && hover_)
     {
         b = &layout->button.active;
@@ -55,7 +55,7 @@ void Button::Render(RenderContext& context)
     label_->Render(context);
 }
 
-void Button::RenderBody(const Skin::Layout::ButtonSet::Button& b, RenderContext& context)
+void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
 {
     auto sprite = gui_->skin()->sprite();
     auto batch = control_batch(context);

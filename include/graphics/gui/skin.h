@@ -27,20 +27,21 @@ public:
     // Defined in the header file for all to see
     struct Layout
     {
+        struct Button
+        {
+            Box top_left;
+            Box top;
+            Box top_right;
+            Box left;
+            Box body;
+            Box right;
+            Box bottom_left;
+            Box bottom;
+            Box bottom_right;
+        };
+
         struct ButtonSet
         {
-            struct Button
-            {
-                Box top_left;
-                Box top;
-                Box top_right;
-                Box left;
-                Box body;
-                Box right;
-                Box bottom_left;
-                Box bottom;
-                Box bottom_right;
-            };
             // Wish initializers didnt suck so much...
             Button normal = Button
             {
@@ -82,31 +83,45 @@ public:
 
         struct Textarea
         {
-            Box top_left = Box(14, 28, 5, 5);
-            Box top = Box(20, 28, 1, 5);
-            Box top_right = Box(22, 28, 5, 5);
-            Box left = Box(14, 34, 5, 1);
-            Box body = Box(20, 34, 1, 1);
-            Box right = Box(22, 34, 5, 1);
-            Box bottom_left = Box(14, 36, 5, 5);
-            Box bottom = Box(20, 36, 1, 5);
-            Box bottom_right = Box(22, 36, 5, 5);
-        } textarea;
+            Box top_left;
+            Box top;
+            Box top_right;
+            Box left;
+            Box body;
+            Box right;
+            Box bottom_left;
+            Box bottom;
+            Box bottom_right;
+        };
+
+        Textarea textarea = Textarea
+        {
+            Box(14, 28, 5, 5), // top_left
+            Box(20, 28, 1, 5), // top
+            Box(22, 28, 5, 5), // top_right
+            Box(14, 34, 5, 1), // left
+            Box(20, 34, 1, 1), // body
+            Box(22, 34, 5, 1), // right
+            Box(14, 36, 5, 5), // bottom_left
+            Box(20, 36, 1, 5), // bottom
+            Box(22, 36, 5, 5)  // bottom_right
+        };
+
+        struct Textbox
+        {
+            Box top_left;
+            Box top;
+            Box top_right;
+            Box left;
+            Box body;
+            Box right;
+            Box bottom_left;
+            Box bottom;
+            Box bottom_right;
+        };
 
         struct TextboxSet
         {
-            struct Textbox
-            {
-                Box top_left;
-                Box top;
-                Box top_right;
-                Box left;
-                Box body;
-                Box right;
-                Box bottom_left;
-                Box bottom;
-                Box bottom_right;
-            };
             Textbox normal = Textbox
             {
                 Box(14, 0, 5, 5), // top_left
@@ -152,6 +167,35 @@ public:
             Box bottom = Box(6, 39, 1, 5);
             Box bottom_right = Box(8, 39, 5, 5);
         } window;
+
+        struct Console
+        {
+            Textarea textarea = Textarea
+            {
+                Box(14, 42, 5, 5), // top_left
+                Box(20, 42, 1, 5), // top
+                Box(22, 42, 5, 5), // top_right
+                Box(14, 48, 5, 1), // left
+                Box(20, 48, 1, 1), // body
+                Box(22, 48, 5, 1), // right
+                Box(14, 50, 5, 5), // bottom_left
+                Box(20, 50, 1, 5), // bottom
+                Box(22, 50, 5, 5)  // bottom_right
+            };
+            Textbox textbox = Textbox
+            {
+                Box(14, 56, 5, 5), // top_left
+                Box(20, 56, 1, 5), // top
+                Box(22, 56, 5, 5), // top_right
+                Box(14, 62, 5, 1), // left
+                Box(20, 62, 1, 1), // body
+                Box(22, 62, 5, 1), // right
+                Box(14, 64, 5, 5), // bottom_left
+                Box(20, 64, 1, 5), // bottom
+                Box(22, 64, 5, 5)  // bottom_right
+            };
+            Box cursor = Box(28, 2, 1, 1);
+        } console;
     };
 
 public:
