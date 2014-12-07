@@ -325,11 +325,9 @@ std::vector<std::string> Font::string_wrap(std::string string, units::pixel max_
             pixel_width = 0;
             last_break = i;
         }
-        else
-        {
-            // How far to advance cursor for next letter
-            pixel_width += g->x_advance;
-        }
+
+        // How far to advance cursor for next letter
+        pixel_width += g->x_advance;
     }
 
     // Still some left over string to append
