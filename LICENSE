@@ -1,4 +1,5 @@
----------------------- blonstech -------------------------
+blonstech
+---------
 The MIT License (MIT)
 
 Copyright (c) 2014 Dominic Bowden
@@ -20,14 +21,10 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-----------------------------------------------------------
 
----------------------- FreeType --------------------------
-Portions of this software are copyright 2014 The FreeType
-Project (www.freetype.org).  All rights reserved.
-----------------------------------------------------------
 
----------------------- SOIL2 -----------------------------
-Simple OpenGL Image Library 2. It's in the public domain.
-Check it out: https://bitbucket.org/SpartanJ/soil2
-----------------------------------------------------------
+
+External libraries used by blonstech
+------------------------------------
+freetype: under the FTL license (www.freetype.org)
+SOIL2: public domain (https://bitbucket.org/SpartanJ/soil2)
