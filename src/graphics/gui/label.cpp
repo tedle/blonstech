@@ -68,6 +68,16 @@ void Label::set_text(std::string text)
     text_ = ColourString(text);
 }
 
+void Label::set_text(ColourString text)
+{
+    text_ = text;
+}
+
+const ColourString& Label::text() const
+{
+    return text_;
+}
+
 void Label::set_colour_parsing(bool colour_parsing)
 {
     colour_parsing_ = colour_parsing;

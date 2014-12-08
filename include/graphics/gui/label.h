@@ -24,6 +24,8 @@ public:
     bool Update(const Input& input) override;
 
     void set_text(std::string text);
+    void set_text(ColourString text);
+    const ColourString& text() const;
     // True if you want $fff colour codes parsed, default true
     void set_colour_parsing(bool colour_parsing);
 
