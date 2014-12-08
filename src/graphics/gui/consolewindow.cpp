@@ -28,6 +28,9 @@ ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, Windo
 
     controls_.push_back(std::move(conarea));
     controls_.push_back(std::move(conbox));
+
+    hiding_ = false;
+    hidden_ = true;
 }
 
 void ConsoleWindow::Render(RenderContext& context)
@@ -51,17 +54,41 @@ void ConsoleWindow::Render(RenderContext& context)
 
 bool ConsoleWindow::Update(const Input& input)
 {
+    slide_.Update();
     return Window::Update(input);
 }
 
 void ConsoleWindow::hide()
 {
-    hidden_ = true;
+    if (hiding_)
+    {
+        show();
+        return;
+    }
+    auto shadow_height = gui_->skin()->layout()->dropshadow.bottom.h;
+    Animation::Callback cb = [this, shadow_height](float d)
+    {
+        pos_.y = -(pos_.h + shadow_height) * d;
+        if (d == 1.0)
+        {
+            hiding_ = false;
+            hidden_ = true;
+        }
+    };
+    slide_ = Animation(300, cb, Animation::CUBIC_IN);
+    hiding_ = true;
 }
 
 void ConsoleWindow::show()
 {
+    auto shadow_height = gui_->skin()->layout()->dropshadow.bottom.h;
+    Animation::Callback cb = [this, shadow_height](float d)
+    {
+        pos_.y = -(pos_.h + shadow_height) * (1.0f - d);
+    };
+    slide_ = Animation(300, cb, Animation::CUBIC_OUT);
     hidden_ = false;
+    hiding_ = false;
 }
 } // namespace GUI
 } // namespace blons

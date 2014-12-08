@@ -30,6 +30,8 @@ public:
 
 private:
     Animation slide_;
+    // TODO: Get rid of hacky state recording
+    bool hiding_;
 };
 } // namepsace GUI
 } // namespace blons
