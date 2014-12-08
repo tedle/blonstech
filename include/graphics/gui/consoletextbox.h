@@ -18,6 +18,7 @@ public:
     ~ConsoleTextbox() {}
 
     void ConsoleTextbox::Render(RenderContext& context);
+    bool ConsoleTextbox::Update(const Input& input);
 };
 } // namespace GUI
 } // namespace blons

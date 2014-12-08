@@ -17,6 +17,7 @@ Textbox::Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* pare
     text_ = "";
     font_style_ = style;
     cursor_ = text_.end();
+    cursor_blink_.start();
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](){};
 
@@ -46,7 +47,10 @@ void Textbox::Render(RenderContext& context)
     }
 
     RenderBody(*textbox_layout, context);
-    RenderCursor(layout->textbox.cursor, context);
+    if (active_)
+    {
+        RenderCursor(layout->textbox.cursor, context);
+    }
 
     RegisterBatches();
 
@@ -142,7 +146,7 @@ void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
-    if (active_ && cursor_blink_.ms() % 1000 < 500)
+    if (cursor_blink_.ms() % 1000 < 500)
     {
         auto cursor_width = 1.0f;
         auto cursor_height = gui_->skin()->font(font_style_)->letter_height() + 6.0f;

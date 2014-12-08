@@ -29,6 +29,14 @@ protected:
     void RenderCursor(const Box& cursor, RenderContext& context);
     void RenderText(RenderContext& context);
 
+    // Helper functions
+    std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input);
+    void OnMouseDown(const Input& input);
+    void OnKeyDown(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
+    void OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
+    void SetCursorPos(std::string::iterator cursor);
+    units::subpixel CursorOffset();
+
 private:
     std::string text_;
     FontStyle font_style_;
@@ -44,14 +52,6 @@ private:
     bool active_;
     // Padding between edge of textbox and text
     units::pixel padding_;
-
-    // Helper functions
-    std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input);
-    void OnMouseDown(const Input& input);
-    void OnKeyDown(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
-    void OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
-    void SetCursorPos(std::string::iterator cursor);
-    units::subpixel CursorOffset();
 };
 } // namespace GUI
 } // namespace blons
