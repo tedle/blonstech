@@ -112,11 +112,7 @@ void Manager::Render(RenderContext& context)
             ui_shader_->SetInput("is_text", false, context);
             ui_shader_->SetInput("diffuse", skin_->sprite()->texture(), context);
         }
-        Vector4 crop(batch.first.crop.x,
-                     batch.first.crop.y,
-                     batch.first.crop.w,
-                     batch.first.crop.h);
-        ui_shader_->SetInput("crop", crop, context);
+        ui_shader_->SetInput("crop", batch.first.crop, context);
         ui_shader_->SetInput("feather", batch.first.crop_feather, context);
 
         batch.second->Render(context);

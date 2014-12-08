@@ -57,6 +57,7 @@ struct Vector4
 
     Vector4() : x(0), y(0), z(0), w(0) {}
     Vector4(units::world _x, units::world _y, units::world _z, units::world _w) : x(_x), y(_y), z(_z), w(_w) {}
+    Vector4(const Box& b) : x(b.x), y(b.y), z(b.w), w(b.h) {}
 
     Vector4& operator= (const Vector4& vec) {x = vec.x; y = vec.y; z = vec.z; w = vec.w; return *this;}
     Vector4& operator+ (const Vector4& vec) {x += vec.x; y += vec.y; z += vec.z; w = vec.w; return *this;}
