@@ -128,6 +128,23 @@ void Manager::Render(RenderContext& context)
 
 bool Manager::Update(const Input& input)
 {
+    // TODO: Replace when we have input binding system
+    for (const auto& e : input.event_queue())
+    {
+        if (e.type == Input::Event::KEY_DOWN &&
+            e.value == Input::KeyCode::SYMBOL_GRAVE_ACCENT)
+        {
+            if (console_window_->hidden())
+            {
+                console_window_->show();
+            }
+            else
+            {
+                console_window_->hide();
+            }
+            return true;
+        }
+    }
     // Update backwards, since last element is top window
     // We don't want input to be sent to windows underneath the one yr clickin on
     if (!console_window_->hidden() && console_window_->Update(input))

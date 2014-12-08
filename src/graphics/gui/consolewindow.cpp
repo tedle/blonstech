@@ -48,5 +48,20 @@ void ConsoleWindow::Render(RenderContext& context)
 
     Window::Render(context);
 }
+
+bool ConsoleWindow::Update(const Input& input)
+{
+    return Window::Update(input);
+}
+
+void ConsoleWindow::hide()
+{
+    hidden_ = true;
+}
+
+void ConsoleWindow::show()
+{
+    hidden_ = false;
+}
 } // namespace GUI
 } // namespace blons

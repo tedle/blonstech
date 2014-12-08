@@ -23,6 +23,13 @@ public:
     ~ConsoleWindow() {}
 
     void Render(RenderContext& context);
+    bool Update(const Input& input);
+
+    void hide();
+    void show();
+
+private:
+    Animation slide_;
 };
 } // namepsace GUI
 } // namespace blons
