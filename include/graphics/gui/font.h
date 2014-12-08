@@ -6,6 +6,7 @@
 // Local Includes
 #include "math/units.h"
 #include "graphics/sprite.h"
+#include "graphics/gui/colourstring.h"
 
 namespace blons
 {
@@ -33,6 +34,9 @@ public:
     units::pixel string_width(std::string string, bool trim_whitespace) const;
     // Breaks string into an array of strings guranteed to each be shorter than max_width
     std::vector<std::string> string_wrap(std::string string, units::pixel max_width);
+    // Same as above except colour codes don't count towards max_width
+    // Also colour codes are insert on newline to ensure they are carried over
+    std::vector<std::string> string_wrap(ColourString string, units::pixel max_width);
     // Return how far to advance horizontally after rendering a character in pixels
     // Resets to 0 after call
     units::pixel advance();

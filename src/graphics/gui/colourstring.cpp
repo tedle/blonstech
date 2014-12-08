@@ -51,16 +51,26 @@ int HexToInt(unsigned char c)
     }
     throw "This shouldn't happen...";
 }
+
+int IntToHex(unsigned char c)
+{
+    if (c >= 0xA && c <= 0xF)
+    {
+        // 'A' is charcode 65, 10 is value of A in hex
+        return c + 65 - 10;
+    }
+    else if (c >= 0 && c <= 9)
+    {
+        return c + 48;
+    }
+    throw "This shouldn't happen...";
+}
 } // namespace
 
 namespace blons
 {
 namespace GUI
 {
-ColourString::ColourString()
-{
-}
-
 ColourString::ColourString(std::string text)
 {
     raw_text_ = text;
@@ -80,9 +90,9 @@ ColourString::ColourString(std::string text)
         {
             Vector4 colour;
             // Prefix ++ to skip over '$' char
-            colour.x = HexToInt(text[++code_pos]) / 16.0f;
-            colour.y = HexToInt(text[++code_pos]) / 16.0f;
-            colour.z = HexToInt(text[++code_pos]) / 16.0f;
+            colour.x = HexToInt(text[++code_pos]) / 15.0f;
+            colour.y = HexToInt(text[++code_pos]) / 15.0f;
+            colour.z = HexToInt(text[++code_pos]) / 15.0f;
             colour.w = 1.0;
             text = text.substr(++code_pos);
             next_frag.colour = colour;
@@ -94,8 +104,14 @@ ColourString::ColourString(std::string text)
     }
 }
 
-ColourString::~ColourString()
+std::string ColourString::MakeColourCode(Vector4 colour)
 {
+    // xxx to avoid extra allocation
+    std::string ret = "$xxx";
+    ret[1] = IntToHex(static_cast<unsigned char>(15.0f * colour.x));
+    ret[2] = IntToHex(static_cast<unsigned char>(15.0f * colour.y));
+    ret[3] = IntToHex(static_cast<unsigned char>(15.0f * colour.z));
+    return ret;
 }
 
 const std::vector<ColourString::Fragment>& ColourString::fragments() const

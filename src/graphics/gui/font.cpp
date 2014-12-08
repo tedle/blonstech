@@ -339,6 +339,59 @@ std::vector<std::string> Font::string_wrap(std::string string, units::pixel max_
     return broken_strings;
 }
 
+std::vector<std::string> Font::string_wrap(ColourString string, units::pixel max_width)
+{
+    std::vector<std::string> broken_strings;
+
+    units::pixel pixel_width = 0;
+    std::size_t last_break = 0;
+    // Stores our position in "full_string", skipping ahead when we find colour codes
+    int i = 0;
+    const auto& full_string = string.raw_str();
+    Vector4 current_colour = kDefaultTextColour;
+    for (const auto& f : string.fragments())
+    {
+        for (const auto& c : f.text)
+        {
+            // Pointer to avoid expensive copying
+            const Glyph* g;
+            // In case someone tries to calculate a string using chars we dont have
+            try
+            {
+                g = &charset_[full_string[i]];
+            }
+            catch (...)
+            {
+                return std::vector<std::string>();
+            }
+            // Out of bounds or newline, slice the string
+            if ((pixel_width + g->x_advance > max_width && pixel_width > 0) ||
+                full_string[i] == '\n')
+            {
+                broken_strings.push_back(ColourString::MakeColourCode(current_colour) + full_string.substr(last_break, i - last_break));
+                pixel_width = 0;
+                last_break = i;
+                current_colour = f.colour;
+            }
+
+            // How far to advance cursor for next letter
+            pixel_width += g->x_advance;
+
+            i++;
+        }
+        // New fragment means skip 4 chars for colour code
+        i += 4;
+    }
+
+    // Still some left over string to append
+    if (last_break < full_string.length())
+    {
+        broken_strings.push_back(ColourString::MakeColourCode(current_colour) + full_string.substr(last_break));
+    }
+
+    return broken_strings;
+}
+
 int Font::advance()
 {
     units::pixel ret = advance_;

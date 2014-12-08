@@ -210,7 +210,7 @@ bool Textarea::Update(const Input& input)
 void Textarea::GenLabel(std::string text)
 {
     const auto& font = gui_->skin()->font(font_style_);
-    auto lines = font->string_wrap(text, units::subpixel_to_pixel(pos_.w) - padding_ * 2);
+    auto lines = font->string_wrap(ColourString(text), units::subpixel_to_pixel(pos_.w) - padding_ * 2);
     if (newest_top_)
     {
         for (auto line = lines.rbegin(); line != lines.rend(); line++)

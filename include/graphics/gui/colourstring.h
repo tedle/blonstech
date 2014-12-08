@@ -26,10 +26,12 @@ public:
     };
 
 public:
-    ColourString();
     ColourString(std::string text);
     ColourString(const char* text) : ColourString(std::string(text)) {}
-    ~ColourString();
+    ColourString() : ColourString("") {}
+    ~ColourString() {}
+
+    static std::string MakeColourCode(Vector4 colour);
 
     const std::vector<Fragment>& fragments() const;
     const std::string& str() const;
