@@ -13,6 +13,8 @@
 
 namespace
 {
+using namespace blons;
+
 static unsigned int HashString(const char* str)
 {
     static const unsigned int kPrime = 16777619;
@@ -28,7 +30,55 @@ static unsigned int HashString(const char* str)
 // Should be thread safe to make this global, since OpenGL context
 // cannot be used from multiple threads anyway.
 static GLuint g_active_shader;
-} //namespace
+void BindShader(GLuint shader)
+{
+    // Avoid repeated calls to glUseProgram (perf boost)
+    if (shader != g_active_shader)
+    {
+        glUseProgram(shader);
+    }
+    g_active_shader = shader;
+}
+
+// Overloaded glUniforms to keep things generic
+void Uniform(GLuint loc, int value)
+{
+    glUniform1i(loc, value);
+}
+void Uniform(GLuint loc, Matrix value)
+{
+    glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)value.m);
+}
+void Uniform(GLuint loc, Vector3 value)
+{
+    glUniform3fv(loc, 1, &value.x);
+}
+void Uniform(GLuint loc, Vector4 value)
+{
+    glUniform4fv(loc, 1, &value.x);
+}
+
+// Generic glUniform call
+template <typename T>
+bool SetUniform(ShaderResource* program, const char* name, T value)
+{
+    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
+
+    BindShader(prog->program_);
+
+    auto location = prog->UniformLocation(name);
+    if (location < 0)
+    {
+        return false;
+    }
+    Uniform(location, value);
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return false;
+    }
+    return true;
+}
+} // namespace
 
 namespace blons
 {
@@ -361,7 +411,6 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count)
 {
-
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     BufferResourceGL40* index_buf = static_cast<BufferResourceGL40*>(index_buffer);
 
@@ -465,7 +514,7 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data
     // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &float);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
 
-    // Re enable this for non-dds textures
+    // TODO: Re enable this for non-dds textures
     // glGenerateMipmap(GL_TEXTURE_2D);
 
     return true;
@@ -576,95 +625,32 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
     // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
 }
-
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, int value)
 {
-    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-
-    BindShader(prog->program_);
-
-    // Bind our uniform variables to the shader
-    auto loc = prog->UniformLocation(name);
-    if (loc < 0)
-    {
-        return false;
-    }
-    glUniform1i(loc, value);
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return false;
-    }
-    return true;
+    return SetUniform(program, name, value);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matrix value)
 {
-    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-
-    BindShader(prog->program_);
-
-    // Bind our uniform variables to the shader
-    auto loc = prog->UniformLocation(name);
-    if (loc < 0)
-    {
-        return false;
-    }
-    glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)value.m);
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return false;
-    }
-    return true;
+    return SetUniform(program, name, value);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector3 value)
 {
-    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-
-    BindShader(prog->program_);
-
-    // Bind our uniform variables to the shader
-    auto loc = prog->UniformLocation(name);
-    if (loc < 0)
-    {
-        return false;
-    }
-    glUniform3fv(loc, 1, &value.x);
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return false;
-    }
-    return true;
+    return SetUniform(program, name, value);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector4 value)
 {
-    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-
-    BindShader(prog->program_);
-
-    // Bind our uniform variables to the shader
-    auto loc = prog->UniformLocation(name);
-    if (loc < 0)
-    {
-        return false;
-    }
-    glUniform4fv(loc, 1, &value.x);
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return false;
-    }
-    return true;
+    return SetUniform(program, name, value);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value)
 {
     const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(value);
-    SetShaderInput(program, name, tex->texture_unit_);
     glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
     glBindTexture(GL_TEXTURE_2D, tex->texture_);
-
-    return true;
+    return SetShaderInput(program, name, tex->texture_unit_);
 }
 
 bool RenderGL40::SetDepthTesting(bool enable)
@@ -730,7 +716,6 @@ bool RenderGL40::LoadPixelData(std::string filename, PixelData* data)
 
 void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
 {
-    // Grab the compile errors
     int buffer_size;
     if (is_shader)
     {
@@ -755,15 +740,5 @@ void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
     g_log->Debug("------------------------------------------------------\n");
 
     return;
-}
-
-void RenderGL40::BindShader(GLuint shader)
-{
-    // Avoid repeated calls to glUseProgram (perf boost)
-    if (shader != g_active_shader)
-    {
-        glUseProgram(shader);
-    }
-    g_active_shader = shader;
 }
 } // namespace blons
