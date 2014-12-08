@@ -12,7 +12,7 @@ public:
     LoggerIDE(Level log_level);
 
 private:
-    void out(std::string msg, Level log_level);
+    void out(std::string msg, Level log_level) override;
 };
 } // namespace blons
 

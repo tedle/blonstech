@@ -58,7 +58,7 @@ private:
     {
     public:
         ManagedModel(std::string filename, RenderContext& context) : Model(filename, context) {}
-        ~ManagedModel();
+        ~ManagedModel() override;
     private:
         friend Graphics;
         void Finish();
@@ -69,7 +69,7 @@ private:
     {
     public:
         ManagedSprite(std::string filename, RenderContext& context) : Sprite(filename, context) {}
-        ~ManagedSprite();
+        ~ManagedSprite() override;
     private:
         friend Graphics;
         void Finish();

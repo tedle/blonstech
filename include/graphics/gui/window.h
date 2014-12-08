@@ -28,8 +28,8 @@ public:
         : Window(id, pos, caption, WindowType::DRAGGABLE, parent_manager) {}
     ~Window() {}
 
-    void Render(RenderContext& context);
-    bool Update(const Input& input);
+    void Render(RenderContext& context) override;
+    bool Update(const Input& input) override;
 
     Button* MakeButton(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string label);
     Label* MakeLabel(units::pixel x, units::pixel y, std::string text);

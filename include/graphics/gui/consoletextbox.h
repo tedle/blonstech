@@ -17,8 +17,8 @@ public:
         : ConsoleTextbox(pos, FontStyle::LABEL, parent_manager, parent_window) {}
     ~ConsoleTextbox() {}
 
-    void ConsoleTextbox::Render(RenderContext& context);
-    bool ConsoleTextbox::Update(const Input& input);
+    void Render(RenderContext& context) override;
+    bool Update(const Input& input) override;
 };
 } // namespace GUI
 } // namespace blons

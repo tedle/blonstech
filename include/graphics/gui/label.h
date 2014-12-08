@@ -20,8 +20,8 @@ public:
         : Label(pos, text, FontStyle::LABEL, parent_manager, parent_window) {}
     ~Label() {}
 
-    void Render(RenderContext& context);
-    bool Update(const Input& input);
+    void Render(RenderContext& context) override;
+    bool Update(const Input& input) override;
 
     void set_text(std::string text);
     // True if you want $fff colour codes parsed, default true

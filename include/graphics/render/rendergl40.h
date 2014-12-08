@@ -14,48 +14,47 @@ namespace blons
 {
 class RenderGL40 : public RenderAPI
 {
-    
 public:
     RenderGL40(units::pixel screen_width, units::pixel screen_height, bool vsync,
                HWND hwnd, bool fullscreen);
-    ~RenderGL40();
+    ~RenderGL40() override;
 
-    void BeginScene();
-    void EndScene();
+    void BeginScene() override;
+    void EndScene() override;
 
-    BufferResource* MakeBufferResource();
-    TextureResource* MakeTextureResource();
-    ShaderResource* MakeShaderResource();
+    BufferResource* MakeBufferResource() override;
+    TextureResource* MakeTextureResource() override;
+    ShaderResource* MakeShaderResource() override;
 
     bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                         Vertex* vertices, unsigned int vert_count,
-                        unsigned int* indices, unsigned int index_count);
+                        unsigned int* indices, unsigned int index_count) override;
     bool Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                         Vertex* vertices, unsigned int vert_count,
-                        unsigned int* indices, unsigned int index_count);
-    bool RegisterTexture(TextureResource* texture, PixelData* pixel_data);
+                        unsigned int* indices, unsigned int index_count) override;
+    bool RegisterTexture(TextureResource* texture, PixelData* pixel_data) override;
     bool RegisterShader(ShaderResource* program,
                         std::string vertex_filename, std::string pixel_filename,
-                        ShaderAttributeList inputs);
+                        ShaderAttributeList inputs) override;
 
-    void RenderShader(ShaderResource* program, unsigned int index_count);
+    void RenderShader(ShaderResource* program, unsigned int index_count) override;
 
-    void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer);
+    void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer) override;
     void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                      Vertex* vertices, unsigned int vert_count,
-                     unsigned int* indices, unsigned int index_count);
-    bool SetShaderInput(ShaderResource* program, const char* name, int value);
-    bool SetShaderInput(ShaderResource* program, const char* name, Matrix value);
-    bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value);
-    bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value);
-    bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value);
+                     unsigned int* indices, unsigned int index_count) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, int value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, Matrix value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value) override;
 
-    bool SetDepthTesting(bool enable);
+    bool SetDepthTesting(bool enable) override;
 
-    void GetVideoCardInfo(char* buffer, int& len_buffer);
+    void GetVideoCardInfo(char* buffer, int& len_buffer) override;
 
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
-    bool LoadPixelData(std::string filename, PixelData* pixel_data);
+    bool LoadPixelData(std::string filename, PixelData* pixel_data) override;
 
 private:
     void LogCompileErrors(GLuint resource, bool is_shader);

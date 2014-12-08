@@ -22,8 +22,8 @@ public:
         : Textarea(pos, FontStyle::LABEL, parent_manager, parent_window) {}
     ~Textarea() {}
 
-    void Render(RenderContext& context);
-    bool Update(const Input& input);
+    void Render(RenderContext& context) override;
+    bool Update(const Input& input) override;
 
     void AddLine(std::string text);
     void Clear();

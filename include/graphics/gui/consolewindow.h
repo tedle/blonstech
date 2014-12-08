@@ -22,11 +22,11 @@ public:
         : ConsoleWindow(id, pos, caption, WindowType::INVISIBLE, parent_manager) {}
     ~ConsoleWindow() {}
 
-    void Render(RenderContext& context);
-    bool Update(const Input& input);
+    void Render(RenderContext& context) override;
+    bool Update(const Input& input) override;
 
-    void hide();
-    void show();
+    void hide() override;
+    void show() override;
 
 private:
     Animation slide_;

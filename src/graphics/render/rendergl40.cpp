@@ -35,7 +35,7 @@ namespace blons
 class BufferResourceGL40 : public BufferResource
 {
 public:
-    ~BufferResourceGL40();
+    ~BufferResourceGL40() override;
 
     GLuint buffer_, vertex_array_id_;
     enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
@@ -44,7 +44,7 @@ public:
 class TextureResourceGL40 : public TextureResource
 {
 public:
-    ~TextureResourceGL40();
+    ~TextureResourceGL40() override;
 
     GLuint texture_, texture_unit_;
 };
@@ -52,7 +52,7 @@ public:
 class ShaderResourceGL40 : public ShaderResource
 {
 public:
-    ~ShaderResourceGL40();
+    ~ShaderResourceGL40() override;
 
     GLuint program_;
     GLuint vertex_shader_;

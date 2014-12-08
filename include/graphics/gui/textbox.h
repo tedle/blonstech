@@ -17,8 +17,8 @@ public:
         : Textbox(pos, FontStyle::LABEL, parent_manager, parent_window) {}
     ~Textbox() {}
 
-    void Render(RenderContext& context);
-    bool Update(const Input& input);
+    void Render(RenderContext& context) override;
+    bool Update(const Input& input) override;
 
     void set_callback(std::function<void()> callback);
     std::string text() const;
