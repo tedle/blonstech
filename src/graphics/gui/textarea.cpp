@@ -128,23 +128,29 @@ void Textarea::RenderText(RenderContext& context)
 
     // Render the text, only grab lines that are at visible
     const auto& font = gui_->skin()->font(font_style_);
-    auto line_offset = scroll_offset_ / font->line_height();
+    units::pixel line_height = font->line_height();
+    auto line_offset = scroll_offset_ / line_height;
     // You only need a height of 2 pixels to be able to see 2 lines, so thats minimum
     std::size_t renderable_lines = std::min(lines_.size() - line_offset,
-                                            static_cast<std::size_t>((pos_.h / font->line_height()) + 2));
+                                            static_cast<std::size_t>((pos_.h / line_height) + 2));
 
     for (auto i = line_offset; i < renderable_lines + line_offset; i++)
     {
+        static const auto feather = padding_ / 2;
         auto& label = lines_[lines_.size() - i - 1];
-        label->set_crop(Box(0.0f, y + padding_ / 2, 0.0f, pos_.h - padding_), 5);
+        Box crop(0.0f, y + padding_ / 2, 0.0f, pos_.h - padding_);
+        // Don't feather our g's and y's if we're at the bottom
+        // Divide by line_height gives us a smoother transition
+        crop.h += std::max(0, feather - scroll_offset_ / line_height);
+        label->set_crop(crop, feather);
 
         if (newest_top_)
         {
-            label->set_pos(pos_.x + padding_, pos_.y + padding_ + i * font->line_height());
+            label->set_pos(pos_.x + padding_, pos_.y + padding_ + i * line_height);
         }
         else
         {
-            label->set_pos(pos_.x + padding_, pos_.y + pos_.h - padding_ - i * font->line_height() + scroll_offset_);
+            label->set_pos(pos_.x + padding_, pos_.y + pos_.h - padding_ - i * line_height + scroll_offset_);
         }
 
         label->Render(context);
