@@ -34,7 +34,7 @@ void Textarea::Render(RenderContext& context)
     RenderBody(layout->textarea, context);
     RegisterBatches();
 
-    RenderText(context);
+    RenderText(layout->textarea, context);
 }
 
 void Textarea::RenderBody(const Skin::Layout::Textarea& t, RenderContext& context)
@@ -118,7 +118,7 @@ void Textarea::RenderBody(const Skin::Layout::Textarea& t, RenderContext& contex
     batch->Append(*sprite->mesh());
 }
 
-void Textarea::RenderText(RenderContext& context)
+void Textarea::RenderText(const Skin::Layout::Textarea& t, RenderContext& context)
 {
     auto parent_pos = parent_->pos();
     auto y = pos_.y + parent_pos.y;
@@ -153,6 +153,7 @@ void Textarea::RenderText(RenderContext& context)
             label->set_pos(pos_.x + padding_, pos_.y + pos_.h - padding_ - i * line_height + scroll_offset_);
         }
 
+        label->set_text_colour(t.colour);
         label->Render(context);
     }
 }

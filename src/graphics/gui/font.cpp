@@ -349,10 +349,12 @@ std::vector<std::string> Font::string_wrap(ColourString string, units::pixel max
     int i = 0;
     const auto& full_string = string.raw_str();
     Vector4 current_colour = string.base_colour();
+    bool current_base = true;
     for (const auto& f : string.fragments())
     {
         for (const auto& c : f.text)
         {
+            current_base = f.is_base;
             // Pointer to avoid expensive copying
             const Glyph* g;
             // In case someone tries to calculate a string using chars we dont have
@@ -368,7 +370,8 @@ std::vector<std::string> Font::string_wrap(ColourString string, units::pixel max
             if ((pixel_width + g->x_advance > max_width && pixel_width > 0) ||
                 full_string[i] == '\n')
             {
-                broken_strings.push_back(ColourString::MakeColourCode(current_colour) + full_string.substr(last_break, i - last_break));
+                std::string prefix = (current_base ? "" : ColourString::MakeColourCode(current_colour));
+                broken_strings.push_back(prefix + full_string.substr(last_break, i - last_break));
                 pixel_width = 0;
                 last_break = i;
                 current_colour = f.colour;
@@ -386,7 +389,8 @@ std::vector<std::string> Font::string_wrap(ColourString string, units::pixel max
     // Still some left over string to append
     if (last_break < full_string.length())
     {
-        broken_strings.push_back(ColourString::MakeColourCode(current_colour) + full_string.substr(last_break));
+        std::string prefix = (current_base ? "" : ColourString::MakeColourCode(current_colour));
+        broken_strings.push_back(prefix + full_string.substr(last_break));
     }
 
     return broken_strings;

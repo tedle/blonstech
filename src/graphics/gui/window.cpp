@@ -23,8 +23,8 @@ Window::Window(std::string id, Box pos, std::string caption, WindowType type, Ma
     {
         c = toupper(c);
     }
-    caption = "$444" + caption;
-    caption_ = std::unique_ptr<Label>(new Label(caption_pos, caption, FontStyle::HEADING, parent_manager, this));
+    Vector4 colour = gui_->skin()->layout()->window.title.colour;
+    caption_ = std::unique_ptr<Label>(new Label(caption_pos, ColourString(caption, colour), FontStyle::HEADING, parent_manager, this));
 }
 
 void Window::Render(RenderContext& context)
@@ -250,7 +250,8 @@ Label* Window::MakeLabel(units::pixel x, units::pixel y, std::string text)
 {
     Vector2 pos(units::pixel_to_subpixel(x),
                 units::pixel_to_subpixel(y));
-    std::unique_ptr<Label> label(new Label(pos, text, gui_, this));
+    Vector4 colour = gui_->skin()->layout()->window.colour;
+    std::unique_ptr<Label> label(new Label(pos, ColourString(text, colour), gui_, this));
     controls_.push_back(std::move(label));
     return static_cast<Label*>(controls_.back().get());
 }

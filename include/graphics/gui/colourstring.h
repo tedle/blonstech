@@ -23,6 +23,7 @@ public:
     {
         Vector4 colour;
         std::string text;
+        bool is_base;
     };
 
 public:
@@ -34,6 +35,7 @@ public:
     static std::string MakeColourCode(Vector4 colour);
 
     const Vector4& base_colour() const;
+    void set_base_colour(Vector4 colour);
     const std::vector<Fragment>& fragments() const;
     const std::string& str() const;
     // Unparsed colour string

@@ -14,7 +14,7 @@ void ConsoleTextarea::Render(RenderContext& context)
     RenderBody(layout->console.textarea, context);
     RegisterBatches();
 
-    RenderText(context);
+    RenderText(layout->console.textarea, context);
 }
 } // namespace GUI
 } // namespace blons

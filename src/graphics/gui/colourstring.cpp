@@ -78,6 +78,7 @@ ColourString::ColourString(std::string text, Vector4 base_colour)
 
     Fragment next_frag;
     next_frag.colour = base_colour_;
+    next_frag.is_base = true;
     while (text.length() > 0)
     {
         std::size_t code_pos = FindColourCode(text.c_str());
@@ -97,6 +98,7 @@ ColourString::ColourString(std::string text, Vector4 base_colour)
             colour.w = 1.0;
             text = text.substr(++code_pos);
             next_frag.colour = colour;
+            next_frag.is_base = false;
         }
         else
         {
@@ -118,6 +120,18 @@ std::string ColourString::MakeColourCode(Vector4 colour)
 const Vector4& ColourString::base_colour() const
 {
     return base_colour_;
+}
+
+void ColourString::set_base_colour(Vector4 colour)
+{
+    base_colour_ = colour;
+    for (auto& frag : text_fragments_)
+    {
+        if (frag.is_base)
+        {
+            frag.colour = base_colour_;
+        }
+    }
 }
 
 const std::vector<ColourString::Fragment>& ColourString::fragments() const

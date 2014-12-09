@@ -136,6 +136,9 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     t.bottom_right.h);
     sprite->set_subtexture(t.bottom_right);
     batch->Append(*sprite->mesh());
+
+    // Label base colour
+    text_label_->set_text_colour(t.colour);
 }
 
 void Textbox::RenderCursor(const Box& cursor, RenderContext& context)

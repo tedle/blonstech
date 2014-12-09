@@ -134,6 +134,9 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.bottom_right.h);
     sprite->set_subtexture(b.bottom_right);
     batch->Append(*sprite->mesh());
+
+    // Label base colour
+    label_->set_text_colour(b.colour);
 }
 
 bool Button::Update(const Input& input)

@@ -30,7 +30,7 @@ public:
 
 protected:
     void RenderBody(const Skin::Layout::Textarea& t, RenderContext& context);
-    void RenderText(RenderContext& context);
+    void RenderText(const Skin::Layout::Textarea& t, RenderContext& context);
 
 private:
     void MoveScrollOffset(units::pixel delta, bool smooth);

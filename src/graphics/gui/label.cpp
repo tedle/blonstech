@@ -7,10 +7,10 @@ namespace blons
 {
 namespace GUI
 {
-Label::Label(Vector2 pos, std::string text, FontStyle style, Manager* parent_manager, Window* parent_window)
+Label::Label(Vector2 pos, ColourString text, FontStyle style, Manager* parent_manager, Window* parent_window)
 {
     pos_ = Box(pos.x, pos.y, 0.0f, 0.0f);
-    text_ = ColourString(text);
+    text_ = text;
     colour_parsing_ = true;
     font_style_ = style;
     gui_ = parent_manager;
@@ -65,12 +65,17 @@ bool Label::Update(const Input& input)
 
 void Label::set_text(std::string text)
 {
-    text_ = ColourString(text);
+    text_ = ColourString(text, text_.base_colour());
 }
 
 void Label::set_text(ColourString text)
 {
     text_ = text;
+}
+
+void Label::set_text_colour(Vector4 colour)
+{
+    text_.set_base_colour(colour);
 }
 
 const ColourString& Label::text() const

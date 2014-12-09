@@ -15,8 +15,8 @@ class Manager;
 class Label : public Control
 {
 public:
-    Label(Vector2 pos, std::string text, FontStyle style, Manager* parent_manager, Window* parent_window);
-    Label(Vector2 pos, std::string text, Manager* parent_manager, Window* parent_window)
+    Label(Vector2 pos, ColourString text, FontStyle style, Manager* parent_manager, Window* parent_window);
+    Label(Vector2 pos, ColourString text, Manager* parent_manager, Window* parent_window)
         : Label(pos, text, FontStyle::LABEL, parent_manager, parent_window) {}
     ~Label() {}
 
@@ -25,6 +25,7 @@ public:
 
     void set_text(std::string text);
     void set_text(ColourString text);
+    void set_text_colour(Vector4 colour);
     const ColourString& text() const;
     // True if you want $fff colour codes parsed, default true
     void set_colour_parsing(bool colour_parsing);
