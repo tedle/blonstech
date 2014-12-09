@@ -14,7 +14,7 @@ public:
     ConsoleTextarea(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
         : Textarea(pos, style, parent_manager, parent_window) {}
     ConsoleTextarea(Box pos, Manager* parent_manager, Window* parent_window)
-        : ConsoleTextarea(pos, FontStyle::LABEL, parent_manager, parent_window) {}
+        : ConsoleTextarea(pos, FontStyle::CONSOLE, parent_manager, parent_window) {}
     ~ConsoleTextarea() {}
 
     void Render(RenderContext& context) override;

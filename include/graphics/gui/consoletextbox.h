@@ -14,7 +14,7 @@ public:
     ConsoleTextbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
         : Textbox(pos, style, parent_manager, parent_window) {}
     ConsoleTextbox(Box pos, Manager* parent_manager, Window* parent_window)
-        : ConsoleTextbox(pos, FontStyle::LABEL, parent_manager, parent_window) {}
+        : ConsoleTextbox(pos, FontStyle::CONSOLE, parent_manager, parent_window) {}
     ~ConsoleTextbox() {}
 
     void Render(RenderContext& context) override;
