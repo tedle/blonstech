@@ -26,19 +26,21 @@ public:
     };
 
 public:
-    ColourString(std::string text);
-    ColourString(const char* text) : ColourString(std::string(text)) {}
+    ColourString(std::string text, Vector4 base_colour);
+    ColourString(std::string text) : ColourString(text, kDefaultTextColour) {}
     ColourString() : ColourString("") {}
     ~ColourString() {}
 
     static std::string MakeColourCode(Vector4 colour);
 
+    const Vector4& base_colour() const;
     const std::vector<Fragment>& fragments() const;
     const std::string& str() const;
     // Unparsed colour string
     const std::string& raw_str() const;
 
 private:
+    Vector4 base_colour_;
     std::vector<Fragment> text_fragments_;
     std::string text_;
     std::string raw_text_;

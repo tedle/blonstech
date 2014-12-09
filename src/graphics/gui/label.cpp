@@ -43,7 +43,7 @@ void Label::Render(RenderContext& context)
     }
     else
     {
-        auto batcher = font_batch(font_style_, kDefaultTextColour, context);
+        auto batcher = font_batch(font_style_, text_.base_colour(), context);
         for (const auto& c : text_.raw_str())
         {
             auto sprite = font->BuildSprite(c, x, y, crop_);

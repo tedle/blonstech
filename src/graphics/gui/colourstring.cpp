@@ -71,12 +71,13 @@ namespace blons
 {
 namespace GUI
 {
-ColourString::ColourString(std::string text)
+ColourString::ColourString(std::string text, Vector4 base_colour)
 {
     raw_text_ = text;
+    base_colour_ = base_colour;
 
     Fragment next_frag;
-    next_frag.colour = kDefaultTextColour;
+    next_frag.colour = base_colour_;
     while (text.length() > 0)
     {
         std::size_t code_pos = FindColourCode(text.c_str());
@@ -112,6 +113,11 @@ std::string ColourString::MakeColourCode(Vector4 colour)
     ret[2] = IntToHex(static_cast<unsigned char>(15.0f * colour.y));
     ret[3] = IntToHex(static_cast<unsigned char>(15.0f * colour.z));
     return ret;
+}
+
+const Vector4& ColourString::base_colour() const
+{
+    return base_colour_;
 }
 
 const std::vector<ColourString::Fragment>& ColourString::fragments() const

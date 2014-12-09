@@ -348,7 +348,7 @@ std::vector<std::string> Font::string_wrap(ColourString string, units::pixel max
     // Stores our position in "full_string", skipping ahead when we find colour codes
     int i = 0;
     const auto& full_string = string.raw_str();
-    Vector4 current_colour = kDefaultTextColour;
+    Vector4 current_colour = string.base_colour();
     for (const auto& f : string.fragments())
     {
         for (const auto& c : f.text)
