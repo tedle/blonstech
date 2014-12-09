@@ -87,6 +87,7 @@ void ConsoleWindow::show()
         pos_.y = -(pos_.h + shadow_height) * (1.0f - d);
     };
     slide_ = Animation(300, cb, Animation::CUBIC_OUT);
+    slide_.Update();
     hidden_ = false;
     hiding_ = false;
 }
