@@ -1,11 +1,11 @@
-#include <graphics/gui/textarea.h>
+#include <blons/graphics/gui/textarea.h>
 
 // Includes
 #include <algorithm>
 // Local Includes
-#include <math/animation.h>
-#include <graphics/gui/gui.h>
-#include <graphics/gui/label.h>
+#include <blons/math/animation.h>
+#include <blons/graphics/gui/gui.h>
+#include <blons/graphics/gui/label.h>
 
 namespace blons
 {

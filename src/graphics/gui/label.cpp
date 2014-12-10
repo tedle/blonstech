@@ -1,7 +1,7 @@
-#include <graphics/gui/label.h>
+#include <blons/graphics/gui/label.h>
 
 // Local Includes
-#include <graphics/gui/gui.h>
+#include <blons/graphics/gui/gui.h>
 
 namespace blons
 {

@@ -1,11 +1,11 @@
-#include <graphics/gui/font.h>
+#include <blons/graphics/gui/font.h>
 
 // Includes
 #include <algorithm>
 #include <FreeType2/include/ft2build.h>
 #include FT_FREETYPE_H
 // Local Includes
-#include <graphics/render/render.h>
+#include <blons/graphics/render/render.h>
 
 namespace blons
 {

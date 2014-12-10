@@ -1,7 +1,7 @@
-#include <graphics/gui/consoletextarea.h>
+#include <blons/graphics/gui/consoletextarea.h>
 
 // Local Includes
-#include <graphics/gui/gui.h>
+#include <blons/graphics/gui/gui.h>
 
 namespace blons
 {

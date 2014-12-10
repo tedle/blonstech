@@ -1,4 +1,4 @@
-#include <graphics/sprite.h>
+#include <blons/graphics/sprite.h>
 
 namespace blons
 {

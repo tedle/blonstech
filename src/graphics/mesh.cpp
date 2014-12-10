@@ -1,7 +1,7 @@
-#include <graphics/mesh.h>
+#include <blons/graphics/mesh.h>
 
 // Local Includes
-#include <graphics/meshimporter.h>
+#include <blons/graphics/meshimporter.h>
 
 namespace blons
 {

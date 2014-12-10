@@ -1,10 +1,10 @@
-#include <graphics/gui/gui.h>
+#include <blons/graphics/gui/gui.h>
 
 // Local Includes
-#include <graphics/graphics.h>
-#include <graphics/render/drawbatcher.h>
-#include <graphics/render/shader.h>
-#include <math/math.h>
+#include <blons/graphics/graphics.h>
+#include <blons/graphics/render/drawbatcher.h>
+#include <blons/graphics/render/shader.h>
+#include <blons/math/math.h>
 
 namespace blons
 {

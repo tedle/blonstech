@@ -1,11 +1,11 @@
-#include <os/client.h>
+#include <blons/os/client.h>
 
 // Includes
 #include <windowsx.h>
 // Local Includes
-#include <debug/console.h>
-#include <debug/log.h>
-#include <graphics/graphics.h>
+#include <blons/debug/console.h>
+#include <blons/debug/log.h>
+#include <blons/graphics/graphics.h>
 
 namespace blons
 {

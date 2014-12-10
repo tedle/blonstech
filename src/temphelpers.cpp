@@ -1,4 +1,4 @@
-#include <temphelpers.h>
+#include <blons/temphelpers.h>
 
 // Includes
 #include <Windows.h>
@@ -8,10 +8,10 @@
 #include <iostream>
 #include <fstream>
 // Local Includes
-#include <graphics/camera.h>
-#include <graphics/graphics.h>
-#include <graphics/model.h>
-#include <input/inputtemp.h>
+#include <blons/graphics/camera.h>
+#include <blons/graphics/graphics.h>
+#include <blons/graphics/model.h>
+#include <blons/input/inputtemp.h>
 
 namespace blons
 {

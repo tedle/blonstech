@@ -1,4 +1,4 @@
-#include <graphics/render/rendergl40.h>
+#include <blons/graphics/render/rendergl40.h>
 
 // Includes
 #include <unordered_map>
@@ -7,8 +7,8 @@
 // OpenGL image loader
 #include <SOIL2/SOIL2.h>
 // Local Includes
-#include <math/math.h>
-#include <graphics/render/glfuncloader.h>
+#include <blons/math/math.h>
+#include <blons/graphics/render/glfuncloader.h>
 
 namespace
 {

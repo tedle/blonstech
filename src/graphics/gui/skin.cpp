@@ -1,7 +1,7 @@
-#include <graphics/gui/skin.h>
+#include <blons/graphics/gui/skin.h>
 
 // Local Includes
-#include <graphics/sprite.h>
+#include <blons/graphics/sprite.h>
 
 namespace blons
 {

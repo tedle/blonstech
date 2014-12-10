@@ -1,4 +1,4 @@
-#include <graphics/camera.h>
+#include <blons/graphics/camera.h>
 
 namespace blons
 {

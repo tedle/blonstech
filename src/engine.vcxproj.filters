@@ -28,122 +28,122 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\include\blons.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\temphelpers.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\camera.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\graphics.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\mesh.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\meshimporter.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\model.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\sprite.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\texture.h">
-      <Filter>src\graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\input\inputbase.h">
-      <Filter>src\input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\input\inputdirect.h">
-      <Filter>src\input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\input\inputraw.h">
-      <Filter>src\input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\input\inputtemp.h">
-      <Filter>src\input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\math\math.h">
-      <Filter>src\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\os\client.h">
-      <Filter>src\os</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\render\drawbatcher.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\render\glfuncloader.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\render\render.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\render\renderd3d11.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\render\rendergl40.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\render\shader.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\font.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\gui.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\button.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\label.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\window.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\colourstring.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\control.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\skin.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\textbox.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\os\timer.h">
-      <Filter>src\os</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\math\animation.h">
-      <Filter>src\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\math\units.h">
-      <Filter>src\math</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\textarea.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\consoletextarea.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\consoletextbox.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\graphics\gui\consolewindow.h">
-      <Filter>src\graphics\gui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\debug\console.h">
+    <ClInclude Include="..\include\blons\debug\console.h">
       <Filter>src\debug</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\debug\log.h">
+    <ClInclude Include="..\include\blons\debug\log.h">
       <Filter>src\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\camera.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\graphics.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\mesh.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\meshimporter.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\model.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\sprite.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\texture.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\button.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\colourstring.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\consoletextarea.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\consoletextbox.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\consolewindow.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\control.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\font.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\gui.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\label.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\skin.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\textarea.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\textbox.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\window.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\drawbatcher.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\glfuncloader.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\render.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\renderd3d11.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\rendergl40.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\shader.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\input\inputbase.h">
+      <Filter>src\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\input\inputdirect.h">
+      <Filter>src\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\input\inputraw.h">
+      <Filter>src\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\input\inputtemp.h">
+      <Filter>src\input</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\math\animation.h">
+      <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\math\math.h">
+      <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\math\units.h">
+      <Filter>src\math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\os\client.h">
+      <Filter>src\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\os\timer.h">
+      <Filter>src\os</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\blons.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\temphelpers.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

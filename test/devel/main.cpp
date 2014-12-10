@@ -1,5 +1,5 @@
-#include <include/blons.h>
-#include <include/temphelpers.h>
+#include <blons/blons.h>
+#include <blons/temphelpers.h>
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
