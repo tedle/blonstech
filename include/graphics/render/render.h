@@ -6,9 +6,9 @@
 #include <string>
 #include <vector>
 // Local Includes
-#include "math/math.h"
-#include "debug/console.h"
-#include "debug/log.h"
+#include <math/math.h>
+#include <debug/console.h>
+#include <debug/log.h>
 
 namespace blons
 {

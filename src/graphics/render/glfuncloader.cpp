@@ -1,4 +1,4 @@
-#include "graphics/render/glfuncloader.h"
+#include <graphics/render/glfuncloader.h>
 
 namespace blons
 {

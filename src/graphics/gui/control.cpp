@@ -1,7 +1,7 @@
-#include "graphics/gui/control.h"
+#include <graphics/gui/control.h>
 
 // Local Includes
-#include "graphics/gui/gui.h"
+#include <graphics/gui/gui.h>
 
 namespace blons
 {

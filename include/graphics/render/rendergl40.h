@@ -8,7 +8,7 @@
 #include <Windows.h>
 #include <gl/GL.h>
 // Local Includes
-#include "render.h"
+#include <graphics/render/render.h>
 
 namespace blons
 {

@@ -2,7 +2,7 @@
 #define BLONSTECH_GUI_CONSOLETEXTBOX_H_
 
 // Local Includes
-#include "graphics/gui/textbox.h"
+#include <graphics/gui/textbox.h>
 
 namespace blons
 {

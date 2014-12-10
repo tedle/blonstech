@@ -5,8 +5,8 @@
 #include <map>
 #include <memory>
 // Local Includes
-#include "graphics/gui/font.h"
-#include "graphics/render/render.h"
+#include <graphics/gui/font.h>
+#include <graphics/render/render.h>
 
 namespace blons
 {

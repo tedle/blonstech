@@ -1,7 +1,7 @@
 #ifndef BLONSTECH_GRAPHICS_CAMERA_H_
 #define BLONSTECH_GRAPHICS_CAMERA_H_
 
-#include "math/math.h"
+#include <math/math.h>
 
 namespace blons
 {

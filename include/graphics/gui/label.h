@@ -2,8 +2,8 @@
 #define BLONSTECH_GRAPHICS_GUI_LABEL_H_
 
 // Local Includes
-#include "graphics/gui/control.h"
-#include "graphics/gui/colourstring.h"
+#include <graphics/gui/control.h>
+#include <graphics/gui/colourstring.h>
 
 namespace blons
 {

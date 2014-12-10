@@ -4,9 +4,9 @@
 // Includes
 #include <vector>
 // Local Includes
-#include "math/units.h"
-#include "graphics/sprite.h"
-#include "graphics/gui/colourstring.h"
+#include <math/units.h>
+#include <graphics/sprite.h>
+#include <graphics/gui/colourstring.h>
 
 namespace blons
 {

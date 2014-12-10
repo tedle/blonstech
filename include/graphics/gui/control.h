@@ -2,10 +2,10 @@
 #define BLONSTECH_GRAPHICS_GUI_CONTROL_H_
 
 // Local Includes
-#include "math/units.h"
-#include "graphics/gui/skin.h"
-#include "graphics/render/drawbatcher.h"
-#include "input/inputtemp.h"
+#include <math/units.h>
+#include <graphics/gui/skin.h>
+#include <graphics/render/drawbatcher.h>
+#include <input/inputtemp.h>
 
 namespace blons
 {

@@ -4,13 +4,13 @@
 // Includes
 #include <map>
 // Local Includes
-#include "math/animation.h"
-#include "input/inputtemp.h"
-#include "graphics/render/drawbatcher.h"
-#include "graphics/gui/skin.h"
-#include "graphics/gui/font.h"
-#include "graphics/gui/window.h"
-#include "graphics/gui/consolewindow.h"
+#include <math/animation.h>
+#include <input/inputtemp.h>
+#include <graphics/render/drawbatcher.h>
+#include <graphics/gui/skin.h>
+#include <graphics/gui/font.h>
+#include <graphics/gui/window.h>
+#include <graphics/gui/consolewindow.h>
 
 namespace blons
 {

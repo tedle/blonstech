@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 // Local Includes
-#include "mesh.h"
-#include "texture.h"
+#include <graphics/mesh.h>
+#include <graphics/texture.h>
 
 namespace blons
 {

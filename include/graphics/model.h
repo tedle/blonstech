@@ -5,8 +5,8 @@
 #include <functional>
 #include <memory>
 // Local Includes
-#include "graphics/texture.h"
-#include "render/render.h"
+#include <graphics/texture.h>
+#include <graphics/render/render.h>
 
 namespace blons
 {

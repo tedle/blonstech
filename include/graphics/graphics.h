@@ -6,9 +6,9 @@
 #include <set>
 #include <Windows.h>
 // Local Includes
-#include "graphics/model.h"
-#include "graphics/sprite.h"
-#include "render/render.h"
+#include <graphics/model.h>
+#include <graphics/sprite.h>
+#include <graphics/render/render.h>
 
 namespace blons
 {

@@ -13,8 +13,8 @@
 #include <d3d11.h>
 // Local Includes
 // #include <DDSTextureLoader\DDSTextureLoader.h>
-#include "math.h"
-#include "render.h"
+#include <math/math.h>
+#include <graphics/render/render.h>
 
 namespace blons
 {

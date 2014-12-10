@@ -2,8 +2,8 @@
 #define BLONSTECH_GRAPHICS_GUI_TEXTBOX_H_
 
 // Local Includes
-#include "graphics/gui/control.h"
-#include "os/timer.h"
+#include <graphics/gui/control.h>
+#include <os/timer.h>
 
 namespace blons
 {

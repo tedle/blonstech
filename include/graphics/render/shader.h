@@ -2,7 +2,7 @@
 #define BLONSTECH_GRAPHICS_RENDER_SHADER_H_
 
 // Includes
-#include "render.h"
+#include <graphics/render/render.h>
 
 namespace blons
 {

@@ -2,7 +2,7 @@
 #define BLONSTECH_GRAPHICS_GUI_BUTTON_H_
 
 // Local Includes
-#include "graphics/gui/control.h"
+#include <graphics/gui/control.h>
 
 namespace blons
 {

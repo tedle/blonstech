@@ -2,7 +2,7 @@
 #define BLONSTECH_GUI_CONSOLETEXTAREA_H_
 
 // Local Includes
-#include "graphics/gui/textarea.h"
+#include <graphics/gui/textarea.h>
 
 namespace blons
 {

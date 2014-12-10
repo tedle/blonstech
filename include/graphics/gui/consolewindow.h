@@ -3,10 +3,10 @@
 #define BLONSTECH_GRAPHICS_GUI_CONSOLEWINDOW_H_
 
 // Local Includes
-#include "graphics/gui/control.h"
-#include "graphics/gui/window.h"
-#include "graphics/gui/consoletextarea.h"
-#include "graphics/gui/consoletextbox.h"
+#include <graphics/gui/control.h>
+#include <graphics/gui/window.h>
+#include <graphics/gui/consoletextarea.h>
+#include <graphics/gui/consoletextbox.h>
 
 namespace blons
 {

@@ -2,9 +2,9 @@
 #define BLONSTECH_GRAPHICS_GUI_TEXTAREA_H_
 
 // Local Includes
-#include "graphics/gui/control.h"
-#include "math/animation.h"
-#include "os/timer.h"
+#include <graphics/gui/control.h>
+#include <math/animation.h>
+#include <os/timer.h>
 
 namespace blons
 {

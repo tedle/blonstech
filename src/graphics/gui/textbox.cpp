@@ -1,7 +1,7 @@
-#include "graphics/gui/textbox.h"
+#include <graphics/gui/textbox.h>
 
 // Local Includes
-#include "graphics/gui/gui.h"
+#include <graphics/gui/gui.h>
 
 namespace blons
 {

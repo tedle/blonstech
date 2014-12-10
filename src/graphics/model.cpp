@@ -1,13 +1,13 @@
-#include "graphics/model.h"
+#include <graphics/model.h>
 
 // Includes
 // TODO: remove this, only used for timing
 #include <Windows.h>
 
 // Local Includes
-#include "graphics/mesh.h"
-#include "graphics/meshimporter.h"
-#include "math/math.h"
+#include <graphics/mesh.h>
+#include <graphics/meshimporter.h>
+#include <math/math.h>
 
 namespace blons
 {

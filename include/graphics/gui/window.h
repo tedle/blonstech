@@ -2,11 +2,11 @@
 #define BLONSTECH_GRAPHICS_GUI_WINDOW_H_
 
 // Local Includes
-#include "graphics/gui/control.h"
-#include "graphics/gui/button.h"
-#include "graphics/gui/label.h"
-#include "graphics/gui/textarea.h"
-#include "graphics/gui/textbox.h"
+#include <graphics/gui/control.h>
+#include <graphics/gui/button.h>
+#include <graphics/gui/label.h>
+#include <graphics/gui/textarea.h>
+#include <graphics/gui/textbox.h>
 
 namespace blons
 {

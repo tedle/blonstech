@@ -1,4 +1,4 @@
-#include "graphics/gui/colourstring.h"
+#include <graphics/gui/colourstring.h>
 
 // Helper functions
 namespace
