@@ -16,22 +16,19 @@ namespace blons
 {
 namespace console
 {
-void in(const char* command)
+void in(const std::string& command)
 {
-    std::string o = "~ ";
-    o += command;
-    o += '\n';
-    out(o.c_str());
+    out("~ " + command + '\n');
 }
 
-void out(const char* fmt, ...)
+void out(const std::string& fmt, ...)
 {
     // Generate printf string
     va_list args;
     va_start(args, fmt);
-    size_t size = _vscprintf(fmt, args) + 1;
+    size_t size = _vscprintf(fmt.c_str(), args) + 1;
     std::unique_ptr<char> buffer(new char[size]);
-    vsnprintf_s(buffer.get(), size, size, fmt, args);
+    vsnprintf_s(buffer.get(), size, size, fmt.c_str(), args);
     std::string formatted_out(buffer.get());
     va_end(args);
 

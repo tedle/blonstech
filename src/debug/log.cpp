@@ -20,11 +20,11 @@ void OutputLogMessage(std::string msg, Level log_level)
     }
 }
 
-std::string FormatPrintString(const char* fmt, va_list args)
+std::string FormatPrintString(const std::string& fmt, va_list args)
 {
-    size_t size = _vscprintf(fmt, args) + 1;
+    size_t size = _vscprintf(fmt.c_str(), args) + 1;
     std::unique_ptr<char> buffer(new char[size]);
-    vsnprintf_s(buffer.get(), size, size, fmt, args);
+    vsnprintf_s(buffer.get(), size, size, fmt.c_str(), args);
     std::string formatted_string(buffer.get());
 
     return formatted_string;
@@ -35,7 +35,7 @@ namespace blons
 {
 namespace log
 {
-void Debug(const char* fmt, ...)
+void Debug(const std::string& fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -45,7 +45,7 @@ void Debug(const char* fmt, ...)
     OutputLogMessage(message, Level::DEBUG);
 }
 
-void Info(const char* fmt, ...)
+void Info(const std::string& fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -55,7 +55,7 @@ void Info(const char* fmt, ...)
     OutputLogMessage(message, Level::INFO);
 }
 
-void Warn(const char* fmt, ...)
+void Warn(const std::string& fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -65,7 +65,7 @@ void Warn(const char* fmt, ...)
     OutputLogMessage(message, Level::WARN);
 }
 
-void Fatal(const char* fmt, ...)
+void Fatal(const std::string& fmt, ...)
 {
     va_list args;
     va_start(args, fmt);

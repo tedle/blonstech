@@ -18,10 +18,10 @@ enum Level {
     NONE = 5
 };
 
-void Debug(const char* fmt, ...);
-void Info(const char* fmt, ...);
-void Warn(const char* fmt, ...);
-void Fatal(const char* fmt, ...);
+void Debug(const std::string& fmt, ...);
+void Info(const std::string& fmt, ...);
+void Warn(const std::string& fmt, ...);
+void Fatal(const std::string& fmt, ...);
 
 void SetOutputLevel(Level level);
 void SetPrintCallback(PrintCallback callback);

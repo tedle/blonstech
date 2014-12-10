@@ -14,8 +14,8 @@ namespace console
 {
 typedef std::function<void(const std::string&)> PrintCallback;
 
-void in(const char* command);
-void out(const char* fmt, ...);
+void in(const std::string& command);
+void out(const std::string& fmt, ...);
 
 void RegisterPrintCallback(PrintCallback callback);
 } // namespace console
