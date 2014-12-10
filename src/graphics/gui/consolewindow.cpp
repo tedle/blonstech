@@ -22,8 +22,12 @@ ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, Windo
     auto conboxptr = conbox.get();
     conbox->set_callback([=]()
     {
-        conareaptr->AddLine(conboxptr->text());
+        console::in(conboxptr->text().c_str());
         conboxptr->set_text("");
+    });
+    console::RegisterPrintCallback([=](const std::string& s)
+    {
+        conareaptr->AddText(s);
     });
 
     controls_.push_back(std::move(conarea));

@@ -374,6 +374,10 @@ std::vector<std::string> Font::string_wrap(ColourString string, units::pixel max
                 broken_strings.push_back(prefix + full_string.substr(last_break, i - last_break));
                 pixel_width = 0;
                 last_break = i;
+                if (full_string[i] == '\n')
+                {
+                    last_break++;
+                }
                 current_colour = f.colour;
             }
 

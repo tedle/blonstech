@@ -18,7 +18,10 @@ namespace console
 {
 void in(const char* command)
 {
-
+    std::string o = "~ ";
+    o += command;
+    o += '\n';
+    out(o.c_str());
 }
 
 void out(const char* fmt, ...)

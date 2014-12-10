@@ -26,6 +26,7 @@ public:
     bool Update(const Input& input) override;
 
     void AddLine(std::string text);
+    void AddText(std::string text);
     void Clear();
 
 protected:
@@ -40,7 +41,7 @@ private:
     // New lines appear on the top, or bottom
     bool newest_top_;
     void GenLabel(std::string text);
-    std::vector<std::string> history_;
+    std::string text_;
     std::vector<std::unique_ptr<Label>> lines_;
     units::pixel line_height_;
     units::pixel padding_;

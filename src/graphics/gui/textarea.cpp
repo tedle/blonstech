@@ -211,6 +211,13 @@ bool Textarea::Update(const Input& input)
 void Textarea::GenLabel(std::string text)
 {
     const auto& font = gui_->skin()->font(font_style_);
+    // Are we appending to already printed text?
+    if (text_.length() > 0 && text_.back() != '\n')
+    {
+        assert(lines_.size() > 0);
+        text = lines_.back()->text().raw_str() + text;
+        lines_.pop_back();
+    }
     auto lines = font->string_wrap(ColourString(text), units::subpixel_to_pixel(pos_.w) - padding_ * 2);
     if (newest_top_)
     {
@@ -230,11 +237,11 @@ void Textarea::GenLabel(std::string text)
     }
 }
 
-void Textarea::AddLine(std::string text)
+void Textarea::AddText(std::string text)
 {
-    history_.push_back(text);
     auto old_size = lines_.size();
     GenLabel(text);
+    text_ += text;
 
     bool at_origin = scroll_destination_ == 0;
     auto line_height = gui_->skin()->font(font_style_)->line_height();
@@ -249,9 +256,14 @@ void Textarea::AddLine(std::string text)
     }
 }
 
+void Textarea::AddLine(std::string text)
+{
+    AddText(text + '\n');
+}
+
 void Textarea::Clear()
 {
-    history_.clear();
+    text_.clear();
     lines_.clear();
 
     scroll_offset_ = 0;
