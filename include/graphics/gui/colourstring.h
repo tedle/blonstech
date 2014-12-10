@@ -8,7 +8,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 // White
 const Vector4 kDefaultTextColour = Vector4(1.0, 1.0, 1.0, 1.0);
@@ -47,6 +47,6 @@ private:
     std::string text_;
     std::string raw_text_;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

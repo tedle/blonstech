@@ -10,7 +10,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 class Font
 {
@@ -57,6 +57,6 @@ private:
     units::pixel line_height_;
     units::pixel advance_;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

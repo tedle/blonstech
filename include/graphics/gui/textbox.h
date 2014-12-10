@@ -7,7 +7,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 class Textbox : public Control
 {
@@ -53,6 +53,6 @@ private:
     // Padding between edge of textbox and text
     units::pixel padding_;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

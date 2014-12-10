@@ -6,7 +6,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 class ConsoleTextarea : public Textarea
 {
@@ -19,6 +19,6 @@ public:
 
     void Render(RenderContext& context) override;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

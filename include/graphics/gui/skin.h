@@ -12,7 +12,7 @@ namespace blons
 {
 // Forward declarations
 class Sprite;
-namespace GUI
+namespace gui
 {
 enum FontStyle
 {
@@ -233,6 +233,6 @@ protected:
     std::map<FontStyle, std::unique_ptr<Font>> font_list_;
 
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

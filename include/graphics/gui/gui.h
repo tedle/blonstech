@@ -17,7 +17,7 @@ namespace blons
 // Forward declarations
 class Shader;
 
-namespace GUI
+namespace gui
 {
 // Forward declarations
 class Label;
@@ -75,6 +75,6 @@ private:
     std::unique_ptr<Window> main_window_;
     std::unique_ptr<Window> console_window_;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

@@ -9,7 +9,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 Textarea::Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
 {
@@ -299,5 +299,5 @@ void Textarea::MoveScrollOffset(units::pixel delta, bool smooth)
     }
     scroll_animation_ = Animation(duration, callback, Animation::CUBIC_OUT);
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

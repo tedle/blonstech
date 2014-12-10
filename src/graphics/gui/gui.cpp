@@ -8,7 +8,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
@@ -205,5 +205,5 @@ Box Manager::screen_dimensions()
 {
     return screen_dimensions_;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

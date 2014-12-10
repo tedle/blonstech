@@ -69,7 +69,7 @@ int IntToHex(unsigned char c)
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 ColourString::ColourString(std::string text, Vector4 base_colour)
 {
@@ -148,5 +148,5 @@ const std::string& ColourString::raw_str() const
 {
     return raw_text_;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

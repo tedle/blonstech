@@ -9,7 +9,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 // Forward declarations
 class Manager;
@@ -72,6 +72,6 @@ private:
     std::vector<std::pair<StaticDrawCallInputs, std::unique_ptr<DrawBatcher>>> draw_batches_;
     std::size_t batch_index_ = 0;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

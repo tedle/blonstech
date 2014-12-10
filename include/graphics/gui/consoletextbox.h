@@ -6,7 +6,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 class ConsoleTextbox : public Textbox
 {
@@ -20,6 +20,6 @@ public:
     void Render(RenderContext& context) override;
     bool Update(const Input& input) override;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

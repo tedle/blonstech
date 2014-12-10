@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 void Control::hide()
 {
@@ -95,5 +95,5 @@ DrawBatcher* Control::control_batch(RenderContext& context)
     StaticDrawCallInputs inputs = { false, FontStyle::DEFAULT, Vector4(0, 0, 0, 0) };
     return batch(inputs, context);
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

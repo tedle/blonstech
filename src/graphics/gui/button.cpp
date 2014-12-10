@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 Button::Button(Box pos, std::string label, Manager* parent_manager, Window* parent_window)
 {
@@ -200,6 +200,6 @@ void Button::set_callback(std::function<void()> callback)
 {
     callback_ = callback;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 

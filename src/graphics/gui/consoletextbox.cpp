@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 void ConsoleTextbox::Render(RenderContext& context)
 {
@@ -41,5 +41,5 @@ bool ConsoleTextbox::Update(const Input& input)
     // Consume input while shown
     return true;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

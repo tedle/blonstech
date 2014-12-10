@@ -10,7 +10,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 class ConsoleWindow : public Window
 {

@@ -6,7 +6,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 class Button : public Control
 {
@@ -28,6 +28,6 @@ private:
     bool hover_;
     bool active_;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

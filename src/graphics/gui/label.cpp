@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 Label::Label(Vector2 pos, ColourString text, FontStyle style, Manager* parent_manager, Window* parent_window)
 {
@@ -87,5 +87,5 @@ void Label::set_colour_parsing(bool colour_parsing)
 {
     colour_parsing_ = colour_parsing;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

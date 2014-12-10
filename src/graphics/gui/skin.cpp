@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 Skin::Skin(RenderContext& context)
 {
@@ -48,5 +48,5 @@ const Skin::Layout* Skin::layout() const
 {
     return &layout_;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

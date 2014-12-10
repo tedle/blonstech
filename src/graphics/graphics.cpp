@@ -78,7 +78,7 @@ Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND h
     }
 
     // GUI
-    gui_ = std::unique_ptr<GUI::Manager>(new GUI::Manager(screen_width, screen_height, std::move(ui_shader), context_));
+    gui_ = std::unique_ptr<gui::Manager>(new gui::Manager(screen_width, screen_height, std::move(ui_shader), context_));
 }
 
 Graphics::~Graphics()
@@ -201,7 +201,7 @@ Camera* Graphics::camera() const
     return camera_.get();
 }
 
-GUI::Manager* Graphics::gui() const
+gui::Manager* Graphics::gui() const
 {
     return gui_.get();
 }

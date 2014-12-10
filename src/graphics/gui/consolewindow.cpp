@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager)
     : Window(id, pos, caption, type, parent_manager)
@@ -95,5 +95,5 @@ void ConsoleWindow::show()
     hidden_ = false;
     hiding_ = false;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

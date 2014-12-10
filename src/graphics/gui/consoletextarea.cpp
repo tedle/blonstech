@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 void ConsoleTextarea::Render(RenderContext& context)
 {
@@ -16,5 +16,5 @@ void ConsoleTextarea::Render(RenderContext& context)
 
     RenderText(layout->console.textarea, context);
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

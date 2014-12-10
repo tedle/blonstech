@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 Textbox::Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
 {
@@ -360,5 +360,5 @@ units::subpixel Textbox::CursorOffset()
     const auto cursor_offset = font->string_width(std::string(text_.begin(), cursor_), false) + label_offset + padding_;
     return cursor_offset;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

@@ -8,7 +8,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 // Forward declarations
 class Label;
@@ -53,6 +53,6 @@ private:
     Animation scroll_animation_;
     Timer scroll_timer_;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif

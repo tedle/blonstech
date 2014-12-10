@@ -25,7 +25,7 @@ const units::world kScreenDepth = 10000.0f;
 const units::world kScreenNear  = 0.1f;
 
 // Forward declarations
-namespace GUI { class Manager; }
+namespace gui { class Manager; }
 class Camera;
 class Shader;
 
@@ -48,7 +48,7 @@ public:
     bool Render();
 
     Camera* camera() const;
-    GUI::Manager* gui() const;
+    gui::Manager* gui() const;
 
 private:
     // Managed assets let this class create and track models & sprites.
@@ -78,7 +78,7 @@ private:
 
     RenderContext context_;
     std::unique_ptr<Camera> camera_;
-    std::unique_ptr<GUI::Manager> gui_;
+    std::unique_ptr<gui::Manager> gui_;
     std::unique_ptr<Shader> shader3d_;
     std::unique_ptr<Shader> shader2d_;
 

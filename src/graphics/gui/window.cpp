@@ -5,7 +5,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 Window::Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager) : id_(id)
 {
@@ -276,5 +276,5 @@ const std::string Window::id() const
 {
     return id_;
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

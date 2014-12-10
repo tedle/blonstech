@@ -10,7 +10,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 enum WindowType
 {

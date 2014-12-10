@@ -9,7 +9,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 struct Font::Glyph
 {
@@ -431,5 +431,5 @@ const TextureResource* Font::texture() const
 {
     return fontsheet_->texture();
 }
-} // namespace GUI
+} // namespace gui
 } // namespace blons

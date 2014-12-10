@@ -7,7 +7,7 @@
 
 namespace blons
 {
-namespace GUI
+namespace gui
 {
 // Forward declarations
 class Manager;
@@ -35,6 +35,6 @@ private:
     ColourString text_;
     bool colour_parsing_;
 };
-} // namespace GUI
+} // namespace gui
 } // namespace blons
 #endif
