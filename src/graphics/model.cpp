@@ -20,12 +20,12 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
     world_matrix_ = MatrixIdentity();
 
-    g_log->Debug("Loading %s... ", mesh_filename);
+    log::Debug("Loading %s... ", mesh_filename);
     DWORD64 start = GetTickCount64();
 
     MeshImporter mesh_data(mesh_filename, true);
     DWORD64 end = GetTickCount64();
-    g_log->Debug("[%ims]\n", end - start);
+    log::Debug("[%ims]\n", end - start);
 
     mesh_ = std::unique_ptr<Mesh>(new Mesh(mesh_data, context));
 
@@ -34,7 +34,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
         throw "Failed to initialize mesh";
     }
 
-    g_log->Debug("Loading textures... ");
+    log::Debug("Loading textures... ");
     start = GetTickCount64();
     // TODO: replace this with proper filesystem class
     std::string tex_folder(mesh_filename);
@@ -80,7 +80,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
         }
     }
     end = GetTickCount64();
-    g_log->Debug("[%ims]\n", end - start);
+    log::Debug("[%ims]\n", end - start);
 }
 
 Model::~Model()

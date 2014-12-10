@@ -4,22 +4,20 @@
 #include <windowsx.h>
 // Local Includes
 #include "debug/console.h"
-#include "debug/loggeride.h"
+#include "debug/log.h"
 #include "graphics/graphics.h"
 
 namespace blons
 {
-std::unique_ptr<LoggerAPI> g_log = nullptr;
-
 Client::Client()
 {
-    g_log = nullptr;
-
     input_ = nullptr;
 
     // Initialize logger
-    g_log = std::unique_ptr<LoggerAPI>(new LoggerIDE(LoggerAPI::Level::DEBUG));
-    console::RegisterPrintCallback([](const std::string& s){ g_log->Debug("[console] %s", s.c_str()); });
+    log::SetOutputLevel(log::DEBUG);
+    // TODO: Temporary callback function, make something more extensible later
+    log::SetPrintCallback([](const std::string& s){ OutputDebugStringA(s.c_str()); });
+    console::RegisterPrintCallback([](const std::string& s){ log::Debug("[console] %s", s.c_str()); });
 
     units::pixel screen_width, screen_height;
     screen_width = screen_height = 0;

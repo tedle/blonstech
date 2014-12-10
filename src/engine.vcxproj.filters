@@ -34,12 +34,6 @@
     <ClInclude Include="..\include\temphelpers.h">
       <Filter>src</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\debug\logger.h">
-      <Filter>src\debug</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\debug\loggeride.h">
-      <Filter>src\debug</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\graphics\camera.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
@@ -148,14 +142,11 @@
     <ClInclude Include="..\include\debug\console.h">
       <Filter>src\debug</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\debug\log.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="debug\logger.cpp">
-      <Filter>src\debug</Filter>
-    </ClCompile>
-    <ClCompile Include="debug\loggeride.cpp">
-      <Filter>src\debug</Filter>
-    </ClCompile>
     <ClCompile Include="graphics\gui\button.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
@@ -250,6 +241,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="debug\console.cpp">
+      <Filter>src\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\log.cpp">
       <Filter>src\debug</Filter>
     </ClCompile>
   </ItemGroup>

@@ -136,7 +136,7 @@ void FPS()
 
     if (st > last_second + 1000)
     {
-        g_log->Debug("FPS: %i(min:%llu), (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, 1000 / max_frame, cur_pos.x, cur_pos.y, cur_pos.z);
+        log::Debug("FPS: %i(min:%llu), (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, 1000 / max_frame, cur_pos.x, cur_pos.y, cur_pos.z);
         last_second = st;
         max_frame = 0;
         fps_count = 0;
@@ -195,7 +195,7 @@ std::vector<std::unique_ptr<Model>> load_codmap(std::string folder, std::vector<
     }
     models[1]->set_pos(0.0, 0.0, 0.0);*/
     DWORD64 end = GetTickCount64();
-    g_log->Debug("Loaded map [%ims]\n", end - start);
+    log::Debug("Loaded map [%ims]\n", end - start);
     return models;
 }
 } // namespace temp

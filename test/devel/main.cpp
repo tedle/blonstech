@@ -37,7 +37,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     auto textbox = gui->window("test")->MakeTextbox(135, 150, 255, 40);
     auto print = [textbox]()
     {
-        blons::g_log->Debug("%s\n", textbox->text().c_str());
+        blons::log::Debug("%s\n", textbox->text().c_str());
         textbox->set_text("");
     };
     auto textareaclear = [textarea]()
@@ -57,7 +57,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     gui->window("test")->MakeButton(10, 105, 380, 40, "Clear!")->set_callback(textareaclear);
 
     // Animation testing
-    blons::Animation::Callback cbd = [](float d){ blons::g_log->Debug("%.4f\n", d); };
+    blons::Animation::Callback cbd = [](float d){ blons::log::Debug("%.4f\n", d); };
     blons::Animation::Callback cbx = [&](float d){ gui->window("test")->set_pos(d * 600 - 500, gui->window("test")->pos().y); };
     blons::Animation::Callback cby = [&](float d){ gui->window("test")->set_pos(gui->window("test")->pos().x, 362 - d * 300); };
     blons::Animation animatex(800, cbx, blons::Animation::QUINT_OUT);

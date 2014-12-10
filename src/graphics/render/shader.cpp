@@ -8,7 +8,7 @@ Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAt
 
     if (!context->RegisterShader(program_.get(), vertex_filename, pixel_filename, inputs))
     {
-        g_log->Fatal("Shaders failed to compile\n");
+        log::Fatal("Shaders failed to compile\n");
         throw "Shaders failed to compile";
     }
 }

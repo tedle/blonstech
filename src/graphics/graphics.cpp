@@ -29,7 +29,7 @@ Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND h
                                             (kRenderMode == RenderMode::FULLSCREEN)));
     if (!context_)
     {
-        g_log->Fatal("Renderer failed to initailize\n");
+        log::Fatal("Renderer failed to initailize\n");
         throw "Failed to initialize rendering context";
     }
 
@@ -73,7 +73,7 @@ Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND h
         shader2d_ == nullptr ||
         ui_shader == nullptr)
     {
-        g_log->Fatal("Shaders failed to initialize\n");
+        log::Fatal("Shaders failed to initialize\n");
         throw "Failed to initialize shader";
     }
 

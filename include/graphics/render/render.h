@@ -8,7 +8,7 @@
 // Local Includes
 #include "math/math.h"
 #include "debug/console.h"
-#include "debug/loggeride.h"
+#include "debug/log.h"
 
 namespace blons
 {

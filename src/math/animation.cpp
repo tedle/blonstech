@@ -1,8 +1,5 @@
 #include "math/animation.h"
 
-// Local Includes
-#include "debug/logger.h"
-
 namespace
 {
 // Interpolation functions

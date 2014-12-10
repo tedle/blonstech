@@ -1,6 +1,5 @@
 #include "graphics/render/rendergl40.h"
 
-
 // Includes
 #include <unordered_map>
 #include <memory>
@@ -735,9 +734,9 @@ void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
     {
         glGetProgramInfoLog(resource, buffer_size, nullptr, compile_errors.get());
     }
-    g_log->Debug("----- SHADER COMPILATION LOG -------------------------\n");
-    g_log->Debug(compile_errors.get());
-    g_log->Debug("------------------------------------------------------\n");
+    log::Debug("----- SHADER COMPILATION LOG -------------------------\n");
+    log::Debug(compile_errors.get());
+    log::Debug("------------------------------------------------------\n");
 
     return;
 }

@@ -224,7 +224,7 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
         }
     }
     // Update vertex count to account for removed duplicates
-    g_log->Debug("%.1f%%v", (((float)vertex_count - (float)mesh_data_.vertices.size()) / (float)vertex_count) * 100.0);
+    log::Debug("%.1f%%v", (((float)vertex_count - (float)mesh_data_.vertices.size()) / (float)vertex_count) * 100.0);
 
     return true;
 }
