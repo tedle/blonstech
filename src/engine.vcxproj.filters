@@ -145,6 +145,9 @@
     <ClInclude Include="..\include\graphics\gui\consolewindow.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\debug\console.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="debug\logger.cpp">
@@ -245,6 +248,9 @@
     </ClCompile>
     <ClCompile Include="temphelpers.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\console.cpp">
+      <Filter>src\debug</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

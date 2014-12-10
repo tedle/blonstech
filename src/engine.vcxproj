@@ -179,6 +179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons.h" />
+    <ClInclude Include="..\include\debug\console.h" />
     <ClInclude Include="..\include\debug\logger.h" />
     <ClInclude Include="..\include\debug\loggeride.h" />
     <ClInclude Include="..\include\graphics\camera.h" />
@@ -219,6 +220,7 @@
     <ClInclude Include="..\include\temphelpers.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="debug\console.cpp" />
     <ClCompile Include="debug\logger.cpp" />
     <ClCompile Include="debug\loggeride.cpp" />
     <ClCompile Include="graphics\camera.cpp" />

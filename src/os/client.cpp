@@ -3,6 +3,7 @@
 // Includes
 #include <windowsx.h>
 // Local Includes
+#include "debug/console.h"
 #include "debug/loggeride.h"
 #include "graphics/graphics.h"
 
@@ -18,6 +19,7 @@ Client::Client()
 
     // Initialize logger
     g_log = std::unique_ptr<LoggerAPI>(new LoggerIDE(LoggerAPI::Level::DEBUG));
+    console::RegisterPrintCallback([](const std::string& s){ g_log->Debug("[console] %s", s.c_str()); });
 
     units::pixel screen_width, screen_height;
     screen_width = screen_height = 0;

@@ -7,6 +7,7 @@
 #include <vector>
 // Local Includes
 #include "math/math.h"
+#include "debug/console.h"
 #include "debug/loggeride.h"
 
 namespace blons
