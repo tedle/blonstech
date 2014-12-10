@@ -1,12 +1,12 @@
 #include <blons/input/inputtemp.h>
 
 // Includes
-#include <map>
+#include <unordered_map>
 
 namespace
 {
 using namespace blons;
-static const std::map<Input::KeyCode, std::pair<unsigned char, unsigned char>> kAsciiMap =
+static const std::unordered_map<Input::KeyCode, std::pair<unsigned char, unsigned char>> kAsciiMap =
 {
     { Input::CHAR_0, { '0', ')' } },
     { Input::CHAR_1, { '1', '!' } },

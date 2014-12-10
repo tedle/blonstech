@@ -20,7 +20,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
     world_matrix_ = MatrixIdentity();
 
-    log::Debug("Loading %s... ", mesh_filename);
+    log::Debug("Loading %s... ", mesh_filename.c_str());
     DWORD64 start = GetTickCount64();
 
     MeshImporter mesh_data(mesh_filename, true);

@@ -2,7 +2,7 @@
 #define BLONSTECH_GRAPHICS_GUI_SKIN_H_
 
 // Includes
-#include <map>
+#include <unordered_map>
 #include <memory>
 // Local Includes
 #include <blons/graphics/gui/font.h>
@@ -230,7 +230,7 @@ public:
 protected:
     Layout layout_;
     std::unique_ptr<Sprite> skin_;
-    std::map<FontStyle, std::unique_ptr<Font>> font_list_;
+    std::unordered_map<FontStyle, std::unique_ptr<Font>> font_list_;
 
 };
 } // namespace gui

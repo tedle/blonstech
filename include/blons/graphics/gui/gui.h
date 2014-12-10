@@ -1,8 +1,6 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_GUI_H_
 #define BLONSTECH_GRAPHICS_GUI_GUI_H_
 
-// Includes
-#include <map>
 // Local Includes
 #include <blons/math/animation.h>
 #include <blons/input/inputtemp.h>
