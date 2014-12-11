@@ -25,5 +25,4 @@ private:
     std::unique_ptr<ShaderResource> program_;
 };
 } // namespace blons
-
 #endif

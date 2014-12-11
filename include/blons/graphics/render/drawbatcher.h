@@ -29,5 +29,5 @@ private:
     unsigned int vertex_idx_, index_idx_;
     std::size_t array_size_;
 };
-}
+} // namespace blons
 #endif

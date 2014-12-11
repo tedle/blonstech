@@ -214,12 +214,14 @@
     <ClInclude Include="..\include\blons\os\client.h" />
     <ClInclude Include="..\include\blons\os\timer.h" />
     <ClInclude Include="..\include\blons\temphelpers.h" />
+    <ClInclude Include="debug\consoleparser.h" />
     <ClInclude Include="graphics\render\glfuncloader.h" />
     <ClInclude Include="graphics\render\renderd3d11.h" />
     <ClInclude Include="graphics\render\rendergl40.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="debug\console.cpp" />
+    <ClCompile Include="debug\consoleparser.cpp" />
     <ClCompile Include="debug\log.cpp" />
     <ClCompile Include="graphics\camera.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />

@@ -145,6 +145,9 @@
     <ClInclude Include="graphics\render\rendergl40.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
+    <ClInclude Include="debug\consoleparser.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -244,6 +247,9 @@
       <Filter>src\debug</Filter>
     </ClCompile>
     <ClCompile Include="debug\log.cpp">
+      <Filter>src\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\consoleparser.cpp">
       <Filter>src\debug</Filter>
     </ClCompile>
   </ItemGroup>
