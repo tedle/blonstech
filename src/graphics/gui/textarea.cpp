@@ -45,7 +45,6 @@ void Textarea::RenderBody(const Skin::Layout::Textarea& t, RenderContext& contex
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
-    batch->Start(context);
     // Top left corner
     sprite->set_pos(x,
                     y,
@@ -117,8 +116,6 @@ void Textarea::RenderBody(const Skin::Layout::Textarea& t, RenderContext& contex
                     t.bottom_right.h);
     sprite->set_subtexture(t.bottom_right);
     batch->Append(*sprite->mesh(), context);
-
-    batch->End(context);
 }
 
 void Textarea::RenderText(const Skin::Layout::Textarea& t, RenderContext& context)

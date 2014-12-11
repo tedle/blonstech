@@ -65,7 +65,6 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
-    batch->Start(context);
     // Top left corner
     sprite->set_pos(x,
                     y,
@@ -137,7 +136,6 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     t.bottom_right.h);
     sprite->set_subtexture(t.bottom_right);
     batch->Append(*sprite->mesh(), context);
-    batch->End(context);
 
     // Label base colour
     text_label_->set_text_colour(t.colour);
@@ -153,7 +151,6 @@ void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
 
     if (cursor_blink_.ms() % 1000 < 500)
     {
-        batch->Start(context);
         auto cursor_width = 1.0f;
         auto cursor_height = gui_->skin()->font(font_style_)->letter_height() + 6.0f;
         auto x_offset = CursorOffset();
@@ -164,7 +161,6 @@ void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
                         cursor_height);
         sprite->set_subtexture(cursor);
         batch->Append(*sprite->mesh(), context);
-        batch->End(context);
     }
 }
 

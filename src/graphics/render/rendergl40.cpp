@@ -27,6 +27,63 @@ static unsigned int HashString(const char* str)
     }
     return hash;
 }
+
+class MappedBufferCache
+{
+public:
+    void Unmap()
+    {
+        if (vertex_buffer_ != 0)
+        {
+            glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
+            glUnmapBuffer(GL_ARRAY_BUFFER);
+        }
+        if (index_buffer_ != 0)
+        {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_);
+            glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+        }
+        vertex_buffer_ = 0;
+        index_buffer_ = 0;
+    }
+
+    void Map(GLuint vertex_array, GLuint vertex_buffer, GLuint index_buffer, void** vertex_data, void** index_data)
+    {
+        if (vertex_buffer != vertex_buffer_ || index_buffer != index_buffer_)
+        {
+            if (vertex_buffer_ != 0 || index_buffer_ != 0)
+            {
+                Unmap();
+            }
+        }
+        else
+        {
+            *vertex_data = vertex_data_;
+            *index_data = index_data_;
+            return;
+        }
+        vertex_buffer_ = vertex_buffer;
+        index_buffer_ = index_buffer;
+
+        glBindVertexArray(vertex_array);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
+        *vertex_data = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+        vertex_data_ = *vertex_data;
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+        *index_data = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
+        index_data_ = *index_data;
+    }
+
+private:
+    GLuint vertex_buffer_ = 0;
+    GLuint index_buffer_ = 0;
+    void* vertex_data_ = nullptr;
+    void* index_data_ = nullptr;
+};
+static MappedBufferCache g_mapped_buffer_cache;
+
 // Should be thread safe to make this global, since OpenGL context
 // cannot be used from multiple threads anyway.
 static GLuint g_active_shader;
@@ -62,6 +119,8 @@ void Uniform(GLuint loc, Vector4 value)
 template <typename T>
 bool SetUniform(ShaderResource* program, const char* name, T value)
 {
+    // Clear errors so we know problems are isolated to this function
+    glGetError();
     ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
 
     BindShader(prog->program_);
@@ -120,6 +179,8 @@ private:
 
 BufferResourceGL40::~BufferResourceGL40()
 {
+    g_mapped_buffer_cache.Unmap();
+
     if (type_ == BufferResourceGL40::VERTEX_BUFFER)
     {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -591,6 +652,8 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
 
 void RenderGL40::RenderShader(ShaderResource* program, unsigned int index_count)
 {
+    g_mapped_buffer_cache.Unmap();
+
     ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
 
     BindShader(shader->program_);
@@ -603,6 +666,8 @@ void RenderGL40::RenderShader(ShaderResource* program, unsigned int index_count)
 
 void RenderGL40::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
+    g_mapped_buffer_cache.Unmap();
+
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     glBindVertexArray(vertex_buf->vertex_array_id_);
 }
@@ -629,27 +694,10 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
 void RenderGL40::MapBufferResource(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                    void** vertex_data, void** index_data)
 {
-    if (vertex_buffer == nullptr || index_buffer == nullptr)
-    {
-        glUnmapBuffer(GL_ARRAY_BUFFER);
-        glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-        return;
-    }
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     BufferResourceGL40* index_buf  = static_cast<BufferResourceGL40*>(index_buffer);
 
-    glBindVertexArray(vertex_buf->vertex_array_id_);
-    // Attach vertex buffer data to VAO
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
-    *vertex_data = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-    //glBufferSubData(GL_ARRAY_BUFFER, vert_offset * sizeof(Vertex), vert_count * sizeof(Vertex), vertices);
-
-    // Attach index buffer data to VAO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
-    // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
-    *index_data = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
-    //glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, index_offset * sizeof(unsigned int), index_count * sizeof(unsigned int), indices);
+    g_mapped_buffer_cache.Map(vertex_buf->vertex_array_id_, vertex_buf->buffer_, index_buf->buffer_, vertex_data, index_data);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, int value)

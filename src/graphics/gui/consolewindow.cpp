@@ -44,7 +44,6 @@ void ConsoleWindow::Render(RenderContext& context)
     auto sprite = skin->sprite();
     auto batch = control_batch(context);
 
-    batch->Start(context);
     // Render a drop shadow
     auto& shadow = layout->dropshadow.bottom;
     sprite->set_pos(pos_.x,
@@ -53,7 +52,6 @@ void ConsoleWindow::Render(RenderContext& context)
                     shadow.h);
     sprite->set_subtexture(shadow);
     batch->Append(*sprite->mesh(), context);
-    batch->End(context);
 
     Window::Render(context);
 }
