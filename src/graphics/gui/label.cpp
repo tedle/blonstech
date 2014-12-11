@@ -30,6 +30,7 @@ void Label::Render(RenderContext& context)
         {
             // One draw call per (colour,font) used across all labels combined
             auto batcher = font_batch(font_style_, frag.colour, context);
+            batcher->Start(context);
             for (const auto& c : frag.text)
             {
                 auto sprite = font->BuildSprite(c, x, y, crop_);
@@ -39,11 +40,13 @@ void Label::Render(RenderContext& context)
                 }
                 x += font->advance();
             }
+            batcher->End(context);
         }
     }
     else
     {
         auto batcher = font_batch(font_style_, text_.base_colour(), context);
+        batcher->Start(context);
         for (const auto& c : text_.raw_str())
         {
             auto sprite = font->BuildSprite(c, x, y, crop_);
@@ -53,6 +56,7 @@ void Label::Render(RenderContext& context)
             }
             x += font->advance();
         }
+        batcher->End(context);
     }
 
     RegisterBatches();

@@ -57,6 +57,7 @@ void Window::RenderBody(RenderContext& context)
     auto layout = skin->layout();
     auto sprite = skin->sprite();
     auto batch = control_batch(context);
+    batch->Start(context);
     // Let's get ugly
     // Title bar
     {
@@ -166,6 +167,7 @@ void Window::RenderBody(RenderContext& context)
         sprite->set_subtexture(b.bottom_right);
         batch->Append(*sprite->mesh(), context);
     }
+    batch->End(context);
 }
 
 bool Window::Update(const Input& input)

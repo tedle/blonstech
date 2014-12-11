@@ -63,6 +63,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
+    batch->Start(context);
     // Top left corner
     sprite->set_pos(x,
                     y,
@@ -134,6 +135,8 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.bottom_right.h);
     sprite->set_subtexture(b.bottom_right);
     batch->Append(*sprite->mesh(), context);
+
+    batch->End(context);
 
     // Label base colour
     label_->set_text_colour(b.colour);
