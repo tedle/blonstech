@@ -58,6 +58,10 @@ public:
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
     bool LoadPixelData(std::string filename, PixelData* pixel_data) override;
 
+    void BindShader(GLuint shader);
+    void UnbindShader();
+    void UnmapBuffers();
+
 private:
     void LogCompileErrors(GLuint resource, bool is_shader);
     bool vsync_;
@@ -67,6 +71,16 @@ private:
     // API specific
     HDC device_context_;
     HGLRC render_context_;
+
+    // Caching to prevent unnecessary API calls
+    GLuint active_shader_;
+    struct MappedBuffers
+    {
+        GLuint vertex = 0;
+        void* vertex_data = nullptr;
+        GLuint index = 0;
+        void* index_data = nullptr;
+    } mapped_buffers_;
 };
 } // namespace blons
     

@@ -28,75 +28,6 @@ static unsigned int HashString(const char* str)
     return hash;
 }
 
-class MappedBufferCache
-{
-public:
-    void Unmap()
-    {
-        if (vertex_buffer_ != 0)
-        {
-            glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer_);
-            glUnmapBuffer(GL_ARRAY_BUFFER);
-        }
-        if (index_buffer_ != 0)
-        {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer_);
-            glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-        }
-        vertex_buffer_ = 0;
-        index_buffer_ = 0;
-    }
-
-    void Map(GLuint vertex_array, GLuint vertex_buffer, GLuint index_buffer, void** vertex_data, void** index_data)
-    {
-        if (vertex_buffer != vertex_buffer_ || index_buffer != index_buffer_)
-        {
-            if (vertex_buffer_ != 0 || index_buffer_ != 0)
-            {
-                Unmap();
-            }
-        }
-        else
-        {
-            *vertex_data = vertex_data_;
-            *index_data = index_data_;
-            return;
-        }
-        vertex_buffer_ = vertex_buffer;
-        index_buffer_ = index_buffer;
-
-        glBindVertexArray(vertex_array);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
-        *vertex_data = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-        vertex_data_ = *vertex_data;
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-        *index_data = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
-        index_data_ = *index_data;
-    }
-
-private:
-    GLuint vertex_buffer_ = 0;
-    GLuint index_buffer_ = 0;
-    void* vertex_data_ = nullptr;
-    void* index_data_ = nullptr;
-};
-static MappedBufferCache g_mapped_buffer_cache;
-
-// Should be thread safe to make this global, since OpenGL context
-// cannot be used from multiple threads anyway.
-static GLuint g_active_shader;
-void BindShader(GLuint shader)
-{
-    // Avoid repeated calls to glUseProgram (perf boost)
-    if (shader != g_active_shader)
-    {
-        glUseProgram(shader);
-    }
-    g_active_shader = shader;
-}
-
 // Overloaded glUniforms to keep things generic
 void Uniform(GLuint loc, int value)
 {
@@ -114,29 +45,6 @@ void Uniform(GLuint loc, Vector4 value)
 {
     glUniform4fv(loc, 1, &value.x);
 }
-
-// Generic glUniform call
-template <typename T>
-bool SetUniform(ShaderResource* program, const char* name, T value)
-{
-    // Clear errors so we know problems are isolated to this function
-    glGetError();
-    ShaderResourceGL40* prog = static_cast<ShaderResourceGL40*>(program);
-
-    BindShader(prog->program_);
-
-    auto location = prog->UniformLocation(name);
-    if (location < 0)
-    {
-        return false;
-    }
-    Uniform(location, value);
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return false;
-    }
-    return true;
-}
 } // namespace
 
 namespace blons
@@ -144,30 +52,38 @@ namespace blons
 class BufferResourceGL40 : public BufferResource
 {
 public:
+    BufferResourceGL40(RenderGL40* context) : context_(context) {}
     ~BufferResourceGL40() override;
 
     GLuint buffer_, vertex_array_id_;
     enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
+    RenderGL40* context_;
 };
 
 class TextureResourceGL40 : public TextureResource
 {
 public:
+    TextureResourceGL40(RenderGL40* context) : context_(context) {}
     ~TextureResourceGL40() override;
 
     GLuint texture_, texture_unit_;
+    RenderGL40* context_;
 };
 
 class ShaderResourceGL40 : public ShaderResource
 {
 public:
+    ShaderResourceGL40(RenderGL40* context) : context_(context) {}
     ~ShaderResourceGL40() override;
 
     GLuint program_;
     GLuint vertex_shader_;
     GLuint frag_shader_;
+    RenderGL40* context_;
 
     GLint UniformLocation(const char* name);
+    template <typename T>
+    bool SetUniform(const char* name, T value);
 
 private:
     struct HashFunc
@@ -179,7 +95,7 @@ private:
 
 BufferResourceGL40::~BufferResourceGL40()
 {
-    g_mapped_buffer_cache.Unmap();
+    context_->UnmapBuffers();
 
     if (type_ == BufferResourceGL40::VERTEX_BUFFER)
     {
@@ -210,7 +126,7 @@ ShaderResourceGL40::~ShaderResourceGL40()
 
     glDeleteProgram(program_);
 
-    g_active_shader = 0;
+    context_->UnbindShader();
 }
 
 GLint ShaderResourceGL40::UniformLocation(const char* name)
@@ -225,10 +141,31 @@ GLint ShaderResourceGL40::UniformLocation(const char* name)
     return it->second;
 }
 
+template <typename T>
+bool ShaderResourceGL40::SetUniform(const char* name, T value)
+{
+    // Clear errors so we know problems are isolated to this function
+    glGetError();
+
+    context_->BindShader(program_);
+
+    auto location = UniformLocation(name);
+    if (location < 0)
+    {
+        return false;
+    }
+    Uniform(location, value);
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return false;
+    }
+    return true;
+}
+
 RenderGL40::RenderGL40(units::pixel screen_width, units::pixel screen_height, bool vsync, HWND hwnd, bool fullscreen)
 {
     // Mitigates repeated calls to glUseProgram
-    g_active_shader = 0;
+    active_shader_ = 0;
 
     // Defining the pixel format we want OpenGL to use
     const int color_depth = 24;
@@ -389,8 +326,6 @@ RenderGL40::~RenderGL40()
     // Reset the current context before deleting it
     wglMakeCurrent(device_context_, nullptr);
     wglDeleteContext(render_context_);
-
-    g_active_shader = 0;
 }
 
 void RenderGL40::BeginScene()
@@ -406,17 +341,17 @@ void RenderGL40::EndScene()
 
 BufferResource* RenderGL40::MakeBufferResource()
 {
-    return new BufferResourceGL40;
+    return new BufferResourceGL40(this);
 }
 
 TextureResource* RenderGL40::MakeTextureResource()
 {
-    return new TextureResourceGL40;
+    return new TextureResourceGL40(this);
 }
 
 ShaderResource* RenderGL40::MakeShaderResource()
 {
-    return new ShaderResourceGL40;
+    return new ShaderResourceGL40(this);
 }
 
 bool RenderGL40::Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
@@ -652,7 +587,7 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
 
 void RenderGL40::RenderShader(ShaderResource* program, unsigned int index_count)
 {
-    g_mapped_buffer_cache.Unmap();
+    UnmapBuffers();
 
     ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
 
@@ -666,7 +601,7 @@ void RenderGL40::RenderShader(ShaderResource* program, unsigned int index_count)
 
 void RenderGL40::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
-    g_mapped_buffer_cache.Unmap();
+    UnmapBuffers();
 
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     glBindVertexArray(vertex_buf->vertex_array_id_);
@@ -697,27 +632,55 @@ void RenderGL40::MapBufferResource(BufferResource* vertex_buffer, BufferResource
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     BufferResourceGL40* index_buf  = static_cast<BufferResourceGL40*>(index_buffer);
 
-    g_mapped_buffer_cache.Map(vertex_buf->vertex_array_id_, vertex_buf->buffer_, index_buf->buffer_, vertex_data, index_data);
+    if (vertex_buf->buffer_ != mapped_buffers_.vertex || index_buf->buffer_ != mapped_buffers_.index)
+    {
+        if (mapped_buffers_.vertex != 0 || mapped_buffers_.index != 0)
+        {
+            UnmapBuffers();
+        }
+    }
+    else
+    {
+        *vertex_data = mapped_buffers_.vertex_data;
+        *index_data = mapped_buffers_.index_data;
+        return;
+    }
+    mapped_buffers_.vertex = vertex_buf->buffer_;
+    mapped_buffers_.index = index_buf->buffer_;
+
+    glBindVertexArray(vertex_buf->vertex_array_id_);
+
+    glBindBuffer(GL_ARRAY_BUFFER, mapped_buffers_.vertex);
+    *vertex_data = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+    mapped_buffers_.vertex_data = *vertex_data;
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mapped_buffers_.index);
+    *index_data = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
+    mapped_buffers_.index_data = *index_data;
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, int value)
 {
-    return SetUniform(program, name, value);
+    auto prog = static_cast<ShaderResourceGL40*>(program);
+    return prog->SetUniform(name, value);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matrix value)
 {
-    return SetUniform(program, name, value);
+    auto prog = static_cast<ShaderResourceGL40*>(program);
+    return prog->SetUniform(name, value);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector3 value)
 {
-    return SetUniform(program, name, value);
+    auto prog = static_cast<ShaderResourceGL40*>(program);
+    return prog->SetUniform(name, value);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector4 value)
 {
-    return SetUniform(program, name, value);
+    auto prog = static_cast<ShaderResourceGL40*>(program);
+    return prog->SetUniform(name, value);
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value)
@@ -787,6 +750,37 @@ bool RenderGL40::LoadPixelData(std::string filename, PixelData* data)
         break;
     }
     return true;
+}
+
+void RenderGL40::BindShader(GLuint shader)
+{
+    // Avoid repeated calls to glUseProgram (perf boost)
+    if (shader != active_shader_)
+    {
+        glUseProgram(shader);
+    }
+    active_shader_ = shader;
+}
+
+void RenderGL40::UnbindShader()
+{
+    active_shader_ = 0;
+}
+
+void RenderGL40::UnmapBuffers()
+{
+    if (mapped_buffers_.vertex != 0)
+    {
+        glBindBuffer(GL_ARRAY_BUFFER, mapped_buffers_.vertex);
+        glUnmapBuffer(GL_ARRAY_BUFFER);
+    }
+    if (mapped_buffers_.index != 0)
+    {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mapped_buffers_.index);
+        glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+    }
+    mapped_buffers_.vertex = 0;
+    mapped_buffers_.index = 0;
 }
 
 void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
