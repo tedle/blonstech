@@ -66,6 +66,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     gui->window("yoyo")->MakeButton(10, 250, 280, 40, "New window!")->set_callback([&animatex](){ animatex.Reset(); });
 
     blons::console::out("Testing a string!\n");
+
+    std::function<void(int)> test_func = [](int i){ blons::console::out("%i gamers in the house!\n", i); };
+    blons::console::Register("testo", test_func);
+
     bool quit = false;
     while (!quit)
     {

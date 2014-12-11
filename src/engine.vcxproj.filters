@@ -148,6 +148,9 @@
     <ClInclude Include="debug\consoleparser.h">
       <Filter>src\debug</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\debug\consolefunction.inl.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">

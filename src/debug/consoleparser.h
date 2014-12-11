@@ -9,20 +9,13 @@ namespace blons
 {
 namespace console
 {
-struct ConsoleArg
+namespace internal
 {
-    enum ValueType
-    {
-        NONE,
-        FUNCTION,
-        STRING,
-        INT,
-        FLOAT
-    } type;
-    std::string value;
-};
+// Forward declarations
+struct ConsoleArg;
+} // namespace internal
 
-std::vector<ConsoleArg> ParseCommand(const std::string& command);
+std::vector<internal::ConsoleArg> ParseCommand(const std::string& command);
 } // namespace console
 } // namespace blons
 #endif

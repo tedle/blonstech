@@ -180,6 +180,7 @@
   <ItemGroup>
     <ClInclude Include="..\include\blons\blons.h" />
     <ClInclude Include="..\include\blons\debug\console.h" />
+    <ClInclude Include="..\include\blons\debug\consolefunction.inl.h" />
     <ClInclude Include="..\include\blons\debug\log.h" />
     <ClInclude Include="..\include\blons\graphics\camera.h" />
     <ClInclude Include="..\include\blons\graphics\graphics.h" />

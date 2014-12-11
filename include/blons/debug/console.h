@@ -17,7 +17,19 @@ typedef std::function<void(const std::string&)> PrintCallback;
 void in(const std::string& command);
 void out(const std::string& fmt, ...);
 
+template <typename... Args>
+void Register(const std::string& name, std::function<void(Args...)> func)
+{
+    internal::Function* f = new internal::TemplatedFunction<Args...>(func);
+    internal::__register(name, f);
+}
+
 void RegisterPrintCallback(PrintCallback callback);
+
+// Since template generation is done at compile time, user needs
+// access to function generation code. You probably don't want
+// to touch anything in here
+#include <blons/debug/consolefunction.inl.h>
 } // namespace console
 } // namespace blons
 #endif

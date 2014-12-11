@@ -1,8 +1,10 @@
 #include "consoleparser.h"
 
+#include <blons/debug/console.h>
+
 namespace
 {
-using namespace blons::console;
+using namespace blons::console::internal;
 struct ParseState
 {
     std::vector<ConsoleArg> args;
