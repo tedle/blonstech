@@ -2,7 +2,7 @@
 
 // Includes
 #include <windowsx.h>
-// Local Includes
+// Public Includes
 #include <blons/debug/console.h>
 #include <blons/debug/log.h>
 #include <blons/graphics/graphics.h>

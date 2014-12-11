@@ -1,6 +1,6 @@
 #include <blons/graphics/gui/consoletextarea.h>
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/gui/gui.h>
 
 namespace blons

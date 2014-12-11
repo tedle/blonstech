@@ -1,7 +1,7 @@
 #ifndef BLONSTECH_GRAPHICS_RENDER_DRAWBATCHER_H_
 #define BLONSTECH_GRAPHICS_RENDER_DRAWBATCHER_H_
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/mesh.h>
 
 namespace blons

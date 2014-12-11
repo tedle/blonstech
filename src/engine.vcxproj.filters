@@ -97,16 +97,7 @@
     <ClInclude Include="..\include\blons\graphics\render\drawbatcher.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\graphics\render\glfuncloader.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\graphics\render\render.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\blons\graphics\render\renderd3d11.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\blons\graphics\render\rendergl40.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
     <ClInclude Include="..\include\blons\graphics\render\shader.h">
@@ -144,6 +135,15 @@
     </ClInclude>
     <ClInclude Include="..\include\blons\temphelpers.h">
       <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\render\glfuncloader.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\render\renderd3d11.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\render\rendergl40.h">
+      <Filter>src\graphics\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

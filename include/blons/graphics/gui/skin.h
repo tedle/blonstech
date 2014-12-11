@@ -4,7 +4,7 @@
 // Includes
 #include <unordered_map>
 #include <memory>
-// Local Includes
+// Public Includes
 #include <blons/graphics/gui/font.h>
 #include <blons/graphics/render/render.h>
 

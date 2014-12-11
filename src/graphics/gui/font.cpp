@@ -4,7 +4,7 @@
 #include <algorithm>
 #include <FreeType2/include/ft2build.h>
 #include FT_FREETYPE_H
-// Local Includes
+// Public Includes
 #include <blons/graphics/render/render.h>
 
 namespace blons

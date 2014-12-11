@@ -1,6 +1,6 @@
 #include <blons/graphics/gui/gui.h>
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/graphics.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>

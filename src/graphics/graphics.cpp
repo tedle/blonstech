@@ -1,16 +1,17 @@
 #include <blons/graphics/graphics.h>
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/model.h>
 #include <blons/graphics/sprite.h>
 #include <blons/graphics/camera.h>
 #include <blons/graphics/gui/gui.h>
 #include <blons/graphics/render/drawbatcher.h>
-#include <blons/graphics/render/renderd3d11.h>
-#include <blons/graphics/render/rendergl40.h>
 #include <blons/graphics/render/shader.h>
 #include <blons/math/math.h>
 #include <blons/temphelpers.h>
+// Local Includes
+#include "render/renderd3d11.h"
+#include "render/rendergl40.h"
 
 namespace blons
 {

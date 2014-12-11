@@ -1,7 +1,7 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_GUI_H_
 #define BLONSTECH_GRAPHICS_GUI_GUI_H_
 
-// Local Includes
+// Public Includes
 #include <blons/math/animation.h>
 #include <blons/input/inputtemp.h>
 #include <blons/graphics/render/drawbatcher.h>

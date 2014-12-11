@@ -1,7 +1,7 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_TEXTAREA_H_
 #define BLONSTECH_GRAPHICS_GUI_TEXTAREA_H_
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/gui/control.h>
 #include <blons/math/animation.h>
 #include <blons/os/timer.h>

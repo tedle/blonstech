@@ -1,6 +1,6 @@
 #include <blons/graphics/gui/skin.h>
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/sprite.h>
 
 namespace blons

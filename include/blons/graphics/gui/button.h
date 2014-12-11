@@ -1,7 +1,7 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_BUTTON_H_
 #define BLONSTECH_GRAPHICS_GUI_BUTTON_H_
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/gui/control.h>
 
 namespace blons

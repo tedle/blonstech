@@ -3,7 +3,7 @@
 
 // Includes
 #include <vector>
-// Local Includes
+// Public Includes
 #include <blons/math/math.h>
 
 namespace blons

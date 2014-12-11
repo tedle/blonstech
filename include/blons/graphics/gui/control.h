@@ -1,7 +1,7 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_CONTROL_H_
 #define BLONSTECH_GRAPHICS_GUI_CONTROL_H_
 
-// Local Includes
+// Public Includes
 #include <blons/math/units.h>
 #include <blons/graphics/gui/skin.h>
 #include <blons/graphics/render/drawbatcher.h>

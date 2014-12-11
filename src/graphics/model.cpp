@@ -4,7 +4,7 @@
 // TODO: remove this, only used for timing
 #include <Windows.h>
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/mesh.h>
 #include <blons/graphics/meshimporter.h>
 #include <blons/math/math.h>

@@ -2,7 +2,7 @@
 
 // Includes
 #include <algorithm>
-// Local Includes
+// Public Includes
 #include <blons/math/animation.h>
 #include <blons/graphics/gui/gui.h>
 #include <blons/graphics/gui/label.h>

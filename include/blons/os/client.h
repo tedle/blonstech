@@ -7,7 +7,7 @@
 // Includes
 #include <memory>
 #include <Windows.h>
-// Local Includes
+// Public Includes
 #include <blons/input/inputtemp.h>
 
 namespace blons

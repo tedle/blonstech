@@ -5,7 +5,7 @@
 #include <memory>
 #include <set>
 #include <Windows.h>
-// Local Includes
+// Public Includes
 #include <blons/graphics/model.h>
 #include <blons/graphics/sprite.h>
 #include <blons/graphics/render/render.h>

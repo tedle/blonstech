@@ -200,10 +200,7 @@
     <ClInclude Include="..\include\blons\graphics\meshimporter.h" />
     <ClInclude Include="..\include\blons\graphics\model.h" />
     <ClInclude Include="..\include\blons\graphics\render\drawbatcher.h" />
-    <ClInclude Include="..\include\blons\graphics\render\glfuncloader.h" />
     <ClInclude Include="..\include\blons\graphics\render\render.h" />
-    <ClInclude Include="..\include\blons\graphics\render\renderd3d11.h" />
-    <ClInclude Include="..\include\blons\graphics\render\rendergl40.h" />
     <ClInclude Include="..\include\blons\graphics\render\shader.h" />
     <ClInclude Include="..\include\blons\graphics\sprite.h" />
     <ClInclude Include="..\include\blons\graphics\texture.h" />
@@ -217,6 +214,9 @@
     <ClInclude Include="..\include\blons\os\client.h" />
     <ClInclude Include="..\include\blons\os\timer.h" />
     <ClInclude Include="..\include\blons\temphelpers.h" />
+    <ClInclude Include="graphics\render\glfuncloader.h" />
+    <ClInclude Include="graphics\render\renderd3d11.h" />
+    <ClInclude Include="graphics\render\rendergl40.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="debug\console.cpp" />

@@ -1,6 +1,6 @@
 #include <blons/graphics/mesh.h>
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/meshimporter.h>
 
 namespace blons

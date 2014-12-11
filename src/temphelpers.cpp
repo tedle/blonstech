@@ -7,7 +7,7 @@
 #include <DirectXMath.h>
 #include <iostream>
 #include <fstream>
-// Local Includes
+// Public Includes
 #include <blons/graphics/camera.h>
 #include <blons/graphics/graphics.h>
 #include <blons/graphics/model.h>

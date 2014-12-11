@@ -4,7 +4,7 @@
 // Includes
 #include <memory>
 #include <vector>
-// Local Includes
+// Public Includes
 #include <blons/graphics/graphics.h>
 #include <blons/graphics/render/render.h>
 

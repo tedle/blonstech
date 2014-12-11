@@ -3,7 +3,7 @@
 
 // Includes
 #include <memory>
-// Local Includes
+// Public Includes
 #include <blons/graphics/render/render.h>
 
 namespace blons

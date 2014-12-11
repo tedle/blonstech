@@ -2,7 +2,7 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_CONSOLEWINDOW_H_
 #define BLONSTECH_GRAPHICS_GUI_CONSOLEWINDOW_H_
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/gui/control.h>
 #include <blons/graphics/gui/window.h>
 #include <blons/graphics/gui/consoletextarea.h>

@@ -1,7 +1,7 @@
 #ifndef BLONSTECH_GUI_CONSOLETEXTAREA_H_
 #define BLONSTECH_GUI_CONSOLETEXTAREA_H_
 
-// Local Includes
+// Public Includes
 #include <blons/graphics/gui/textarea.h>
 
 namespace blons

@@ -5,7 +5,7 @@
 #include <memory>
 #include <string>
 #include <vector>
-// Local Includes
+// Public Includes
 #include <blons/math/math.h>
 #include <blons/debug/console.h>
 #include <blons/debug/log.h>

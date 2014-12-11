@@ -3,7 +3,7 @@
 
 // Includes
 #include <functional>
-// Local Includes
+// Public Includes
 #include <blons/os/timer.h>
 
 namespace blons

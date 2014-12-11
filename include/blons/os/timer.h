@@ -1,7 +1,7 @@
 #ifndef BLONSTECH_OS_TIMER_H_
 #define BLONSTECH_OS_TIMER_H_
 
-// Local Includes
+// Public Includes
 #include <blons/math/units.h>
 
 namespace blons

@@ -3,7 +3,7 @@
 
 // Includes
 #include <vector>
-// Local Includes
+// Public Includes
 #include <blons/math/units.h>
 #include <blons/graphics/sprite.h>
 #include <blons/graphics/gui/colourstring.h>

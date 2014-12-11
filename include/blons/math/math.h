@@ -5,7 +5,7 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 #include <string.h>
-// Local Includes
+// Public Includes
 #include <blons/math/units.h>
 
 namespace blons
