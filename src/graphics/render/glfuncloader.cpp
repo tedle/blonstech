@@ -48,6 +48,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glBufferData");
     }
 
+    glBufferSubData = (PFNGLBUFFERSUBDATAPROC)glGetProcAddress("glBufferSubData");
+    if (glBufferSubData == nullptr)
+    {
+        failed.push_back("glBufferSubData");
+    }
+
     glCompileShader = (PFNGLCOMPILESHADERPROC)glGetProcAddress("glCompileShader");
     if (glCompileShader == nullptr)
     {
@@ -244,6 +250,7 @@ PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
 PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 PFNGLBUFFERDATAPROC glBufferData;
+PFNGLBUFFERSUBDATAPROC glBufferSubData;
 PFNGLCOMPILESHADERPROC glCompileShader;
 PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLCREATESHADERPROC glCreateShader;

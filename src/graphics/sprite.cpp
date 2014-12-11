@@ -44,8 +44,8 @@ void Sprite::Render(RenderContext& context)
 {
     BuildQuad();
     context->SetMeshData(vertex_buffer_.get(), index_buffer_.get(),
-                         mesh_.vertices.data(), vertex_count(),
-                         mesh_.indices.data(), index_count());
+                         mesh_.vertices.data(), 0, vertex_count(),
+                         mesh_.indices.data(), 0, index_count());
     context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 }
 

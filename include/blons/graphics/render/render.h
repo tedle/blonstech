@@ -89,8 +89,8 @@ public:
 
     virtual void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)=0;
     virtual void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                             Vertex* vertices, unsigned int vert_count,
-                             unsigned int* indices, unsigned int index_count)=0;
+                             const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
+                             const unsigned int* indices, unsigned int index_offset, unsigned int index_count)=0;
     // Using const char* instead of std::string here is noticably faster
     virtual bool SetShaderInput(ShaderResource* program, const char* name, int value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Matrix value)=0;

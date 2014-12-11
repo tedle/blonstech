@@ -427,7 +427,7 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
     // Attach vertex buffer data to VAO
     glGenBuffers(1, &vertex_buf->buffer_);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_DYNAMIC_DRAW);
 
     // Enable pos and uv inputs ??
     glEnableVertexAttribArray(0);
@@ -444,7 +444,7 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
     // Setup the index buffer
     glGenBuffers(1, &index_buf->buffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
 
     // nvogl32.dll loves it when i clean up my VAOs!
     glBindVertexArray(0);
@@ -608,8 +608,8 @@ void RenderGL40::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* i
 }
 
 void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                             Vertex* vertices, unsigned int vert_count,
-                             unsigned int* indices, unsigned int index_count)
+                             const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
+                             const unsigned int* indices, unsigned int index_offset, unsigned int index_count)
 {
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     BufferResourceGL40* index_buf  = static_cast<BufferResourceGL40*>(index_buffer);
@@ -618,13 +618,14 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
     // Attach vertex buffer data to VAO
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
-    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ARRAY_BUFFER, vert_offset * sizeof(Vertex), vert_count * sizeof(Vertex), vertices);
 
     // Attach index buffer data to VAO
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
     // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
+    glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, index_offset * sizeof(unsigned int), index_count * sizeof(unsigned int), indices);
 }
+
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, int value)
 {
     return SetUniform(program, name, value);

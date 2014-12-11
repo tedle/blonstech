@@ -14,7 +14,7 @@ public:
     DrawBatcher(RenderContext& context);
     ~DrawBatcher() {}
 
-    void Append(const MeshData& mesh_data);
+    void Append(const MeshData& mesh_data, RenderContext&);
     void Render(RenderContext& context);
 
     int index_count() const;
@@ -27,7 +27,7 @@ private:
     std::unique_ptr<unsigned int> indices_;
     unsigned int vertex_count_, index_count_;
     unsigned int vertex_idx_, index_idx_;
-    std::size_t array_size_;
+    unsigned int array_size_;
 };
 } // namespace blons
 #endif

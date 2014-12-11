@@ -35,7 +35,7 @@ void Label::Render(RenderContext& context)
                 auto sprite = font->BuildSprite(c, x, y, crop_);
                 if (sprite != nullptr)
                 {
-                    batcher->Append(*sprite->mesh());
+                    batcher->Append(*sprite->mesh(), context);
                 }
                 x += font->advance();
             }
@@ -49,7 +49,7 @@ void Label::Render(RenderContext& context)
             auto sprite = font->BuildSprite(c, x, y, crop_);
             if (sprite != nullptr)
             {
-                batcher->Append(*sprite->mesh());
+                batcher->Append(*sprite->mesh(), context);
             }
             x += font->advance();
         }

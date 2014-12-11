@@ -67,21 +67,21 @@ void Window::RenderBody(RenderContext& context)
                         t.left.w,
                         t.left.h);
         sprite->set_subtexture(t.left);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
         // Center
         sprite->set_pos(pos_.x + t.left.w,
                         pos_.y,
                         pos_.w - (t.left.w + t.right.w),
                         t.left.h);
         sprite->set_subtexture(t.center);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
         // Right
         sprite->set_pos(pos_.x + pos_.w - t.right.w,
                         pos_.y,
                         t.right.w,
                         t.right.h);
         sprite->set_subtexture(t.right);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
     }
     // Body
     {
@@ -100,7 +100,7 @@ void Window::RenderBody(RenderContext& context)
                         b.top_left.w,
                         b.top_left.h);
         sprite->set_subtexture(b.top_left);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
 
         // Top edge
         sprite->set_pos(pos_.x + b.top_left.w,
@@ -108,7 +108,7 @@ void Window::RenderBody(RenderContext& context)
                         pos_.w - (b.top_left.w + b.top_right.w),
                         b.top.h);
         sprite->set_subtexture(b.top);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
 
         // Top right corner
         sprite->set_pos(pos_.x + pos_.w - b.top_right.w,
@@ -116,7 +116,7 @@ void Window::RenderBody(RenderContext& context)
                         b.top_right.w,
                         b.top_right.h);
         sprite->set_subtexture(b.top_right);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
 
         // Left edge
         sprite->set_pos(pos_.x,
@@ -124,7 +124,7 @@ void Window::RenderBody(RenderContext& context)
                         b.left.w,
                         pos_.h - (b.top_left.h + b.bottom_right.h) - t_off);
         sprite->set_subtexture(b.left);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
 
         // Body
         sprite->set_pos(pos_.x + b.left.w,
@@ -132,7 +132,7 @@ void Window::RenderBody(RenderContext& context)
                         pos_.w - (b.left.w + b.right.w),
                         pos_.h - (b.top.h + b.bottom.h) - t_off);
         sprite->set_subtexture(b.body);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
 
         // Right edge
         sprite->set_pos(pos_.x + pos_.w - b.right.w,
@@ -140,7 +140,7 @@ void Window::RenderBody(RenderContext& context)
                         b.right.w,
                         pos_.h - (b.top_right.h + b.bottom_right.h) - t_off);
         sprite->set_subtexture(b.right);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
 
         // Bottom left corner
         sprite->set_pos(pos_.x,
@@ -148,7 +148,7 @@ void Window::RenderBody(RenderContext& context)
                         b.bottom_left.w,
                         b.bottom_left.h);
         sprite->set_subtexture(b.bottom_left);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
 
         // Bottom edge
         sprite->set_pos(pos_.x + b.bottom_left.w,
@@ -156,7 +156,7 @@ void Window::RenderBody(RenderContext& context)
                         pos_.w - (b.bottom_left.w + b.bottom_right.w),
                         b.bottom.h);
         sprite->set_subtexture(b.bottom);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
 
         // Bottom right corner
         sprite->set_pos(pos_.x + pos_.w - b.bottom_right.w,
@@ -164,7 +164,7 @@ void Window::RenderBody(RenderContext& context)
                         b.bottom_right.w,
                         b.bottom_right.h);
         sprite->set_subtexture(b.bottom_right);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
     }
 }
 

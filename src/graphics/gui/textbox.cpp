@@ -71,7 +71,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     t.top_left.w,
                     t.top_left.h);
     sprite->set_subtexture(t.top_left);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Top edge
     sprite->set_pos(x + t.top_left.w,
@@ -79,7 +79,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     pos_.w - (t.top_left.w + t.top_right.w),
                     t.top.h);
     sprite->set_subtexture(t.top);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Top right corner
     sprite->set_pos(x + pos_.w - t.top_right.w,
@@ -87,7 +87,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     t.top_right.w,
                     t.top_right.h);
     sprite->set_subtexture(t.top_right);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Left edge
     sprite->set_pos(x,
@@ -95,7 +95,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     t.left.w,
                     pos_.h - (t.top_left.h + t.bottom_right.h));
     sprite->set_subtexture(t.left);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Body
     sprite->set_pos(x + t.left.w,
@@ -103,7 +103,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     pos_.w - (t.left.w + t.right.w),
                     pos_.h - (t.top.h + t.bottom.h));
     sprite->set_subtexture(t.body);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Right edge
     sprite->set_pos(x + pos_.w - t.right.w,
@@ -111,7 +111,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     t.right.w,
                     pos_.h - (t.top_right.h + t.bottom_right.h));
     sprite->set_subtexture(t.right);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Bottom left corner
     sprite->set_pos(x,
@@ -119,7 +119,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     t.bottom_left.w,
                     t.bottom_left.h);
     sprite->set_subtexture(t.bottom_left);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Bottom edge
     sprite->set_pos(x + t.bottom_left.w,
@@ -127,7 +127,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     pos_.w - (t.bottom_left.w + t.bottom_right.w),
                     t.bottom.h);
     sprite->set_subtexture(t.bottom);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Bottom right corner
     sprite->set_pos(x + pos_.w - t.bottom_right.w,
@@ -135,7 +135,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
                     t.bottom_right.w,
                     t.bottom_right.h);
     sprite->set_subtexture(t.bottom_right);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Label base colour
     text_label_->set_text_colour(t.colour);
@@ -160,7 +160,7 @@ void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
                         cursor_width,
                         cursor_height);
         sprite->set_subtexture(cursor);
-        batch->Append(*sprite->mesh());
+        batch->Append(*sprite->mesh(), context);
     }
 }
 

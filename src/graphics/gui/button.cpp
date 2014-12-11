@@ -69,7 +69,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.top_left.w,
                     b.top_left.h);
     sprite->set_subtexture(b.top_left);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Top edge
     sprite->set_pos(x + b.top_left.w,
@@ -77,7 +77,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     pos_.w - (b.top_left.w + b.top_right.w),
                     b.top.h);
     sprite->set_subtexture(b.top);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Top right corner
     sprite->set_pos(x + pos_.w - b.top_right.w,
@@ -85,7 +85,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.top_right.w,
                     b.top_right.h);
     sprite->set_subtexture(b.top_right);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Left edge
     sprite->set_pos(x,
@@ -93,7 +93,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.left.w,
                     pos_.h - (b.top_left.h + b.bottom_right.h));
     sprite->set_subtexture(b.left);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Body
     sprite->set_pos(x + b.left.w,
@@ -101,7 +101,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     pos_.w - (b.left.w + b.right.w),
                     pos_.h - (b.top.h + b.bottom.h));
     sprite->set_subtexture(b.body);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Right edge
     sprite->set_pos(x + pos_.w - b.right.w,
@@ -109,7 +109,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.right.w,
                     pos_.h - (b.top_right.h + b.bottom_right.h));
     sprite->set_subtexture(b.right);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Bottom left corner
     sprite->set_pos(x,
@@ -117,7 +117,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.bottom_left.w,
                     b.bottom_left.h);
     sprite->set_subtexture(b.bottom_left);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Bottom edge
     sprite->set_pos(x + b.bottom_left.w,
@@ -125,7 +125,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     pos_.w - (b.bottom_left.w + b.bottom_right.w),
                     b.bottom.h);
     sprite->set_subtexture(b.bottom);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Bottom right corner
     sprite->set_pos(x + pos_.w - b.bottom_right.w,
@@ -133,7 +133,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.bottom_right.w,
                     b.bottom_right.h);
     sprite->set_subtexture(b.bottom_right);
-    batch->Append(*sprite->mesh());
+    batch->Append(*sprite->mesh(), context);
 
     // Label base colour
     label_->set_text_colour(b.colour);
