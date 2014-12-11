@@ -23,8 +23,6 @@ private:
     std::unique_ptr<BufferResource> vertex_buffer_;
     std::unique_ptr<BufferResource> index_buffer_;
 
-    std::unique_ptr<Vertex> vertices_;
-    std::unique_ptr<unsigned int> indices_;
     unsigned int vertex_count_, index_count_;
     unsigned int vertex_idx_, index_idx_;
     unsigned int array_size_;

@@ -54,6 +54,18 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glBufferSubData");
     }
 
+    glMapBuffer = (PFNGLMAPBUFFERPROC)glGetProcAddress("glMapBuffer");
+    if (glMapBuffer == nullptr)
+    {
+        failed.push_back("glMapBuffer");
+    }
+
+    glUnmapBuffer = (PFNGLUNMAPBUFFERPROC)glGetProcAddress("glUnmapBuffer");
+    if (glUnmapBuffer == nullptr)
+    {
+        failed.push_back("glUnmapBuffer");
+    }
+
     glCompileShader = (PFNGLCOMPILESHADERPROC)glGetProcAddress("glCompileShader");
     if (glCompileShader == nullptr)
     {
@@ -251,6 +263,8 @@ PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 PFNGLBUFFERDATAPROC glBufferData;
 PFNGLBUFFERSUBDATAPROC glBufferSubData;
+PFNGLMAPBUFFERPROC glMapBuffer;
+PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 PFNGLCOMPILESHADERPROC glCompileShader;
 PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLCREATESHADERPROC glCreateShader;
