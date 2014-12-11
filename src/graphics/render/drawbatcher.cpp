@@ -36,12 +36,13 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
     }
     void* vptr = nullptr;
     void* iptr = nullptr;
-    context->MapBufferResource(vertex_buffer_.get(), index_buffer_.get(), &vptr, &iptr);
+    context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vptr, &iptr);
     Vertex* vertices = (Vertex*)vptr;
     unsigned int* indices = (unsigned int*)iptr;
+
     // memcpy is noticably faster in debug builds, not so much with compiler optimizations
     memcpy(vertices+vertex_idx_, mesh_data.vertices.data(), sizeof(Vertex) * vert_size);
-    // Caching these helps debug perf
+    // Caching this helps debug perf
     auto batch_indices_ptr = mesh_data.indices.data();
     // Can't memcpy here because indices need to be incremented as meshes are appended
     for (std::size_t j = 0; j < index_size; j++)

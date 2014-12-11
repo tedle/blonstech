@@ -46,8 +46,8 @@ public:
     void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                      const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
                      const unsigned int* indices, unsigned int index_offset, unsigned int index_count) override;
-    void MapBufferResource(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                           void** vertex_data, void** index_data) override;
+    void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                     void** vertex_data, void** index_data) override;
     bool SetShaderInput(ShaderResource* program, const char* name, int value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, Matrix value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value) override;
