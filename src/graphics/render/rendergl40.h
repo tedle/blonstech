@@ -41,6 +41,9 @@ public:
 
     void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer) override;
     void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                     const Vertex* vertices, unsigned int vert_count,
+                     const unsigned int* indices, unsigned int index_count);
+    void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                      const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
                      const unsigned int* indices, unsigned int index_offset, unsigned int index_count) override;
     void MapBufferResource(BufferResource* vertex_buffer, BufferResource* index_buffer,
