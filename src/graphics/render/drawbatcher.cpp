@@ -30,15 +30,28 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
         // TODO: Change this to *= 2? Maybe? Maybe not?
         array_size_ = std::max(vertex_idx_ + vert_size, index_idx_ + index_size);
 
+        // Make a backup copy of mesh data we've already pushed to render API
+        Vertex* vptr = nullptr;
+        unsigned int* iptr = nullptr;
+        context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vptr, &iptr);
+        auto old_vertices = std::unique_ptr<Vertex>(new Vertex[vertex_idx_]);
+        auto old_indices = std::unique_ptr<unsigned int>(new unsigned int[index_idx_]);
+        memcpy(old_vertices.get(), vptr, vertex_idx_ * sizeof(Vertex));
+        memcpy(old_indices.get(), iptr, index_idx_ * sizeof(unsigned int));
+
+        // Make the new, larger buffers
         vertex_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
         index_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
         context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, array_size_, nullptr, array_size_);
+
+        // Move our backup copy of mesh data into the new buffer
+        context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
+                                old_vertices.get(), 0, vertex_idx_,
+                                old_indices.get(), 0, index_idx_);
     }
-    void* vptr = nullptr;
-    void* iptr = nullptr;
-    context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vptr, &iptr);
-    Vertex* vertices = (Vertex*)vptr;
-    unsigned int* indices = (unsigned int*)iptr;
+    Vertex* vertices;
+    unsigned int* indices;
+    context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vertices, &indices);
 
     // memcpy is noticably faster in debug builds, not so much with compiler optimizations
     memcpy(vertices+vertex_idx_, mesh_data.vertices.data(), sizeof(Vertex) * vert_size);

@@ -43,11 +43,11 @@ public:
     void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                      const Vertex* vertices, unsigned int vert_count,
                      const unsigned int* indices, unsigned int index_count);
-    void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                     const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
-                     const unsigned int* indices, unsigned int index_offset, unsigned int index_count) override;
+    void UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                        const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
+                        const unsigned int* indices, unsigned int index_offset, unsigned int index_count) override;
     void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                     void** vertex_data, void** index_data) override;
+                     Vertex** vertex_data, unsigned int** index_data) override;
     bool SetShaderInput(ShaderResource* program, const char* name, int value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, Matrix value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value) override;
@@ -80,9 +80,9 @@ private:
     struct MappedBuffers
     {
         GLuint vertex = 0;
-        void* vertex_data = nullptr;
+        Vertex* vertex_data = nullptr;
         GLuint index = 0;
-        void* index_data = nullptr;
+        unsigned int* index_data = nullptr;
     } mapped_buffers_;
 };
 } // namespace blons

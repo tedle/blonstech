@@ -91,11 +91,15 @@ public:
     virtual void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                              const Vertex* vertices, unsigned int vert_count,
                              const unsigned int* indices, unsigned int index_count)=0;
-    virtual void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                             const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
-                             const unsigned int* indices, unsigned int index_offset, unsigned int index_count)=0;
+    virtual void UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                                const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
+                                const unsigned int* indices, unsigned int index_offset, unsigned int index_count)=0;
+    // TODO: The pointers returned by this are only good until the next API call,
+    // make this more clear to the user somehow! I want it to be explicit in the API,
+    // instead of just casually mentioned deep in the docs somewhere
+    // NOTE: Tried using weak_ptrs, lambda callbacks. Both hurt performance too much
     virtual void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                             void** vertex_data, void** index_data)=0;
+                             Vertex** vertex_data, unsigned int** index_data)=0;
     // Using const char* instead of std::string here is noticably faster
     virtual bool SetShaderInput(ShaderResource* program, const char* name, int value)=0;
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Matrix value)=0;

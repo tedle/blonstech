@@ -626,9 +626,9 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
 }
 
-void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                             const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
-                             const unsigned int* indices, unsigned int index_offset, unsigned int index_count)
+void RenderGL40::UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                                const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
+                                const unsigned int* indices, unsigned int index_offset, unsigned int index_count)
 {
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     BufferResourceGL40* index_buf  = static_cast<BufferResourceGL40*>(index_buffer);
@@ -644,7 +644,7 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
 }
 
 void RenderGL40::MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                                   void** vertex_data, void** index_data)
+                                   Vertex** vertex_data, unsigned int** index_data)
 {
     BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
     BufferResourceGL40* index_buf  = static_cast<BufferResourceGL40*>(index_buffer);
@@ -668,11 +668,11 @@ void RenderGL40::MapMeshData(BufferResource* vertex_buffer, BufferResource* inde
     glBindVertexArray(vertex_buf->vertex_array_id_);
 
     glBindBuffer(GL_ARRAY_BUFFER, mapped_buffers_.vertex);
-    *vertex_data = glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+    *vertex_data = static_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));
     mapped_buffers_.vertex_data = *vertex_data;
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mapped_buffers_.index);
-    *index_data = glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
+    *index_data = static_cast<unsigned int*>(glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE));
     mapped_buffers_.index_data = *index_data;
 }
 
