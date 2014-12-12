@@ -1,5 +1,6 @@
 namespace internal
 {
+// Storage for parsed console input arguments.
 struct ConsoleArg
 {
     enum Type
@@ -13,18 +14,23 @@ struct ConsoleArg
     std::string value;
 };
 
+// Builds a list of indices during compilation
 template<unsigned... i>struct Indices{ typedef Indices type; };
 template<unsigned size, unsigned... i>struct MakeIndices : MakeIndices<size - 1, size - 1, i...> {};
 template<unsigned... i>struct MakeIndices<0, i...> : Indices<i...> {};
 template<unsigned size>using MakeIndicesType = typename MakeIndices<size>::type;
 
+// Base class used to store functions in the console
 class Function
 {
 public:
+    // Turns the list of ConsoleArgs into real arguments and calls the function
     virtual bool Run(const std::vector<ConsoleArg>& args)=0;
+    // Returns a ordered list of expected inputs
     virtual std::vector<ConsoleArg::Type> ArgList()=0;
 };
 
+// Generates one class for each unique function prototype registered to the console
 template <typename... Args>
 class TemplatedFunction : public Function
 {
@@ -81,6 +87,8 @@ private:
     template<>
     ConsoleArg::Type ArgType<const char*>() { return ConsoleArg::STRING; }
 
+    // Converts console args into real types
+    // Throws an exception if the wrong type is passed
     template<typename T>
     T UnpackArg(unsigned int i, const std::vector<ConsoleArg>& args)
     {
@@ -111,13 +119,16 @@ private:
     template<unsigned... i>
     bool PackArgsAndCall(Indices<i...>, const std::vector<ConsoleArg>& runtime_args)
     {
+        // Check we were passed the right amount of arguments
         if (runtime_args.size() != sizeof...(i))
         {
             return false;
         }
         try
         {
+            // This will throw if there's a type mismatch in supplied arguments
             auto arg_tuple = std::make_tuple(UnpackArg<Args>(i, runtime_args)...);
+            // Calls the stored function with real arguments
             func_(std::get<i>(arg_tuple)...);
         }
         catch (const char*)
@@ -128,5 +139,6 @@ private:
     }
 };
 
+// Registers a function the console
 void __register(const std::string& name, Function* func);
 } // namespace internal

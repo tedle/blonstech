@@ -12,6 +12,7 @@ using namespace blons::console;
 using namespace internal;
 
 typedef std::vector<std::unique_ptr<Function>> FunctionList;
+
 struct ConsoleState
 {
     std::vector<PrintCallback> print_callbacks;
@@ -58,6 +59,9 @@ namespace console
 {
 using namespace internal;
 
+// The main Register function is templated and needs to be defined in
+// public headers. We use this function to hardcode as much as we can
+// into the library.
 void internal::__register(const std::string& name, Function* func)
 {
     const auto arg_list = func->ArgList();
@@ -141,6 +145,7 @@ void out(const std::string& fmt, ...)
     std::string formatted_out(buffer.get());
     va_end(args);
 
+    // Send formatted text to every registered print callback
     for (const auto& output : g_state.print_callbacks)
     {
         output(formatted_out);
