@@ -68,7 +68,11 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     blons::console::out("Testing a string!\n");
 
     std::function<void(int)> test_func = [](int i){ blons::console::out("%i gamers in the house!\n", i); };
+    std::function<void(const char*)> test_func_s = [](const char* i){ blons::console::out("%s stringers in the house!\n", i); };
+    std::function<void(int, int)> test_func_ii = [](int i, int j){blons::console::out("%i, %i double inters in the house!\n", i, j); };
     blons::console::Register("testo", test_func);
+    blons::console::Register("testo", test_func_s);
+    blons::console::Register("testo", test_func_ii);
 
     bool quit = false;
     while (!quit)

@@ -8,14 +8,48 @@
 
 namespace
 {
+using namespace blons::console;
+using namespace internal;
+
+typedef std::vector<std::unique_ptr<Function>> FunctionList;
 struct ConsoleState
 {
-    std::vector<blons::console::PrintCallback> print_callbacks;
-    // TODO: Overloaded functions
-    std::unordered_map<std::string, std::unique_ptr<blons::console::internal::Function>> functions;
+    std::vector<PrintCallback> print_callbacks;
+    // Stored as a vector to allow function overloading
+    std::unordered_map<std::string, FunctionList> functions;
 } g_state;
+
 const std::string kErrorPrefix = "* $E33";
 const std::string kUserPrefix = "~ $CCE";
+
+void PrintUsage(const std::string& func_name, const FunctionList& func_list)
+{
+    out("%s%s usage list:\n", kErrorPrefix, func_name);
+    for (const auto& f : func_list)
+    {
+        out("%s  ", kErrorPrefix);
+        for (const auto& arg : f->ArgList())
+        {
+            switch (arg)
+            {
+            case ConsoleArg::INT:
+                out("int");
+                break;
+            case ConsoleArg::FLOAT:
+                out("float");
+                break;
+            case ConsoleArg::STRING:
+                out("str");
+                break;
+            default:
+                // Should never happen
+                throw "Unknown argument type";
+            }
+            out(" ");
+        }
+        out("\n");
+    }
+}
 } // namespace
 
 namespace blons
@@ -24,16 +58,26 @@ namespace console
 {
 using namespace internal;
 
-void internal::__register(const std::string& name, Function* f)
+void internal::__register(const std::string& name, Function* func)
 {
-    g_state.functions[name] = std::unique_ptr<Function>(f);
+    const auto arg_list = func->ArgList();
+    auto& func_list = g_state.functions[name];
+    // Check if there's already a function with this name and argument list
+    for (auto& f : func_list)
+    {
+        if (f->ArgList() == arg_list)
+        {
+            f = std::unique_ptr<Function>(func);
+            return;
+        }
+    }
+    func_list.push_back(std::unique_ptr<Function>(func));
 }
 
 void in(const std::string& command)
 {
     out(kUserPrefix + command + '\n');
 
-    // Spaghetti parser is go
     std::vector<ConsoleArg> args;
     try
     {
@@ -51,8 +95,9 @@ void in(const std::string& command)
         return;
     }
 
-    auto func = g_state.functions.find(args[0].value);
-    if (func == g_state.functions.end())
+    auto func_name = args[0].value;
+    auto func_list = g_state.functions.find(func_name);
+    if (func_list == g_state.functions.end())
     {
         out(kErrorPrefix + "Unknown function \"%s\"\n", args[0].value);
         return;
@@ -61,25 +106,28 @@ void in(const std::string& command)
     // Remove function name from arg list
     args.erase(args.begin());
 
-    auto expected_args = func->second->ArgList();
-    if (args.size() != expected_args.size())
+    // Find a function matching input arguments and call it
+    for (const auto& f : func_list->second)
     {
-        out(kErrorPrefix + "Expected %i arguments, %i given\n", expected_args.size(), args.size());
-        return;
-    }
-
-    for (int i = 0; i < args.size(); i++)
-    {
-        if (args[i].type != expected_args[i])
+        const auto expected_args = f->ArgList();
+        if (args.size() == expected_args.size())
         {
-            out(kErrorPrefix + "Wrong type given for argument %i\n", i + 1);
-            return;
+            for (int i = 0; i < args.size(); i++)
+            {
+                if (args[i].type != expected_args[i])
+                {
+                    break;
+                }
+                if (i == args.size() - 1)
+                {
+                    f->Run(args);
+                    return;
+                }
+            }
         }
     }
-
-    func->second->Run(args);
-
-    return;
+    // Could not find a matching argument set, call fails
+    PrintUsage(func_name, func_list->second);
 }
 
 void out(const std::string& fmt, ...)
