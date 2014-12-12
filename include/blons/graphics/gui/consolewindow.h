@@ -1,4 +1,3 @@
-
 #ifndef BLONSTECH_GRAPHICS_GUI_CONSOLEWINDOW_H_
 #define BLONSTECH_GRAPHICS_GUI_CONSOLEWINDOW_H_
 
@@ -35,4 +34,5 @@ private:
 };
 } // namepsace GUI
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_GUI_CONSOLEWINDOW_H_

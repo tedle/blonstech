@@ -18,4 +18,5 @@ struct ConsoleArg;
 std::vector<internal::ConsoleArg> ParseCommand(const std::string& command);
 } // namespace console
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_DEBUG_CONSOLEPARSER_H_

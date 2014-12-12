@@ -22,4 +22,5 @@ public:
 };
 } // namespace gui
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GUI_CONSOLETEXTBOX_H_

@@ -35,4 +35,4 @@ protected:
 };
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_GRAPHICS_MODEL_H_

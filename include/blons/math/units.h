@@ -38,4 +38,5 @@ inline us ms_to_us(ms t)
 } // namespace time
 } // namespace units
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_MATH_UNITS_H_

@@ -37,4 +37,5 @@ private:
 };
 } // namespace gui
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_GUI_LABEL_H_

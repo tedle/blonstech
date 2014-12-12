@@ -50,4 +50,5 @@ protected:
     Box tex_map_;
 };
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_SPRITE_H_

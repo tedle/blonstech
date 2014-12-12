@@ -32,4 +32,4 @@ private:
 };
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_GRAPHICS_TEXTURE_H_

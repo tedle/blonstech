@@ -52,4 +52,5 @@ private:
     TweenType tween_method_;
 };
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_MATH_ANIMATION_H_

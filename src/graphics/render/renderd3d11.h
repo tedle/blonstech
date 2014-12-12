@@ -98,4 +98,4 @@ private:
 };
 } // namespace blons
     
-#endif
+#endif // BLONSTECH_GRAPHICS_RENDER_RENDERD3D11_H_

@@ -75,4 +75,5 @@ private:
 };
 } // namespace gui
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_GUI_GUI_H_

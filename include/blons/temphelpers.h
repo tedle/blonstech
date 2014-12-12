@@ -24,4 +24,4 @@ std::vector<std::unique_ptr<Model>> load_codmap(std::string, std::vector<std::un
 } // namespace temp
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_TEMPHELPERS_H_

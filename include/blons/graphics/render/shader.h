@@ -25,4 +25,5 @@ private:
     std::unique_ptr<ShaderResource> program_;
 };
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_RENDER_SHADER_H_

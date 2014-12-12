@@ -32,4 +32,5 @@ void RegisterPrintCallback(PrintCallback callback);
 #include <blons/debug/consolefunction.inl.h>
 } // namespace console
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_DEBUG_CONSOLE_H_

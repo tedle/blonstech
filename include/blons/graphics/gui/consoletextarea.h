@@ -21,4 +21,5 @@ public:
 };
 } // namespace gui
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GUI_CONSOLETEXTAREA_H_

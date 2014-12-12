@@ -235,4 +235,5 @@ protected:
 };
 } // namespace gui
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_GUI_SKIN_H_

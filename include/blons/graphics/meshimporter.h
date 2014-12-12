@@ -42,4 +42,4 @@ private:
 };
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_GRAPHICS_MESHIMPORTER_H_

@@ -5,4 +5,4 @@
 #include <blons/graphics/gui/gui.h>
 #include <blons/os/client.h>
 
-#endif
+#endif // BLONSTECH_BLONS_H_

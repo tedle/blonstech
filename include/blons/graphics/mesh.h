@@ -31,4 +31,4 @@ private:
 };
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_GRAPHICS_MESH_H_

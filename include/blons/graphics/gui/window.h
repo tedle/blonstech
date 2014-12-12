@@ -54,4 +54,5 @@ private:
 };
 } // namepsace GUI
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_GUI_WINDOW_H_

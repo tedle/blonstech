@@ -90,4 +90,4 @@ private:
 };
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_GRAPHICS_GRAPHICS_H_

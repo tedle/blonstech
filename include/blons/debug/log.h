@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_DEBUG_LOGGER_H_
-#define BLONSTECH_DEBUG_LOGGER_H_
+#ifndef BLONSTECH_DEBUG_LOG_H_
+#define BLONSTECH_DEBUG_LOG_H_
 
 // Includes
 #include <functional>
@@ -28,4 +28,4 @@ void SetPrintCallback(PrintCallback callback);
 } // namespace log
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_DEBUG_LOG_H_

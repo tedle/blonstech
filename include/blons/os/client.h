@@ -53,4 +53,4 @@ static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static Client* g_application_handle = nullptr;
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_OS_CLIENT_H_

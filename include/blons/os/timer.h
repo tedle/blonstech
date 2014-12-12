@@ -26,4 +26,5 @@ private:
     bool paused_;
 };
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_OS_TIMER_H_

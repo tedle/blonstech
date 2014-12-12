@@ -28,4 +28,4 @@ private:
 };
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_GRAPHICS_CAMERA_H_

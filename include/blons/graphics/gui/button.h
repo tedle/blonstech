@@ -30,4 +30,5 @@ private:
 };
 } // namespace gui
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_GUI_BUTTON_H_

@@ -28,4 +28,5 @@ private:
     unsigned int array_size_;
 };
 } // namespace blons
-#endif
+
+#endif // BLONSTECH_GRAPHICS_RENDER_DRAWBATCHER_H_

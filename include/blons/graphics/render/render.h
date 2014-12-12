@@ -121,4 +121,4 @@ protected:
 };
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_GRAPHICS_RENDER_RENDER_H_

@@ -87,4 +87,4 @@ private:
 };
 } // namespace blons
     
-#endif
+#endif // BLONSTECH_GRAPHICS_RENDER_RENDERGL40_H_

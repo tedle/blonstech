@@ -160,4 +160,4 @@ private:
 };
 } // namespace blons
 
-#endif
+#endif // BLONSTECH_INPUT_INPUTTEMP_H_
