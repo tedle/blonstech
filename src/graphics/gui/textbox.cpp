@@ -8,11 +8,8 @@ namespace blons
 namespace gui
 {
 Textbox::Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
+    : Control(pos, parent_manager, parent_window)
 {
-    pos_ = pos;
-    gui_ = parent_manager;
-    parent_ = parent_window;
-
     active_ = false;
     text_ = "";
     font_style_ = style;

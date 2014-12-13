@@ -8,13 +8,11 @@ namespace blons
 namespace gui
 {
 Label::Label(Vector2 pos, ColourString text, FontStyle style, Manager* parent_manager, Window* parent_window)
+    : Control(Box(pos.x, pos.y, 0.0f, 0.0f), parent_manager, parent_window)
 {
-    pos_ = Box(pos.x, pos.y, 0.0f, 0.0f);
     text_ = text;
     colour_parsing_ = true;
     font_style_ = style;
-    gui_ = parent_manager;
-    parent_ = parent_window;
 }
 
 void Label::Render(RenderContext& context)

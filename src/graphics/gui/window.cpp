@@ -7,11 +7,10 @@ namespace blons
 {
 namespace gui
 {
-Window::Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager) : id_(id)
+Window::Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager)
+    : Control(pos, parent_manager, nullptr), id_(id)
 {
-    pos_ = pos;
     type_ = type;
-    gui_ = parent_manager;
     dragging_ = false;
     drag_offset_ = Vector2(0, 0);
 

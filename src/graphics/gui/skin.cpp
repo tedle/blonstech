@@ -18,11 +18,6 @@ Skin::Skin(RenderContext& context)
     font_list_[CONSOLE] = nullptr;
 }
 
-Skin::~Skin()
-{
-
-}
-
 bool Skin::LoadFont(std::string filename, FontStyle style, units::pixel pixel_size, RenderContext& context)
 {
     font_list_[style] = std::unique_ptr<Font>(new Font(filename, pixel_size, context));

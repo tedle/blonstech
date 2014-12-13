@@ -12,11 +12,9 @@ namespace blons
 namespace gui
 {
 Textarea::Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
+    : Control(pos, parent_manager, parent_window)
 {
-    pos_ = pos;
     font_style_ = style;
-    gui_ = parent_manager;
-    parent_ = parent_window;
 
     newest_top_ = false;
     padding_ = units::subpixel_to_pixel(gui_->skin()->layout()->textarea.left.w * 2);

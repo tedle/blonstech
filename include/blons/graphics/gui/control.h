@@ -38,6 +38,9 @@ struct StaticDrawCallInputs
 class Control
 {
 public:
+    Control(Box pos, Manager* parent_manager, Window* parent_window)
+        : pos_(pos), gui_(parent_manager), parent_(parent_window) {}
+
     virtual void Render(RenderContext& context)=0;
     virtual bool Update(const Input& input)=0;
 

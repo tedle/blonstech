@@ -220,7 +220,7 @@ public:
 
 public:
     Skin(RenderContext& context);
-    ~Skin();
+    ~Skin() {}
 
     bool LoadFont(std::string filename, FontStyle style, units::pixel pixel_size, RenderContext& context);
     Font* font(FontStyle style);

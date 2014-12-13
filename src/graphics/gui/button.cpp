@@ -8,10 +8,8 @@ namespace blons
 namespace gui
 {
 Button::Button(Box pos, std::string label, Manager* parent_manager, Window* parent_window)
+    : Control(pos, parent_manager, parent_window)
 {
-    pos_ = pos;
-    gui_ = parent_manager;
-    parent_ = parent_window;
     hover_ = false;
     active_ = false;
     // Empty lambda is easier than worrying about nullptrs
