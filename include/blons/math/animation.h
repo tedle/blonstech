@@ -4,7 +4,7 @@
 // Includes
 #include <functional>
 // Public Includes
-#include <blons/os/timer.h>
+#include <blons/system/timer.h>
 
 namespace blons
 {

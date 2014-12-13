@@ -1,10 +1,9 @@
-#include <blons/os/client.h>
+#include <blons/system/client.h>
 
 // Includes
 #include <windowsx.h>
 // Public Includes
-#include <blons/debug/console.h>
-#include <blons/debug/log.h>
+#include <blons/debug.h>
 #include <blons/graphics/graphics.h>
 
 namespace blons

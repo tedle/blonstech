@@ -179,9 +179,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons\blons.h" />
+    <ClInclude Include="..\include\blons\debug.h" />
     <ClInclude Include="..\include\blons\debug\console.h" />
     <ClInclude Include="..\include\blons\debug\consolefunction.inl.h" />
     <ClInclude Include="..\include\blons\debug\log.h" />
+    <ClInclude Include="..\include\blons\graphics.h" />
     <ClInclude Include="..\include\blons\graphics\camera.h" />
     <ClInclude Include="..\include\blons\graphics\graphics.h" />
     <ClInclude Include="..\include\blons\graphics\gui\button.h" />
@@ -205,15 +207,18 @@
     <ClInclude Include="..\include\blons\graphics\render\shader.h" />
     <ClInclude Include="..\include\blons\graphics\sprite.h" />
     <ClInclude Include="..\include\blons\graphics\texture.h" />
+    <ClInclude Include="..\include\blons\input.h" />
     <ClInclude Include="..\include\blons\input\inputbase.h" />
     <ClInclude Include="..\include\blons\input\inputdirect.h" />
     <ClInclude Include="..\include\blons\input\inputraw.h" />
     <ClInclude Include="..\include\blons\input\inputtemp.h" />
+    <ClInclude Include="..\include\blons\math.h" />
     <ClInclude Include="..\include\blons\math\animation.h" />
     <ClInclude Include="..\include\blons\math\math.h" />
     <ClInclude Include="..\include\blons\math\units.h" />
-    <ClInclude Include="..\include\blons\os\client.h" />
-    <ClInclude Include="..\include\blons\os\timer.h" />
+    <ClInclude Include="..\include\blons\system.h" />
+    <ClInclude Include="..\include\blons\system\client.h" />
+    <ClInclude Include="..\include\blons\system\timer.h" />
     <ClInclude Include="..\include\blons\temphelpers.h" />
     <ClInclude Include="debug\consoleparser.h" />
     <ClInclude Include="graphics\render\glfuncloader.h" />
@@ -252,8 +257,8 @@
     <ClCompile Include="input\inputtemp.cpp" />
     <ClCompile Include="math\animation.cpp" />
     <ClCompile Include="math\math.cpp" />
-    <ClCompile Include="os\client.cpp" />
-    <ClCompile Include="os\timer.cpp" />
+    <ClCompile Include="system\client.cpp" />
+    <ClCompile Include="system\timer.cpp" />
     <ClCompile Include="temphelpers.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

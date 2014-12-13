@@ -1,0 +1,13 @@
+#ifndef BLONSTECH_SYSTEM_H_
+#define BLONSTECH_SYSTEM_H_
+
+// Public Includes
+#include <blons/system/client.h>
+#include <blons/system/timer.h>
+
+////////////////////////////////////////////////////////////////////////////////
+/// \defgroup system System
+/// \brief Cross-platform windowing and timers.
+////////////////////////////////////////////////////////////////////////////////
+
+#endif // BLONSTECH_SYSTEM_H_

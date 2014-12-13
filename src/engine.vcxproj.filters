@@ -8,9 +8,6 @@
     <Filter Include="src\debug">
       <UniqueIdentifier>{3d8e3c6a-893a-4915-801f-ab7bf9cc13ec}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\os">
-      <UniqueIdentifier>{26a604fb-f88a-4ca6-a2cd-964adcb23926}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\math">
       <UniqueIdentifier>{c9b64562-c5b4-4ee7-bf29-d14b1bbaeed9}</UniqueIdentifier>
     </Filter>
@@ -25,6 +22,9 @@
     </Filter>
     <Filter Include="src\graphics\gui">
       <UniqueIdentifier>{41e15434-3732-485f-baeb-51669960c2a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\system">
+      <UniqueIdentifier>{26a604fb-f88a-4ca6-a2cd-964adcb23926}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -124,12 +124,6 @@
     <ClInclude Include="..\include\blons\math\units.h">
       <Filter>src\math</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\os\client.h">
-      <Filter>src\os</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\blons\os\timer.h">
-      <Filter>src\os</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\blons.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -150,6 +144,27 @@
     </ClInclude>
     <ClInclude Include="..\include\blons\debug\consolefunction.inl.h">
       <Filter>src\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\debug.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\system\client.h">
+      <Filter>src\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\system\timer.h">
+      <Filter>src\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\system.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\input.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\math.h">
+      <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -237,12 +252,6 @@
     <ClCompile Include="math\math.cpp">
       <Filter>src\math</Filter>
     </ClCompile>
-    <ClCompile Include="os\client.cpp">
-      <Filter>src\os</Filter>
-    </ClCompile>
-    <ClCompile Include="os\timer.cpp">
-      <Filter>src\os</Filter>
-    </ClCompile>
     <ClCompile Include="temphelpers.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -254,6 +263,12 @@
     </ClCompile>
     <ClCompile Include="debug\consoleparser.cpp">
       <Filter>src\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="system\client.cpp">
+      <Filter>src\system</Filter>
+    </ClCompile>
+    <ClCompile Include="system\timer.cpp">
+      <Filter>src\system</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

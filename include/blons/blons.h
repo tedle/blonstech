@@ -1,9 +1,11 @@
 #ifndef BLONSTECH_BLONS_H_
 #define BLONSTECH_BLONS_H_
 
-#include <blons/graphics/graphics.h>
-#include <blons/graphics/gui/gui.h>
-#include <blons/os/client.h>
+#include <blons/debug.h>
+#include <blons/graphics.h>
+#include <blons/input.h>
+#include <blons/math.h>
+#include <blons/system.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \namespace blons
@@ -16,8 +18,9 @@
 ///
 /// \section intro Welcome, gamer!
 /// **blonstech** is a C++ game engine providing abstractions for rendering, UI,
-/// input, windowing, and much more. I'd recommend you don't use this because I
-/// don't really know what I'm doing. Good luck!
+/// input, windowing, and much more, all inside of a modular include system.
+/// I'd recommend you don't use this because I don't really know what I'm doing.
+/// Good luck!
 ///
 /// \section example Example
 /// Here's a simple blonstech program that opens a window and draws a sprite.

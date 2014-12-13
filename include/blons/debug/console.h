@@ -90,6 +90,7 @@ void RegisterPrintCallback(PrintCallback callback);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \namespace blons::console
+/// \ingroup debug
 ///
 /// The console allows you to print, register C++ functions, and parse input
 /// to call registered functions. Also supports function overloading.

@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_OS_TIMER_H_
-#define BLONSTECH_OS_TIMER_H_
+#ifndef BLONSTECH_SYSTEM_TIMER_H_
+#define BLONSTECH_SYSTEM_TIMER_H_
 
 // Public Includes
 #include <blons/math/units.h>
@@ -27,4 +27,4 @@ private:
 };
 } // namespace blons
 
-#endif // BLONSTECH_OS_TIMER_H_
+#endif // BLONSTECH_SYSTEM_TIMER_H_

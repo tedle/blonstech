@@ -1,0 +1,13 @@
+#ifndef BLONSTECH_DEBUG_H_
+#define BLONSTECH_DEBUG_H_
+
+// Public Includes
+#include <blons/debug/console.h>
+#include <blons/debug/log.h>
+
+////////////////////////////////////////////////////////////////////////////////
+/// \defgroup debug Debug
+/// \brief Utilities including an extensible console and logger.
+////////////////////////////////////////////////////////////////////////////////
+
+#endif // BLONSTECH_DEBUG_H_

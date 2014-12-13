@@ -1,5 +1,5 @@
-#ifndef BLONSTECH_OS_CLIENT_H_
-#define BLONSTECH_OS_CLIENT_H_
+#ifndef BLONSTECH_SYSTEM_CLIENT_H_
+#define BLONSTECH_SYSTEM_CLIENT_H_
 
 // Strips less used APIs from inclusion
 #define WIN32_LEAN_AND_MEAN
@@ -44,6 +44,7 @@ private:
     HINSTANCE hinstance_;
     Info screen_info_;
 
+    // TODO: Separate this from client
     std::unique_ptr<Input> input_;
 };
 
@@ -53,4 +54,4 @@ static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 static Client* g_application_handle = nullptr;
 } // namespace blons
 
-#endif // BLONSTECH_OS_CLIENT_H_
+#endif // BLONSTECH_SYSTEM_CLIENT_H_
