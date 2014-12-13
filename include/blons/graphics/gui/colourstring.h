@@ -64,7 +64,6 @@ public:
     /// \return Vector4 colour with members ranging from [0.0, 1.0]
     ////////////////////////////////////////////////////////////////////////////////
     const Vector4& base_colour() const;
-
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the base colour of the current string that is applied when
     /// colour codes aren't found. Is applied retroactively.
@@ -72,7 +71,6 @@ public:
     /// \param colour Vector4 with members ranging from [0.0, 1.0]
     ////////////////////////////////////////////////////////////////////////////////
     void set_base_colour(Vector4 colour);
-
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Returns a list of text fragments each with a unique colour applied.
     /// List is ordered to be the same as original text string.
@@ -80,7 +78,6 @@ public:
     /// \return List of ColourString::Fragment
     ////////////////////////////////////////////////////////////////////////////////
     const std::vector<Fragment>& fragments() const;
-
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Returns the stored text after all colour codes have been parsed and
     /// removed.
@@ -88,7 +85,6 @@ public:
     /// \return Parsed string
     ////////////////////////////////////////////////////////////////////////////////
     const std::string& str() const;
-
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Returns the stored text with all colour codes intact.
     ///

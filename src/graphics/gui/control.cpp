@@ -44,8 +44,8 @@ void Control::RegisterBatches()
     for (std::size_t i = 0; i < batch_index_; i++)
     {
         const auto& batch = draw_batches_[i];
-        // Since crop boxes are volatile we don't wanna overpopulate batch cache
-        // Cropping info is injected into a new copy here
+        // Since crop boxes are volatile and we don't wanna overpopulate the batch cache,
+        // cropping info is injected into a new copy here
         DrawCallInputs batch_info =
         {
             batch.first.is_text,
@@ -65,6 +65,9 @@ void Control::ClearBatches()
     batch_index_ = 0;
 }
 
+// This is setup to recycle memory as much as we can. Used like a C array
+// that is only resized when the total batches for a frame is greater
+// than any previous frame. Can only be reset manually by calling ClearBatches().
 DrawBatcher* Control::batch(StaticDrawCallInputs inputs, RenderContext& context)
 {
     DrawBatcher* batch;
