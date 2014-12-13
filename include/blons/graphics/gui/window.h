@@ -18,9 +18,13 @@ enum WindowType
     STATIC,
     INVISIBLE
 };
+/// \brief whats up
+///
+/// other test!
 class Window : public Control
 {
 public:
+    /// \brief testio master 3000
     Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager);
     Window(std::string id, Box pos, WindowType type, Manager* parent_manager)
         : Window(id, pos, "", type, parent_manager) {}

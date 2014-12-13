@@ -14,9 +14,13 @@ namespace gui
 class Label;
 
 // Currently immutable to user
+/// \brief whats up
+///
+/// other test!
 class Textarea : public Control
 {
 public:
+    /// \brief TEMP TEST
     Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window);
     Textarea(Box pos, Manager* parent_manager, Window* parent_window)
         : Textarea(pos, FontStyle::LABEL, parent_manager, parent_window) {}

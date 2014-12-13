@@ -9,9 +9,13 @@ namespace blons
 {
 namespace gui
 {
+/// \brief whats up
+///
+/// other test!
 class Textbox : public Control
 {
 public:
+    /// \brief TMEPER TEST
     Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window);
     Textbox(Box pos, Manager* parent_manager, Window* parent_window)
         : Textbox(pos, FontStyle::LABEL, parent_manager, parent_window) {}

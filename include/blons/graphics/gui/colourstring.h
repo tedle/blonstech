@@ -42,10 +42,17 @@ public:
     ///
     /// \param text Text to be parsed and stored
     /// \param base_colour Colour to be applied where no colour codes are found.
-    /// Defaults to blons::gui::kDefaultTextColour
     ////////////////////////////////////////////////////////////////////////////////
     ColourString(std::string text, Vector4 base_colour);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls ColourString(std::string, Vector4) with a base colour of
+    /// blons::gui::kDefaultTextColour.
+    ////////////////////////////////////////////////////////////////////////////////
     ColourString(std::string text) : ColourString(text, kDefaultTextColour) {}
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates an empty ColourString with a base colour of
+    /// blons::gui::kDefaultTextColour.
+    ////////////////////////////////////////////////////////////////////////////////
     ColourString() : ColourString("") {}
     ~ColourString() {}
 

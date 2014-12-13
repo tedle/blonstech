@@ -12,19 +12,23 @@ ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, Windo
 {
     auto font_style = FontStyle::CONSOLE;
     float textbox_height = 40.0f;
-    Box textarea_pos = Box(pos_.x, pos_.y, pos_.w, pos_.h - textbox_height);
+    // Attach ConsoleTextbox to the bottom of window with a height of textbox_height
     Box textbox_pos = Box(pos_.x, pos_.y + pos_.h - textbox_height, pos_.w, textbox_height);
+    // Have ConsoleTextarea fill all remaining space
+    Box textarea_pos = Box(pos_.x, pos_.y, pos_.w, pos_.h - textbox_height);
 
     auto conarea = std::unique_ptr<ConsoleTextarea>(new ConsoleTextarea(textarea_pos, font_style, parent_manager, this));
     auto conbox = std::unique_ptr<ConsoleTextbox>(new ConsoleTextbox(textbox_pos, font_style, parent_manager, this));
 
     auto conareaptr = conarea.get();
     auto conboxptr = conbox.get();
+    // Have ConsoleTextbox feed all input to game console when return is pressed
     conbox->set_callback([=]()
     {
         console::in(conboxptr->text().c_str());
         conboxptr->set_text("");
     });
+    // Have game console feed all output to ConsoleTextarea
     console::RegisterPrintCallback([=](const std::string& s)
     {
         conareaptr->AddText(s);
@@ -73,6 +77,7 @@ void ConsoleWindow::hide()
     Animation::Callback cb = [this, shadow_height](float d)
     {
         pos_.y = -(pos_.h + shadow_height) * d;
+        // Animation has finished
         if (d == 1.0)
         {
             hiding_ = false;
