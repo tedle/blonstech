@@ -9,7 +9,7 @@ namespace
 {
 using namespace blons::log;
 
-Level g_log_level = Level::NONE;
+Level g_log_level = Level::INFO;
 PrintCallback g_print = [](const std::string& s){ std::cout << s; };
 
 void OutputLogMessage(std::string msg, Level log_level)

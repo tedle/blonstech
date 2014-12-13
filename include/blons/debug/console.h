@@ -71,7 +71,7 @@ void Register(const std::string& name, std::function<void(Args...)> func)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Register a function that will be called whenever the console prints.
+/// \brief Registers a function that will be called whenever the console prints.
 ///
 /// The callback function will be sent a `const std::string&` containing
 /// the text that is being printed each call. There can be multiple callbacks
