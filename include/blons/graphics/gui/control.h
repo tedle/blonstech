@@ -35,9 +35,15 @@ struct StaticDrawCallInputs
     bool operator< (const StaticDrawCallInputs call) const { return memcmp(this, &call, sizeof(StaticDrawCallInputs))>0; }
 };
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Abstract base class for UI elements
+////////////////////////////////////////////////////////////////////////////////
 class Control
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes the pos_, gui_, and parent_ members with supplied values
+    ////////////////////////////////////////////////////////////////////////////////
     Control(Box pos, Manager* parent_manager, Window* parent_window)
         : pos_(pos), gui_(parent_manager), parent_(parent_window) {}
 

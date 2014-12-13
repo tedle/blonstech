@@ -10,11 +10,18 @@ namespace blons
 {
 namespace gui
 {
-// White
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Fallback text colour used by various classes when none is supplied.
+////////////////////////////////////////////////////////////////////////////////
 const Vector4 kDefaultTextColour = Vector4(1.0, 1.0, 1.0, 1.0);
-// Formatting:
-//     $fff = hex colour code
-//         "white text$f00red text$0f0green text!"
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Colourable string for UI elements
+///
+/// Can be formatted with input text using a `$` followed by a 3 letter hex code
+/// Example:
+/// `$fff` makes a white colour code 
+/// `default text$f00red text$0f0green text!`
+////////////////////////////////////////////////////////////////////////////////
 class ColourString
 {
 public:
