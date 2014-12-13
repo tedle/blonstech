@@ -20,7 +20,7 @@ Button::Button(Box pos, std::string label, Manager* parent_manager, Window* pare
         const auto& font = gui_->skin()->font(FontStyle::LABEL);
         units::pixel caption_width = font->string_width(label);
         units::pixel letter_height = font->letter_height();
-        // For centering the button caption
+        // Vertically center the button caption
         Vector2 caption_pos;
         caption_pos.x = pos.x + floor((pos.w - caption_width) / 2 - font->cursor_offset(label[0]));
         caption_pos.y = pos.y + floor((pos.h + letter_height) / 2);
@@ -172,6 +172,7 @@ bool Button::Update(const Input& input)
             }
             else if (e.type == Input::Event::MOUSE_UP)
             {
+                // Only do callback if cursor is inside button's region when mouse is released
                 if (active_ && hover_)
                 {
                     callback_();

@@ -3,9 +3,10 @@
 // Helper functions
 namespace
 {
+// Simple parser to find '$fff' hex colour codes in strings
+// Returns std::string::npos when none are found
 std::size_t FindColourCode(const char* text)
 {
-    // Simple parser to find '$fff' hex colour codes in strings
     static const std::string kFormatChars = "abcdefABCDEF0123456789";
     std::size_t code_pos = std::string::npos;
     int format_matches = 0;
@@ -76,9 +77,11 @@ ColourString::ColourString(std::string text, Vector4 base_colour)
     raw_text_ = text;
     base_colour_ = base_colour;
 
+    // Parse text and generate colour fragments
     Fragment next_frag;
     next_frag.colour = base_colour_;
     next_frag.is_base = true;
+    // Text is set to a substr of itself whenever a colour code is found
     while (text.length() > 0)
     {
         std::size_t code_pos = FindColourCode(text.c_str());

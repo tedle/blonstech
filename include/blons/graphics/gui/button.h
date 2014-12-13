@@ -19,7 +19,8 @@ public:
     /// by gui::Window::MakeButton
     ///
     /// \param pos Position and dimensions of the button
-    /// \param label Caption text displayed on top of the button
+    /// \param label Caption text displayed on top of the button. Follows
+    /// gui::ColourString formatting rules.
     /// \param parent_manager gui::Manager containing this element
     /// \param parent_window gui::Window containing this element
     ////////////////////////////////////////////////////////////////////////////////
