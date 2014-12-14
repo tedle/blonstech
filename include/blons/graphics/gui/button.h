@@ -15,8 +15,8 @@ class Button : public Control
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes member functions with supplied values. Meant to be used
-    /// by gui::Window::MakeButton
+    /// \brief Initializes members with supplied values. Meant to be used by
+    /// gui::Window::MakeButton
     ///
     /// \param pos Position and dimensions of the button
     /// \param label Caption text displayed on top of the button. Follows
