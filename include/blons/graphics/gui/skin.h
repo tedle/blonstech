@@ -14,6 +14,17 @@ namespace blons
 class Sprite;
 namespace gui
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Used to categorize which fonts are used by which UI elements
+///   
+/// Common uses are:
+/// * `FontStyle::DEFAULT`, used when style is unspecified or if a specific
+/// style is not loaded in the Skin
+/// * `FontStyle::HEADING`, used for title text and Window captions
+/// * `FontStyle::LABEL`, used for general text, Button captions, Textbox
+/// text, etc
+/// * `FontStyle::CONSOLE`, used by the game console
+////////////////////////////////////////////////////////////////////////////////
 enum FontStyle
 {
     DEFAULT,
@@ -21,12 +32,28 @@ enum FontStyle
     LABEL,
     CONSOLE
 };
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Modularizes the look and feel of the GUI system
+////////////////////////////////////////////////////////////////////////////////
 class Skin
 {
 public:
-    // Defined in the header file for all to see
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Maps the GUI's skin texture pixel coordinates to conveniently named
+    /// Box%es.
+    ///
+    /// Elements are stretched to fit their needed space as aproppriate (left and
+    /// right edges are only stretched vertically, bodies are stretched all
+    /// directions, etc)
+    ////////////////////////////////////////////////////////////////////////////////
     struct Layout
     {
+
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Struct with Box%es detailing where to find the 4 edges, 4 corners,
+        /// and center body of a button in the skin texture, as well as a suggested
+        /// colour for rendering text captions
+        ////////////////////////////////////////////////////////////////////////////////
         struct Button
         {
             Box top_left;
@@ -41,9 +68,15 @@ public:
             Vector4 colour;
         };
 
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Contains all the types of buttons used by the GUI in various states
+        /// (hover, click, standard, etc)
+        ////////////////////////////////////////////////////////////////////////////////
         struct ButtonSet
         {
-            // Wish initializers didnt suck so much...
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Displays when a button is not being interacted with
+            ////////////////////////////////////////////////////////////////////////////////
             Button normal = Button
             {
                 Box(0, 45, 5, 5), // top_left
@@ -55,8 +88,11 @@ public:
                 Box(0, 53, 5, 5), // bottom_left
                 Box(6, 53, 1, 5), // bottom
                 Box(8, 53, 5, 5), // bottom_right
-                Vector4(1.0, 1.0, 1.0, 1.0)
+                Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Displays when the mouse hovers over a button
+            ////////////////////////////////////////////////////////////////////////////////
             Button hover = Button
             {
                 Box(0, 59, 5, 5), // top_left
@@ -68,8 +104,11 @@ public:
                 Box(0, 67, 5, 5), // bottom_left
                 Box(6, 67, 1, 5), // bottom
                 Box(8, 67, 5, 5), // bottom_right
-                Vector4(1.0, 1.0, 1.0, 1.0)
+                Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Displays when the mouse is clicking on a button
+            ////////////////////////////////////////////////////////////////////////////////
             Button active = Button
             {
                 Box(0, 73, 5, 5), // top_left
@@ -81,10 +120,15 @@ public:
                 Box(0, 81, 5, 5), // bottom_left
                 Box(6, 81, 1, 5), // bottom
                 Box(8, 81, 5, 5), // bottom_right
-                Vector4(1.0, 1.0, 1.0, 1.0)
+                Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
         } button;
 
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Struct with Box%es detailing where to find the 4 edges, 4 corners,
+        /// and center body of a gui::Textarea in the skin texture, as well as a
+        /// suggested colour for rendering displayed text
+        ////////////////////////////////////////////////////////////////////////////////
         struct Textarea
         {
             Box top_left;
@@ -99,6 +143,9 @@ public:
             Vector4 colour;
         };
 
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Displayed at all times
+        ////////////////////////////////////////////////////////////////////////////////
         Textarea textarea = Textarea
         {
             Box(14, 28, 5, 5), // top_left
@@ -110,9 +157,14 @@ public:
             Box(14, 36, 5, 5), // bottom_left
             Box(20, 36, 1, 5), // bottom
             Box(22, 36, 5, 5), // bottom_right
-            Vector4(1.0, 1.0, 1.0, 1.0)
+            Vector4(1.0, 1.0, 1.0, 1.0) // text colour
         };
 
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Struct with Box%es detailing where to find the 4 edges, 4 corners,
+        /// and center body of a gui::Textbox in the skin texture, as well as a
+        /// suggested colour for rendering typed text
+        ////////////////////////////////////////////////////////////////////////////////
         struct Textbox
         {
             Box top_left;
@@ -127,8 +179,15 @@ public:
             Vector4 colour;
         };
 
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Contains all the types of textboxes used by the GUI in various states
+        /// (active, standard, etc)
+        ////////////////////////////////////////////////////////////////////////////////
         struct TextboxSet
         {
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Displays when a textbox is not being interacted with
+            ////////////////////////////////////////////////////////////////////////////////
             Textbox normal = Textbox
             {
                 Box(14, 0, 5, 5), // top_left
@@ -140,8 +199,12 @@ public:
                 Box(14, 8, 5, 5), // bottom_left
                 Box(20, 8, 1, 5), // bottom
                 Box(22, 8, 5, 5), // bottom_right
-                Vector4(0.8f, 0.8f, 0.8f, 1.0)
+                Vector4(0.8f, 0.8f, 0.8f, 1.0) // text colour
             };
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Displays when the mouse has activated a textbox and is ready to
+            /// accept typed input
+            ////////////////////////////////////////////////////////////////////////////////
             Textbox active = Textbox
             {
                 Box(14, 14, 5, 5), // top_left
@@ -153,13 +216,27 @@ public:
                 Box(14, 22, 5, 5), // bottom_left
                 Box(20, 22, 1, 5), // bottom
                 Box(22, 22, 5, 5), // bottom_right
-                Vector4(1.0, 1.0, 1.0, 1.0)
+                Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Drawn where text insertion takes place. Stretched in all directions
+            /// to fit with font specifications
+            ////////////////////////////////////////////////////////////////////////////////
             Box cursor = Box(14, 42, 1, 1);
         } textbox;
 
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Struct with Box%es detailing where to find the 4 edges, 4 corners,
+        /// and center body of a gui::Window in the skin texture, as well as a suggested
+        /// colour for rendering child gui::Label%s
+        ////////////////////////////////////////////////////////////////////////////////
         struct Window
         {
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Struct with Box%es detailing where to find the 2 edges, and body of a
+            /// gui::Window's title bar in the skin texture, as well as a suggested colour
+            /// for rendering caption text
+            ////////////////////////////////////////////////////////////////////////////////
             struct Titlebar
             {
                 Box left = Box(0, 0, 5, 30);
@@ -179,6 +256,10 @@ public:
             Vector4 colour = Vector4(1.0, 0.0, 1.0, 1.0);
         } window;
 
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Contains all the types of elements skinned specifically for the game
+        /// console
+        ////////////////////////////////////////////////////////////////////////////////
         struct Console
         {
             Textarea textarea = Textarea
@@ -192,7 +273,7 @@ public:
                 Box(56, 35, 10, 10), // bottom_left
                 Box(67, 35, 1, 10),  // bottom
                 Box(69, 35, 10, 10), // bottom_right
-                Vector4(0.9f, 0.9f, 0.9f, 1.0)
+                Vector4(0.9f, 0.9f, 0.9f, 1.0) // text colour
             };
             Textbox textbox = Textbox
             {
@@ -205,11 +286,15 @@ public:
                 Box(30, 13, 10, 10), // bottom_left
                 Box(41, 13, 1, 10),  // bottom
                 Box(43, 13, 10, 10), // bottom_right
-                Vector4(0.9f, 0.9f, 0.9f, 1.0)
+                Vector4(0.9f, 0.9f, 0.9f, 1.0) // text colour
             };
             Box cursor = Box(56, 48, 1, 1);
         } console;
 
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Struct with Box%es detailing where to find a pre-rendered drop shadow
+        /// for use by other UI elements
+        ////////////////////////////////////////////////////////////////////////////////
         struct Dropshadow
         {
             Box bottom_left = Box(82, 0, 10, 40);
@@ -219,21 +304,105 @@ public:
     };
 
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes nullptr for all Font%s (**temporary**) and a
+    /// hard-coded skin texture (**temporary**)
+    ///
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     Skin(RenderContext& context);
     ~Skin() {}
 
-    bool LoadFont(std::string filename, FontStyle style, units::pixel pixel_size, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Loads a font file into the current Skin.
+    ///
+    /// \param filename Filename of the font to open
+    /// \param pixel_size How large the font should be
+    /// \param style Determines which parts of the UI will use the font. Valid
+    /// inputs include:
+    /// * `FontStyle::DEFAULT`, used when style is unspecified or if a specific
+    /// style is not loaded in the Skin
+    /// * `FontStyle::HEADING`, used for title text and Window captions
+    /// * `FontStyle::LABEL`, used for general text, Button captions, Textbox
+    /// text, etc
+    /// * `FontStyle::CONSOLE`, used by the game console
+    /// \param context Handle to the current rendering context
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    bool LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves a handle to the font used for the specified FontStyle
+    ///
+    /// \return Font attached to the specified style. If none has been loaded for
+    /// that style then the Font attached to `FontStyle::DEFAULT` is returned
+    ////////////////////////////////////////////////////////////////////////////////
     Font* font(FontStyle style);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the Sprite with the current skin texture loaded into it
+    ///
+    /// \return %Skin texture Sprite
+    ////////////////////////////////////////////////////////////////////////////////
     Sprite* sprite() const;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the skin layout for locating which part of the skin texture
+    /// a UI element should render to represent itself
+    ///
+    /// \return %Skin layout
+    ////////////////////////////////////////////////////////////////////////////////
     const Layout* layout() const;
 
 protected:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Stores the current skin texture layout
+    ////////////////////////////////////////////////////////////////////////////////
     Layout layout_;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Stores the current skin texture
+    ////////////////////////////////////////////////////////////////////////////////
     std::unique_ptr<Sprite> skin_;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Stores any fonts used by the current skin
+    ////////////////////////////////////////////////////////////////////////////////
     std::unordered_map<FontStyle, std::unique_ptr<Font>> font_list_;
-
 };
 } // namespace gui
 } // namespace blons
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class blons::gui::Skin
+/// \ingroup graphics
+///
+/// Defines fonts, text colours, and Sprite%s for all Control%s to render with.
+///
+/// ### Example:
+/// \code
+/// // A UI element rendered using a skin
+/// void DerivesControl::Render(RenderContext& context)
+/// {
+///     // Find which part of the skin we're supposed to render
+///     auto layout = gui_->skin()->layout();
+///     auto region = layout->button.normal;
+///
+///     // Sprite containing the skin texture
+///     auto sprite = gui_->skin()->sprite();
+///
+///     // Batch to send mesh data to
+///     auto batch = control_batch(context);
+///
+///     // Follow the containing Window's position as it's dragged around
+///     auto parent_pos = parent_->pos();
+///     auto x = pos_.x + parent_pos.x;
+///     auto y = pos_.y + parent_pos.y;
+///
+///     // Render the center body of a button
+///     sprite->set_pos(x, y, pos_.w, pos_.h);
+///     sprite->set_subtexture(region.body);
+///     batch->Append(*sprite->mesh(), context);
+///
+///     // Submit the batches to gui::Manager
+///     RegisterBatches();
+/// }
+/// \endcode
+////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_GUI_SKIN_H_

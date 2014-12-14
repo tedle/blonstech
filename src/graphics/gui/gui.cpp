@@ -36,7 +36,7 @@ Manager::~Manager()
 
 bool Manager::LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context)
 {
-    return skin_->LoadFont(filename, style, pixel_size, context);
+    return skin_->LoadFont(filename, pixel_size, style, context);
 }
 
 bool Manager::LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context)

@@ -43,20 +43,7 @@ public:
     ~Manager();
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Loads a font file into the current Skin.
-    ///
-    /// \param filename Filename of the font file to open
-    /// \param pixel_size How large the font should be
-    /// \param style Determines which parts of the UI will use the font. Valid
-    /// inputs include:
-    /// * `FontStyle::DEFAULT`, used when style is unspecified or if a specific
-    /// style is not loaded in the Skin
-    /// * `FontStyle::HEADING`, used for title text and Window captions
-    /// * `FontStyle::LABEL`, used for general text, Button captions, Textbox
-    /// text, etc
-    /// * `FontStyle::CONSOLE`, used by the game console
-    /// \param context Handle to the current rendering context
-    /// \return True on success
+    /// \copydoc gui::Skin::LoadFont
     ////////////////////////////////////////////////////////////////////////////////
     bool LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
