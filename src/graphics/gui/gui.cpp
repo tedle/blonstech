@@ -34,24 +34,14 @@ Manager::~Manager()
 {
 }
 
-bool Manager::LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context)
-{
-    return LoadFont(filename, pixel_size, FontStyle::DEFAULT, context);
-}
-
 bool Manager::LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context)
 {
     return skin_->LoadFont(filename, style, pixel_size, context);
 }
 
-Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
+bool Manager::LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context)
 {
-    return MakeWindow(id, x, y, width, height, caption, WindowType::DRAGGABLE);
-}
-
-Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, WindowType type)
-{
-    return MakeWindow(id, x, y, width, height, "", type);
+    return LoadFont(filename, pixel_size, FontStyle::DEFAULT, context);
 }
 
 Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, WindowType type)
@@ -80,9 +70,21 @@ Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, unit
     return windows_.back().get();
 }
 
+Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
+{
+    return MakeWindow(id, x, y, width, height, caption, WindowType::DRAGGABLE);
+}
+
+Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, WindowType type)
+{
+    return MakeWindow(id, x, y, width, height, "", type);
+}
+
 void Manager::Render(RenderContext& context)
 {
+    // Main window always renders at the bottom
     main_window_->Render(context);
+    // User made windows
     for (const auto& w : windows_)
     {
         if (!w->hidden())
@@ -90,6 +92,7 @@ void Manager::Render(RenderContext& context)
             w->Render(context);
         }
     }
+    // Console window always renders on top
     if (!console_window_->hidden())
     {
         console_window_->Render(context);
