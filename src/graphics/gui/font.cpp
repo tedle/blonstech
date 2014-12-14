@@ -153,17 +153,12 @@ Font::Font(std::string font_filename, units::pixel pixel_size, RenderContext& co
     return;
 }
 
+// Defined in .cpp to allow for destruction of glyphs
 Font::~Font()
 {
 }
 
-Sprite* Font::BuildSprite(unsigned char letter, units::subpixel x, units::subpixel y)
-{
-    static const Box no_crop = Box(0, 0, 0, 0);
-    return BuildSprite(letter, x, y, no_crop);
-}
-
-Sprite* Font::BuildSprite(unsigned char letter, units::subpixel x, units::subpixel y, Box crop)
+const MeshData* Font::BuildMesh(unsigned char letter, units::subpixel x, units::subpixel y, Box crop)
 {
     // Pointer to avoid expensive copying
     const Glyph* g;
@@ -225,7 +220,13 @@ Sprite* Font::BuildSprite(unsigned char letter, units::subpixel x, units::subpix
     fontsheet_->set_pos(s);
     fontsheet_->set_subtexture(t);
 
-    return fontsheet_.get();
+    return fontsheet_.get()->mesh();
+}
+
+const MeshData* Font::BuildMesh(unsigned char letter, units::subpixel x, units::subpixel y)
+{
+    static const Box no_crop = Box(0, 0, 0, 0);
+    return BuildMesh(letter, x, y, no_crop);
 }
 
 units::pixel Font::cursor_offset(unsigned char letter) const
@@ -243,11 +244,7 @@ units::pixel Font::cursor_offset(unsigned char letter) const
     }
 }
 
-units::pixel Font::string_width(std::string string) const
-{
-    return string_width(string, true);
-}
-
+// TODO: Might need to make this const char* for perf later, if its used a lot
 units::pixel Font::string_width(std::string string, bool trim_whitespace) const
 {
     if (trim_whitespace)
@@ -280,21 +277,27 @@ units::pixel Font::string_width(std::string string, bool trim_whitespace) const
         // How far to advance cursor for next letter
         pixel_width += g->x_advance;
 
-        // Trim the whitespace
         if (trim_whitespace)
         {
             if (i == 0)
             {
+                // Leftward padding of the first character
                 pixel_width -= g->x_offset;
             }
             if (i == string.length() - 1)
             {
+                // Rightward padding of the last character
                 pixel_width -= g->x_advance - (g->x_offset + g->width);
             }
         }
     }
 
     return pixel_width;
+}
+
+units::pixel Font::string_width(std::string string) const
+{
+    return string_width(string, true);
 }
 
 std::vector<std::string> Font::string_wrap(std::string string, units::pixel max_width)
@@ -405,11 +408,6 @@ int Font::advance()
     units::pixel ret = advance_;
     advance_ = 0;
     return ret;
-}
-
-unsigned int Font::index_count() const
-{
-    return fontsheet_->index_count();
 }
 
 units::pixel Font::letter_height() const

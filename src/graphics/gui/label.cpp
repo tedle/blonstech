@@ -30,10 +30,10 @@ void Label::Render(RenderContext& context)
             auto batcher = font_batch(font_style_, frag.colour, context);
             for (const auto& c : frag.text)
             {
-                auto sprite = font->BuildSprite(c, x, y, crop_);
-                if (sprite != nullptr)
+                auto mesh = font->BuildMesh(c, x, y, crop_);
+                if (mesh != nullptr)
                 {
-                    batcher->Append(*sprite->mesh(), context);
+                    batcher->Append(*mesh, context);
                 }
                 x += font->advance();
             }
@@ -44,10 +44,10 @@ void Label::Render(RenderContext& context)
         auto batcher = font_batch(font_style_, text_.base_colour(), context);
         for (const auto& c : text_.raw_str())
         {
-            auto sprite = font->BuildSprite(c, x, y, crop_);
-            if (sprite != nullptr)
+            auto mesh = font->BuildMesh(c, x, y, crop_);
+            if (mesh != nullptr)
             {
-                batcher->Append(*sprite->mesh(), context);
+                batcher->Append(*mesh, context);
             }
             x += font->advance();
         }
