@@ -11,10 +11,10 @@
 // Local Includes
 #include "glfuncloader.h"
 
+namespace blons
+{
 namespace
 {
-using namespace blons;
-
 static unsigned int HashString(const char* str)
 {
     static const unsigned int kPrime = 16777619;
@@ -47,8 +47,6 @@ void Uniform(GLuint loc, Vector4 value)
 }
 } // namespace
 
-namespace blons
-{
 class BufferResourceGL40 : public BufferResource
 {
 public:

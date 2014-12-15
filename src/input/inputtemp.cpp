@@ -3,9 +3,10 @@
 // Includes
 #include <unordered_map>
 
+namespace blons
+{
 namespace
 {
-using namespace blons;
 static const std::unordered_map<Input::KeyCode, std::pair<unsigned char, unsigned char>> kAsciiMap =
 {
     { Input::CHAR_0, { '0', ')' } },
@@ -62,8 +63,6 @@ static const std::unordered_map<Input::KeyCode, std::pair<unsigned char, unsigne
 };
 } // namespace
 
-namespace blons
-{
 Input::Input()
 {
     for (int i=0; i<256; i++)

@@ -6,11 +6,15 @@
 // Local Includes
 #include "consoleparser.h"
 
+namespace blons
+{
+namespace console
+{
+using internal::Function;
+using internal::ConsoleArg;
+
 namespace
 {
-using namespace blons::console;
-using namespace internal;
-
 typedef std::vector<std::unique_ptr<Function>> FunctionList;
 
 struct ConsoleState
@@ -52,12 +56,6 @@ void PrintUsage(const std::string& func_name, const FunctionList& func_list)
     }
 }
 } // namespace
-
-namespace blons
-{
-namespace console
-{
-using namespace internal;
 
 // The main Register function is templated and needs to be defined in
 // public headers. We use this function to hardcode as much as we can

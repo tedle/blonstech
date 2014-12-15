@@ -2,9 +2,13 @@
 
 #include <blons/debug/console.h>
 
+namespace blons
+{
+namespace console
+{
 namespace
 {
-using namespace blons::console::internal;
+using internal::ConsoleArg;
 struct ParseState
 {
     std::vector<ConsoleArg> args;
@@ -16,10 +20,6 @@ struct ParseState
 };
 } // namespace
 
-namespace blons
-{
-namespace console
-{
 void ParseSpace(ParseState* state)
 {
     // If we are NOT inside a "quoted string"...

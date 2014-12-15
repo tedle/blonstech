@@ -5,10 +5,12 @@
 #include <memory>
 #include <stdarg.h>
 
+namespace blons
+{
+namespace log
+{
 namespace
 {
-using namespace blons::log;
-
 Level g_log_level = Level::INFO;
 PrintCallback g_print = [](const std::string& s){ std::cout << s; };
 
@@ -31,10 +33,6 @@ std::string FormatPrintString(const std::string& fmt, va_list args)
 }
 } // namespace
 
-namespace blons
-{
-namespace log
-{
 void Debug(const std::string& fmt, ...)
 {
     va_list args;

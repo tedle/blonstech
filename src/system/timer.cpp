@@ -1,7 +1,8 @@
 #include <blons/system/timer.h>
 
-// Stop gap platform isolation
-namespace
+namespace blons
+{
+namespace // Stop gap platform isolation
 {
 // Quarantine this sucker
 #include <Windows.h>
@@ -15,8 +16,6 @@ blons::units::time::us GetMicroseconds()
 }
 } // namespace
 
-namespace blons
-{
 Timer::Timer()
 {
     stop();

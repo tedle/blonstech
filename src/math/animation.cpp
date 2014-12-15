@@ -1,5 +1,7 @@
 #include <blons/math/animation.h>
 
+namespace blons
+{
 namespace
 {
 // Interpolation functions
@@ -88,8 +90,6 @@ inline float quint_in_out(float x)
 }
 } // namespace
 
-namespace blons
-{
 Animation::Animation(units::time::ms duration, Callback callback, TweenType tween_method)
 {
     completed_ = false;

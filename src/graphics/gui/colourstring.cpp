@@ -1,6 +1,9 @@
 #include <blons/graphics/gui/colourstring.h>
 
-// Helper functions
+namespace blons
+{
+namespace gui
+{
 namespace
 {
 // Simple parser to find '$fff' hex colour codes in strings
@@ -68,10 +71,6 @@ int IntToHex(unsigned char c)
 }
 } // namespace
 
-namespace blons
-{
-namespace gui
-{
 ColourString::ColourString(std::string text, Vector4 base_colour)
 {
     raw_text_ = text;
