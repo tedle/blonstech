@@ -132,7 +132,7 @@ void Textarea::RenderText(const Skin::Layout::Textarea& t, RenderContext& contex
 
     for (auto i = line_offset; i < renderable_lines + line_offset; i++)
     {
-        static const auto feather = padding_ / 2;
+        const auto feather = padding_ / 2;
         auto& label = lines_[lines_.size() - i - 1];
         Box crop(0.0f, y + padding_ / 2, 0.0f, pos_.h - padding_);
         // Don't feather our g's and y's if we're at the bottom

@@ -12,39 +12,137 @@ namespace blons
 {
 namespace gui
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Used to determine Window behaviour
+///   
+/// * `WindowType::DRAGGABLE`, has a titlebar, caption, and can be dragged
+/// around
+/// * `WindowType::STATIC`, renders like a pane, cannot be moved
+/// * `WindowType::INVISIBLE`, renders only child Control%s
+////////////////////////////////////////////////////////////////////////////////
 enum WindowType
 {
     DRAGGABLE,
     STATIC,
     INVISIBLE
 };
-/// \brief whats up
-///
-/// other test!
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Container for UI elements
+////////////////////////////////////////////////////////////////////////////////
 class Window : public Control
 {
 public:
-    /// \brief testio master 3000
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes members with supplied values. Meant to be used by
+    /// gui::Manager::MakeWindow
+    ///
+    /// \param id Unique string to identify and retrieve window by
+    /// \param pos Position and dimensions of the window
+    /// \param caption String to be displayed in titlebar, only used if type is
+    /// `WindowType::DRAGGABLE`
+    /// \param type How the window should behave. Valid inputs include:
+    /// * `WindowType::DRAGGABLE`, has a titlebar, caption, and can be dragged
+    /// around
+    /// * `WindowType::STATIC`, renders like a pane, cannot be moved
+    /// * `WindowType::INVISIBLE`, renders only child Control%s
+    /// \param parent_manager gui::Manager containing this window
+    ////////////////////////////////////////////////////////////////////////////////
     Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls Window(std::string, Box, std::string, WindowType, Manager*)
+    /// with an empty caption
+    ////////////////////////////////////////////////////////////////////////////////
     Window(std::string id, Box pos, WindowType type, Manager* parent_manager)
         : Window(id, pos, "", type, parent_manager) {}
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls Window(std::string, Box, std::string, WindowType, Manager*)
+    /// with a type of `WindowType::DRAGGABLE`
+    ////////////////////////////////////////////////////////////////////////////////
     Window(std::string id, Box pos, std::string caption, Manager* parent_manager)
         : Window(id, pos, caption, WindowType::DRAGGABLE, parent_manager) {}
     ~Window() {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Submits a drawbatch with mesh data & shader inputs to the parent
+    /// gui::Manager for itself and each child Control
+    ///
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     void Render(RenderContext& context) override;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Performs input logic for itself and all child Control%s
+    ///
+    /// \param input Handle to the current input events
+    /// \return True if the input was consumed by the window
+    ////////////////////////////////////////////////////////////////////////////////
     bool Update(const Input& input) override;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates a new blons::gui::Button inside the window
+    ///
+    /// \param x Where to place the button horizontally in pixels
+    /// \param y Where to place the button vertically in pixels
+    /// \param width How wide the button should be in pixels
+    /// \param height How tall the button should be in pixels
+    /// \param label Caption text displayed on top of the button. Follows
+    /// gui::ColourString formatting rules.
+    /// \return Pointer to the created button. This memory is owned by the
+    /// gui::Window and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
     Button* MakeButton(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string label);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates a new blons::gui::Label inside the window
+    ///
+    /// \param x Where to place the label horizontally in pixels
+    /// \param y Where to place the label vertically in pixels
+    /// \param text Text for the label to display. Follows gui::ColourString
+    /// formatting rules.
+    /// \return Pointer to the created label. This memory is owned by the
+    /// gui::Window and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
     Label* MakeLabel(units::pixel x, units::pixel y, std::string text);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates a new blons::gui::Textarea inside the window
+    ///
+    /// \param x Where to place the textarea horizontally in pixels
+    /// \param y Where to place the textarea vertically in pixels
+    /// \param width How wide the textarea should be in pixels
+    /// \param height How tall the textarea should be in pixels
+    /// \return Pointer to the created textarea. This memory is owned by the
+    /// gui::Window and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
     Textarea* MakeTextarea(units::pixel x, units::pixel y, units::pixel width, units::pixel height);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates a new blons::gui::Textbox inside the window
+    ///
+    /// \param x Where to place the textbox horizontally in pixels
+    /// \param y Where to place the textbox vertically in pixels
+    /// \param width How wide the textbox should be in pixels
+    /// \param height How tall the textbox should be in pixels
+    /// \return Pointer to the created textbox. This memory is owned by the
+    /// gui::Window and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
     Textbox* MakeTextbox(units::pixel x, units::pixel y, units::pixel width, units::pixel height);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the unique string used to identify this window
+    ///
+    /// \return Unique string ID
+    ////////////////////////////////////////////////////////////////////////////////
     const std::string id() const;
 
 protected:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief A list containing every child Control to be rendered by the window
+    ////////////////////////////////////////////////////////////////////////////////
     std::vector<std::unique_ptr<Control>> controls_;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates mesh for the body and appends it to the window's draw queue
+    ///
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     void RenderBody(RenderContext& context);
 
 private:
@@ -58,5 +156,25 @@ private:
 };
 } // namepsace GUI
 } // namespace blons
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class blons::gui::Window
+/// \ingroup gui
+///
+/// ### Example:
+/// \code
+/// // Retrieving the gui::Manager
+/// auto gui = graphics->gui();
+///
+/// // Creating a Window
+/// auto window = gui->MakeWindow("some id", 0, 0, 300, 300, "Window title!");
+///
+/// // Retrieving the Window later
+/// window = gui->window("some id");
+///
+/// // Adding a button to the window
+/// window->MakeButton(10, 150, 120, 40, "Hey!");
+/// \endcode
+////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_GUI_WINDOW_H_

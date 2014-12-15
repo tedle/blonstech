@@ -145,6 +145,7 @@ void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
+    // Transition blink state every 500ms
     if (cursor_blink_.ms() % 1000 < 500)
     {
         auto cursor_width = 1.0f;

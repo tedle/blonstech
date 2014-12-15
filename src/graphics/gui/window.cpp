@@ -56,8 +56,8 @@ void Window::RenderBody(RenderContext& context)
     auto layout = skin->layout();
     auto sprite = skin->sprite();
     auto batch = control_batch(context);
-    // Let's get ugly
     // Title bar
+    if (type_ == WindowType::DRAGGABLE)
     {
         auto& t = layout->window.title;
         // Left
@@ -204,8 +204,10 @@ bool Window::Update(const Input& input)
     }
     if (dragging_ && type_ == DRAGGABLE)
     {
+        // Update position
         set_pos(mx - drag_offset_.x, my - drag_offset_.y);
 
+        // Keep window in bounds
         Box screen = gui_->screen_dimensions();
         if (pos_.x < 0)
         {
