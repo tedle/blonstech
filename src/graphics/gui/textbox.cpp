@@ -15,7 +15,7 @@ Textbox::Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* pare
     font_style_ = style;
     cursor_ = text_.end();
     // Empty lambda is easier than worrying about nullptrs
-    callback_ = [](){};
+    callback_ = [](Textbox* t){};
 
     padding_ = units::subpixel_to_pixel(gui_->skin()->layout()->textbox.normal.left.w * 2);
     // For vertically centering the text
@@ -200,7 +200,7 @@ bool Textbox::Update(const Input& input)
     return active_;
 }
 
-void Textbox::set_callback(std::function<void()> callback)
+void Textbox::set_callback(std::function<void(Textbox*)> callback)
 {
     callback_ = callback;
 }
@@ -310,7 +310,7 @@ void Textbox::OnKeyDown(const Input& input, const Input::KeyCode key, Input::Mod
     }
     else if (key == Input::RETURN)
     {
-        callback_();
+        callback_(this);
     }
     text_label_->set_text(text_);
 }

@@ -23,10 +23,10 @@ ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, Windo
     auto conareaptr = conarea.get();
     auto conboxptr = conbox.get();
     // Have ConsoleTextbox feed all input to game console when return is pressed
-    conbox->set_callback([=]()
+    conbox->set_callback([](Textbox* textbox)
     {
-        console::in(conboxptr->text().c_str());
-        conboxptr->set_text("");
+        console::in(textbox->text().c_str());
+        textbox->set_text("");
     });
     // Have game console feed all output to ConsoleTextarea
     console::RegisterPrintCallback([=](const std::string& s)

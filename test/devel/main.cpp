@@ -44,7 +44,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     {
         textarea->Clear();
     };
-    auto textareaprint = [textarea, textbox]()
+    auto textareaprint = [textarea](blons::gui::Textbox* textbox)
     {
         for (int i = 0; i < 1; i++)
         {
