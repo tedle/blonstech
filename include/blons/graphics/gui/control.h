@@ -177,6 +177,7 @@ protected:
     ///
     /// \param style gui::FontStyle to be drawn
     /// \param colour Colour of the text with values ranging from 0.0 to 1.0
+    /// \param context Handle to the current rendering context
     /// \return The Drawbatcher for rendering
     ////////////////////////////////////////////////////////////////////////////////
     DrawBatcher* font_batch(FontStyle style, Vector4 colour, RenderContext& context);
@@ -184,6 +185,7 @@ protected:
     /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
     /// towards element body rendering.
     ///
+    /// \param context Handle to the current rendering context
     /// \return The Drawbatcher for rendering
     ////////////////////////////////////////////////////////////////////////////////
     DrawBatcher* control_batch(RenderContext& context);
@@ -198,7 +200,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::gui::Control
-/// \ingroup graphics
+/// \ingroup gui
 ///
 /// Elements derived from this class can be created from or attached to any
 /// window.

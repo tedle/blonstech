@@ -110,7 +110,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::gui::ColourString
-/// \ingroup graphics
+/// \ingroup gui
 ///
 /// Can be formatted with input text using a `$` followed by a 3 character
 /// case-insensitive hex code

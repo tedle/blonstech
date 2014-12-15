@@ -166,6 +166,9 @@
     <ClInclude Include="..\include\blons\math.h">
       <Filter>src</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\manager.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -202,9 +205,6 @@
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
     <ClCompile Include="graphics\gui\window.cpp">
-      <Filter>src\graphics\gui</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics\gui\gui.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
     <ClCompile Include="graphics\render\drawbatcher.cpp">
@@ -269,6 +269,9 @@
     </ClCompile>
     <ClCompile Include="system\timer.cpp">
       <Filter>src\system</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\manager.cpp">
+      <Filter>src\graphics\gui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

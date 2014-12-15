@@ -157,7 +157,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::gui::Font
-/// \ingroup graphics
+/// \ingroup gui
 ///
 /// For an easy to use UI element that renders text, see gui::Label.
 ///

@@ -370,7 +370,7 @@ protected:
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::gui::Skin
-/// \ingroup graphics
+/// \ingroup gui
 ///
 /// Defines fonts, text colours, and Sprite%s for all Control%s to render with.
 ///

@@ -195,6 +195,7 @@
     <ClInclude Include="..\include\blons\graphics\gui\font.h" />
     <ClInclude Include="..\include\blons\graphics\gui\gui.h" />
     <ClInclude Include="..\include\blons\graphics\gui\label.h" />
+    <ClInclude Include="..\include\blons\graphics\gui\manager.h" />
     <ClInclude Include="..\include\blons\graphics\gui\skin.h" />
     <ClInclude Include="..\include\blons\graphics\gui\textarea.h" />
     <ClInclude Include="..\include\blons\graphics\gui\textbox.h" />
@@ -238,8 +239,8 @@
     <ClCompile Include="graphics\gui\consolewindow.cpp" />
     <ClCompile Include="graphics\gui\control.cpp" />
     <ClCompile Include="graphics\gui\font.cpp" />
-    <ClCompile Include="graphics\gui\gui.cpp" />
     <ClCompile Include="graphics\gui\label.cpp" />
+    <ClCompile Include="graphics\gui\manager.cpp" />
     <ClCompile Include="graphics\gui\skin.cpp" />
     <ClCompile Include="graphics\gui\textarea.cpp" />
     <ClCompile Include="graphics\gui\textbox.cpp" />

@@ -24,7 +24,7 @@ public:
     ///
     /// \param pos Position of the text
     /// \param text Text do be displayed. Uses gui::ColourString formatting rules
-    /// \param style %Font to use for rendering text
+    /// \param style Type of font to be rendered by the label
     /// \param parent_manager gui::Manager containing this element
     /// \param parent_window gui::Window containing this element
     ////////////////////////////////////////////////////////////////////////////////
@@ -95,9 +95,10 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::gui::Label
-/// \ingroup graphics
+/// \ingroup gui
 ///
-/// The label can be created from or attached to any window.
+/// The label can be created from or attached to any window. Supports
+/// gui::ColourString formatting.
 ///
 /// ### Example:
 /// \code

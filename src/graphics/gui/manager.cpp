@@ -1,4 +1,4 @@
-#include <blons/graphics/gui/gui.h>
+#include <blons/graphics/gui/manager.h>
 
 // Public Includes
 #include <blons/graphics/graphics.h>

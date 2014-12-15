@@ -69,7 +69,7 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::gui::Button
-/// \ingroup graphics
+/// \ingroup gui
 ///
 /// The button element can be created from or attached to any window.
 ///
