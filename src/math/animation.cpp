@@ -97,7 +97,6 @@ Animation::Animation(units::time::ms duration, Callback callback, TweenType twee
     callback_ = callback;
     duration_ = duration;
     tween_method_ = tween_method;
-    timer_.start();
 }
 
 void Animation::Reset()

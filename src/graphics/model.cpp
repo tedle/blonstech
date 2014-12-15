@@ -8,6 +8,7 @@
 #include <blons/graphics/mesh.h>
 #include <blons/graphics/meshimporter.h>
 #include <blons/math/math.h>
+#include <blons/system/timer.h>
 
 namespace blons
 {
@@ -21,11 +22,11 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     world_matrix_ = MatrixIdentity();
 
     log::Debug("Loading %s... ", mesh_filename.c_str());
-    DWORD64 start = GetTickCount64();
+    Timer timer;
 
+    timer.start();
     MeshImporter mesh_data(mesh_filename, true);
-    DWORD64 end = GetTickCount64();
-    log::Debug("[%ims]\n", end - start);
+    log::Debug("[%ims]\n", timer.ms());
 
     mesh_ = std::unique_ptr<Mesh>(new Mesh(mesh_data, context));
 
@@ -35,7 +36,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     }
 
     log::Debug("Loading textures... ");
-    start = GetTickCount64();
+    timer.start();
     // TODO: replace this with proper filesystem class
     std::string tex_folder(mesh_filename);
     // Go from folder/mesh/ to folder/
@@ -79,8 +80,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
             throw "Failed to load diffuse texture";
         }
     }
-    end = GetTickCount64();
-    log::Debug("[%ims]\n", end - start);
+    log::Debug("[%ims]\n", timer.ms());
 }
 
 Model::~Model()

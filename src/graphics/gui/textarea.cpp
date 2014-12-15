@@ -21,8 +21,6 @@ Textarea::Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* pa
 
     scroll_offset_ = 0;
     scroll_destination_ = 0;
-
-    scroll_timer_.start();
 }
 
 void Textarea::Render(RenderContext& context)

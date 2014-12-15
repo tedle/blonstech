@@ -19,6 +19,7 @@ blons::units::time::us GetMicroseconds()
 Timer::Timer()
 {
     stop();
+    start();
 }
 
 void Timer::start()

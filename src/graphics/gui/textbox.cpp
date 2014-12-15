@@ -14,7 +14,6 @@ Textbox::Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* pare
     text_ = "";
     font_style_ = style;
     cursor_ = text_.end();
-    cursor_blink_.start();
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](){};
 

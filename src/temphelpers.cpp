@@ -12,6 +12,7 @@
 #include <blons/graphics/graphics.h>
 #include <blons/graphics/model.h>
 #include <blons/input/inputtemp.h>
+#include <blons/system/timer.h>
 
 namespace blons
 {
@@ -30,10 +31,12 @@ void noclip(Input* input, Camera* camera)
         camera->set_rot(rot.x, rot.y, 0.0);
     }
 
-    static DWORD64 last_move = 0;
+    static Timer last_move;
     // Welcome to the hackiest no clip wasd movement u ever see
-    if (GetTickCount64() > last_move + 10)
+    if (last_move.ms() > 10)
     {
+        last_move.rewind(10);
+
         float velocity = 0.2f;
         if (input->IsKeyDown(Input::SHIFT))
         {
@@ -43,7 +46,6 @@ void noclip(Input* input, Camera* camera)
         {
             velocity *= 4.0f;
         }
-        last_move = GetTickCount64();
         Vector3 pos = camera->pos();
         Vector3 rot = camera->rot();
         int ud = 0, lr = 0;
@@ -103,11 +105,11 @@ void noclip(Input* input, Camera* camera)
 void move_camera_around_origin(float delta, Camera* camera)
 {
     float orientation = static_cast<float>(XM_PI)*1.5f;
-    static DWORD64 last_call = 0;
+    static Timer last_call;
 
-    if (GetTickCount64() > last_call + 10)
+    if (last_call.ms() > 10)
     {
-        last_call = GetTickCount64();
+        last_call.rewind(10);
 
         float r = 20.0f;
         float orient_delta = 0.03f * delta;
@@ -126,32 +128,31 @@ void move_camera_around_origin(float delta, Camera* camera)
 
 void FPS()
 {
-    static DWORD64 last_second = 0;
     static DWORD64 last_frame = 0;
     static DWORD64 max_frame = 0;
     static int fps_count = 0;
-    DWORD64 st = GetTickCount64();
+    static Timer st;
 
-    max_frame = max(max_frame, st - last_frame);
+    max_frame = max(max_frame, st.ms() - last_frame);
 
-    if (st > last_second + 1000)
+    if (st.ms() > 1000)
     {
         log::Debug("FPS: %i(min:%llu), (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, 1000 / max_frame, cur_pos.x, cur_pos.y, cur_pos.z);
-        last_second = st;
         max_frame = 0;
         fps_count = 0;
+        st.rewind(1000);
     }
     else
     {
         fps_count++;
     }
-    last_frame = st;
+    last_frame = st.ms();
 }
 
 
 std::vector<std::unique_ptr<Model>> load_codmap(std::string folder, std::vector<std::unique_ptr<Model>> models, Graphics* graphics)
 {
-    DWORD64 start = GetTickCount64();
+    Timer timer;
     std::string csv_file = folder;
     if (csv_file.back() != '/' && csv_file.back() != '\\')
     {
@@ -194,8 +195,7 @@ std::vector<std::unique_ptr<Model>> load_codmap(std::string folder, std::vector<
         throw "other model problem";
     }
     models[1]->set_pos(0.0, 0.0, 0.0);*/
-    DWORD64 end = GetTickCount64();
-    log::Debug("Loaded map [%ims]\n", end - start);
+    log::Debug("Loaded map [%ims]\n", timer.ms());
     return models;
 }
 } // namespace temp
