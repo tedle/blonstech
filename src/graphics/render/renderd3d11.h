@@ -12,7 +12,6 @@
 // Includes
 #include <d3d11.h>
 // Public Includes
-// #include <DDSTextureLoader\DDSTextureLoader.h>
 #include <blons/math/math.h>
 #include <blons/graphics/render/render.h>
 

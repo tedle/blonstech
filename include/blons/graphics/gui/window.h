@@ -14,17 +14,12 @@ namespace gui
 {
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Used to determine Window behaviour
-///   
-/// * `WindowType::DRAGGABLE`, has a titlebar, caption, and can be dragged
-/// around
-/// * `WindowType::STATIC`, renders like a pane, cannot be moved
-/// * `WindowType::INVISIBLE`, renders only child Control%s
 ////////////////////////////////////////////////////////////////////////////////
 enum WindowType
 {
-    DRAGGABLE,
-    STATIC,
-    INVISIBLE
+    DRAGGABLE, ///< Has a titlebar, caption, and can be dragged around
+    STATIC,    ///< Renders like a pane, cannot be moved
+    INVISIBLE  ///< Renders only child Control%s
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -41,11 +36,7 @@ public:
     /// \param pos Position and dimensions of the window
     /// \param caption String to be displayed in titlebar, only used if type is
     /// `WindowType::DRAGGABLE`
-    /// \param type How the window should behave. Valid inputs include:
-    /// * `WindowType::DRAGGABLE`, has a titlebar, caption, and can be dragged
-    /// around
-    /// * `WindowType::STATIC`, renders like a pane, cannot be moved
-    /// * `WindowType::INVISIBLE`, renders only child Control%s
+    /// \param type How the window should behave. See gui::WindowType
     /// \param parent_manager gui::Manager containing this window
     ////////////////////////////////////////////////////////////////////////////////
     Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager);

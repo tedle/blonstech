@@ -16,21 +16,13 @@ namespace gui
 {
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Used to categorize which fonts are used by which UI elements
-///   
-/// Common uses are:
-/// * `FontStyle::DEFAULT`, used when style is unspecified or if a specific
-/// style is not loaded in the Skin
-/// * `FontStyle::HEADING`, used for title text and Window captions
-/// * `FontStyle::LABEL`, used for general text, Button captions, Textbox
-/// text, etc
-/// * `FontStyle::CONSOLE`, used by the game console
 ////////////////////////////////////////////////////////////////////////////////
 enum FontStyle
 {
-    DEFAULT,
-    HEADING,
-    LABEL,
-    CONSOLE
+    DEFAULT, ///< Used when style is unspecified or if a specific style is not loaded in the Skin
+    HEADING, ///< Used for title text and Window captions
+    LABEL,   ///< Used for general text, Button captions, Textbox text, etc
+    CONSOLE  ///< Used by the game console
 };
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Modularizes the look and feel of the GUI system
@@ -318,14 +310,8 @@ public:
     ///
     /// \param filename Filename of the font to open
     /// \param pixel_size How large the font should be
-    /// \param style Determines which parts of the UI will use the font. Valid
-    /// inputs include:
-    /// * `FontStyle::DEFAULT`, used when style is unspecified or if a specific
-    /// style is not loaded in the Skin
-    /// * `FontStyle::HEADING`, used for title text and Window captions
-    /// * `FontStyle::LABEL`, used for general text, Button captions, Textbox
-    /// text, etc
-    /// * `FontStyle::CONSOLE`, used by the game console
+    /// \param style Determines which parts of the UI will use the font. See
+    /// gui::FontStyle
     /// \param context Handle to the current rendering context
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////

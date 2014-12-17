@@ -9,6 +9,13 @@
 
 namespace blons
 {
+struct MatrixBuffer
+{
+    Matrix world;
+    Matrix view;
+    Matrix projection;
+};
+
 BufferResourceD3D11::~BufferResourceD3D11()
 {
     p->Release();

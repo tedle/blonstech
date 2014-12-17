@@ -61,13 +61,7 @@ public:
     /// \param height How tall the window should be in pixels
     /// \param caption Text to display on the titlebar. Only applicable if type is
     /// `WindowType::DRAGGABLE`
-    /// \param type Determines how the window will behave. Valid inputs include:
-    /// * `WindowType::DRAGGABLE`, has a titlebar that can be used to drag the
-    /// window around the screen.
-    /// * `WindowType::STATIC`, renders like a pane, has no titlebar, cannot be
-    /// moved
-    /// * `WindowType::INVISIBLE`, does not render itself and cannot be moved. Only
-    /// draws child Control%s
+    /// \param type Determines how the window will behave. See gui::WindowType
     /// \return Pointer to the created window. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
