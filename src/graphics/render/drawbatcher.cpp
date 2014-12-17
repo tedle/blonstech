@@ -11,7 +11,7 @@ DrawBatcher::DrawBatcher(RenderContext& context)
     index_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
     context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0);
 
-    array_size_ = 1;
+    buffer_size_ = 0;
     vertex_count_ = 0;
     index_count_ = 0;
     vertex_idx_ = 0;
@@ -24,11 +24,11 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
     const unsigned int index_size = static_cast<unsigned int>(mesh_data.indices.size());
 
     // Dynamically resize our buffers as needed
-    if (vertex_idx_ + vert_size > array_size_ ||
-        index_idx_ + index_size > array_size_)
+    if (vertex_idx_ + vert_size > buffer_size_ ||
+        index_idx_ + index_size > buffer_size_)
     {
         // TODO: Change this to *= 2? Maybe? Maybe not?
-        array_size_ = std::max(vertex_idx_ + vert_size, index_idx_ + index_size);
+        buffer_size_ = std::max(vertex_idx_ + vert_size, index_idx_ + index_size);
 
         // Make a backup copy of mesh data we've already pushed to render API
         Vertex* vptr = nullptr;
@@ -42,7 +42,7 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
         // Make the new, larger buffers
         vertex_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
         index_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
-        context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, array_size_, nullptr, array_size_);
+        context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_);
 
         // Move our backup copy of mesh data into the new buffer
         context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
@@ -53,14 +53,14 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
     unsigned int* indices;
     context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vertices, &indices);
 
-    // memcpy is noticably faster in debug builds, not so much with compiler optimizations
+    // Append vertex data to the buffer
     memcpy(vertices+vertex_idx_, mesh_data.vertices.data(), sizeof(Vertex) * vert_size);
     // Caching this helps debug perf
-    auto batch_indices_ptr = mesh_data.indices.data();
+    auto mesh_indices_ptr = mesh_data.indices.data();
     // Can't memcpy here because indices need to be incremented as meshes are appended
     for (std::size_t j = 0; j < index_size; j++)
     {
-        indices[index_idx_ + j] = batch_indices_ptr[j] + vertex_idx_;
+        indices[index_idx_ + j] = mesh_indices_ptr[j] + vertex_idx_;
     }
 
     vertex_idx_ += vert_size;
