@@ -7,8 +7,8 @@ namespace blons
 {
 Mesh::Mesh(const MeshImporter& mesh, RenderContext& context)
 {
-    vertex_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
-    index_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
+    vertex_buffer_.reset(context->MakeBufferResource());
+    index_buffer_.reset(context->MakeBufferResource());
     mesh_data_.vertices = mesh.mesh_data()->vertices;
     mesh_data_.indices = mesh.mesh_data()->indices;
 

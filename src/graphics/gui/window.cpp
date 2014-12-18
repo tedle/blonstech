@@ -23,7 +23,7 @@ Window::Window(std::string id, Box pos, std::string caption, WindowType type, Ma
         c = toupper(c);
     }
     Vector4 colour = gui_->skin()->layout()->window.title.colour;
-    caption_ = std::unique_ptr<Label>(new Label(caption_pos, ColourString(caption, colour), FontStyle::HEADING, parent_manager, this));
+    caption_.reset(new Label(caption_pos, ColourString(caption, colour), FontStyle::HEADING, parent_manager, this));
 }
 
 void Window::Render(RenderContext& context)

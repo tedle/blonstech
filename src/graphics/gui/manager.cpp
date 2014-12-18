@@ -18,7 +18,7 @@ Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader
 
     ui_shader_ = std::move(ui_shader);
 
-    skin_ = std::unique_ptr<Skin>(new Skin(context));
+    skin_.reset(new Skin(context));
 
     // TODO: move this out of constructor! font load included!
     LoadFont("../../notes/font stuff/test-console.ttf", 28, FontStyle::DEFAULT, context);
@@ -26,8 +26,8 @@ Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader
     LoadFont("../../notes/font stuff/test-label.ttf", 20, FontStyle::LABEL, context);
     LoadFont("../../notes/font stuff/test-console.ttf", 28, FontStyle::CONSOLE, context);
     // TODO: get rid of main_window... i think
-    main_window_ = std::unique_ptr<Window>(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), WindowType::INVISIBLE, this));
-    console_window_ = std::unique_ptr<Window>(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), WindowType::INVISIBLE, this));
+    main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), WindowType::INVISIBLE, this));
+    console_window_.reset(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), WindowType::INVISIBLE, this));
 }
 
 Manager::~Manager()

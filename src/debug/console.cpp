@@ -69,7 +69,7 @@ void internal::__register(const std::string& name, Function* func)
     {
         if (f->ArgList() == arg_list)
         {
-            f = std::unique_ptr<Function>(func);
+            f.reset(func);
             return;
         }
     }

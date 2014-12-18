@@ -7,8 +7,8 @@ namespace blons
 {
 DrawBatcher::DrawBatcher(RenderContext& context)
 {
-    vertex_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
-    index_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
+    vertex_buffer_.reset(context->MakeBufferResource());
+    index_buffer_.reset(context->MakeBufferResource());
     context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0);
 
     buffer_size_ = 0;
@@ -40,8 +40,8 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
         memcpy(old_indices.get(), iptr, index_idx_ * sizeof(unsigned int));
 
         // Make the new, larger buffers
-        vertex_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
-        index_buffer_ = std::unique_ptr<BufferResource>(context->MakeBufferResource());
+        vertex_buffer_.reset(context->MakeBufferResource());
+        index_buffer_.reset(context->MakeBufferResource());
         context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_);
 
         // Move our backup copy of mesh data into the new buffer

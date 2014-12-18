@@ -45,7 +45,7 @@ Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND h
                                        kScreenNear, kScreenDepth);
 
     // Camera
-    camera_ = std::unique_ptr<Camera>(new Camera);
+    camera_.reset(new Camera);
     if (camera_ == nullptr)
     {
         throw "Failed to initialize camera";
@@ -58,12 +58,12 @@ Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND h
     inputs3d.push_back(ShaderAttribute(0, "input_pos"));
     inputs3d.push_back(ShaderAttribute(1, "input_uv"));
     inputs3d.push_back(ShaderAttribute(2, "input_norm"));
-    shader3d_ = std::unique_ptr<Shader>(new Shader("mesh.vert.glsl", "mesh.frag.glsl", inputs3d, context_));
+    shader3d_.reset(new Shader("mesh.vert.glsl", "mesh.frag.glsl", inputs3d, context_));
 
     ShaderAttributeList inputs2d;
     inputs2d.push_back(ShaderAttribute(0, "input_pos"));
     inputs2d.push_back(ShaderAttribute(1, "input_uv"));
-    shader2d_ = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "sprite.frag.glsl", inputs2d, context_));
+    shader2d_.reset(new Shader("sprite.vert.glsl", "sprite.frag.glsl", inputs2d, context_));
 
     ShaderAttributeList inputs_ui;
     inputs_ui.push_back(ShaderAttribute(0, "input_pos"));
@@ -79,7 +79,7 @@ Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND h
     }
 
     // GUI
-    gui_ = std::unique_ptr<gui::Manager>(new gui::Manager(screen_width, screen_height, std::move(ui_shader), context_));
+    gui_.reset(new gui::Manager(screen_width, screen_height, std::move(ui_shader), context_));
 }
 
 Graphics::~Graphics()

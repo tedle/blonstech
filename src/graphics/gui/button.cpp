@@ -24,7 +24,7 @@ Button::Button(Box pos, std::string label, Manager* parent_manager, Window* pare
         Vector2 caption_pos;
         caption_pos.x = pos.x + floor((pos.w - caption_width) / 2 - font->cursor_offset(label[0]));
         caption_pos.y = pos.y + floor((pos.h + letter_height) / 2);
-        label_ = std::unique_ptr<Label>(new Label(caption_pos, label, parent_manager, parent_window));
+        label_.reset(new Label(caption_pos, label, parent_manager, parent_window));
     }
 }
 

@@ -736,7 +736,7 @@ bool RenderGL40::LoadPixelData(std::string filename, PixelData* data)
     {
         return false;
     }
-    data->pixels = std::unique_ptr<unsigned char>(pixel_data);
+    data->pixels.reset(pixel_data);
 
     filetype = filetype.substr(filetype.size() - 4);
 

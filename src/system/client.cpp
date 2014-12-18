@@ -26,7 +26,7 @@ Client::Client()
     screen_info_.width = screen_width;
     screen_info_.height = screen_height;
 
-    input_ = std::unique_ptr<Input>(new Input);
+    input_.reset(new Input);
     if (input_ == nullptr)
     {
         throw "Failed input initilization";

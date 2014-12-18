@@ -19,7 +19,7 @@ Texture::Texture(PixelData* pixels, Type type, RenderContext& context)
 
 void Texture::Init(PixelData* pixels, Type type, RenderContext& context)
 {
-    texture_ = std::unique_ptr<TextureResource>(context->MakeTextureResource());
+    texture_.reset(context->MakeTextureResource());
     if (texture_ == nullptr)
     {
         throw "Failed to load texture";

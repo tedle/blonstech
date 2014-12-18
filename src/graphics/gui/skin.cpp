@@ -10,7 +10,7 @@ namespace gui
 Skin::Skin(RenderContext& context)
 {
     // TODO: Load from user supplied image
-    skin_ = std::unique_ptr<Sprite>(new Sprite("../../notes/skin.png", context));
+    skin_.reset(new Sprite("../../notes/skin.png", context));
 
     // TODO: Ensure DEFAULT font is somehow not nullptr before being handed over to user
     font_list_[DEFAULT] = nullptr;
@@ -21,7 +21,7 @@ Skin::Skin(RenderContext& context)
 
 bool Skin::LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context)
 {
-    font_list_[style] = std::unique_ptr<Font>(new Font(filename, pixel_size, context));
+    font_list_[style].reset(new Font(filename, pixel_size, context));
     return true;
 }
 
