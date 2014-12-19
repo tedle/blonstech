@@ -46,7 +46,7 @@ public:
 };
 
 
-class RenderD3D11 : public RenderAPI
+class RenderD3D11 : public Render
 {
     
 public:

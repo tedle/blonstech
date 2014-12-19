@@ -12,7 +12,7 @@
 
 namespace blons
 {
-class RenderGL40 : public RenderAPI
+class RenderGL40 : public Render
 {
 public:
     RenderGL40(units::pixel screen_width, units::pixel screen_height, bool vsync,

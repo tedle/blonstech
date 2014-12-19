@@ -23,7 +23,7 @@ struct Vertex
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Makes vertices sortable allowing for efficient std::map lookups
     ////////////////////////////////////////////////////////////////////////////////
-    bool operator< (const Vertex vert) const {return memcmp(this, &vert, sizeof(Vertex))>0;}
+    bool operator< (const Vertex vert) const { return memcmp(this, &vert, sizeof(Vertex)) > 0; }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,8 @@ struct PixelData
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Determines the pixel format of a texture
     ////////////////////////////////////////////////////////////////////////////////
-    enum BitDepth {
+    enum BitDepth
+    {
         A8       = 8,  ///< Monochrome 8-bit
         R8G8B8   = 24, ///< 24-bit full colour, no alpha
         R8G8B8A8 = 32  ///< 32-bit full colour with alpha
@@ -56,87 +57,344 @@ struct PixelData
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Determines the format and rendering options of a texture
     ////////////////////////////////////////////////////////////////////////////////
-    enum Format {
+    enum Format
+    {
         AUTO, ///< Compresses to DXT5 & generates mipmaps
         DDS,  ///< Uses mipmaps & compression from image file
         RAW   ///< Will not generate mipmaps, will not compress on GPU, use nearest neighbour filtering
     } format; ///< \copybrief Format
 };
 
-class BufferResource {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Contains identifying data to render data to the screen
+////////////////////////////////////////////////////////////////////////////////
+class BufferResource
+{
 public:
     virtual ~BufferResource() {};
 };
-class ShaderResource {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Contains identifying data to activate and ineract with shaders
+////////////////////////////////////////////////////////////////////////////////
+class ShaderResource
+{
 public:
     virtual ~ShaderResource() {};
 };
-class TextureResource {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Contains identifying data to bind textures
+////////////////////////////////////////////////////////////////////////////////
+class TextureResource
+{
 public:
     virtual ~TextureResource() {};
 };
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Holds a shader attribute's index and name
+////////////////////////////////////////////////////////////////////////////////
 typedef std::pair<unsigned int, std::string> ShaderAttribute;
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Holds a list of shader attributes
+////////////////////////////////////////////////////////////////////////////////
 typedef std::vector<ShaderAttribute> ShaderAttributeList;
-typedef std::unique_ptr<class RenderAPI> RenderContext;
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Handle to a rendering context
+////////////////////////////////////////////////////////////////////////////////
+typedef std::unique_ptr<class Render> RenderContext;
 
-class RenderAPI {
-
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Class for interfacing with a graphics API
+////////////////////////////////////////////////////////////////////////////////
+class Render
+{
 public:
-    virtual ~RenderAPI() {};
+    virtual ~Render() {};
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Called at the beginning of each frame, allows for any necessary setup
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void BeginScene()=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Called at the end of each frame, allows for any necessary teardown
+    /// and framebuffer swapping
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void EndScene()=0;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates an implementation specific BufferResource to be stored as its
+    /// base class
+    ///
+    /// \return New BufferResource
+    ////////////////////////////////////////////////////////////////////////////////
     virtual BufferResource* MakeBufferResource()=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates an implementation specific TextureResource to be stored as its
+    /// base class
+    ///
+    /// \return New TextureResource
+    ////////////////////////////////////////////////////////////////////////////////
     virtual TextureResource* MakeTextureResource()=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates an implementation specific ShaderResource to be stored as its
+    /// base class
+    ///
+    /// \return New ShaderResource
+    ////////////////////////////////////////////////////////////////////////////////
     virtual ShaderResource* MakeShaderResource()=0;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a pair of BufferResource%s and binds them to the graphics API
+    /// permitting their use for rendering calls. Sets up shader inputs using the
+    /// entirety of supplied vertex data
+    ///
+    /// \param vertex_buffer Buffer for vertices to bind to
+    /// \param index_buffer Buffer for indices to bind to
+    /// \param vertices Vertices to be bound to buffer, may be nullptr if vert_count
+    /// and index_count are 0
+    /// \param vert_count Number of vertices to be bound to buffer, may be 0 for an
+    /// empty mesh
+    /// \param indices Indices to be bound to buffer, may be nullptr if vert_count
+    /// and index_count are 0
+    /// \param index_count Number of indices to be bound to buffer, may be 0 for an
+    /// empty mesh
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a pair of BufferResource%s and binds them to the graphics API
+    /// permitting their use for rendering calls. Sets up shader inputs using a
+    /// subset of the supplied vertex data useful for 2D rendering. This includes
+    /// the X & Y coordinates of the vertex position as well as UV texture
+    ///
+    /// \param vertex_buffer Buffer for vertices to bind to
+    /// \param index_buffer Buffer for indices to bind to
+    /// \param vertices Vertices to be bound to buffer, may be nullptr if vert_count
+    /// and index_count are 0
+    /// \param vert_count Number of vertices to be bound to buffer, may be 0 for an
+    /// empty mesh
+    /// \param indices Indices to be bound to buffer, may be nullptr if vert_count
+    /// and index_count are 0
+    /// \param index_count Number of indices to be bound to buffer, may be 0 for an
+    /// empty mesh
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a TextureResource and binds it, combined with the supplied
+    /// PixelData, to the graphics API permitting their use for rendering calls.
+    ///
+    /// \param texture TextureResource for identifying PixelData in future calls
+    /// \param pixel_data Raw bitmap and format settings of the texture
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterTexture(TextureResource* texture, PixelData* pixel_data)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a ShaderResource, shader source files, and list of attributes,
+    /// compiling them all into a single shader program to be used for rendering
+    /// meshes each frame.
+    ///
+    /// \param program ShaderResource for identifying shader code in future calls
+    /// \param vertex_filename Filename of the vertex shader source
+    /// \param pixel_filename Filename of the pixel (fragment) shader source
+    /// \param inputs List of attributes to be passed into the shader on each draw
+    /// call. Allows for translation of vertex data to shader data
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterShader(ShaderResource* program,
                                 std::string vertex_filename, std::string pixel_filename,
                                 ShaderAttributeList inputs)=0;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Binds the supplied ShaderResource and renders a number of vertices
+    /// from the currently bound mesh equal to the supplied index_count. Currently
+    /// bound mesh is determined by the most recent call to Render::BindMeshBuffer
+    ///
+    /// \param program %Shader pipeline to render with
+    /// \param index_count Number of vertices to render
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void RenderShader(ShaderResource* program, unsigned int index_count)=0;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a supplied vertex and index buffer resource and binds them
+    /// to the graphics API, prepping them for a draw call
+    ///
+    /// \param vertex_buffer Buffer pointing to renderable vertex data
+    /// \param index_buffer Buffer pointing to the indices of vertex data
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets the mesh data of the supplied vertex and index buffer to match
+    /// that of the provided vertices and indices. Resizes the buffers if needed
+    ///
+    /// \param vertex_buffer Buffer pointing to renderable vertex data
+    /// \param index_buffer Buffer pointing to the indices of vertex data
+    /// \param vertices %Vertex data to be bound to the buffer
+    /// \param vert_count Number of vertices to bind to the buffer
+    /// \param indices Index data to be bound to the buffer
+    /// \param index_count Number of indices to bind to the buffer
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                              const Vertex* vertices, unsigned int vert_count,
                              const unsigned int* indices, unsigned int index_count)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Updates a subset of the mesh data bound to the supplied vertex and
+    /// index buffer to match that of the provided vertices and indices. The offsets
+    /// point to the beginning of the region to modify and are counted in number of
+    /// vertices/indices. The end of the region is determined by offset + count
+    ///
+    /// \param vertex_buffer Buffer pointing to renderable vertex data
+    /// \param index_buffer Buffer pointing to the indices of vertex data
+    /// \param vertices %Vertex data to be bound to the buffer
+    /// \param vert_offset Offset, in vertices, pointing to the beginning of the
+    /// subregion to modify
+    /// \param vert_count Number of vertices to update in the buffer
+    /// \param indices Index data to be bound to the buffer
+    /// \param index_offset Offset, in 4 byte chunks, pointing to the beginning of
+    /// the subregion to modify
+    /// \param index_count Number of indices to update in the buffer
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
                                 const unsigned int* indices, unsigned int index_offset, unsigned int index_count)=0;
-    // TODO: The pointers returned by this are only good until the next API call,
-    // make this more clear to the user somehow! I want it to be explicit in the API,
-    // instead of just casually mentioned deep in the docs somewhere
-    // NOTE: Tried using weak_ptrs, lambda callbacks. Both hurt performance too much
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a vertex and index buffer and returns, through the input
+    /// arguments, pointers to the mesh data stored internally in the rendering API
+    /// allowing for free modification of the data. **Note that the pointers
+    /// returned by this function are only valid until the next call to this
+    /// class.** I wanted to make this more explicit through API usage somehow, but
+    /// safe guards like std::weak_ptr%s and lambda callbacks gave too much of a
+    /// performance hit. Sorry!
+    ///
+    /// \param vertex_buffer Buffer pointing to vertex data to modify
+    /// \param index_buffer Buffer pointing to the indices to modify
+    /// \param[out] vertex_data Pointer to the internally stored vertices
+    /// \param[out] index_data Pointer to the internally stored indices
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                              Vertex** vertex_data, unsigned int** index_data)=0;
-    // Using const char* instead of std::string here is noticably faster
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets a shader's global variable to be that of the given value
+    ///
+    /// \param program Shader containing global variable
+    /// \param name Name of global variable to modify
+    /// \param value Value to set global variable to
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderInput(ShaderResource* program, const char* name, int value)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Matrix value)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value)=0;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets depth testing to be either enabled or disabled
+    ///
+    /// \param enable True to enable depth testing, false to disable
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetDepthTesting(bool enable)=0;
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the video card information
+    ///
+    /// \param[out] buffer Pointer to the string containing information
+    /// \param[out] len_buffer Number of bytes copied into buffer
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void GetVideoCardInfo(char* buffer, int& len_buffer)=0;
 
     // TODO: do this MANULLY in texture class later
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Decodes an image into raw pixel data and format information. This is
+    /// only **temporarily** handled by the render class because the image decoding
+    /// library also handles API specific functions
+    ///
+    /// \param filename Name of the image file to load
+    /// \param[out] pixel_data Stores decoded pixel data and format information
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool LoadPixelData(std::string filename, PixelData* pixel_data)=0;
 
 protected:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief True is vsync should be enabled
+    ////////////////////////////////////////////////////////////////////////////////
     bool vsync_;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Video card memory in bytes
+    ////////////////////////////////////////////////////////////////////////////////
     int video_card_memory_;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Vendor information of video card
+    ////////////////////////////////////////////////////////////////////////////////
     std::string video_card_desc_;
 };
 } // namespace blons
+
+// TODO: Add wayyyy more examples of dealing with the Render API at a low level
+////////////////////////////////////////////////////////////////////////////////
+/// \class blons::Render
+/// \ingroup graphics
+///
+/// Provides a platform independent way of rendering raw meshes and textures
+/// to the screen with a programmable pipeline.
+/// 
+/// ### Example:
+/// \code
+/// // Simple render loop dealing with a RenderContext
+/// bool RenderScene()
+/// {
+///     // Clear buffers
+///     context->BeginScene();
+///
+///     // Update camera matrix
+///     camera->Render();
+///
+///     // Get view matrix
+///     view_matrix = camera->view_matrix();
+///
+///     // Prep the pipeline for drawing
+///     model->Render(context);
+///     world_matrix = model->world_matrix();
+///
+///     // Set the inputs
+///     if (!shader->SetInput("world_matrix", world_matrix, context) ||
+///         !shader->SetInput("view_matrix", view_matrix, context) ||
+///         !shader->SetInput("proj_matrix", proj_matrix, context) ||
+///         !shader->SetInput("diffuse", model->texture(), context))
+///     {
+///         return false;
+///     }
+///
+///     // Finally do the render
+///     if (!shader->Render(model->index_count(), context))
+///     {
+///         return false;
+///     }
+///
+///     // Swap buffers
+///     context->EndScene();
+///
+///     return true;
+/// }
+/// \endcode
+////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_RENDER_RENDER_H_
