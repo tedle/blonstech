@@ -48,9 +48,4 @@ bool Shader::SetInput(const char* field, const TextureResource* value, RenderCon
 {
     return context->SetShaderInput(program_.get(), field, value);
 }
-
-ShaderResource* Shader::program() const
-{
-    return program_.get();
-}
 } // namespace blons
