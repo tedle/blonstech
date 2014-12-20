@@ -131,9 +131,6 @@ bool Graphics::Render()
     // Clear buffers
     context_->BeginScene();
 
-    // Update camera matrix
-    camera_->Render();
-
     // Get matrices
     view_matrix = camera_->view_matrix();
 

@@ -37,17 +37,9 @@ void Camera::LookAt(units::world x, units::world y, units::world z)
     Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
     Vector3 rotation;
 
-    view_matrix_ = MatrixLookAt(pos_, look, up);
-    rotation = Vector3PitchYawRoll(view_matrix_);
+    rotation = Vector3PitchYawRoll(MatrixLookAt(pos_, look, up));
     
     set_rot(rotation.x, rotation.y, rotation.z);
-}
-
-void Camera::Render()
-{
-    view_matrix_ = MatrixView(pos_, rot_);
-
-    return;
 }
 
 Vector3 Camera::pos() const
@@ -62,6 +54,6 @@ Vector3 Camera::rot() const
 
 Matrix Camera::view_matrix() const
 {
-    return view_matrix_;
+    return MatrixView(pos_, rot_);
 }
 } // namespace blons
