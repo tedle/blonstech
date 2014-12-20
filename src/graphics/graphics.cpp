@@ -15,6 +15,29 @@
 
 namespace blons
 {
+// Managed assets that allows the blons::Graphics class to track and render anything it creates
+class ManagedModel : public Model
+{
+public:
+    ManagedModel(std::string filename, RenderContext& context) : Model(filename, context) {}
+    ~ManagedModel() override;
+private:
+    friend Graphics;
+    void Finish();
+    std::function<void(ManagedModel*)> deleter_;
+};
+
+class ManagedSprite : public Sprite
+{
+public:
+    ManagedSprite(std::string filename, RenderContext& context) : Sprite(filename, context) {}
+    ~ManagedSprite() override;
+private:
+    friend Graphics;
+    void Finish();
+    std::function<void(ManagedSprite*)> deleter_;
+};
+
 Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND hwnd)
 {
     context_ = nullptr;
@@ -204,7 +227,7 @@ gui::Manager* Graphics::gui() const
     return gui_.get();
 }
 
-void Graphics::ManagedModel::Finish()
+void ManagedModel::Finish()
 {
     if (deleter_ != nullptr)
     {
@@ -218,7 +241,7 @@ void Graphics::ManagedModel::Finish()
     light_texture_.reset();
 }
 
-Graphics::ManagedModel::~ManagedModel()
+ManagedModel::~ManagedModel()
 {
     if (deleter_ != nullptr)
     {
@@ -226,7 +249,7 @@ Graphics::ManagedModel::~ManagedModel()
     }
 }
 
-void Graphics::ManagedSprite::Finish()
+void ManagedSprite::Finish()
 {
     if (deleter_ != nullptr)
     {
@@ -239,7 +262,7 @@ void Graphics::ManagedSprite::Finish()
     texture_.reset();
 }
 
-Graphics::ManagedSprite::~ManagedSprite()
+ManagedSprite::~ManagedSprite()
 {
     if (deleter_ != nullptr)
     {
