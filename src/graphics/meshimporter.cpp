@@ -5,36 +5,13 @@
 
 namespace blons
 {
-MeshImporter::MeshImporter(std::string filename)
-{
-    uv_count_ = 0;
-    normal_count_ = 0;
-    face_count_ = 0;
-
-    if (!Load(filename, false))
-    {
-        throw "Failed to import mesh";
-    }
-}
-
+// TODO: Refactor this with some helper functions
 MeshImporter::MeshImporter(std::string filename, bool invert_y)
 {
     uv_count_ = 0;
     normal_count_ = 0;
     face_count_ = 0;
 
-    if (!Load(filename, invert_y))
-    {
-        throw "Failed to import mesh";
-    }
-}
-
-MeshImporter::~MeshImporter()
-{
-}
-
-bool MeshImporter::Load(std::string filename, bool invert_y)
-{
     FILE* file;
     std::vector<Vector3> vertices, normals;
     std::vector<Vector2> uvs;
@@ -45,7 +22,7 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
     fopen_s(&file, filename.c_str(), "rb");
     if (file == nullptr)
     {
-        return false;
+        throw "Could not find mesh file";
     }
 
     unsigned int vertices_read, uvs_read, normals_read, faces_read, texture_count;
@@ -68,13 +45,13 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
         normal_count_ * sizeof(Vector3) > file_size ||
         face_count_ * sizeof(unsigned int) > file_size)
     {
-        return false;
+        throw "Corrupted mesh file";
     }
 
     // TODO: support non-textured objects (need shader layouts, settings n shit)
     if (!uv_count_)
     {
-        return false;
+        throw "Mesh file needs UV data";
     }
 
     // The seems like the most efficient way to read a lot of data straight into a vector...
@@ -130,19 +107,27 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
     if (vertices_read != vertex_count || uvs_read != uv_count_ ||
         normals_read != normal_count_ || faces_read != face_count_ || !eof)
     {
-        return false;
+        throw "Could not read mesh file successfully";
     }
 
     // 3 vertices for every tri
     vertex_count = index_count = face_count_ * 3;
 
+    if (vertex_count >= ULONG_MAX)
+    {
+        throw "Too many vertices!";
+    }
     mesh_data_.vertices.reserve(vertex_count);
 
     if (mesh_data_.vertices.max_size() < vertex_count)
     {
-        return false;
+        throw "Could not allocate memory for new mesh";
     }
 
+    if (index_count >= ULONG_MAX)
+    {
+        throw "Too many indices!";
+    }
     mesh_data_.indices.resize(index_count);
 
     // If there's no UVs, normals immediately follow vertex
@@ -225,27 +210,17 @@ bool MeshImporter::Load(std::string filename, bool invert_y)
     }
     // Update vertex count to account for removed duplicates
     log::Debug("%.1f%%v", (((float)vertex_count - (float)mesh_data_.vertices.size()) / (float)vertex_count) * 100.0);
-
-    return true;
 }
 
 unsigned int MeshImporter::vertex_count() const
 {
     std::size_t vertex_count = mesh_data_.vertices.size();
-    if (vertex_count >= ULONG_MAX)
-    {
-        throw "Too many vertices!";
-    }
     return static_cast<unsigned int>(vertex_count);
 }
 
 unsigned int MeshImporter::index_count() const
 {
     std::size_t index_count = mesh_data_.indices.size();
-    if (index_count >= ULONG_MAX)
-    {
-        throw "Too many indices!";
-    }
     return static_cast<unsigned int>(index_count);
 }
 
@@ -264,13 +239,13 @@ unsigned int MeshImporter::face_count() const
     return face_count_;
 }
 
-const MeshData* MeshImporter::mesh_data() const
+const MeshData& MeshImporter::mesh_data() const
 {
-    return &mesh_data_;
+    return mesh_data_;
 }
 
-const std::vector<MeshImporter::TextureInfo>* MeshImporter::textures() const
+const std::vector<MeshImporter::TextureInfo>& MeshImporter::textures() const
 {
-    return &textures_;
+    return textures_;
 }
 } // namespace blons

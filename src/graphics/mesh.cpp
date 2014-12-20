@@ -12,16 +12,24 @@ Mesh::Mesh(const MeshData& mesh_data, RenderContext& context)
     mesh_data_.vertices = mesh_data.vertices;
     mesh_data_.indices = mesh_data.indices;
 
+    // Graphics APIs dont support having more than 4 billion vertices...
+    // I'm OK with that
+    if (mesh_data_.vertices.size() >= ULONG_MAX)
+    {
+        throw "Too many vertices!";
+    }
+
+    if (mesh_data_.indices.size() >= ULONG_MAX)
+    {
+        throw "Too many indices!";
+    }
+
     if (!context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(),
                                  mesh_data_.vertices.data(), vertex_count(),
                                  mesh_data_.indices.data(), index_count()))
     {
         throw "Failed to register mesh data";
     }
-}
-
-Mesh::~Mesh()
-{
 }
 
 BufferResource* Mesh::vertex_buffer() const
@@ -37,20 +45,12 @@ BufferResource* Mesh::index_buffer() const
 unsigned int Mesh::vertex_count() const
 {
     std::size_t vertex_count = mesh_data_.vertices.size();
-    if (vertex_count >= ULONG_MAX)
-    {
-        throw "Too many vertices!";
-    }
     return static_cast<unsigned int>(vertex_count);
 }
 
 unsigned int Mesh::index_count() const
 {
     std::size_t index_count = mesh_data_.indices.size();
-    if (index_count >= ULONG_MAX)
-    {
-        throw "Too many indices!";
-    }
     return static_cast<unsigned int>(index_count);
 }
 } // namespace blons

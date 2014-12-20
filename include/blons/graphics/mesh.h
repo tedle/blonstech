@@ -30,7 +30,7 @@ public:
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     Mesh(const MeshData& mesh_data, RenderContext& context);
-    ~Mesh();
+    ~Mesh() {}
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a handle to the mesh's vertex buffer resource
@@ -72,7 +72,7 @@ private:
 /// // Creating a new mesh from a file
 /// MeshImporter importer("mesh.bms");
 ///
-/// Mesh mesh(*importer.mesh_data(), context);
+/// Mesh mesh(importer.mesh_data(), context);
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

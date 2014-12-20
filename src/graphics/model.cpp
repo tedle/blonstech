@@ -28,7 +28,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     MeshImporter mesh(mesh_filename, true);
     log::Debug("[%ims]\n", timer.ms());
 
-    mesh_.reset(new Mesh(*mesh.mesh_data(), context));
+    mesh_.reset(new Mesh(mesh.mesh_data(), context));
 
     if (mesh_ == nullptr)
     {
@@ -43,7 +43,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     tex_folder = tex_folder.substr(0, tex_folder.find_last_of('/'));
     tex_folder = tex_folder.substr(0, tex_folder.find_last_of('/'));
     tex_folder += "/tex/";
-    for (const auto& tex : *mesh.textures())
+    for (const auto& tex : mesh.textures())
     {
         std::string tex_file;
         tex_file = tex_folder + tex.filename;
