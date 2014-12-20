@@ -5,12 +5,12 @@
 
 namespace blons
 {
-Mesh::Mesh(const MeshImporter& mesh, RenderContext& context)
+Mesh::Mesh(const MeshData& mesh_data, RenderContext& context)
 {
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
-    mesh_data_.vertices = mesh.mesh_data()->vertices;
-    mesh_data_.indices = mesh.mesh_data()->indices;
+    mesh_data_.vertices = mesh_data.vertices;
+    mesh_data_.indices = mesh_data.indices;
 
     if (!context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(),
                                  mesh_data_.vertices.data(), vertex_count(),
