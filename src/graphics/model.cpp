@@ -82,10 +82,6 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     log::Debug("[%ims]\n", timer.ms());
 }
 
-Model::~Model()
-{
-}
-
 void Model::Render(RenderContext& context)
 {
     // TODO: Clean this up with operator overloads
