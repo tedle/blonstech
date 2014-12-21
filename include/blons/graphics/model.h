@@ -120,7 +120,7 @@ protected:
 ///         graphics->Render();
 ///     }
 ///
-///     // Model can be deleted at any time to prevent it from being rendered anymore
+///     // Model can be deleted at any time to remove it from the render loop
 ///     model.reset();
 /// }
 ///

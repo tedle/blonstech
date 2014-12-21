@@ -23,6 +23,7 @@ void Sprite::Init(RenderContext& context)
     set_subtexture(0, 0, dimensions.width, dimensions.height);
 
     mesh_.indices.resize(6);
+    // Order to render the quad's vertices in
     mesh_.indices = { 0, 1, 2, 1, 3, 2 };
 
     mesh_.vertices.resize(4);
@@ -36,10 +37,6 @@ void Sprite::Init(RenderContext& context)
     }
 }
 
-Sprite::~Sprite()
-{
-}
-
 void Sprite::Render(RenderContext& context)
 {
     BuildQuad();
@@ -51,11 +48,8 @@ void Sprite::Render(RenderContext& context)
 
 unsigned int Sprite::vertex_count() const
 {
+    // 4
     std::size_t vertex_count = mesh_.vertices.size();
-    if (vertex_count >= ULONG_MAX)
-    {
-        throw "Too many vertices!";
-    }
     return static_cast<unsigned int>(vertex_count);
 }
 
@@ -63,10 +57,6 @@ unsigned int Sprite::index_count() const
 {
     // 6, lol
     std::size_t index_count = mesh_.indices.size();
-    if (index_count >= ULONG_MAX)
-    {
-        throw "Too many indices!";
-    }
     return static_cast<unsigned int>(index_count);
 }
 
@@ -153,6 +143,7 @@ void Sprite::BuildQuad()
     vs[2].pos.x = pos_.x;          vs[2].pos.y = pos_.y + pos_.h;
     vs[3].pos.x = pos_.x + pos_.w; vs[3].pos.y = pos_.y + pos_.h;
 
+    // Texture region is stored in pixels, but graphics API needs it normalized as [0,1]
     Texture::Info info = texture_->info();
     Box normal_tex(tex_map_.x / info.width,
                    tex_map_.y / info.height,
