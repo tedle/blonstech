@@ -698,9 +698,9 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vecto
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value)
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource& value)
 {
-    const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(value);
+    const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(&value);
     glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
     glBindTexture(GL_TEXTURE_2D, tex->texture_);
     return SetShaderInput(program, name, tex->texture_unit_);

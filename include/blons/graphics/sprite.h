@@ -21,10 +21,10 @@ public:
 
     unsigned int vertex_count() const;
     unsigned int index_count() const;
-    const TextureResource* texture() const;
+    const TextureResource& texture() const;
     Vector2 pos() const;
     Vector2 dimensions() const;
-    const MeshData* mesh();
+    const MeshData& mesh();
 
     // The set the position and/or size of sprite
     // as rendered on screen in pixels

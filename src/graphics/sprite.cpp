@@ -70,9 +70,9 @@ unsigned int Sprite::index_count() const
     return static_cast<unsigned int>(index_count);
 }
 
-const TextureResource* Sprite::texture() const
+const TextureResource& Sprite::texture() const
 {
-    return texture_->texture();
+    return *texture_->texture();
 }
 
 Vector2 Sprite::pos() const
@@ -137,10 +137,10 @@ void Sprite::set_subtexture(const Box& subtexture)
     set_subtexture(subtexture.x, subtexture.y, subtexture.w, subtexture.h);
 }
 
-const MeshData* Sprite::mesh()
+const MeshData& Sprite::mesh()
 {
     BuildQuad();
-    return &mesh_;
+    return mesh_;
 }
 
 void Sprite::BuildQuad()

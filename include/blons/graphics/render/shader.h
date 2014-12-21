@@ -56,7 +56,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc SetInput
     ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const TextureResource* value, RenderContext& context);
+    bool SetInput(const char* field, const TextureResource& value, RenderContext& context);
 
 private:
     std::unique_ptr<ShaderResource> program_;

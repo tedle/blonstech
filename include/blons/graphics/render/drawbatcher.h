@@ -87,7 +87,7 @@ private:
 ///     for (int y = 0; y < 10; y++)
 ///     {
 ///         sprite->set_pos(x * 32, y * 32);
-///         batch.Append(*sprite->mesh());
+///         batch.Append(sprite->mesh());
 ///     }
 /// }
 ///

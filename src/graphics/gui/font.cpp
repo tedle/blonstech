@@ -220,7 +220,7 @@ const MeshData* Font::BuildMesh(unsigned char letter, units::subpixel x, units::
     fontsheet_->set_pos(s);
     fontsheet_->set_subtexture(t);
 
-    return fontsheet_.get()->mesh();
+    return &fontsheet_.get()->mesh();
 }
 
 const MeshData* Font::BuildMesh(unsigned char letter, units::subpixel x, units::subpixel y)
@@ -425,7 +425,7 @@ units::pixel Font::pixel_size() const
     return pixel_size_;
 }
 
-const TextureResource* Font::texture() const
+const TextureResource& Font::texture() const
 {
     return fontsheet_->texture();
 }

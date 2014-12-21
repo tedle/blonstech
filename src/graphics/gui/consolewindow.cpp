@@ -55,7 +55,7 @@ void ConsoleWindow::Render(RenderContext& context)
                     pos_.w,
                     shadow.h);
     sprite->set_subtexture(shadow);
-    batch->Append(*sprite->mesh(), context);
+    batch->Append(sprite->mesh(), context);
 
     Window::Render(context);
 }

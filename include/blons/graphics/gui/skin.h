@@ -383,7 +383,7 @@ protected:
 ///     // Render the center body of a button
 ///     sprite->set_pos(x, y, pos_.w, pos_.h);
 ///     sprite->set_subtexture(region.body);
-///     batch->Append(*sprite->mesh(), context);
+///     batch->Append(sprite->mesh(), context);
 ///
 ///     // Submit the batches to gui::Manager
 ///     RegisterBatches();

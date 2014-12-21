@@ -96,10 +96,10 @@ int Model::index_count() const
     return mesh_->index_count();
 }
 
-const TextureResource* Model::texture() const
+const TextureResource& Model::texture() const
 {
     // TODO: getters for all types of textures
-    return diffuse_texture_->texture();
+    return *diffuse_texture_->texture();
 }
 
 Vector3 Model::pos() const
