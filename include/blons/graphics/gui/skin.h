@@ -15,21 +15,22 @@ class Sprite;
 namespace gui
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Used to categorize which fonts are used by which UI elements
-////////////////////////////////////////////////////////////////////////////////
-enum FontStyle
-{
-    DEFAULT, ///< Used when style is unspecified or if a specific style is not loaded in the Skin
-    HEADING, ///< Used for title text and Window captions
-    LABEL,   ///< Used for general text, Button captions, Textbox text, etc
-    CONSOLE  ///< Used by the game console
-};
-////////////////////////////////////////////////////////////////////////////////
 /// \brief Modularizes the look and feel of the GUI system
 ////////////////////////////////////////////////////////////////////////////////
 class Skin
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to categorize which fonts are used by which UI elements
+    ////////////////////////////////////////////////////////////////////////////////
+    enum FontStyle
+    {
+        DEFAULT, ///< Used when style is unspecified or if a specific style is not loaded in the Skin
+        HEADING, ///< Used for title text and Window captions
+        LABEL,   ///< Used for general text, Button captions, Textbox text, etc
+        CONSOLE  ///< Used by the game console
+    };
+
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Maps the GUI's skin texture pixel coordinates to conveniently named
     /// Box%es.

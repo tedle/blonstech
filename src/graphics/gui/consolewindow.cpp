@@ -7,10 +7,10 @@ namespace blons
 {
 namespace gui
 {
-ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager)
+ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager)
     : Window(id, pos, caption, type, parent_manager)
 {
-    auto font_style = FontStyle::CONSOLE;
+    auto font_style = Skin::FontStyle::CONSOLE;
     float textbox_height = 40.0f;
     // Attach ConsoleTextbox to the bottom of window with a height of textbox_height
     Box textbox_pos = Box(pos_.x, pos_.y + pos_.h - textbox_height, pos_.w, textbox_height);

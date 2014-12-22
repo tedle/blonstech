@@ -21,14 +21,14 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc Textbox(Box, FontStyle, Manager*, Window*)
     ////////////////////////////////////////////////////////////////////////////////
-    ConsoleTextbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
+    ConsoleTextbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window)
         : Textbox(pos, style, parent_manager, parent_window) {}
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls ConsoleTextbox(Box, FontStyle, Manager*, Window*) with a
     /// style of FontStyle::CONSOLE
     ////////////////////////////////////////////////////////////////////////////////
     ConsoleTextbox(Box pos, Manager* parent_manager, Window* parent_window)
-        : ConsoleTextbox(pos, FontStyle::CONSOLE, parent_manager, parent_window) {}
+        : ConsoleTextbox(pos, Skin::FontStyle::CONSOLE, parent_manager, parent_window) {}
     ~ConsoleTextbox() {}
 
     ////////////////////////////////////////////////////////////////////////////////

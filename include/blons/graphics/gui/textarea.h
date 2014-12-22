@@ -28,13 +28,13 @@ public:
     /// \param parent_manager gui::Manager containing this element
     /// \param parent_window gui::Window containing this element
     ////////////////////////////////////////////////////////////////////////////////
-    Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window);
+    Textarea(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Textarea(Box, FontStyle, Manager*, Window*) with a default
     /// style of `FontStyle::LABEL`
     ////////////////////////////////////////////////////////////////////////////////
     Textarea(Box pos, Manager* parent_manager, Window* parent_window)
-        : Textarea(pos, FontStyle::LABEL, parent_manager, parent_window) {}
+        : Textarea(pos, Skin::FontStyle::LABEL, parent_manager, parent_window) {}
     ~Textarea() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ protected:
 private:
     void MoveScrollOffset(units::pixel delta, bool smooth);
 
-    FontStyle font_style_;
+    Skin::FontStyle font_style_;
 
     // New lines appear on the top, or bottom
     bool newest_top_;

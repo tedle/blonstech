@@ -87,7 +87,7 @@ DrawBatcher* Control::batch(StaticDrawCallInputs inputs, RenderContext& context)
     return batch;
 }
 
-DrawBatcher* Control::font_batch(FontStyle style, Vector4 colour, RenderContext& context)
+DrawBatcher* Control::font_batch(Skin::FontStyle style, Vector4 colour, RenderContext& context)
 {
     StaticDrawCallInputs inputs = { true, style, colour };
     return batch(inputs, context);
@@ -95,7 +95,7 @@ DrawBatcher* Control::font_batch(FontStyle style, Vector4 colour, RenderContext&
 
 DrawBatcher* Control::control_batch(RenderContext& context)
 {
-    StaticDrawCallInputs inputs = { false, FontStyle::DEFAULT, Vector4(0, 0, 0, 0) };
+    StaticDrawCallInputs inputs = { false, Skin::FontStyle::DEFAULT, Vector4(0, 0, 0, 0) };
     return batch(inputs, context);
 }
 } // namespace gui

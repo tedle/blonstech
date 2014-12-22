@@ -42,7 +42,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc gui::Skin::LoadFont
     ////////////////////////////////////////////////////////////////////////////////
-    bool LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context);
+    bool LoadFont(std::string filename, units::pixel pixel_size, Skin::FontStyle style, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls LoadFont(std::string, units::pixel, FontStyle, RenderContext&)
     /// with a style of `FontStyle::DEFAULT`.
@@ -65,7 +65,7 @@ public:
     /// \return Pointer to the created window. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, WindowType type);
+    Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
     /// MakeWindow(std::string, units::pixel, units::pixel, units::pixel, units::pixel, std::string, WindowType)
@@ -77,7 +77,7 @@ public:
     /// MakeWindow(std::string, units::pixel, units::pixel, units::pixel, units::pixel, std::string, WindowType)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, WindowType type);
+    Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the screen. Generally issued

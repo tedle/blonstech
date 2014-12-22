@@ -24,13 +24,13 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc Window(std::string, Box, std::string, WindowType, Manager*, Window*)
     ////////////////////////////////////////////////////////////////////////////////
-    ConsoleWindow(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager);
+    ConsoleWindow(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
     /// ConsoleWindow(std::string, Box, std::string, WindowType, Manager*)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
-    ConsoleWindow(std::string id, Box pos, WindowType type, Manager* parent_manager)
+    ConsoleWindow(std::string id, Box pos, Type type, Manager* parent_manager)
         : ConsoleWindow(id, pos, "", type, parent_manager) {}
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
@@ -38,7 +38,7 @@ public:
     /// with a style of WindowType::INVISIBLE
     ////////////////////////////////////////////////////////////////////////////////
     ConsoleWindow(std::string id, Box pos, std::string caption, Manager* parent_manager)
-        : ConsoleWindow(id, pos, caption, WindowType::INVISIBLE, parent_manager) {}
+        : ConsoleWindow(id, pos, caption, Type::INVISIBLE, parent_manager) {}
     ~ConsoleWindow() {}
 
     ////////////////////////////////////////////////////////////////////////////////

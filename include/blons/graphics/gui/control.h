@@ -22,7 +22,7 @@ class Window;
 struct DrawCallInputs
 {
     bool is_text;
-    FontStyle font_style;
+    Skin::FontStyle font_style;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Is only applied to text. Values range from 0.0 to 1.0
     ////////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ struct DrawCallInputs
 struct StaticDrawCallInputs
 {
     bool is_text;
-    FontStyle font_style;
+    Skin::FontStyle font_style;
     Vector4 colour;
     // needed for efficient std::map lookups
     bool operator< (const StaticDrawCallInputs call) const { return memcmp(this, &call, sizeof(StaticDrawCallInputs))>0; }
@@ -180,7 +180,7 @@ protected:
     /// \param context Handle to the current rendering context
     /// \return The Drawbatcher for rendering
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* font_batch(FontStyle style, Vector4 colour, RenderContext& context);
+    DrawBatcher* font_batch(Skin::FontStyle style, Vector4 colour, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
     /// towards element body rendering.

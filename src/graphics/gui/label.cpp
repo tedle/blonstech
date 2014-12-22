@@ -7,7 +7,7 @@ namespace blons
 {
 namespace gui
 {
-Label::Label(Vector2 pos, ColourString text, FontStyle style, Manager* parent_manager, Window* parent_window)
+Label::Label(Vector2 pos, ColourString text, Skin::FontStyle style, Manager* parent_manager, Window* parent_window)
     : Control(Box(pos.x, pos.y, 0.0f, 0.0f), parent_manager, parent_window)
 {
     text_ = text;

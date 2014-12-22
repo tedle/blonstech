@@ -7,7 +7,7 @@ namespace blons
 {
 namespace gui
 {
-Window::Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager)
+Window::Window(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager)
     : Control(pos, parent_manager, nullptr), id_(id)
 {
     type_ = type;
@@ -15,7 +15,7 @@ Window::Window(std::string id, Box pos, std::string caption, WindowType type, Ma
     drag_offset_ = Vector2(0, 0);
 
     units::subpixel title_bar_height = gui_->skin()->layout()->window.title.center.h;
-    units::subpixel letter_height = units::pixel_to_subpixel(gui_->skin()->font(FontStyle::HEADING)->letter_height());
+    units::subpixel letter_height = units::pixel_to_subpixel(gui_->skin()->font(Skin::FontStyle::HEADING)->letter_height());
     units::subpixel caption_offset = (title_bar_height + letter_height) / 2;
     Vector2 caption_pos(20, caption_offset);
     for (auto& c : caption)
@@ -23,7 +23,7 @@ Window::Window(std::string id, Box pos, std::string caption, WindowType type, Ma
         c = toupper(c);
     }
     Vector4 colour = gui_->skin()->layout()->window.title.colour;
-    caption_.reset(new Label(caption_pos, ColourString(caption, colour), FontStyle::HEADING, parent_manager, this));
+    caption_.reset(new Label(caption_pos, ColourString(caption, colour), Skin::FontStyle::HEADING, parent_manager, this));
 }
 
 void Window::Render(RenderContext& context)
@@ -57,7 +57,7 @@ void Window::RenderBody(RenderContext& context)
     auto sprite = skin->sprite();
     auto batch = control_batch(context);
     // Title bar
-    if (type_ == WindowType::DRAGGABLE)
+    if (type_ == Window::DRAGGABLE)
     {
         auto& t = layout->window.title;
         // Left
@@ -86,7 +86,7 @@ void Window::RenderBody(RenderContext& context)
     {
         // Add offset if window has a title bar
         units::subpixel t_off = 0.0;
-        if (type_ == WindowType::DRAGGABLE)
+        if (type_ == Window::DRAGGABLE)
         {
             t_off = layout->window.title.center.h;
         }

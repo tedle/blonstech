@@ -7,7 +7,7 @@ namespace blons
 {
 namespace gui
 {
-Textbox::Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
+Textbox::Textbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window)
     : Control(pos, parent_manager, parent_window)
 {
     active_ = false;

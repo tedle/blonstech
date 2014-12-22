@@ -24,13 +24,13 @@ public:
     /// \param parent_manager gui::Manager containing this element
     /// \param parent_window gui::Window containing this element
     ////////////////////////////////////////////////////////////////////////////////
-    Textbox(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window);
+    Textbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Textbox(Box, FontStyle, Manager*, Window*) with a default
     /// style of `FontStyle::LABEL`
     ////////////////////////////////////////////////////////////////////////////////
     Textbox(Box pos, Manager* parent_manager, Window* parent_window)
-        : Textbox(pos, FontStyle::LABEL, parent_manager, parent_window) {}
+        : Textbox(pos, Skin::FontStyle::LABEL, parent_manager, parent_window) {}
     ~Textbox() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -133,7 +133,7 @@ private:
     units::subpixel CursorOffset();
 
     std::string text_;
-    FontStyle font_style_;
+    Skin::FontStyle font_style_;
     std::string::iterator cursor_;
     Timer cursor_blink_;
     struct

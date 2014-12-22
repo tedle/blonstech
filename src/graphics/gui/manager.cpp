@@ -21,34 +21,34 @@ Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader
     skin_.reset(new Skin(context));
 
     // TODO: move this out of constructor! font load included!
-    LoadFont("../../notes/font stuff/test-console.ttf", 28, FontStyle::DEFAULT, context);
-    LoadFont("../../notes/font stuff/test-heading.ttf", 14, FontStyle::HEADING, context);
-    LoadFont("../../notes/font stuff/test-label.ttf", 20, FontStyle::LABEL, context);
-    LoadFont("../../notes/font stuff/test-console.ttf", 28, FontStyle::CONSOLE, context);
+    LoadFont("../../notes/font stuff/test-console.ttf", 28, Skin::FontStyle::DEFAULT, context);
+    LoadFont("../../notes/font stuff/test-heading.ttf", 14, Skin::FontStyle::HEADING, context);
+    LoadFont("../../notes/font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL, context);
+    LoadFont("../../notes/font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE, context);
     // TODO: get rid of main_window... i think
-    main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), WindowType::INVISIBLE, this));
-    console_window_.reset(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), WindowType::INVISIBLE, this));
+    main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
+    console_window_.reset(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
 }
 
 Manager::~Manager()
 {
 }
 
-bool Manager::LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context)
+bool Manager::LoadFont(std::string filename, units::pixel pixel_size, Skin::FontStyle style, RenderContext& context)
 {
     return skin_->LoadFont(filename, pixel_size, style, context);
 }
 
 bool Manager::LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context)
 {
-    return LoadFont(filename, pixel_size, FontStyle::DEFAULT, context);
+    return LoadFont(filename, pixel_size, Skin::FontStyle::DEFAULT, context);
 }
 
-Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, WindowType type)
+Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
 {
     Box win_pos(x, y, width, height);
     Window* temp_win;
-    if (type == WindowType::DRAGGABLE)
+    if (type == Window::DRAGGABLE)
     {
         temp_win = new Window(id, win_pos, caption, this);
     }
@@ -72,10 +72,10 @@ Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, unit
 
 Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
 {
-    return MakeWindow(id, x, y, width, height, caption, WindowType::DRAGGABLE);
+    return MakeWindow(id, x, y, width, height, caption, Window::DRAGGABLE);
 }
 
-Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, WindowType type)
+Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type)
 {
     return MakeWindow(id, x, y, width, height, "", type);
 }

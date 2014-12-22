@@ -13,20 +13,21 @@ namespace blons
 namespace gui
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Used to determine Window behaviour
-////////////////////////////////////////////////////////////////////////////////
-enum WindowType
-{
-    DRAGGABLE, ///< Has a titlebar, caption, and can be dragged around
-    STATIC,    ///< Renders like a pane, cannot be moved
-    INVISIBLE  ///< Renders only child Control%s
-};
-
-////////////////////////////////////////////////////////////////////////////////
 /// \brief Container for UI elements
 ////////////////////////////////////////////////////////////////////////////////
 class Window : public Control
 {
+public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to determine Window behaviour
+    ////////////////////////////////////////////////////////////////////////////////
+    enum Type
+    {
+        DRAGGABLE, ///< Has a titlebar, caption, and can be dragged around
+        STATIC,    ///< Renders like a pane, cannot be moved
+        INVISIBLE  ///< Renders only child Control%s
+    };
+
 public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Initializes members with supplied values. Meant to be used by
@@ -39,19 +40,19 @@ public:
     /// \param type How the window should behave. See gui::WindowType
     /// \param parent_manager gui::Manager containing this window
     ////////////////////////////////////////////////////////////////////////////////
-    Window(std::string id, Box pos, std::string caption, WindowType type, Manager* parent_manager);
+    Window(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Window(std::string, Box, std::string, WindowType, Manager*)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
-    Window(std::string id, Box pos, WindowType type, Manager* parent_manager)
+    Window(std::string id, Box pos, Type type, Manager* parent_manager)
         : Window(id, pos, "", type, parent_manager) {}
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Window(std::string, Box, std::string, WindowType, Manager*)
     /// with a type of `WindowType::DRAGGABLE`
     ////////////////////////////////////////////////////////////////////////////////
     Window(std::string id, Box pos, std::string caption, Manager* parent_manager)
-        : Window(id, pos, caption, WindowType::DRAGGABLE, parent_manager) {}
+        : Window(id, pos, caption, Type::DRAGGABLE, parent_manager) {}
     ~Window() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +139,7 @@ protected:
 
 private:
     const std::string id_;
-    WindowType type_;
+    Type type_;
 
     // For draggable windows
     bool dragging_;

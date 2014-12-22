@@ -11,7 +11,7 @@ namespace blons
 {
 namespace gui
 {
-Textarea::Textarea(Box pos, FontStyle style, Manager* parent_manager, Window* parent_window)
+Textarea::Textarea(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window)
     : Control(pos, parent_manager, parent_window)
 {
     font_style_ = style;

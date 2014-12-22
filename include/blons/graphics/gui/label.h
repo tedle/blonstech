@@ -28,13 +28,13 @@ public:
     /// \param parent_manager gui::Manager containing this element
     /// \param parent_window gui::Window containing this element
     ////////////////////////////////////////////////////////////////////////////////
-    Label(Vector2 pos, ColourString text, FontStyle style, Manager* parent_manager, Window* parent_window);
+    Label(Vector2 pos, ColourString text, Skin::FontStyle style, Manager* parent_manager, Window* parent_window);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Label(Vector2, ColourString, FontStyle, Manager*, Window*)
     /// with a default style of `FontStyle::LABEL`
     ////////////////////////////////////////////////////////////////////////////////
     Label(Vector2 pos, ColourString text, Manager* parent_manager, Window* parent_window)
-        : Label(pos, text, FontStyle::LABEL, parent_manager, parent_window) {}
+        : Label(pos, text, Skin::FontStyle::LABEL, parent_manager, parent_window) {}
     ~Label() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ public:
     void set_colour_parsing(bool colour_parsing);
 
 private:
-    FontStyle font_style_;
+    Skin::FontStyle font_style_;
     ColourString text_;
     bool colour_parsing_;
 };
