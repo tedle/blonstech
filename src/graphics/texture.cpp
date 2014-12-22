@@ -41,17 +41,13 @@ void Texture::Init(PixelData* pixels, Type type, RenderContext& context)
     info_.type = type;
 }
 
-Texture::~Texture()
-{
-}
-
 Texture::Info Texture::info() const
 {
     return info_;
 }
 
-const TextureResource* Texture::texture() const
+const TextureResource& Texture::texture() const
 {
-    return texture_.get();
+    return *texture_;
 }
 } // namespace blons

@@ -62,7 +62,7 @@ unsigned int Sprite::index_count() const
 
 const TextureResource& Sprite::texture() const
 {
-    return *texture_->texture();
+    return texture_->texture();
 }
 
 Vector2 Sprite::pos() const
