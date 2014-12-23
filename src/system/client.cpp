@@ -70,8 +70,9 @@ bool Client::Frame()
         }
     }
 
+    input_->Frame();
     // Esc = exit
-    if (!input_->Frame() || input_->IsKeyDown(Input::ESCAPE))
+    if (input_->IsKeyDown(Input::ESCAPE))
     {
         return true;
     }

@@ -202,7 +202,7 @@ const std::vector<Input::Event>& Input::event_queue() const
     return event_queue_;
 }
 
-bool Input::Frame()
+void Input::Frame()
 {
     delta_mouse_x_ = mouse_x_ - old_mouse_x_;
     delta_mouse_y_ = mouse_y_ - old_mouse_y_;
@@ -224,8 +224,6 @@ bool Input::Frame()
     // Since event polling is done before frame is called
     event_queue_ = event_queue_buffer_;
     event_queue_buffer_.clear();
-
-    return true;
 }
 
 void Input::Modifiers::Update(Event e)
