@@ -94,10 +94,10 @@ ColourString::ColourString(std::string text, Vector4 base_colour)
         {
             Vector4 colour;
             // Prefix ++ to skip over '$' char
-            colour.x = HexToInt(text[++code_pos]) / 15.0f;
-            colour.y = HexToInt(text[++code_pos]) / 15.0f;
-            colour.z = HexToInt(text[++code_pos]) / 15.0f;
-            colour.w = 1.0;
+            colour.r = HexToInt(text[++code_pos]) / 15.0f;
+            colour.g = HexToInt(text[++code_pos]) / 15.0f;
+            colour.b = HexToInt(text[++code_pos]) / 15.0f;
+            colour.a = 1.0;
             text = text.substr(++code_pos);
             next_frag.colour = colour;
             next_frag.is_base = false;
@@ -113,9 +113,9 @@ std::string ColourString::MakeColourCode(Vector4 colour)
 {
     // xxx to avoid extra allocation
     std::string ret = "$xxx";
-    ret[1] = IntToHex(static_cast<unsigned char>(15.0f * colour.x));
-    ret[2] = IntToHex(static_cast<unsigned char>(15.0f * colour.y));
-    ret[3] = IntToHex(static_cast<unsigned char>(15.0f * colour.z));
+    ret[1] = IntToHex(static_cast<unsigned char>(15.0f * colour.r));
+    ret[2] = IntToHex(static_cast<unsigned char>(15.0f * colour.g));
+    ret[3] = IntToHex(static_cast<unsigned char>(15.0f * colour.b));
     return ret;
 }
 
