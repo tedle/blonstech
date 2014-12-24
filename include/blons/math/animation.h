@@ -8,39 +8,74 @@
 
 namespace blons
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Utility class for general animation and easing effects
+////////////////////////////////////////////////////////////////////////////////
 class Animation
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Available easing functions for animations
+    ////////////////////////////////////////////////////////////////////////////////
     enum TweenType
     {
-        LINEAR,
-        QUAD_IN,
-        QUAD_OUT,
-        QUAD_IN_OUT,
-        CUBIC_IN,
-        CUBIC_OUT,
-        CUBIC_IN_OUT,
-        QUINT_IN,
-        QUINT_OUT,
-        QUINT_IN_OUT,
-        SMOOTHSTEP
+        LINEAR,       ///< 1-to-1 linear function
+        QUAD_IN,      ///< Quadratic (x^2) function
+        QUAD_OUT,     ///< Inverse quadratic (x^2) function
+        QUAD_IN_OUT,  ///< Mixed quadratic (x^2) function
+        CUBIC_IN,     ///< Cubic (x^3) function
+        CUBIC_OUT,    ///< Inverse cubic (x^3) function
+        CUBIC_IN_OUT, ///< Mixed cubic (x^3) function
+        QUINT_IN,     ///< Quintic (x^5) function
+        QUINT_OUT,    ///< Inverse quintic (x^5) function
+        QUINT_IN_OUT, ///< Mixed quintic (x^5) function
+        SMOOTHSTEP    ///< Generic smoothing function
     };
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Function prototype for animation callbacks, receives a number from
+    /// [0.0, 1.0] indicating the completion progress of the animation
+    ////////////////////////////////////////////////////////////////////////////////
     typedef std::function<void(float)> Callback;
 
 public:
-    // Callback is sent a progression value ranging from 0.0 to 1.0
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes a new animation
+    ///
+    /// \param duration Total running time of the animation in milliseconds
+    /// \param callback Function for the animation to act on whenever
+    /// Animation::Update is called. Receives a floating point value from 0.0 to 1.0
+    /// \param tween_method Easing algorithm to use for the animation
+    ////////////////////////////////////////////////////////////////////////////////
     Animation(units::time::ms duration, Callback callback, TweenType tween_method);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls Animation(units::time::ms, Callback, TweenType) with a default
+    /// easing function of TweenType::LINEAR
+    ////////////////////////////////////////////////////////////////////////////////
     Animation(units::time::ms duration, Callback callback)
         : Animation(duration, callback, LINEAR) {}
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates an empty animation with no callback
+    ////////////////////////////////////////////////////////////////////////////////
     Animation()
         : Animation(0, [](float){}) {}
-    ~Animation() {};
+    ~Animation() {}
 
-    // Restarts animation from beginning
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Restarts animation from the beginning
+    ////////////////////////////////////////////////////////////////////////////////
     void Reset();
-    // Completely halts animation
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Completely halts animation
+    ////////////////////////////////////////////////////////////////////////////////
     void Stop();
-    // Returns true on completion
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief To be called during an update cycle, performs easing calculations
+    /// and invokes the callback with a value ranging from 0.0 to 1.0 indicating the
+    /// progress of the animation. If the animation has already been completed in an
+    /// earlier call to Update then the callback is not invoked
+    ///
+    /// \return Returns true on completion of the entire animation
+    ////////////////////////////////////////////////////////////////////////////////
     bool Update();
 
 private:
@@ -52,5 +87,34 @@ private:
     TweenType tween_method_;
 };
 } // namespace blons
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class blons::Animation
+/// \ingroup math
+///
+/// Animations are performed through a user defined callback that is supplied
+/// during initialization and is invoked whenever Animation::Update is called.
+///
+/// ### Example:
+/// \code
+/// // Create a new animation with a 1 second duration
+/// // that prints its progress to the debug log
+/// blons::Animation::Callback cb = [](float d)
+/// {
+///     blons::log::Debug("%.1f%% complete!\n", d * 100);
+/// };
+/// blons::Animation animation(1000, cb, blons::Animation::SMOOTHSTEP);
+///
+/// // Main update loop, containing application code and stuff
+/// while (true)
+/// {
+///     if (animation.Update())
+///     {
+///         blons::log::Debug("Animation completed!\n");
+///         break;
+///     }
+/// }
+/// \endcode
+////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_MATH_ANIMATION_H_
