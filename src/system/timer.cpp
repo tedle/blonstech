@@ -48,7 +48,15 @@ void Timer::stop()
 
 void Timer::rewind(units::time::ms ms)
 {
-    microseconds_ -= units::time::ms_to_us(ms);
+    // Overflow check
+    if (units::time::ms_to_us(ms) > microseconds_)
+    {
+        microseconds_ -= units::time::ms_to_us(ms);
+    }
+    else
+    {
+        microseconds_ = 0;
+    }
 }
 
 units::time::ms Timer::ms()

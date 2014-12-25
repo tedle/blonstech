@@ -6,8 +6,13 @@
 #include <blons/debug.h>
 #include <blons/graphics/graphics.h>
 
+
 namespace blons
 {
+// TODO: Temporary until Direct & Raw input are setup
+static Client* g_application_handle = nullptr;
+// Message hooking helpers
+static LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 Client::Client()
 {
     input_ = nullptr;
