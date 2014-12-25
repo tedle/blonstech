@@ -68,7 +68,7 @@ public:
         SYMBOL_SEMICOLON     = 0x29, ///< ;
         SYMBOL_QUOTE         = 0x2A, ///< '
         SYMBOL_COMMA         = 0x2B, ///< ,
-        SYMBOL_PERIOD        = 0x2C, ///< .
+        SYMBOL_PERIOD        = 0x2C, ///< Period symbol
         SYMBOL_SLASH         = 0x2D, ///< /
         SYMBOL_MINUS         = 0x2E, ///< Minus symbol
         SYMBOL_EQUALS        = 0x2F, ///< =
@@ -82,7 +82,7 @@ public:
         ALT                  = 0x33, ///< Alt modifier
         BACKSPACE            = 0x34, ///< Backspace key
 
-        DEL                  = 0x35, ///< Delete key (shoutouts to a certain company that loves #define!)
+        DEL                  = 0x35, ///< Delete key (shoutouts to a certain company that loves macros!)
         ESCAPE               = 0x36, ///< Escape key
         RETURN               = 0x37, ///< Return (enter) key
 
@@ -112,7 +112,7 @@ public:
             MOUSE_SCROLL, ///< Mouse wheel was scrolled
             KEY_DOWN,     ///< Keyboard key was pressed
             KEY_UP        ///< Keyboard key was released
-        } type;
+        } type; ///< Type of input event that occured
 
         ////////////////////////////////////////////////////////////////////////////////
         /// \brief Value of the input event

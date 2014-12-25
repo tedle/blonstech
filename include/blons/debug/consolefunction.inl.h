@@ -15,10 +15,13 @@ struct ConsoleArg
 };
 
 // Builds a list of indices during compilation
-template<unsigned... i>struct Indices{ typedef Indices type; };
-template<unsigned size, unsigned... i>struct MakeIndices : MakeIndices<size - 1, size - 1, i...> {};
-template<unsigned... i>struct MakeIndices<0, i...> : Indices<i...> {};
-template<unsigned size>using MakeIndicesType = typename MakeIndices<size>::type;
+/// @cond Doxygen_Suppress
+// ^^^ Why am I even getting doxygen warnings?? These are excluded symbols, go away
+template<unsigned... i> struct Indices { typedef Indices type; };
+template<unsigned size, unsigned... i> struct MakeIndices : MakeIndices<size - 1, size - 1, i...> {};
+template<unsigned... i> struct MakeIndices<0, i...> : Indices<i...> {};
+template<unsigned size> using MakeIndicesType = typename MakeIndices<size>::type;
+/// @endcond
 
 // Base class used to store functions in the console
 class Function

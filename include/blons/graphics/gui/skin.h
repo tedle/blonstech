@@ -49,16 +49,16 @@ public:
         ////////////////////////////////////////////////////////////////////////////////
         struct Button
         {
-            Box top_left;
-            Box top;
-            Box top_right;
-            Box left;
-            Box body;
-            Box right;
-            Box bottom_left;
-            Box bottom;
-            Box bottom_right;
-            Vector4 colour;
+            Box top_left;     ///< Texture coordinates for the top left region
+            Box top;          ///< Texture coordinates for the top edge region
+            Box top_right;    ///< Texture coordinates for the top right region
+            Box left;         ///< Texture coordinates for the left edge region
+            Box body;         ///< Texture coordinates for the body region
+            Box right;        ///< Texture coordinates for the right edge region
+            Box bottom_left;  ///< Texture coordinates for the bottom left region
+            Box bottom;       ///< Texture coordinates for the bottom edge region
+            Box bottom_right; ///< Texture coordinates for the bottom right region
+            Vector4 colour;   ///< Colour of caption text
         };
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ public:
                 Box(8, 81, 5, 5), // bottom_right
                 Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
-        } button;
+        } button; ///< Layouts for various button states
 
         ////////////////////////////////////////////////////////////////////////////////
         /// \brief Struct with Box%es detailing where to find the 4 edges, 4 corners,
@@ -124,16 +124,16 @@ public:
         ////////////////////////////////////////////////////////////////////////////////
         struct Textarea
         {
-            Box top_left;
-            Box top;
-            Box top_right;
-            Box left;
-            Box body;
-            Box right;
-            Box bottom_left;
-            Box bottom;
-            Box bottom_right;
-            Vector4 colour;
+            Box top_left;     ///< Texture coordinates for the top left region
+            Box top;          ///< Texture coordinates for the top edge region
+            Box top_right;    ///< Texture coordinates for the top right region
+            Box left;         ///< Texture coordinates for the left edge region
+            Box body;         ///< Texture coordinates for the body region
+            Box right;        ///< Texture coordinates for the right edge region
+            Box bottom_left;  ///< Texture coordinates for the bottom left region
+            Box bottom;       ///< Texture coordinates for the bottom edge region
+            Box bottom_right; ///< Texture coordinates for the bottom right region
+            Vector4 colour;   ///< Colour of text
         };
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -160,16 +160,16 @@ public:
         ////////////////////////////////////////////////////////////////////////////////
         struct Textbox
         {
-            Box top_left;
-            Box top;
-            Box top_right;
-            Box left;
-            Box body;
-            Box right;
-            Box bottom_left;
-            Box bottom;
-            Box bottom_right;
-            Vector4 colour;
+            Box top_left;     ///< Texture coordinates for the top left region
+            Box top;          ///< Texture coordinates for the top edge region
+            Box top_right;    ///< Texture coordinates for the top right region
+            Box left;         ///< Texture coordinates for the left edge region
+            Box body;         ///< Texture coordinates for the body region
+            Box right;        ///< Texture coordinates for the right edge region
+            Box bottom_left;  ///< Texture coordinates for the bottom left region
+            Box bottom;       ///< Texture coordinates for the bottom edge region
+            Box bottom_right; ///< Texture coordinates for the bottom right region
+            Vector4 colour;   ///< Colour of text
         };
 
         ////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ public:
             /// to fit with font specifications
             ////////////////////////////////////////////////////////////////////////////////
             Box cursor = Box(14, 42, 1, 1);
-        } textbox;
+        } textbox; ///< Layouts for various textbox states
 
         ////////////////////////////////////////////////////////////////////////////////
         /// \brief Struct with Box%es detailing where to find the 4 edges, 4 corners,
@@ -232,22 +232,22 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             struct Titlebar
             {
-                Box left = Box(0, 0, 5, 30);
-                Box center = Box(6, 0, 1, 30);
-                Box right = Box(8, 0, 5, 30);
-                Vector4 colour = Vector4(0.25f, 0.25f, 0.25f, 1.0);
-            } title;
-            Box top_left = Box(0, 31, 5, 5);
-            Box top = Box(6, 31, 1, 5);
-            Box top_right = Box(8, 31, 5, 5);
-            Box left = Box(0, 37, 5, 1);
-            Box body = Box(6, 37, 1, 1);
-            Box right = Box(8, 37, 5, 1);
-            Box bottom_left = Box(0, 39, 5, 5);
-            Box bottom = Box(6, 39, 1, 5);
-            Box bottom_right = Box(8, 39, 5, 5);
-            Vector4 colour = Vector4(1.0, 0.0, 1.0, 1.0);
-        } window;
+                Box left = Box(0, 0, 5, 30);   ///< Texture coordinates for the left edge region
+                Box center = Box(6, 0, 1, 30); ///< Texture coordinates for the center body region
+                Box right = Box(8, 0, 5, 30);  ///< Texture coordinates for the right edge region
+                Vector4 colour = Vector4(0.25f, 0.25f, 0.25f, 1.0); ///< Colour of the window caption
+            } title; ///< Layout for the window's titlebar
+            Box top_left = Box(0, 31, 5, 5);     ///< Texture coordinates for the top left region
+            Box top = Box(6, 31, 1, 5);          ///< Texture coordinates for the top edge region
+            Box top_right = Box(8, 31, 5, 5);    ///< Texture coordinates for the top right region
+            Box left = Box(0, 37, 5, 1);         ///< Texture coordinates for the left edge region
+            Box body = Box(6, 37, 1, 1);         ///< Texture coordinates for the body region
+            Box right = Box(8, 37, 5, 1);        ///< Texture coordinates for the right edge region
+            Box bottom_left = Box(0, 39, 5, 5);  ///< Texture coordinates for the bottom left region
+            Box bottom = Box(6, 39, 1, 5);       ///< Texture coordinates for the bottom edge region
+            Box bottom_right = Box(8, 39, 5, 5); ///< Texture coordinates for the bottom right region
+            Vector4 colour = Vector4(1.0, 0.0, 1.0, 1.0); ///< Default colour of labels
+        } window; ///< Layout for windows
 
         ////////////////////////////////////////////////////////////////////////////////
         /// \brief Contains all the types of elements skinned specifically for the game
@@ -255,6 +255,9 @@ public:
         ////////////////////////////////////////////////////////////////////////////////
         struct Console
         {
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Layout for console textareas
+            ////////////////////////////////////////////////////////////////////////////////
             Textarea textarea = Textarea
             {
                 Box(56, 0, 10, 10),  // top_left
@@ -268,6 +271,9 @@ public:
                 Box(69, 35, 10, 10), // bottom_right
                 Vector4(0.9f, 0.9f, 0.9f, 1.0) // text colour
             };
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Layout for console textboxes
+            ////////////////////////////////////////////////////////////////////////////////
             Textbox textbox = Textbox
             {
                 Box(30, 0, 10, 10),  // top_left
@@ -281,8 +287,8 @@ public:
                 Box(43, 13, 10, 10), // bottom_right
                 Vector4(0.9f, 0.9f, 0.9f, 1.0) // text colour
             };
-            Box cursor = Box(56, 48, 1, 1);
-        } console;
+            Box cursor = Box(56, 48, 1, 1); ///< Texture coordinates for the text cursor region
+        } console; ///< Layout for console controls
 
         ////////////////////////////////////////////////////////////////////////////////
         /// \brief Struct with Box%es detailing where to find a pre-rendered drop shadow
@@ -290,10 +296,10 @@ public:
         ////////////////////////////////////////////////////////////////////////////////
         struct Dropshadow
         {
-            Box bottom_left = Box(82, 0, 10, 40);
-            Box bottom = Box(93, 0, 1, 40);
-            Box bottom_right = Box(95, 0, 10, 40);
-        } dropshadow;
+            Box bottom_left = Box(82, 0, 10, 40);  ///< Texture coordinates for the bottom left region
+            Box bottom = Box(93, 0, 1, 40);        ///< Texture coordinates for the bottom center region
+            Box bottom_right = Box(95, 0, 10, 40); ///< Texture coordinates for the bottom right region
+        } dropshadow; ///< Generic drop shadow layout for controls
     };
 
 public:

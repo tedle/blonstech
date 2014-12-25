@@ -19,7 +19,7 @@ public:
     ///
     /// \param vertex_filename Location of the vertex shader source on disk
     /// \param pixel_filename Location of the pixel (fragment) shader source on disk
-    /// \param input %Vertex layout to be sent to the shader every frame
+    /// \param inputs %Vertex layout to be sent to the shader every frame
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs, RenderContext& context);
