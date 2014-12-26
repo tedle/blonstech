@@ -6,14 +6,15 @@ namespace blons
 {
 namespace console
 {
+using internal::Variable;
+
 namespace
 {
-using internal::ConsoleArg;
 struct ParseState
 {
-    std::vector<ConsoleArg> args;
+    std::vector<Variable> args;
     // Valid input always has a function name as the first word
-    ConsoleArg current_arg = ConsoleArg{ ConsoleArg::FUNCTION, "" };
+    Variable current_arg = Variable{ Variable::FUNCTION, "" };
     unsigned char current_letter;
     // Records whether we are in the middle of a "quoted string"
     bool open_string = false;
@@ -26,14 +27,14 @@ void ParseSpace(ParseState* state)
     if (!state->open_string)
     {
         // Make sure we've parsed part of an argument (no double spaces)
-        if (state->current_arg.type == ConsoleArg::NONE ||
+        if (state->current_arg.type == Variable::NONE ||
             state->current_arg.value.length() == 0)
         {
             throw "Unexpected space";
         }
         // Push that argument to the return list
         state->args.push_back(state->current_arg);
-        state->current_arg.type = ConsoleArg::NONE;
+        state->current_arg.type = Variable::NONE;
         state->current_arg.value.clear();
     }
     // If we are inside a "quoted string"...
@@ -46,15 +47,15 @@ void ParseSpace(ParseState* state)
 void ParseNumber(ParseState* state)
 {
     // Ensure this is the start of a word
-    if (state->current_arg.type == ConsoleArg::NONE)
+    if (state->current_arg.type == Variable::NONE)
     {
-        state->current_arg.type = ConsoleArg::INT;
+        state->current_arg.type = Variable::INT;
     }
     // If we aren't at the start of a word, turn this into a string
     else if (state->current_letter == '-' &&
-             state->current_arg.type != ConsoleArg::FUNCTION)
+             state->current_arg.type != Variable::FUNCTION)
     {
-        state->current_arg.type = ConsoleArg::STRING;
+        state->current_arg.type = Variable::STRING;
     }
     state->current_arg.value += state->current_letter;
 }
@@ -63,10 +64,10 @@ void ParseFloat(ParseState* state)
 {
     // If we find a '.' at the start of a word, or in the middle
     // of an integer, then convert to float.
-    if (state->current_arg.type == ConsoleArg::INT ||
-        state->current_arg.type == ConsoleArg::NONE)
+    if (state->current_arg.type == Variable::INT ||
+        state->current_arg.type == Variable::NONE)
     {
-        state->current_arg.type = ConsoleArg::FLOAT;
+        state->current_arg.type = Variable::FLOAT;
     }
     state->current_arg.value += state->current_letter;
 }
@@ -74,7 +75,7 @@ void ParseFloat(ParseState* state)
 void ParseQuote(ParseState* state)
 {
     // Opening quotes are only valid at the start of a word
-    if (state->current_arg.type != ConsoleArg::NONE &&
+    if (state->current_arg.type != Variable::NONE &&
         state->open_string == false)
     {
         throw "Unexpected quote";
@@ -82,13 +83,13 @@ void ParseQuote(ParseState* state)
     // If this is an opening quote, convert to string
     if (!state->open_string)
     {
-        state->current_arg.type = ConsoleArg::STRING;
+        state->current_arg.type = Variable::STRING;
     }
     // If this is a closing quote, push arg and reset to none
     else
     {
         state->args.push_back(state->current_arg);
-        state->current_arg.type = ConsoleArg::NONE;
+        state->current_arg.type = Variable::NONE;
         state->current_arg.value.clear();
     }
     state->open_string = !state->open_string;
@@ -97,9 +98,9 @@ void ParseQuote(ParseState* state)
 void ParseString(ParseState* state)
 {
     // Make sure this isnt the first word before we convert
-    if (state->current_arg.type != ConsoleArg::FUNCTION)
+    if (state->current_arg.type != Variable::FUNCTION)
     {
-        state->current_arg.type = ConsoleArg::STRING;
+        state->current_arg.type = Variable::STRING;
     }
     state->current_arg.value += state->current_letter;
 }
@@ -112,14 +113,14 @@ void ParseFinish(ParseState* state)
         throw "Missing close quote";
     }
     // Check for trailing arguments
-    if (state->current_arg.type != ConsoleArg::NONE &&
+    if (state->current_arg.type != Variable::NONE &&
         state->current_arg.value.length() != 0)
     {
         state->args.push_back(state->current_arg);
     }
 }
 
-std::vector<ConsoleArg> ParseCommand(const std::string& command)
+std::vector<Variable> ParseCommand(const std::string& command)
 {
     ParseState state;
     for (const auto& c : command)

@@ -45,16 +45,23 @@ void in(const std::string& command);
 void out(const std::string& fmt, ...);
 
 ////////////////////////////////////////////////////////////////////////////////
+/// \brief Retrieves a global console variable by name
+///
+/// \param name Name of the variable to retrieve
+/// \tparam T Type to return value as
+/// \return Value of the variable
+////////////////////////////////////////////////////////////////////////////////
+template <typename T>
+T var(const std::string& name)
+{
+    return internal::__var(name).to<T>();
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// \brief Register a C++ function to be used as a console command.
 ///
 /// The callback function must return void and can only accept certain types of
-/// inputs as parameters.
-///
-/// Valid inputs are:
-/// * const char*
-/// * float
-/// * int
-/// * std::string
+/// inputs as parameters. See console::Variable for a list of valid inputs.
 ///
 /// If you register a function that is already in use it will either replace
 /// the current function if the input parameters are the same, or act as an

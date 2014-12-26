@@ -11,7 +11,7 @@ namespace blons
 namespace console
 {
 using internal::Function;
-using internal::ConsoleArg;
+using internal::Variable;
 
 namespace
 {
@@ -22,8 +22,8 @@ struct ConsoleState
     std::vector<PrintCallback> print_callbacks;
     // Stored as a vector to allow function overloading
     std::unordered_map<std::string, FunctionList> functions;
+    std::unordered_map<std::string, Variable> variables;
 } g_state;
-
 const std::string kErrorPrefix = "* $E33";
 const std::string kUserPrefix = "~ $CCE";
 
@@ -37,13 +37,13 @@ void PrintUsage(const std::string& func_name, const FunctionList& func_list)
         {
             switch (arg)
             {
-            case ConsoleArg::INT:
+            case Variable::INT:
                 out("int");
                 break;
-            case ConsoleArg::FLOAT:
+            case Variable::FLOAT:
                 out("float");
                 break;
-            case ConsoleArg::STRING:
+            case Variable::STRING:
                 out("str");
                 break;
             default:
@@ -76,11 +76,16 @@ void internal::__register(const std::string& name, Function* func)
     func_list.push_back(std::unique_ptr<Function>(func));
 }
 
+const Variable& internal::__var(const std::string& name)
+{
+    return g_state.variables[name];
+}
+
 void in(const std::string& command)
 {
     out(kUserPrefix + command + '\n');
 
-    std::vector<ConsoleArg> args;
+    std::vector<Variable> args;
     try
     {
         args = ParseCommand(command);
@@ -91,7 +96,7 @@ void in(const std::string& command)
         return;
     }
 
-    if (args.size() < 1 || args[0].type != ConsoleArg::FUNCTION)
+    if (args.size() < 1 || args[0].type != Variable::FUNCTION)
     {
         out(kErrorPrefix + "Function call requires a name\n");
         return;

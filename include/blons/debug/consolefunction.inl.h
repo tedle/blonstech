@@ -1,17 +1,97 @@
 namespace internal
 {
-// Storage for parsed console input arguments.
-struct ConsoleArg
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Contains a typed console variable
+///
+/// Can easily convert to native types through the templated Variable::to()
+/// function. Will throw if a type mismatch occurs.
+///
+/// Valid C++ types include:
+/// * int
+/// * const char*
+/// * std::string
+////////////////////////////////////////////////////////////////////////////////
+struct Variable
 {
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Possible types of variables
+    ////////////////////////////////////////////////////////////////////////////////
     enum Type
     {
-        NONE,
-        FUNCTION,
-        STRING,
-        INT,
-        FLOAT
-    } type;
+        NONE,     ///< Unknown or null
+        FUNCTION, ///< Callable C function
+        STRING,   ///< String
+        INT,      ///< Signed integer
+        FLOAT     ///< Signed floating point
+    };
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Type of the variable
+    ////////////////////////////////////////////////////////////////////////////////
+    Type type;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Value of the variable
+    ////////////////////////////////////////////////////////////////////////////////
     std::string value;
+
+    // Possible future option? Bugged with intellisense at the moment
+    // template <typename T>
+    // operator T() const { return to<T>(); }
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Converts variable in native C++ types
+    ////////////////////////////////////////////////////////////////////////////////
+    template<typename T>
+    T to() const
+    {
+        static_assert(false, "Unsupported conversion of console variable to native type");
+    }
+
+    template<>
+    int to() const
+    {
+        AssertInt();
+        return atoi(value.c_str());
+    }
+
+    template<>
+    const char* to() const
+    {
+        AssertString();
+        return value.c_str();
+    }
+
+    template<>
+    std::string to() const
+    {
+        AssertString();
+        return value;
+    }
+
+private:
+    inline void AssertFloat() const
+    {
+        if (type != Variable::FLOAT)
+        {
+            throw "Expected float";
+        }
+    }
+
+    inline void AssertInt() const
+    {
+        if (type != Variable::INT)
+        {
+            throw "Expected int";
+        }
+    }
+
+    inline void AssertString() const
+    {
+        if (type != Variable::STRING)
+        {
+            throw "Expected string";
+        }
+    }
 };
 
 // Builds a list of indices during compilation
@@ -27,10 +107,10 @@ template<unsigned size> using MakeIndicesType = typename MakeIndices<size>::type
 class Function
 {
 public:
-    // Turns the list of ConsoleArgs into real arguments and calls the function
-    virtual bool Run(const std::vector<ConsoleArg>& args)=0;
+    // Turns the list of console::Variable into real arguments and calls the function
+    virtual bool Run(const std::vector<Variable>& args)=0;
     // Returns a ordered list of expected inputs
-    virtual std::vector<ConsoleArg::Type> ArgList()=0;
+    virtual std::vector<Variable::Type> ArgList()=0;
 };
 
 // Generates one class for each unique function prototype registered to the console
@@ -40,12 +120,12 @@ class TemplatedFunction : public Function
 public:
     TemplatedFunction(std::function<void(Args...)> func) : func_(func) {}
 
-    bool Run(const std::vector<ConsoleArg>& runtime_args)
+    bool Run(const std::vector<Variable>& runtime_args)
     {
         return PackArgsAndCall(MakeIndicesType<sizeof...(Args)>{}, runtime_args);
     }
 
-    std::vector<ConsoleArg::Type> ArgList()
+    std::vector<Variable::Type> ArgList()
     {
         return { ArgType<Args>()... };
     }
@@ -53,74 +133,21 @@ public:
 private:
     std::function<void(Args...)> func_;
 
-    void AssertFloat(const ConsoleArg& arg)
-    {
-        if (arg.type != ConsoleArg::FLOAT)
-        {
-            throw "Expected float";
-        }
-    }
-
-    void AssertInt(const ConsoleArg& arg)
-    {
-        if (arg.type != ConsoleArg::INT)
-        {
-            throw "Expected int";
-        }
-    }
-
-    void AssertString(const ConsoleArg& arg)
-    {
-        if (arg.type != ConsoleArg::STRING)
-        {
-            throw "Expected string";
-        }
-    }
-
     template<typename T>
-    ConsoleArg::Type ArgType()
+    Variable::Type ArgType()
     {
         static_assert(false, "Unsupported argument type in console function");
     }
 
     template<>
-    ConsoleArg::Type ArgType<int>() { return ConsoleArg::INT; }
+    Variable::Type ArgType<int>() { return Variable::INT; }
     template<>
-    ConsoleArg::Type ArgType<std::string>() { return ConsoleArg::STRING; }
+    Variable::Type ArgType<std::string>() { return Variable::STRING; }
     template<>
-    ConsoleArg::Type ArgType<const char*>() { return ConsoleArg::STRING; }
-
-    // Converts console args into real types
-    // Throws an exception if the wrong type is passed
-    template<typename T>
-    T UnpackArg(unsigned int i, const std::vector<ConsoleArg>& args)
-    {
-        static_assert(false, "Unsupported argument type in console function");
-    }
-
-    template<>
-    int UnpackArg(unsigned int i, const std::vector<ConsoleArg>& args)
-    {
-        AssertInt(args[i]);
-        return atoi(args[i].value.c_str());
-    }
-
-    template<>
-    std::string UnpackArg(unsigned int i, const std::vector<ConsoleArg>& args)
-    {
-        AssertString(args[i]);
-        return args[i].value;
-    }
-
-    template<>
-    const char* UnpackArg(unsigned int i, const std::vector<ConsoleArg>& args)
-    {
-        AssertString(args[i]);
-        return _strdup(args[i].value.c_str());
-    }
+    Variable::Type ArgType<const char*>() { return Variable::STRING; }
 
     template<unsigned... i>
-    bool PackArgsAndCall(Indices<i...>, const std::vector<ConsoleArg>& runtime_args)
+    bool PackArgsAndCall(Indices<i...>, const std::vector<Variable>& runtime_args)
     {
         // Check we were passed the right amount of arguments
         if (runtime_args.size() != sizeof...(i))
@@ -130,7 +157,7 @@ private:
         try
         {
             // This will throw if there's a type mismatch in supplied arguments
-            auto arg_tuple = std::make_tuple(UnpackArg<Args>(i, runtime_args)...);
+            auto arg_tuple = std::make_tuple(runtime_args[i].to<Args>()...);
             // Calls the stored function with real arguments
             func_(std::get<i>(arg_tuple)...);
         }
@@ -144,4 +171,7 @@ private:
 
 // Registers a function the console
 void __register(const std::string& name, Function* func);
+
+// Retrieves a variable from the console
+const Variable& __var(const std::string& name);
 } // namespace internal

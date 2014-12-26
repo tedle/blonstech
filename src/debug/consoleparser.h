@@ -12,7 +12,7 @@ namespace console
 namespace internal
 {
 // Forward declarations
-struct ConsoleArg;
+struct Variable;
 } // namespace internal
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ struct ConsoleArg;
 /// \return A list of function arguments. The first argument is always the
 /// function name.
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<internal::ConsoleArg> ParseCommand(const std::string& command);
+std::vector<internal::Variable> ParseCommand(const std::string& command);
 } // namespace console
 } // namespace blons
 
