@@ -1,15 +1,11 @@
 namespace internal
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Contains a typed console variable
+/// \brief Contains an immutable typed console variable
 ///
 /// Can easily convert to native types through the templated Variable::to()
-/// function. Will throw if a type mismatch occurs.
-///
-/// Valid C++ types include:
-/// * int
-/// * const char*
-/// * std::string
+/// function. Will throw if a type mismatch occurs. See blons::console for valid
+/// types.
 ////////////////////////////////////////////////////////////////////////////////
 struct Variable
 {
@@ -25,19 +21,32 @@ struct Variable
         FLOAT     ///< Signed floating point
     };
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Type of the variable
-    ////////////////////////////////////////////////////////////////////////////////
-    Type type;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Value of the variable
-    ////////////////////////////////////////////////////////////////////////////////
-    std::string value;
+    Variable() : type_(NONE), value_("") {}
+
+    Variable(const Type t, std::string v) : type_(t), value_(v) {}
+    Variable(const Type t, const char* v) : type_(t), value_(v) {}
+
+    Variable(std::string v) : type_(STRING), value_(v) {}
+    Variable(const char* v) : type_(STRING), value_(v) {}
+    Variable(int v) : type_(INT)
+    {
+        value_ = std::to_string(v);
+    }
+    Variable(float v) : type_(FLOAT)
+    {
+        value_ = std::to_string(v);
+    }
+
+    Type type() const
+    {
+        return type_;
+    }
 
     // Possible future option? Bugged with intellisense at the moment
     // template <typename T>
     // operator T() const { return to<T>(); }
 
+    Variable& operator= (const Variable& var) { type_ = var.type_; value_ = var.value_; return *this; }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Converts variable in native C++ types
     ////////////////////////////////////////////////////////////////////////////////
@@ -51,27 +60,43 @@ struct Variable
     int to() const
     {
         AssertInt();
-        return atoi(value.c_str());
+        return atoi(value_.c_str());
+    }
+
+    template<>
+    float to() const
+    {
+        AssertFloat();
+        return static_cast<float>(atof(value_.c_str()));
     }
 
     template<>
     const char* to() const
     {
         AssertString();
-        return value.c_str();
+        return value_.c_str();
     }
 
     template<>
     std::string to() const
     {
         AssertString();
-        return value;
+        return value_;
     }
 
 private:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Type of the variable
+    ////////////////////////////////////////////////////////////////////////////////
+    Type type_;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Value of the variable
+    ////////////////////////////////////////////////////////////////////////////////
+    std::string value_;
+
     inline void AssertFloat() const
     {
-        if (type != Variable::FLOAT)
+        if (type_ != Variable::FLOAT)
         {
             throw "Expected float";
         }
@@ -79,7 +104,7 @@ private:
 
     inline void AssertInt() const
     {
-        if (type != Variable::INT)
+        if (type_ != Variable::INT)
         {
             throw "Expected int";
         }
@@ -87,7 +112,7 @@ private:
 
     inline void AssertString() const
     {
-        if (type != Variable::STRING)
+        if (type_ != Variable::STRING && type_ != Variable::FUNCTION)
         {
             throw "Expected string";
         }
@@ -170,7 +195,10 @@ private:
 };
 
 // Registers a function the console
-void __register(const std::string& name, Function* func);
+void __registerfunction(const std::string& name, Function* func);
+
+// Registers a variable the console
+void __registervariable(const std::string& name, Variable var);
 
 // Retrieves a variable from the console
 const Variable& __var(const std::string& name);

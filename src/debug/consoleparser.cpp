@@ -13,8 +13,11 @@ namespace
 struct ParseState
 {
     std::vector<Variable> args;
-    // Valid input always has a function name as the first word
-    Variable current_arg = Variable{ Variable::FUNCTION, "" };
+    struct
+    {
+        Variable::Type type;
+        std::string value;
+    } current_arg;
     unsigned char current_letter;
     // Records whether we are in the middle of a "quoted string"
     bool open_string = false;
@@ -33,7 +36,7 @@ void ParseSpace(ParseState* state)
             throw "Unexpected space";
         }
         // Push that argument to the return list
-        state->args.push_back(state->current_arg);
+        state->args.push_back(Variable(state->current_arg.type, state->current_arg.value));
         state->current_arg.type = Variable::NONE;
         state->current_arg.value.clear();
     }
@@ -88,7 +91,7 @@ void ParseQuote(ParseState* state)
     // If this is a closing quote, push arg and reset to none
     else
     {
-        state->args.push_back(state->current_arg);
+        state->args.push_back(Variable(state->current_arg.type, state->current_arg.value));
         state->current_arg.type = Variable::NONE;
         state->current_arg.value.clear();
     }
@@ -116,13 +119,15 @@ void ParseFinish(ParseState* state)
     if (state->current_arg.type != Variable::NONE &&
         state->current_arg.value.length() != 0)
     {
-        state->args.push_back(state->current_arg);
+        state->args.push_back(Variable(state->current_arg.type, state->current_arg.value));
     }
 }
 
 std::vector<Variable> ParseCommand(const std::string& command)
 {
     ParseState state;
+    // Valid input always has a function name as the first word
+    state.current_arg.type = Variable::FUNCTION;
     for (const auto& c : command)
     {
         state.current_letter = c;

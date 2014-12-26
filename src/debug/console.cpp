@@ -57,10 +57,10 @@ void PrintUsage(const std::string& func_name, const FunctionList& func_list)
 }
 } // namespace
 
-// The main Register function is templated and needs to be defined in
+// The main RegisterFunction function is templated and needs to be defined in
 // public headers. We use this function to hardcode as much as we can
 // into the library.
-void internal::__register(const std::string& name, Function* func)
+void internal::__registerfunction(const std::string& name, Function* func)
 {
     const auto arg_list = func->ArgList();
     auto& func_list = g_state.functions[name];
@@ -69,11 +69,25 @@ void internal::__register(const std::string& name, Function* func)
     {
         if (f->ArgList() == arg_list)
         {
-            f.reset(func);
-            return;
+            throw "Function already defined";
         }
     }
     func_list.push_back(std::unique_ptr<Function>(func));
+}
+
+// The main RegisterVariable function is templated and needs to be defined in
+// public headers. We use this function to hardcode as much as we can
+// into the library.
+void internal::__registervariable(const std::string& name, Variable var)
+{
+    if (g_state.variables.find(name) == g_state.variables.end())
+    {
+        g_state.variables[name] = var;
+    }
+    else
+    {
+        throw "Variable already defined";
+    }
 }
 
 const Variable& internal::__var(const std::string& name)
@@ -96,17 +110,17 @@ void in(const std::string& command)
         return;
     }
 
-    if (args.size() < 1 || args[0].type != Variable::FUNCTION)
+    if (args.size() < 1 || args[0].type() != Variable::FUNCTION)
     {
         out(kErrorPrefix + "Function call requires a name\n");
         return;
     }
 
-    auto func_name = args[0].value;
+    auto func_name = args[0].to<std::string>();
     auto func_list = g_state.functions.find(func_name);
     if (func_list == g_state.functions.end())
     {
-        out(kErrorPrefix + "Unknown function \"%s\"\n", args[0].value);
+        out(kErrorPrefix + "Unknown function \"%s\"\n", func_name.c_str());
         return;
     }
 
@@ -121,7 +135,7 @@ void in(const std::string& command)
         {
             for (int i = 0; i < args.size(); i++)
             {
-                if (args[i].type != expected_args[i])
+                if (args[i].type() != expected_args[i])
                 {
                     break;
                 }

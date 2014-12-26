@@ -70,9 +70,17 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     std::function<void(int)> test_func = [](int i){ blons::console::out("%i gamers in the house!\n", i); };
     std::function<void(const char*)> test_func_s = [](const char* i){ blons::console::out("%s stringers in the house!\n", i); };
     std::function<void(int, int)> test_func_ii = [](int i, int j){blons::console::out("%i, %i double inters in the house!\n", i, j); };
-    blons::console::Register("testo", test_func);
-    blons::console::Register("testo", test_func_s);
-    blons::console::Register("testo", test_func_ii);
+    blons::console::RegisterFunction("testo", test_func);
+    blons::console::RegisterFunction("testo", test_func_s);
+    blons::console::RegisterFunction("testo", test_func_ii);
+
+    blons::console::RegisterVariable("a", 5);
+    blons::console::RegisterVariable("b", 3.14f);
+    blons::console::RegisterVariable("c", "heyo heyo heyo heyo");
+
+    auto v_a = blons::console::var<int>("a");
+    auto v_b = blons::console::var<float>("b");
+    auto v_c = blons::console::var<std::string>("c");
 
     bool quit = false;
     while (!quit)

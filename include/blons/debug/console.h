@@ -4,6 +4,7 @@
 // Includes
 #include <functional>
 #include <memory>
+#include <string>
 #include <vector>
 
 namespace blons
@@ -45,7 +46,8 @@ void in(const std::string& command);
 void out(const std::string& fmt, ...);
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Retrieves a global console variable by name
+/// \brief Retrieves a global console variable by name. See blons::console for
+/// valid return types.
 ///
 /// \param name Name of the variable to retrieve
 /// \tparam T Type to return value as
@@ -61,20 +63,38 @@ T var(const std::string& name)
 /// \brief Register a C++ function to be used as a console command.
 ///
 /// The callback function must return void and can only accept certain types of
-/// inputs as parameters. See console::Variable for a list of valid inputs.
+/// inputs as parameters. See blons::console for valid inputs.
 ///
-/// If you register a function that is already in use it will either replace
-/// the current function if the input parameters are the same, or act as an
-/// overloaded function if the inputs are different.
+/// If you register a function that is already in use it will either throw if
+/// the input parameters are the same, or act as an overloaded function if the
+/// inputs are different.
 ///
 /// \param name The name the function will be called by
 /// \param func Function that will be called whenever invoked by the console
 ////////////////////////////////////////////////////////////////////////////////
 template <typename... Args>
-void Register(const std::string& name, std::function<void(Args...)> func)
+void RegisterFunction(const std::string& name, std::function<void(Args...)> func)
 {
     internal::Function* f = new internal::TemplatedFunction<Args...>(func);
-    internal::__register(name, f);
+    internal::__registerfunction(name, f);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Register a global console variable to be used for configuration.
+///
+/// The variable is statically typed and only support certain native C++ types.
+/// See blons::console for valid inputs.
+///
+/// If you register a variable that is already in use it will throw
+///
+/// \param name The name the function will be called by
+/// \param value Value of console variable
+////////////////////////////////////////////////////////////////////////////////
+template <typename T>
+void RegisterVariable(const std::string& name, T value)
+{
+    internal::Variable v(value);
+    internal::__registervariable(name, v);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -99,8 +119,14 @@ void RegisterPrintCallback(PrintCallback callback);
 /// \namespace blons::console
 /// \ingroup debug
 ///
-/// The console allows you to print, register C++ functions, and parse input
-/// to call registered functions. Also supports function overloading.
+/// The console allows you to print, register overloadable C++ functions, parse
+/// input, and register global console variables for configuration.
+///
+/// Console variables are only compatible certain C++ native types:
+/// * int
+/// * float
+/// * const char*
+/// * std::string
 ///
 /// ### Example:
 /// \code
@@ -120,7 +146,7 @@ void RegisterPrintCallback(PrintCallback callback);
 /// {
 ///     blons::console::out("Sum is %i\n", x + y);
 /// }
-/// blons::console::Register("add", add);
+/// blons::console::RegisterFunction("add", add);
 /// blons::console::in("add 10 20"); // Prints "Sum is 30"
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
