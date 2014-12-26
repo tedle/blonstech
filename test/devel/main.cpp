@@ -78,6 +78,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     blons::console::RegisterVariable("b", 3.14f);
     blons::console::RegisterVariable("c", "heyo heyo heyo heyo");
 
+    blons::console::set_var("a", 10);
+
     auto v_a = blons::console::var<int>("a");
     auto v_b = blons::console::var<float>("b");
     auto v_c = blons::console::var<std::string>("c");

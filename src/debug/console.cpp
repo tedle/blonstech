@@ -78,7 +78,7 @@ void internal::__registerfunction(const std::string& name, Function* func)
 // The main RegisterVariable function is templated and needs to be defined in
 // public headers. We use this function to hardcode as much as we can
 // into the library.
-void internal::__registervariable(const std::string& name, Variable var)
+void internal::__registervariable(const std::string& name, const Variable& var)
 {
     if (g_state.variables.find(name) == g_state.variables.end())
     {
@@ -92,7 +92,35 @@ void internal::__registervariable(const std::string& name, Variable var)
 
 const Variable& internal::__var(const std::string& name)
 {
-    return g_state.variables[name];
+    auto v = g_state.variables.find(name);
+    if (v != g_state.variables.end())
+    {
+        return v->second;
+    }
+    else
+    {
+        throw "Variable not found";
+    }
+}
+
+void internal::__set_var(const std::string& name, const Variable& value)
+{
+    auto v = g_state.variables.find(name);
+    if (v != g_state.variables.end())
+    {
+        if (v->second.type() == value.type())
+        {
+            v->second = value;
+        }
+        else
+        {
+            throw "Type mismatch";
+        }
+    }
+    else
+    {
+        throw "Variable not found";
+    }
 }
 
 void in(const std::string& command)

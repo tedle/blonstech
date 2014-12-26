@@ -47,7 +47,7 @@ void out(const std::string& fmt, ...);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Retrieves a global console variable by name. See blons::console for
-/// valid return types.
+/// valid return types. Will throw if the variable has not been declared
 ///
 /// \param name Name of the variable to retrieve
 /// \tparam T Type to return value as
@@ -57,6 +57,20 @@ template <typename T>
 T var(const std::string& name)
 {
     return internal::__var(name).to<T>();
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Sets the value of an existing global console variable. Will throw
+/// if a type mismatch occurs or if the variable has not been declared
+///
+/// \param name Name of the variable to modify
+/// \param value New value of the variable
+////////////////////////////////////////////////////////////////////////////////
+template <typename T>
+void set_var(const std::string& name, T value)
+{
+    internal::Variable v(value);
+    internal::__set_var(name, v);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -82,13 +96,13 @@ void RegisterFunction(const std::string& name, std::function<void(Args...)> func
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Register a global console variable to be used for configuration.
 ///
-/// The variable is statically typed and only support certain native C++ types.
+/// The variable is statically typed and only supports certain native C++ types.
 /// See blons::console for valid inputs.
 ///
 /// If you register a variable that is already in use it will throw
 ///
-/// \param name The name the function will be called by
-/// \param value Value of console variable
+/// \param name Name of the variable
+/// \param value Value of the variable
 ////////////////////////////////////////////////////////////////////////////////
 template <typename T>
 void RegisterVariable(const std::string& name, T value)
@@ -122,11 +136,12 @@ void RegisterPrintCallback(PrintCallback callback);
 /// The console allows you to print, register overloadable C++ functions, parse
 /// input, and register global console variables for configuration.
 ///
-/// Console variables are only compatible certain C++ native types:
-/// * int
-/// * float
-/// * const char*
-/// * std::string
+/// Console variables are statically typed and only compatible certain C++
+/// native types:
+/// * `int`
+/// * `float`
+/// * `const char*`
+/// * `std::string`
 ///
 /// ### Example:
 /// \code
@@ -148,6 +163,11 @@ void RegisterPrintCallback(PrintCallback callback);
 /// }
 /// blons::console::RegisterFunction("add", add);
 /// blons::console::in("add 10 20"); // Prints "Sum is 30"
+///
+/// // Registering a console variable
+/// blons::console::RegisterVariable("my_int", 5);
+/// blons::console::set_var("my_int", 10);
+/// auto my_int = blons::console::var<int>("my_int"); // int with a value of 10
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
