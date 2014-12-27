@@ -211,9 +211,6 @@
     <ClInclude Include="..\include\blons\graphics\sprite.h" />
     <ClInclude Include="..\include\blons\graphics\texture.h" />
     <ClInclude Include="..\include\blons\input.h" />
-    <ClInclude Include="..\include\blons\input\inputbase.h" />
-    <ClInclude Include="..\include\blons\input\inputdirect.h" />
-    <ClInclude Include="..\include\blons\input\inputraw.h" />
     <ClInclude Include="..\include\blons\input\inputtemp.h" />
     <ClInclude Include="..\include\blons\math.h" />
     <ClInclude Include="..\include\blons\math\animation.h" />

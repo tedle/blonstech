@@ -103,15 +103,6 @@
     <ClInclude Include="..\include\blons\graphics\render\shader.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\input\inputbase.h">
-      <Filter>src\input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\blons\input\inputdirect.h">
-      <Filter>src\input</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\blons\input\inputraw.h">
-      <Filter>src\input</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\input\inputtemp.h">
       <Filter>src\input</Filter>
     </ClInclude>
