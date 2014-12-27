@@ -38,19 +38,6 @@ namespace blons
 {
 namespace
 {
-static unsigned int HashString(const char* str)
-{
-    static const unsigned int kPrime = 16777619;
-    static const unsigned int kOffset = 2166136261;
-    unsigned int hash = kOffset;
-    while (*str != '\0')
-    {
-        hash ^= *str++;
-        hash *= kPrime;
-    }
-    return hash;
-}
-
 // Overloaded glUniforms to keep things generic
 void Uniform(GLuint loc, int value)
 {
@@ -107,11 +94,11 @@ public:
     bool SetUniform(const char* name, T value);
 
 private:
-    struct HashFunc
-    {
-        unsigned int operator()(const char* s){ return HashString(s); }
-    };
-    std::unordered_map<const char*, GLint, HashFunc> uniform_location_cache_;
+    struct HashFunc { unsigned int operator()(const char* s){ return FastHash(s); } };
+    struct CompFunc { bool operator()(const char* a, const char* b) { return strcmp(a, b) == 0; } };
+    std::unordered_map<const char*, GLint, HashFunc, CompFunc> uniform_location_cache_;
+    // slow, but clean. possible memory leak with const char* key anyway, iduno
+    // std::unordered_map<std::string, GLint> uniform_location_cache_;
 };
 
 BufferResourceGL40::~BufferResourceGL40()
@@ -156,7 +143,7 @@ GLint ShaderResourceGL40::UniformLocation(const char* name)
     if (it == uniform_location_cache_.end())
     {
         auto location = glGetUniformLocation(program_, name);
-        uniform_location_cache_[name] = location;
+        uniform_location_cache_[_strdup(name)] = location;
         return location;
     }
     return it->second;
@@ -344,6 +331,7 @@ RenderGL40::RenderGL40(units::pixel screen_width, units::pixel screen_height, bo
 
 RenderGL40::~RenderGL40()
 {
+    // TODO: Somehow nullify all created resources in here
     // Reset the current context before deleting it
     wglMakeCurrent(device_context_, nullptr);
     wglDeleteContext(render_context_);

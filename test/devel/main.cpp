@@ -39,7 +39,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     // Model 2
     models.push_back(graphics->MakeModel("../../notes/cube.bms"));
     models[1]->set_pos(10.0, 0.0, 20.0);
-    //models = blons::temp::load_codmap("../../notes/bms_test", std::move(models), graphics.get());
+    models = blons::temp::load_codmap("../../notes/bms_test", std::move(models), graphics.get());
 
     // Sprite 1
     auto sprite = graphics->MakeSprite("../../notes/me.dds");

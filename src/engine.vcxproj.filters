@@ -160,6 +160,9 @@
     <ClInclude Include="..\include\blons\graphics\gui\manager.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\resource.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -263,6 +266,9 @@
     </ClCompile>
     <ClCompile Include="graphics\gui\manager.cpp">
       <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\resource.cpp">
+      <Filter>src\graphics</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

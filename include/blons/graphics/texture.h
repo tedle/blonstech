@@ -92,8 +92,7 @@ public:
     const TextureResource& texture() const;
 
 private:
-    void Init(PixelData* pixels, Type type, RenderContext& context);
-    std::unique_ptr<TextureResource> texture_;
+    std::shared_ptr<TextureResource> texture_;
     Info info_;
 };
 } // namespace blons

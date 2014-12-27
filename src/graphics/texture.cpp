@@ -23,24 +23,21 @@
 
 #include <blons/graphics/texture.h>
 
+// Local Includes
+#include "resource.h"
+
 namespace blons
 {
 Texture::Texture(std::string filename, Type type, RenderContext& context)
 {
-    std::unique_ptr<PixelData> tex_data(new PixelData);
-    if (!context->LoadPixelData(filename, tex_data.get()))
+    texture_ = resource::LoadTexture(filename, type, &info_, context);
+    if (texture_ == nullptr)
     {
         throw "Failed to load texture";
     }
-    Init(tex_data.get(), type, context);
 }
 
 Texture::Texture(PixelData* pixels, Type type, RenderContext& context)
-{
-    Init(pixels, type, context);
-}
-
-void Texture::Init(PixelData* pixels, Type type, RenderContext& context)
 {
     texture_.reset(context->MakeTextureResource());
     if (texture_ == nullptr)

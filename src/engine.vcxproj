@@ -224,6 +224,7 @@
     <ClInclude Include="graphics\render\glfuncloader.h" />
     <ClInclude Include="graphics\render\renderd3d11.h" />
     <ClInclude Include="graphics\render\rendergl40.h" />
+    <ClInclude Include="graphics\resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="debug\console.cpp" />
@@ -252,6 +253,7 @@
     <ClCompile Include="graphics\render\renderd3d11.cpp" />
     <ClCompile Include="graphics\render\rendergl40.cpp" />
     <ClCompile Include="graphics\render\shader.cpp" />
+    <ClCompile Include="graphics\resource.cpp" />
     <ClCompile Include="graphics\sprite.cpp" />
     <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="input\inputtemp.cpp" />

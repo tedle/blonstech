@@ -199,4 +199,17 @@ Vector3 Vector3PitchYawRoll(Matrix view_matrix)
 
     return rot;
 }
+
+unsigned int FastHash(const char* str)
+{
+    static const unsigned int kPrime = 16777619;
+    static const unsigned int kOffset = 2166136261;
+    unsigned int hash = kOffset;
+    while (*str != '\0')
+    {
+        hash ^= *str++;
+        hash *= kPrime;
+    }
+    return hash;
+}
 } // namespace blons
