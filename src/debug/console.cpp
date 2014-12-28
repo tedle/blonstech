@@ -42,11 +42,13 @@ typedef std::vector<std::unique_ptr<Function>> FunctionList;
 
 struct ConsoleState
 {
-    std::vector<PrintCallback> print_callbacks;
     // Stored as a vector to allow function overloading
     std::unordered_map<std::string, FunctionList> functions;
     std::unordered_map<std::string, Variable> variables;
+    std::vector<PrintCallback> print_callbacks;
+    std::vector<std::string> history;
 } g_state;
+
 const std::string kErrorPrefix = "* $E33";
 const std::string kUserPrefix = "~ $CCE";
 
@@ -148,6 +150,7 @@ void internal::__set_var(const std::string& name, const Variable& value)
 
 void in(const std::string& command)
 {
+    g_state.history.push_back(command);
     out(kUserPrefix + command + '\n');
 
     std::vector<Variable> args;
@@ -225,6 +228,11 @@ void out(const std::string& fmt, ...)
     {
         output(formatted_out);
     }
+}
+
+const std::vector<std::string>& history()
+{
+    return g_state.history;
 }
 
 void RegisterPrintCallback(PrintCallback callback)

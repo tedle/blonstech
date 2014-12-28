@@ -103,6 +103,13 @@ void set_var(const std::string& name, T value)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// \brief Retrieves an ordered list of every command entered into the console
+///
+/// \return String vector containing commands
+////////////////////////////////////////////////////////////////////////////////
+const std::vector<std::string>& history();
+
+////////////////////////////////////////////////////////////////////////////////
 /// \brief Register a C++ function to be used as a console command.
 ///
 /// The callback function must return void and can only accept certain types of
