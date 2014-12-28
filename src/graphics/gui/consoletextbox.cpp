@@ -23,6 +23,8 @@
 
 #include <blons/graphics/gui/consoletextbox.h>
 
+// Includes
+#include <algorithm>
 // Public Includes
 #include <blons/graphics/gui/gui.h>
 
@@ -30,6 +32,12 @@ namespace blons
 {
 namespace gui
 {
+ConsoleTextbox::ConsoleTextbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window)
+    : Textbox(pos, style, parent_manager, parent_window)
+{
+    command_history_index_ = kCommandHistoryIndexNone;
+}
+
 void ConsoleTextbox::Render(RenderContext& context)
 {
     auto layout = gui_->skin()->layout();
@@ -51,6 +59,7 @@ bool ConsoleTextbox::Update(const Input& input)
 
         if (e.type == Input::Event::KEY_DOWN)
         {
+            SearchHistory(key);
             Textbox::OnKeyDown(input, key, mods);
         }
         else if (e.type == Input::Event::KEY_UP)
@@ -60,6 +69,36 @@ bool ConsoleTextbox::Update(const Input& input)
     }
     // Consume input while shown
     return true;
+}
+
+void ConsoleTextbox::SearchHistory(Input::KeyCode key)
+{
+    if (key == Input::UP)
+    {
+        const auto& history = blons::console::history();
+        command_history_index_ = std::min(command_history_index_ + 1, static_cast<int>(history.size()) - 1);
+        if (command_history_index_ >= 0)
+        {
+            set_text(*(history.rbegin() + command_history_index_));
+        }
+    }
+    else if (key == Input::DOWN)
+    {
+        const auto& history = blons::console::history();
+        command_history_index_ = std::max(command_history_index_ - 1, kCommandHistoryIndexNone);
+        if (command_history_index_ >= 0)
+        {
+            set_text(*(history.rbegin() + command_history_index_));
+        }
+        else
+        {
+            set_text("");
+        }
+    }
+    else
+    {
+        command_history_index_ = kCommandHistoryIndexNone;
+    }
 }
 } // namespace gui
 } // namespace blons

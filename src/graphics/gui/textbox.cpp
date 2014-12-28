@@ -249,6 +249,8 @@ std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input)
         if (input.IsPrintable(code) ||
             code == Input::BACKSPACE ||
             code == Input::DEL ||
+            code == Input::UP ||
+            code == Input::DOWN ||
             code == Input::LEFT ||
             code == Input::RIGHT)
         {

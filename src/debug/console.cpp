@@ -150,8 +150,12 @@ void internal::__set_var(const std::string& name, const Variable& value)
 
 void in(const std::string& command)
 {
-    g_state.history.push_back(command);
     out(kUserPrefix + command + '\n');
+    if (command.length() == 0)
+    {
+        return;
+    }
+    g_state.history.push_back(command);
 
     std::vector<Variable> args;
     try
