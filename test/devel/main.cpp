@@ -108,7 +108,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     auto v_c = blons::console::var<std::string>("c");
 
     bool vid_restart = false;
-    std::function<void(int)> reload = [&](int x) { vid_restart = true; };
+    std::function<void()> reload = [&]() { vid_restart = true; };
     blons::console::RegisterFunction("vid_restart", reload);
 
     bool quit = false;

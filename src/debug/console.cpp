@@ -184,6 +184,13 @@ void in(const std::string& command)
         const auto expected_args = f->ArgList();
         if (args.size() == expected_args.size())
         {
+            // Void functions dont need param checking
+            if (args.size() == 0)
+            {
+                f->Run(args);
+                return;
+            }
+
             for (int i = 0; i < args.size(); i++)
             {
                 if (args[i].type() != expected_args[i])

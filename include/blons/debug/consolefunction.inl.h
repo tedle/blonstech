@@ -161,6 +161,28 @@ public:
     virtual std::vector<Variable::Type> ArgList()=0;
 };
 
+class VoidFunction : public Function
+{
+public:
+    VoidFunction(std::function<void()> func) : func_(func) {}
+
+    bool Run(const std::vector<Variable>& args)
+    {
+        if (args.size() != 0)
+        {
+            return false;
+        }
+        func_();
+        return true;
+    }
+    std::vector<Variable::Type> ArgList()
+    {
+        return {};
+    }
+private:
+    std::function<void()> func_;
+};
+
 // Generates one class for each unique function prototype registered to the console
 template <typename... Args>
 class TemplatedFunction : public Function

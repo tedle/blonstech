@@ -37,6 +37,11 @@ namespace blons
 ////////////////////////////////////////////////////////////////////////////////
 namespace console
 {
+// Since template generation is done at compile time, user needs
+// access to function generation code. You probably don't want
+// to touch anything in here
+#include <blons/debug/consolefunction.inl.h>
+
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Prototype for functions called everytime the console prints.
 ///
@@ -110,9 +115,18 @@ void set_var(const std::string& name, T value)
 /// \param func Function that will be called whenever invoked by the console
 ////////////////////////////////////////////////////////////////////////////////
 template <typename... Args>
-void RegisterFunction(const std::string& name, std::function<void(Args...)> func)
+inline void RegisterFunction(const std::string& name, std::function<void(Args...)> func)
 {
     internal::Function* f = new internal::TemplatedFunction<Args...>(func);
+    internal::__registerfunction(name, f);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+/// \copydoc console::RegisterFunction
+////////////////////////////////////////////////////////////////////////////////
+inline void RegisterFunction(const std::string& name, std::function<void()> func)
+{
+    internal::Function* f = new internal::VoidFunction(func);
     internal::__registerfunction(name, f);
 }
 
@@ -144,11 +158,6 @@ void RegisterVariable(const std::string& name, T value)
 /// \param callback Function to be called when the console prints
 ////////////////////////////////////////////////////////////////////////////////
 void RegisterPrintCallback(PrintCallback callback);
-
-// Since template generation is done at compile time, user needs
-// access to function generation code. You probably don't want
-// to touch anything in here
-#include <blons/debug/consolefunction.inl.h>
 } // namespace console
 } // namespace blons
 
