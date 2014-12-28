@@ -51,15 +51,13 @@ void Textarea::Render(RenderContext& context)
     auto layout = gui_->skin()->layout();
 
     RenderBody(layout->textarea, context);
-    RegisterBatches();
-
     RenderText(layout->textarea, context);
 }
 
 void Textarea::RenderBody(const Skin::Layout::Textarea& t, RenderContext& context)
 {
     auto sprite = gui_->skin()->sprite();
-    auto batch = control_batch(context);
+    auto batch = gui_->control_batch(crop_, feather_, context);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;

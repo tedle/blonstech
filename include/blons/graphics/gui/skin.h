@@ -403,7 +403,7 @@ protected:
 ///     auto sprite = gui_->skin()->sprite();
 ///
 ///     // Batch to send mesh data to
-///     auto batch = control_batch(context);
+///     auto batch = control_batch(crop_, feather_, context);
 ///
 ///     // Follow the containing Window's position as it's dragged around
 ///     auto parent_pos = parent_->pos();
@@ -414,9 +414,6 @@ protected:
 ///     sprite->set_pos(x, y, pos_.w, pos_.h);
 ///     sprite->set_subtexture(region.body);
 ///     batch->Append(sprite->mesh(), context);
-///
-///     // Submit the batches to gui::Manager
-///     RegisterBatches();
 /// }
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////

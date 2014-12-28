@@ -70,7 +70,6 @@ void Button::Render(RenderContext& context)
     }
 
     RenderBody(*b, context);
-    RegisterBatches();
 
     // Button text yall
     label_->Render(context);
@@ -79,7 +78,7 @@ void Button::Render(RenderContext& context)
 void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
 {
     auto sprite = gui_->skin()->sprite();
-    auto batch = control_batch(context);
+    auto batch = gui_->control_batch(crop_, feather_, context);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;

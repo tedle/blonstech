@@ -56,6 +56,9 @@ void Manager::Init(units::pixel width, units::pixel height, std::unique_ptr<Shad
     LoadFont("../../notes/font stuff/test-heading.ttf", 14, Skin::FontStyle::HEADING, context);
     LoadFont("../../notes/font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL, context);
     LoadFont("../../notes/font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE, context);
+
+    draw_batches_.clear();
+    batch_index_ = 0;
 }
 
 Manager::~Manager()
@@ -129,8 +132,9 @@ void Manager::Render(RenderContext& context)
     // Draw pass
     ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
     ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
-    for (auto& batch : draw_batches_)
+    for (int i = 0; i < batch_index_; i++)
     {
+        auto& batch = draw_batches_[i];
         if (batch.first.is_text)
         {
             auto font = skin_->font(batch.first.font_style);
@@ -150,7 +154,7 @@ void Manager::Render(RenderContext& context)
         ui_shader_->Render(batch.second->index_count(), context);
     }
 
-    draw_batches_.clear();
+    batch_index_ = 0;
 }
 
 void Manager::Reload(units::pixel screen_width, units::pixel screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
@@ -205,9 +209,38 @@ Window* Manager::window(std::string id)
     return nullptr;
 }
 
-void Manager::RegisterDrawCall(DrawCallInputs info, DrawBatcher* batch)
+// This is setup to recycle memory as much as we can. Used like a C array
+// that is only resized when the total batches for a frame is greater
+// than any previous frame. Can only be reset manually by calling ClearBatches().
+DrawBatcher* Manager::batch(DrawCallInputs inputs, RenderContext& context)
 {
-    draw_batches_.push_back(std::make_pair(info, batch));
+    DrawBatcher* batch;
+    if (batch_index_ < draw_batches_.size())
+    {
+        draw_batches_[batch_index_].first = inputs;
+        batch = draw_batches_[batch_index_].second.get();
+    }
+    else
+    {
+        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(context));
+        draw_batches_.push_back(std::make_pair(inputs, std::move(batcher)));
+        batch = draw_batches_.back().second.get();
+    }
+
+    batch_index_++;
+    return batch;
+}
+
+DrawBatcher* Manager::font_batch(Skin::FontStyle style, Vector4 colour, Box crop, units::pixel crop_feather, RenderContext& context)
+{
+    DrawCallInputs inputs = { true, style, colour, crop, crop_feather };
+    return batch(inputs, context);
+}
+
+DrawBatcher* Manager::control_batch(Box crop, units::pixel crop_feather, RenderContext& context)
+{
+    DrawCallInputs inputs = { false, Skin::FontStyle::DEFAULT, Vector4(0, 0, 0, 0), crop, crop_feather };
+    return batch(inputs, context);
 }
 
 Skin* Manager::skin() const

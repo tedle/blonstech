@@ -56,8 +56,6 @@ void Window::Render(RenderContext& context)
         RenderBody(context);
     }
 
-    RegisterBatches();
-
     if (type_ == DRAGGABLE)
     {
         caption_->Render(context);
@@ -78,7 +76,7 @@ void Window::RenderBody(RenderContext& context)
     auto skin = gui_->skin();
     auto layout = skin->layout();
     auto sprite = skin->sprite();
-    auto batch = control_batch(context);
+    auto batch = gui_->control_batch(crop_, feather_, context);
     // Title bar
     if (type_ == Window::DRAGGABLE)
     {

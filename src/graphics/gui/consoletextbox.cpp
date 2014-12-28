@@ -36,9 +36,6 @@ void ConsoleTextbox::Render(RenderContext& context)
 
     RenderBody(layout->console.textbox, context);
     RenderCursor(layout->console.cursor, context);
-
-    RegisterBatches();
-
     RenderText(context);
 }
 

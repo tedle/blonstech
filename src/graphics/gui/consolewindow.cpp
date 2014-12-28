@@ -69,7 +69,7 @@ void ConsoleWindow::Render(RenderContext& context)
     auto skin = gui_->skin();
     auto layout = skin->layout();
     auto sprite = skin->sprite();
-    auto batch = control_batch(context);
+    auto batch = gui_->control_batch(crop_, feather_, context);
 
     // Render a drop shadow
     auto& shadow = layout->dropshadow.bottom;

@@ -52,6 +52,37 @@ class Manager
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Inputs to be sent to the UI shader. Paired one-to-one with each
+    /// blons::Drawbatcher.
+    ////////////////////////////////////////////////////////////////////////////////
+    struct DrawCallInputs
+    {
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief True if the draw call is rendering text
+        ////////////////////////////////////////////////////////////////////////////////
+        bool is_text;
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Font to use for text rendering
+        ////////////////////////////////////////////////////////////////////////////////
+        Skin::FontStyle font_style;
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Is only applied to text. Values range from 0.0 to 1.0
+        ////////////////////////////////////////////////////////////////////////////////
+        Vector4 colour;
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Only render anything inside this Box. A width of 0 prevents any
+        /// horizontal cropping. A height of 0 prevents any vertical cropping.
+        ////////////////////////////////////////////////////////////////////////////////
+        Box crop;
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Renders a linear alpha fade towards the crop box, approaching 0 at
+        /// the boundaries.
+        ////////////////////////////////////////////////////////////////////////////////
+        units::pixel crop_feather;
+    };
+
+public:
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Initializes the UI and console window.
     ///
     /// \param screen_width Maximum width of the view screen in pixels
@@ -151,14 +182,44 @@ private:
     friend Window;
     friend ConsoleWindow;
     void Init(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
-    void RegisterDrawCall(DrawCallInputs info, DrawBatcher* batch);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves an unnused Drawbatcher with the specific shader inputs
+    /// for a Control to render to.
+    ///
+    /// \param inputs The shader settings that will be applied to this Drawbatcher
+    /// during the render cycle
+    /// \param context Handle to the current rendering context
+    /// \return The Drawbatcher for rendering
+    ////////////////////////////////////////////////////////////////////////////////
+    DrawBatcher* batch(DrawCallInputs inputs, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
+    /// towards font rendering.
+    ///
+    /// \param style gui::FontStyle to be drawn
+    /// \param colour Colour of the text with values ranging from 0.0 to 1.0
+    /// \param context Handle to the current rendering context
+    /// \return The Drawbatcher for rendering
+    ////////////////////////////////////////////////////////////////////////////////
+    DrawBatcher* font_batch(Skin::FontStyle style, Vector4 colour, Box crop, units::pixel crop_feather, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
+    /// towards element body rendering.
+    ///
+    /// \param context Handle to the current rendering context
+    /// \return The Drawbatcher for rendering
+    ////////////////////////////////////////////////////////////////////////////////
+    DrawBatcher* control_batch(Box crop, units::pixel crop_feather, RenderContext& context);
+
     Skin* skin() const;
     Window* active_window() const;
     void set_active_window(Window* window);
     Box screen_dimensions();
 
-    // Raw pointers because cleared every frame
-    std::vector<std::pair<DrawCallInputs, DrawBatcher*>> draw_batches_;
+    // Vector + batch index stored to recycle as much memory as we can
+    std::vector<std::pair<DrawCallInputs, std::unique_ptr<DrawBatcher>>> draw_batches_;
+    std::size_t batch_index_ = 0;
 
     Box screen_dimensions_;
     Matrix ortho_matrix_;

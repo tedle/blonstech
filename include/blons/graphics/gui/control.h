@@ -39,61 +39,6 @@ class Manager;
 class Window;
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Inputs to be sent to the UI shader. Paired one-to-one with each
-/// blons::Drawbatcher.
-////////////////////////////////////////////////////////////////////////////////
-struct DrawCallInputs
-{
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief True if the draw call is rendering text
-    ////////////////////////////////////////////////////////////////////////////////
-    bool is_text;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Font to use for text rendering
-    ////////////////////////////////////////////////////////////////////////////////
-    Skin::FontStyle font_style;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Is only applied to text. Values range from 0.0 to 1.0
-    ////////////////////////////////////////////////////////////////////////////////
-    Vector4 colour;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Only render anything inside this Box. A width of 0 prevents any
-    /// horizontal cropping. A height of 0 prevents any vertical cropping.
-    ////////////////////////////////////////////////////////////////////////////////
-    Box crop;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Renders a linear alpha fade towards the crop box, approaching 0 at
-    /// the boundaries.
-    ////////////////////////////////////////////////////////////////////////////////
-    units::pixel crop_feather;
-};
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Shader inputs that are unlikely to change between frames. Used for
-/// caching.
-////////////////////////////////////////////////////////////////////////////////
-struct StaticDrawCallInputs
-{
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief True if the draw call is rendering text
-    ////////////////////////////////////////////////////////////////////////////////
-    bool is_text;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Font to use for text rendering
-    ////////////////////////////////////////////////////////////////////////////////
-    Skin::FontStyle font_style;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Is only applied to text. Values range from 0.0 to 1.0
-    ////////////////////////////////////////////////////////////////////////////////
-    Vector4 colour;
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Comparisons needed for efficient std::map lookups
-    ////////////////////////////////////////////////////////////////////////////////
-    bool operator< (const StaticDrawCallInputs call) const { return memcmp(this, &call, sizeof(StaticDrawCallInputs))>0; }
-};
-
-////////////////////////////////////////////////////////////////////////////////
 /// \brief Abstract base class for UI elements
 ////////////////////////////////////////////////////////////////////////////////
 class Control
@@ -108,11 +53,11 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Called once per frame during gui::Manager::Render.
     ///
-    /// Make a call to Control::batch, Control::font_batch, or
-    /// Control::control_batch and append any mesh data to the resulting
-    /// Drawbatcher. Once done make a call to Control::RegisterBatches. The order of
-    /// calls to Control::RegisterBatches made by various Control%s is the same as
-    /// the order they will appear on screen.
+    /// Make a call to Manager::batch, Manager::font_batch, or
+    /// Manager::control_batch and append any mesh data to the resulting
+    /// DrawBatcher. The order these functions are called in is the same as the
+    /// order they wil appear on screen.
+    ///
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     virtual void Render(RenderContext& context)=0;
@@ -190,51 +135,6 @@ protected:
     /// \brief The gui::Window containing this element.
     ////////////////////////////////////////////////////////////////////////////////
     Window* parent_ = nullptr;
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Submits a Drawbatcher with mesh data & shader inputs to the parent
-    /// gui::Manager. Order of the calls to this function is the same as the
-    /// submitted Drawbatcher%s are rendered onto the screen.
-    ////////////////////////////////////////////////////////////////////////////////
-    void RegisterBatches();
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Clears any queued Drawbatcher%s waiting for submission.
-    ////////////////////////////////////////////////////////////////////////////////
-    void ClearBatches();
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves an unnused Drawbatcher with the specific shader inputs
-    /// for a Control to render to.
-    ///
-    /// \param inputs The shader settings that will be applied to this Drawbatcher
-    /// during the render cycle
-    /// \param context Handle to the current rendering context
-    /// \return The Drawbatcher for rendering
-    ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* batch(StaticDrawCallInputs inputs, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
-    /// towards font rendering.
-    ///
-    /// \param style gui::FontStyle to be drawn
-    /// \param colour Colour of the text with values ranging from 0.0 to 1.0
-    /// \param context Handle to the current rendering context
-    /// \return The Drawbatcher for rendering
-    ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* font_batch(Skin::FontStyle style, Vector4 colour, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
-    /// towards element body rendering.
-    ///
-    /// \param context Handle to the current rendering context
-    /// \return The Drawbatcher for rendering
-    ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* control_batch(RenderContext& context);
-
-private:
-    // Vector + batch index stored to recycle as much memory as we can
-    std::vector<std::pair<StaticDrawCallInputs, std::unique_ptr<DrawBatcher>>> draw_batches_;
-    std::size_t batch_index_ = 0;
 };
 } // namespace gui
 } // namespace blons
@@ -266,7 +166,7 @@ private:
 ///         auto sprite = gui_->skin()->sprite();
 ///
 ///         // Batch to send mesh data to
-///         auto batch = control_batch(context);
+///         auto batch = gui_->control_batch(crop_, feather_, context);
 ///
 ///         // Follow the containing Window's position as it's dragged around
 ///         auto parent_pos = parent_->pos();
@@ -277,9 +177,6 @@ private:
 ///         sprite->set_pos(x, y, pos_.w, pos_.h);
 ///         sprite->set_subtexture(region.body);
 ///         batch->Append(sprite->mesh(), context);
-///
-///         // Submit the batches to gui::Manager
-///         RegisterBatches();
 ///     }
 ///
 ///     bool Update(const Input& input) override

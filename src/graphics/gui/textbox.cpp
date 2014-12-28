@@ -71,15 +71,13 @@ void Textbox::Render(RenderContext& context)
         RenderCursor(layout->textbox.cursor, context);
     }
 
-    RegisterBatches();
-
     RenderText(context);
 }
 
 void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
 {
     auto sprite = gui_->skin()->sprite();
-    auto batch = control_batch(context);
+    auto batch = gui_->control_batch(crop_, feather_, context);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
@@ -163,7 +161,7 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
 void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
 {
     auto sprite = gui_->skin()->sprite();
-    auto batch = control_batch(context);
+    auto batch = gui_->control_batch(crop_, feather_, context);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;

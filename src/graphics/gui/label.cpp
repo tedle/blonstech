@@ -50,7 +50,7 @@ void Label::Render(RenderContext& context)
         for (const auto& frag : text_.fragments())
         {
             // One draw call per (colour,font) used across all labels combined
-            auto batcher = font_batch(font_style_, frag.colour, context);
+            auto batcher = gui_->font_batch(font_style_, frag.colour, crop_, feather_, context);
             for (const auto& c : frag.text)
             {
                 auto mesh = font->BuildMesh(c, x, y, crop_);
@@ -64,7 +64,7 @@ void Label::Render(RenderContext& context)
     }
     else
     {
-        auto batcher = font_batch(font_style_, text_.base_colour(), context);
+        auto batcher = gui_->font_batch(font_style_, text_.base_colour(), crop_, feather_, context);
         for (const auto& c : text_.raw_str())
         {
             auto mesh = font->BuildMesh(c, x, y, crop_);
@@ -75,8 +75,6 @@ void Label::Render(RenderContext& context)
             x += font->advance();
         }
     }
-
-    RegisterBatches();
 }
 
 bool Label::Update(const Input& input)

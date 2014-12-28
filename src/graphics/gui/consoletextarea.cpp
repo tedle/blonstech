@@ -35,8 +35,6 @@ void ConsoleTextarea::Render(RenderContext& context)
     auto layout = gui_->skin()->layout();
 
     RenderBody(layout->console.textarea, context);
-    RegisterBatches();
-
     RenderText(layout->console.textarea, context);
 }
 } // namespace gui
