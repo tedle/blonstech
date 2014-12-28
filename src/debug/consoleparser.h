@@ -35,7 +35,7 @@ namespace console
 namespace internal
 {
 // Forward declarations
-struct Variable;
+class Variable;
 } // namespace internal
 
 ////////////////////////////////////////////////////////////////////////////////

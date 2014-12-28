@@ -163,6 +163,9 @@
     <ClInclude Include="graphics\resource.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\debug\consolevariable.inl.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">

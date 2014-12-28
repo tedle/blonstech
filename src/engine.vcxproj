@@ -184,6 +184,7 @@
     <ClInclude Include="..\include\blons\debug.h" />
     <ClInclude Include="..\include\blons\debug\console.h" />
     <ClInclude Include="..\include\blons\debug\consolefunction.inl.h" />
+    <ClInclude Include="..\include\blons\debug\consolevariable.inl.h" />
     <ClInclude Include="..\include\blons\debug\log.h" />
     <ClInclude Include="..\include\blons\graphics.h" />
     <ClInclude Include="..\include\blons\graphics\camera.h" />

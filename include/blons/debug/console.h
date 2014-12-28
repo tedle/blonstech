@@ -40,6 +40,7 @@ namespace console
 // Since template generation is done at compile time, user needs
 // access to function generation code. You probably don't want
 // to touch anything in here
+#include <blons/debug/consolevariable.inl.h>
 #include <blons/debug/consolefunction.inl.h>
 
 ////////////////////////////////////////////////////////////////////////////////
