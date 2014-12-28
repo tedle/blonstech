@@ -109,6 +109,17 @@ public:
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     void Render(RenderContext& context);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reloads GUI to be bound to the supplied rendering context
+    ///
+    /// \param screen_width Maximum width of the view screen in pixels
+    /// \param screen_height Maximum height of the view screen in pixels
+    /// \param ui_shader Shader to be used for rendering Control%s and text
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
+    void Reload(units::pixel screen_width, units::pixel screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
+
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs input logic for all Window%s and Control%s. Generally issued
     /// by user.
@@ -139,6 +150,7 @@ private:
     friend ConsoleTextbox;
     friend Window;
     friend ConsoleWindow;
+    void Init(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
     void RegisterDrawCall(DrawCallInputs info, DrawBatcher* batch);
     Skin* skin() const;
     Window* active_window() const;

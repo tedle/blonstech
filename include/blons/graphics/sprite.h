@@ -62,6 +62,14 @@ public:
     void Render(RenderContext& context);
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reloads the sprite to be active in the supplied rendering context
+    ///
+    /// \param context Handle to the current rendering context
+    /// \return True if reinitialized successfully
+    ////////////////////////////////////////////////////////////////////////////////
+    bool Reload(RenderContext& context);
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Number of vertices in the quad used for rendering. Should always be
     /// 4, really
     ///
@@ -175,7 +183,7 @@ protected:
     ///
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Init(RenderContext& context);
+    bool Init(RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Updates the internal mesh data to be based on the current position
     /// and texture region. Called by both Sprite::Render and Sprite::mesh

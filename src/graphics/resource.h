@@ -50,6 +50,11 @@ namespace resource
 /// \return Shared TextureResource pointer, or nullptr on failure
 ////////////////////////////////////////////////////////////////////////////////
 std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Texture::Type type, Texture::Info* info, RenderContext& context);
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Clears all cached resource buffers, but not cached resource data
+////////////////////////////////////////////////////////////////////////////////
+void ClearBufferCache();
 } // namespace resource
 } // namespace blons
 

@@ -28,16 +28,22 @@ namespace blons
 Sprite::Sprite(std::string texture_filename, RenderContext& context)
 {
     texture_.reset(new Texture(texture_filename, Texture::Type::SPRITE, context));
-    Init(context);
+    if (!Init(context))
+    {
+        throw "Failed to register sprite";
+    }
 }
 
 Sprite::Sprite(PixelData* texture_data, RenderContext& context)
 {
     texture_.reset(new Texture(texture_data, Texture::Type::SPRITE, context));
-    Init(context);
+    if (!Init(context))
+    {
+        throw "Failed to register sprite";
+    }
 }
 
-void Sprite::Init(RenderContext& context)
+bool Sprite::Init(RenderContext& context)
 {
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
@@ -56,8 +62,9 @@ void Sprite::Init(RenderContext& context)
                                  mesh_.vertices.data(), vertex_count(),
                                  mesh_.indices.data(), index_count()))
     {
-        throw "Failed to register sprite";
+        return false;
     }
+    return true;
 }
 
 void Sprite::Render(RenderContext& context)
@@ -67,6 +74,29 @@ void Sprite::Render(RenderContext& context)
                             mesh_.vertices.data(), 0, vertex_count(),
                             mesh_.indices.data(), 0, index_count());
     context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
+}
+
+bool Sprite::Reload(RenderContext& context)
+{
+    // Backup our sprite settings
+    auto temp_pos = pos_;
+    auto temp_tex = tex_map_;
+
+    // Freshly initialize
+    if (!Init(context) || !texture_->Reload(context))
+    {
+        return false;
+    }
+
+    // Restore & push settings
+    pos_ = temp_pos;
+    tex_map_ = temp_tex;
+    BuildQuad();
+    context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
+                            mesh_.vertices.data(), 0, vertex_count(),
+                            mesh_.indices.data(), 0, index_count());
+
+    return true;
 }
 
 unsigned int Sprite::vertex_count() const

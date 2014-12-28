@@ -175,6 +175,7 @@ public:
 
     std::vector<Variable::Type> ArgList()
     {
+        // TODO: Fix this when func type is void()
         return { ArgType<Args>()... };
     }
 

@@ -35,6 +35,14 @@ namespace gui
 {
 Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
+    Init(width, height, std::move(ui_shader), context);
+    // TODO: Make the windows resize on reload
+    main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
+    console_window_.reset(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
+}
+
+void Manager::Init(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
+{
     screen_dimensions_ = Box(0, 0, width, height);
     ortho_matrix_ = MatrixOrthographic(screen_dimensions_.w, screen_dimensions_.h,
                                        kScreenNear, kScreenDepth);
@@ -48,9 +56,6 @@ Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader
     LoadFont("../../notes/font stuff/test-heading.ttf", 14, Skin::FontStyle::HEADING, context);
     LoadFont("../../notes/font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL, context);
     LoadFont("../../notes/font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE, context);
-    // TODO: get rid of main_window... i think
-    main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
-    console_window_.reset(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
 }
 
 Manager::~Manager()
@@ -146,6 +151,11 @@ void Manager::Render(RenderContext& context)
     }
 
     draw_batches_.clear();
+}
+
+void Manager::Reload(units::pixel screen_width, units::pixel screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
+{
+    Init(screen_width, screen_height, std::move(ui_shader), context);
 }
 
 bool Manager::Update(const Input& input)

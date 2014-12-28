@@ -89,6 +89,7 @@ public:
     void UnmapBuffers();
 
 private:
+    unsigned int id_;
     void LogCompileErrors(GLuint resource, bool is_shader);
     bool vsync_;
     int video_card_memory_;

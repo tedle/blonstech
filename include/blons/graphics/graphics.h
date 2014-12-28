@@ -120,6 +120,12 @@ public:
     bool Render();
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reloads graphics API. Used for applying new video settings. **Never**
+    /// call this in the middle of rendering a frame (callbacks beware!).
+    ////////////////////////////////////////////////////////////////////////////////
+    void Reload(units::pixel width, units::pixel height, HWND hwnd);
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Returns a pointer to the camera owned by the blons::Graphics manager
     /// that is used each frame to view renderable models
     ///
@@ -135,6 +141,8 @@ public:
     gui::Manager* gui() const;
 
 private:
+    bool MakeContext(units::pixel width, units::pixel height, HWND hwnd);
+
     RenderContext context_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<gui::Manager> gui_;

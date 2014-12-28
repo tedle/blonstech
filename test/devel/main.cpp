@@ -107,9 +107,18 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     auto v_b = blons::console::var<float>("b");
     auto v_c = blons::console::var<std::string>("c");
 
+    bool vid_restart = false;
+    std::function<void(int)> reload = [&](int x) { vid_restart = true; };
+    blons::console::RegisterFunction("vid_restart", reload);
+
     bool quit = false;
     while (!quit)
     {
+        if (vid_restart)
+        {
+            vid_restart = false;
+            graphics->Reload(info.width, info.height, info.hwnd);
+        }
         quit = client->Frame();
         blons::temp::FPS();
         bool gui_used_input = gui->Update(*client->input());

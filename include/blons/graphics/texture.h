@@ -79,6 +79,14 @@ public:
     ~Texture() {}
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reloads the texture to be active in the supplied rendering context
+    ///
+    /// \param context Handle to the current rendering context
+    /// \return True if reinitialized successfully
+    ////////////////////////////////////////////////////////////////////////////////
+    bool Reload(RenderContext& context);
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves texture information like dimensions & usage type
     ///
     /// \return Info struct containing texture info
@@ -92,6 +100,15 @@ public:
     const TextureResource& texture() const;
 
 private:
+    bool Init(std::string filename, Type type, RenderContext& context);
+    bool Init(PixelData* pixels, Type type, RenderContext& context);
+
+    // Empty if initialized from PixelData
+    std::string filename_;
+    // nullptr if initialized from filename
+    PixelData* pixel_data_;
+    //std::unique_ptr<PixelData> pixel_data_;
+
     std::shared_ptr<TextureResource> texture_;
     Info info_;
 };

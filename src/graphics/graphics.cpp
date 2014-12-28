@@ -35,6 +35,7 @@
 // Local Includes
 #include "render/renderd3d11.h"
 #include "render/rendergl40.h"
+#include "resource.h"
 
 namespace blons
 {
@@ -63,32 +64,11 @@ private:
 
 Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND hwnd)
 {
-    context_ = nullptr;
-    camera_ = nullptr;
-    shader3d_ = nullptr;
-    shader2d_ = nullptr;
-
-    // DirectX
-    //context_ = RenderContext(new RenderD3D11);
-
-    // OpenGL
-    context_ = RenderContext(new RenderGL40(screen_width, screen_height, kEnableVsync, hwnd,
-                                            (kRenderMode == RenderMode::FULLSCREEN)));
-    if (!context_)
+    if (!MakeContext(screen_width, screen_height, hwnd))
     {
-        log::Fatal("Renderer failed to initailize\n");
-        throw "Failed to initialize rendering context";
+        log::Fatal("Failed to initialize rendering context\n");
+        throw "Failed to initiralize rendering context";
     }
-
-    // Projection matrix (3D space->2D screen)
-    float fov = kPi / 4.0f;
-    float screen_aspect = static_cast<float>(screen_width) / static_cast<float>(screen_height);
-
-    proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, kScreenNear, kScreenDepth);
-
-    // Ortho projection matrix (for 2d stuff, shadow maps, etc)
-    ortho_matrix_ = MatrixOrthographic(units::pixel_to_subpixel(screen_width), units::pixel_to_subpixel(screen_height),
-                                       kScreenNear, kScreenDepth);
 
     // Camera
     camera_.reset(new Camera);
@@ -98,34 +78,6 @@ Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND h
     }
 
     camera_->set_pos(0.0f, 0.0f, -10.0f);
-
-    // Shaders
-    ShaderAttributeList inputs3d;
-    inputs3d.push_back(ShaderAttribute(0, "input_pos"));
-    inputs3d.push_back(ShaderAttribute(1, "input_uv"));
-    inputs3d.push_back(ShaderAttribute(2, "input_norm"));
-    shader3d_.reset(new Shader("mesh.vert.glsl", "mesh.frag.glsl", inputs3d, context_));
-
-    ShaderAttributeList inputs2d;
-    inputs2d.push_back(ShaderAttribute(0, "input_pos"));
-    inputs2d.push_back(ShaderAttribute(1, "input_uv"));
-    shader2d_.reset(new Shader("sprite.vert.glsl", "sprite.frag.glsl", inputs2d, context_));
-
-    ShaderAttributeList inputs_ui;
-    inputs_ui.push_back(ShaderAttribute(0, "input_pos"));
-    inputs_ui.push_back(ShaderAttribute(1, "input_uv"));
-    auto ui_shader = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "ui.frag.glsl", inputs_ui, context_));
-
-    if (shader3d_ == nullptr ||
-        shader2d_ == nullptr ||
-        ui_shader == nullptr)
-    {
-        log::Fatal("Shaders failed to initialize\n");
-        throw "Failed to initialize shader";
-    }
-
-    // GUI
-    gui_.reset(new gui::Manager(screen_width, screen_height, std::move(ui_shader), context_));
 }
 
 Graphics::~Graphics()
@@ -240,6 +192,23 @@ bool Graphics::Render()
     return true;
 }
 
+void Graphics::Reload(units::pixel screen_width, units::pixel screen_height, HWND hwnd)
+{
+    log::Debug("Reloading ... ");
+    Timer timer;
+    resource::ClearBufferCache();
+    MakeContext(screen_width, screen_height, hwnd);
+    for (auto& m : models_)
+    {
+        m->Reload(context_);
+    }
+    for (auto& s : sprites_)
+    {
+        s->Reload(context_);
+    }
+    log::Debug("%ims!\n", timer.ms());
+}
+
 Camera* Graphics::camera() const
 {
     return camera_.get();
@@ -248,6 +217,67 @@ Camera* Graphics::camera() const
 gui::Manager* Graphics::gui() const
 {
     return gui_.get();
+}
+
+bool Graphics::MakeContext(units::pixel screen_width, units::pixel screen_height, HWND hwnd)
+{
+    // DirectX
+    //context_ = RenderContext(new RenderD3D11);
+
+    // OpenGL
+    context_.reset();
+    context_ = RenderContext(new RenderGL40(screen_width, screen_height, kEnableVsync, hwnd,
+                                            (kRenderMode == RenderMode::FULLSCREEN)));
+    if (!context_)
+    {
+        return false;
+    }
+
+    // Projection matrix (3D space->2D screen)
+    float fov = kPi / 4.0f;
+    float screen_aspect = static_cast<float>(screen_width) / static_cast<float>(screen_height);
+
+    proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, kScreenNear, kScreenDepth);
+
+    // Ortho projection matrix (for 2d stuff, shadow maps, etc)
+    ortho_matrix_ = MatrixOrthographic(units::pixel_to_subpixel(screen_width), units::pixel_to_subpixel(screen_height),
+                                       kScreenNear, kScreenDepth);
+
+    // Shaders
+    ShaderAttributeList inputs3d;
+    inputs3d.push_back(ShaderAttribute(0, "input_pos"));
+    inputs3d.push_back(ShaderAttribute(1, "input_uv"));
+    inputs3d.push_back(ShaderAttribute(2, "input_norm"));
+    shader3d_.reset(new Shader("mesh.vert.glsl", "mesh.frag.glsl", inputs3d, context_));
+
+    ShaderAttributeList inputs2d;
+    inputs2d.push_back(ShaderAttribute(0, "input_pos"));
+    inputs2d.push_back(ShaderAttribute(1, "input_uv"));
+    shader2d_.reset(new Shader("sprite.vert.glsl", "sprite.frag.glsl", inputs2d, context_));
+
+    ShaderAttributeList inputs_ui;
+    inputs_ui.push_back(ShaderAttribute(0, "input_pos"));
+    inputs_ui.push_back(ShaderAttribute(1, "input_uv"));
+    auto ui_shader = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "ui.frag.glsl", inputs_ui, context_));
+
+    if (shader3d_ == nullptr ||
+        shader2d_ == nullptr ||
+        ui_shader == nullptr)
+    {
+        return false;
+    }
+
+    // GUI
+    if (gui_ == nullptr)
+    {
+        gui_.reset(new gui::Manager(screen_width, screen_height, std::move(ui_shader), context_));
+    }
+    else
+    {
+        gui_->Reload(screen_width, screen_height, std::move(ui_shader), context_);
+    }
+
+    return true;
 }
 
 void ManagedModel::Finish()

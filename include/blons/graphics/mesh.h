@@ -62,6 +62,14 @@ public:
     ~Mesh() {}
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reloads the mesh to be active in the supplied rendering context
+    ///
+    /// \param context Handle to the current rendering context
+    /// \return True if reinitialized successfully
+    ////////////////////////////////////////////////////////////////////////////////
+    bool Reload(RenderContext& context);
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a handle to the mesh's vertex buffer resource
     ///
     /// \return Vertex buffer
@@ -87,6 +95,8 @@ public:
     unsigned int index_count() const;
 
 private:
+    bool Init(const MeshData& mesh_data, RenderContext& context);
+
     std::unique_ptr<BufferResource> vertex_buffer_, index_buffer_;
     MeshData mesh_data_;
 };

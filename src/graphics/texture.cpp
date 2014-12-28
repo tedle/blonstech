@@ -30,19 +30,42 @@ namespace blons
 {
 Texture::Texture(std::string filename, Type type, RenderContext& context)
 {
-    texture_ = resource::LoadTexture(filename, type, &info_, context);
-    if (texture_ == nullptr)
+    if (!Init(filename, type, context))
     {
         throw "Failed to load texture";
     }
 }
 
+bool Texture::Init(std::string filename, Type type, RenderContext& context)
+{
+    filename_ = filename;
+    pixel_data_ = nullptr;
+
+    texture_ = resource::LoadTexture(filename, type, &info_, context);
+    if (texture_ == nullptr)
+    {
+        return false;
+    }
+    return true;
+}
+
 Texture::Texture(PixelData* pixels, Type type, RenderContext& context)
 {
+    if (!Init(pixels, type, context))
+    {
+        throw "Failed to load texture";
+    }
+}
+
+bool Texture::Init(PixelData* pixels, Type type, RenderContext& context)
+{
+    filename_ = "";
+    pixel_data_ = pixels;
+
     texture_.reset(context->MakeTextureResource());
     if (texture_ == nullptr)
     {
-        throw "Failed to load texture";
+        return false;
     }
 
     if (type == Type::SPRITE)
@@ -53,12 +76,29 @@ Texture::Texture(PixelData* pixels, Type type, RenderContext& context)
 
     if (!context->RegisterTexture(texture_.get(), pixels))
     {
-        throw "Failed to load texture";
+        return false;
     }
 
     info_.width = pixels->width;
     info_.height = pixels->height;
     info_.type = type;
+
+    return true;
+}
+
+bool Texture::Reload(RenderContext& context)
+{
+    if (filename_.length() > 0)
+    {
+        return Init(filename_, info_.type, context);
+    }
+
+    else if (pixel_data_ != nullptr)
+    {
+        return Init(pixel_data_, info_.type, context);
+    }
+
+    return false;
 }
 
 Texture::Info Texture::info() const

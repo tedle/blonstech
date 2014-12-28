@@ -38,13 +38,13 @@ struct TextureCache
     // TODO: Make this unique per context
     std::shared_ptr<TextureResource> texture;
 };
-std::unordered_map<std::string, TextureCache> texture_cache;
+std::unordered_map<std::string, TextureCache> g_texture_cache;
 } // namespace
 
 std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Texture::Type type, Texture::Info* info, RenderContext& context)
 {
     // Get texture data for file, or create fresh texture data if new
-    auto& tex = texture_cache[filename];
+    auto& tex = g_texture_cache[filename];
 
     // Have we loaded the pixels yet?
     if (tex.pixels == nullptr)
@@ -90,6 +90,14 @@ std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Textur
     info->type = type;
 
     return tex.texture;
+}
+
+void ClearBufferCache()
+{
+    for (auto& t : g_texture_cache)
+    {
+        t.second.texture.reset();
+    }
 }
 } // namespace resource
 } // namespace blons

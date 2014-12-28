@@ -59,6 +59,14 @@ public:
     void Render(RenderContext& context);
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reloads the model to be active in the supplied rendering context
+    ///
+    /// \param context Handle to the current rendering context
+    /// \return True if reinitialized successfully
+    ////////////////////////////////////////////////////////////////////////////////
+    bool Reload(RenderContext& context);
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the number of indices contained in the mesh
     ///
     /// \return Number of indices

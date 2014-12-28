@@ -38,6 +38,10 @@ namespace blons
 {
 namespace
 {
+// Used to determine which context is currently active, if multiple exist
+static unsigned int g_active_context;
+static unsigned int g_context_count;
+
 // Overloaded glUniforms to keep things generic
 void Uniform(GLuint loc, int value)
 {
@@ -66,6 +70,7 @@ public:
     GLuint buffer_, vertex_array_id_;
     enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
     RenderGL40* context_;
+    unsigned int context_id_;
 };
 
 class TextureResourceGL40 : public TextureResource
@@ -76,6 +81,7 @@ public:
 
     GLuint texture_, texture_unit_;
     RenderGL40* context_;
+    unsigned int context_id_;
 };
 
 class ShaderResourceGL40 : public ShaderResource
@@ -88,6 +94,7 @@ public:
     GLuint vertex_shader_;
     GLuint frag_shader_;
     RenderGL40* context_;
+    unsigned int context_id_;
 
     GLint UniformLocation(const char* name);
     template <typename T>
@@ -103,6 +110,12 @@ private:
 
 BufferResourceGL40::~BufferResourceGL40()
 {
+    if (context_id_ != g_active_context)
+    {
+        // TODO: Something cleaner in case owning context isnt actually deleted
+        return;
+    }
+
     context_->UnmapBuffers();
 
     if (type_ == BufferResourceGL40::VERTEX_BUFFER)
@@ -121,11 +134,21 @@ BufferResourceGL40::~BufferResourceGL40()
 
 TextureResourceGL40::~TextureResourceGL40()
 {
+    if (context_id_ != g_active_context)
+    {
+        return;
+    }
+
     glDeleteTextures(1, &texture_);
 }
 
 ShaderResourceGL40::~ShaderResourceGL40()
 {
+    if (context_id_ != g_active_context)
+    {
+        return;
+    }
+
     glDetachShader(program_, vertex_shader_);
     glDetachShader(program_, frag_shader_);
 
@@ -172,6 +195,10 @@ bool ShaderResourceGL40::SetUniform(const char* name, T value)
 
 RenderGL40::RenderGL40(units::pixel screen_width, units::pixel screen_height, bool vsync, HWND hwnd, bool fullscreen)
 {
+    g_context_count++;
+    id_ = g_context_count;
+    g_active_context = id_;
+
     // Mitigates repeated calls to glUseProgram
     active_shader_ = 0;
 
@@ -335,6 +362,8 @@ RenderGL40::~RenderGL40()
     // Reset the current context before deleting it
     wglMakeCurrent(device_context_, nullptr);
     wglDeleteContext(render_context_);
+
+    g_active_context = 0;
 }
 
 void RenderGL40::BeginScene()

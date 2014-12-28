@@ -114,6 +114,28 @@ void Model::Render(RenderContext& context)
     return;
 }
 
+bool Model::Reload(RenderContext& context)
+{
+    if (!mesh_->Reload(context))
+    {
+        return false;
+    }
+    if (diffuse_texture_ != nullptr && !diffuse_texture_->Reload(context))
+    {
+        return false;
+    }
+    if (normal_texture_ != nullptr && !normal_texture_->Reload(context))
+    {
+        return false;
+    }
+    if (light_texture_ != nullptr && !light_texture_->Reload(context))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 int Model::index_count() const
 {
     return mesh_->index_count();

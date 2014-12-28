@@ -30,6 +30,14 @@ namespace blons
 {
 Mesh::Mesh(const MeshData& mesh_data, RenderContext& context)
 {
+    if (!Init(mesh_data, context))
+    {
+        throw "Failed to initialize mesh";
+    }
+}
+
+bool Mesh::Init(const MeshData& mesh_data, RenderContext& context)
+{
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
     mesh_data_.vertices = mesh_data.vertices;
@@ -39,20 +47,29 @@ Mesh::Mesh(const MeshData& mesh_data, RenderContext& context)
     // I'm OK with that
     if (mesh_data_.vertices.size() >= ULONG_MAX)
     {
-        throw "Too many vertices!";
+        return false;
     }
 
     if (mesh_data_.indices.size() >= ULONG_MAX)
     {
-        throw "Too many indices!";
+        return false;
     }
 
     if (!context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(),
                                  mesh_data_.vertices.data(), vertex_count(),
                                  mesh_data_.indices.data(), index_count()))
     {
-        throw "Failed to register mesh data";
+        return false;
     }
+
+    return true;
+}
+
+bool Mesh::Reload(RenderContext& context)
+{
+    // Make a copy of mesh data so we dont try to overwrite our own object, could be ugly?
+    auto temp_data = mesh_data_;
+    return Init(temp_data, context);
 }
 
 BufferResource* Mesh::vertex_buffer() const
