@@ -94,6 +94,8 @@ private:
     template<>
     Variable::Type ArgType<int>() { return Variable::INT; }
     template<>
+    Variable::Type ArgType<float>() { return Variable::FLOAT; }
+    template<>
     Variable::Type ArgType<std::string>() { return Variable::STRING; }
     template<>
     Variable::Type ArgType<const char*>() { return Variable::STRING; }

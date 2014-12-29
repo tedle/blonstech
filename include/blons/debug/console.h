@@ -126,6 +126,9 @@ const std::vector<std::string>& history();
 /// the input parameters are the same, or act as an overloaded function if the
 /// inputs are different.
 ///
+/// If you register a function with the same name as an existing variable it
+/// will throw.
+///
 /// \param name The name the function will be called by
 /// \param func Function that will be called whenever invoked by the console
 ////////////////////////////////////////////////////////////////////////////////
@@ -151,7 +154,8 @@ inline void RegisterFunction(const std::string& name, std::function<void()> func
 /// The variable is statically typed and only supports certain native C++ types.
 /// See blons::console for valid inputs.
 ///
-/// If you register a variable that is already in use it will throw
+/// If you register a variable that is already in use or has the same name as an
+/// existing function it will throw
 ///
 /// \param name Name of the variable
 /// \param value Value of the variable

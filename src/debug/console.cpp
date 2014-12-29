@@ -87,6 +87,11 @@ void PrintUsage(const std::string& func_name, const FunctionList& func_list)
 // into the library.
 void internal::__registerfunction(const std::string& name, Function* func)
 {
+    if (g_state.variables.find(name) != g_state.variables.end())
+    {
+        throw "Variable already exists with this name";
+    }
+
     const auto arg_list = func->ArgList();
     auto& func_list = g_state.functions[name];
     // Check if there's already a function with this name and argument list
@@ -103,16 +108,47 @@ void internal::__registerfunction(const std::string& name, Function* func)
 // The main RegisterVariable function is templated and needs to be defined in
 // public headers. We use this function to hardcode as much as we can
 // into the library.
-void internal::__registervariable(const std::string& name, const Variable& var)
+void internal::__registervariable(const std::string& name, const Variable& variable)
 {
-    if (g_state.variables.find(name) == g_state.variables.end())
-    {
-        g_state.variables[name] = var;
-    }
-    else
+    if (g_state.variables.find(name) != g_state.variables.end())
     {
         throw "Variable already defined";
     }
+    if (g_state.functions.find(name) != g_state.functions.end())
+    {
+        throw "Function already exists with this name";
+    }
+
+    // Create getter and setter functions for the variable
+    switch (variable.type())
+    {
+    case Variable::INT:
+    {
+        RegisterFunction(name, [=](){ out("%i\n", var<int>(name)); });
+        std::function<void(int)> setter = [=](int v){ set_var(name, v); };
+        RegisterFunction(name, setter);
+        break;
+    }
+    case Variable::FLOAT:
+    {
+        RegisterFunction(name, [=](){ out("%f\n", var<float>(name)); });
+        std::function<void(float)> setter = [=](float v){ set_var(name, v); };
+        RegisterFunction(name, setter);
+        break;
+    }
+    case Variable::STRING:
+    {
+        RegisterFunction(name, [=](){ out("\"%s\"\n", var<const char*>(name)); });
+        std::function<void(const char*)> setter = [=](const char* v){ set_var(name, v); };
+        RegisterFunction(name, setter);
+        break;
+    }
+    default:
+        throw "Unexpected variable type";
+        break;
+    }
+
+    g_state.variables[name] = variable;
 }
 
 const Variable& internal::__var(const std::string& name)
