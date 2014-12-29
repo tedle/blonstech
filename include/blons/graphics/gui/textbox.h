@@ -32,6 +32,9 @@ namespace blons
 {
 namespace gui
 {
+// Forward delcarations
+class Label;
+
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief UI element for taking typed user input
 ////////////////////////////////////////////////////////////////////////////////
@@ -150,6 +153,26 @@ protected:
     ////////////////////////////////////////////////////////////////////////////////
     void OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the font style used for this textbox
+    ///
+    /// \return Font style
+    ////////////////////////////////////////////////////////////////////////////////
+    Skin::FontStyle font_style() const;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves a pointer to the textbox's label used for rendering
+    /// input text
+    ///
+    /// \return Label pointer
+    ////////////////////////////////////////////////////////////////////////////////
+    Label* label() const;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the amount of text padding used by the textbox in pixels
+    ///
+    /// \return Text padding
+    ////////////////////////////////////////////////////////////////////////////////
+    units::pixel padding() const;
+
 private:
     // Helper functions
     void SetCursorPos(std::string::iterator cursor);
@@ -164,7 +187,7 @@ private:
         Timer timer;
         Input::KeyCode code;
     } key_repeat_;
-    std::unique_ptr<class Label> text_label_;
+    std::unique_ptr<Label> text_label_;
     std::function<void(Textbox*)> callback_;
     bool active_;
     // Padding between edge of textbox and text

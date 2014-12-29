@@ -70,11 +70,22 @@ public:
     bool Update(const Input& input) override;
 
 private:
+    void RenderCompletionText(RenderContext& context);
     // Takes a keycode and if its up or down arrow, sets the textbox text to a
     // recent console command
     void SearchHistory(Input::KeyCode key);
+    // Takes a keycode and if its a tab key will try to provide tab completion
+    void TabCompletion(Input::KeyCode key);
+
     static const int kCommandHistoryIndexNone = -1;
+    // How far weve scrolled up/down cmd history
     int command_history_index_;
+    // Currently selected completion option
+    int tab_completion_index_;
+    // Caches original query while we flip thru tab results
+    std::string search_text_;
+    // Shows low contrast completion hints
+    std::unique_ptr<Label> completion_text_;
 };
 } // namespace gui
 } // namespace blons

@@ -103,19 +103,20 @@ public:
         SHIFT                = 0x31, ///< Shift modifier
         CONTROL              = 0x32, ///< Control modifier
         ALT                  = 0x33, ///< Alt modifier
-        BACKSPACE            = 0x34, ///< Backspace key
 
+        BACKSPACE            = 0x34, ///< Backspace key
         DEL                  = 0x35, ///< Delete key (shoutouts to a certain company that loves macros!)
         ESCAPE               = 0x36, ///< Escape key
         RETURN               = 0x37, ///< Return (enter) key
+        TAB                  = 0x38, ///< Tab key
 
-        PG_UP                = 0x38, ///< Page up
-        PG_DOWN              = 0x39, ///< Page down
+        PG_UP                = 0x39, ///< Page up
+        PG_DOWN              = 0x3A, ///< Page down
 
-        LEFT                 = 0x3A, ///< Left arrow key
-        RIGHT                = 0x3B, ///< Right arrow key
-        UP                   = 0x3C, ///< Up arrow key
-        DOWN                 = 0x3D  ///< Down arrow key
+        LEFT                 = 0x3B, ///< Left arrow key
+        RIGHT                = 0x3C, ///< Right arrow key
+        UP                   = 0x3D, ///< Up arrow key
+        DOWN                 = 0x3E  ///< Down arrow key
     };
 
     ////////////////////////////////////////////////////////////////////////////////

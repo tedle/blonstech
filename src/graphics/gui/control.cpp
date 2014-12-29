@@ -61,5 +61,10 @@ void Control::set_crop(Box crop, units::pixel feather)
     crop_ = crop;
     feather_ = feather;
 }
+
+Box Control::crop() const
+{
+    return crop_;
+}
 } // namespace gui
 } // namespace blons

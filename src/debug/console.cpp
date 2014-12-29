@@ -234,6 +234,16 @@ void out(const std::string& fmt, ...)
     }
 }
 
+const std::vector<std::string> functions()
+{
+    std::vector<std::string> func_list;
+    for (const auto& func_name : g_state.functions)
+    {
+        func_list.push_back(func_name.first);
+    }
+    return func_list;
+}
+
 const std::vector<std::string>& history()
 {
     return g_state.history;

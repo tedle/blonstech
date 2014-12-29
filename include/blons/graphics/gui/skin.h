@@ -308,8 +308,9 @@ public:
                 Box(30, 13, 10, 10), // bottom_left
                 Box(41, 13, 1, 10),  // bottom
                 Box(43, 13, 10, 10), // bottom_right
-                Vector4(0.9f, 0.9f, 0.9f, 1.0) // text colour
+                Vector4(0.9f, 0.9f, 0.9f, 1.0f) // text colour
             };
+            Vector4 completion_colour = Vector4(0.9f, 0.9f, 1.0f, 0.6f); ///< Colour for tab completion hinting text
             Box cursor = Box(56, 48, 1, 1); ///< Texture coordinates for the text cursor region
         } console; ///< Layout for console controls
 

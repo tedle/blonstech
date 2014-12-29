@@ -353,6 +353,21 @@ void Textbox::OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modif
     }
 }
 
+Skin::FontStyle Textbox::font_style() const
+{
+    return font_style_;
+}
+
+Label* Textbox::label() const
+{
+    return text_label_.get();
+}
+
+units::pixel Textbox::padding() const
+{
+    return padding_;
+}
+
 void Textbox::SetCursorPos(std::string::iterator cursor)
 {
     cursor_ = cursor;
