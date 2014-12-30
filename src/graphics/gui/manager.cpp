@@ -52,10 +52,10 @@ void Manager::Init(units::pixel width, units::pixel height, std::unique_ptr<Shad
     skin_.reset(new Skin(context));
 
     // TODO: move this out of constructor! font load included!
-    LoadFont("../../notes/font stuff/test-console.ttf", 28, Skin::FontStyle::DEFAULT, context);
-    LoadFont("../../notes/font stuff/test-heading.ttf", 14, Skin::FontStyle::HEADING, context);
-    LoadFont("../../notes/font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL, context);
-    LoadFont("../../notes/font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE, context);
+    LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::DEFAULT, context);
+    LoadFont("font stuff/test-heading.ttf", 14, Skin::FontStyle::HEADING, context);
+    LoadFont("font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL, context);
+    LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE, context);
 
     draw_batches_.clear();
     batch_index_ = 0;

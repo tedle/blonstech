@@ -96,7 +96,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     // TODO: make a proper solution for no diffuse texture
     if (diffuse_texture_ == nullptr)
     {
-        diffuse_texture_.reset(new Texture("../../notes/me.dds", Texture::DIFFUSE, context));
+        diffuse_texture_.reset(new Texture("me.dds", Texture::DIFFUSE, context));
         if (diffuse_texture_ == nullptr)
         {
             throw "Failed to load diffuse texture";

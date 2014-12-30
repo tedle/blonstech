@@ -248,17 +248,17 @@ bool Graphics::MakeContext(units::pixel screen_width, units::pixel screen_height
     inputs3d.push_back(ShaderAttribute(0, "input_pos"));
     inputs3d.push_back(ShaderAttribute(1, "input_uv"));
     inputs3d.push_back(ShaderAttribute(2, "input_norm"));
-    shader3d_.reset(new Shader("mesh.vert.glsl", "mesh.frag.glsl", inputs3d, context_));
+    shader3d_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", inputs3d, context_));
 
     ShaderAttributeList inputs2d;
     inputs2d.push_back(ShaderAttribute(0, "input_pos"));
     inputs2d.push_back(ShaderAttribute(1, "input_uv"));
-    shader2d_.reset(new Shader("sprite.vert.glsl", "sprite.frag.glsl", inputs2d, context_));
+    shader2d_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", inputs2d, context_));
 
     ShaderAttributeList inputs_ui;
     inputs_ui.push_back(ShaderAttribute(0, "input_pos"));
     inputs_ui.push_back(ShaderAttribute(1, "input_uv"));
-    auto ui_shader = std::unique_ptr<Shader>(new Shader("sprite.vert.glsl", "ui.frag.glsl", inputs_ui, context_));
+    auto ui_shader = std::unique_ptr<Shader>(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", inputs_ui, context_));
 
     if (shader3d_ == nullptr ||
         shader2d_ == nullptr ||

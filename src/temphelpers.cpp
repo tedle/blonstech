@@ -207,13 +207,13 @@ std::vector<std::unique_ptr<Model>> load_codmap(std::string folder, std::vector<
         }
         models.back()->set_pos(0.0, 0.0, 0.0);
     }
-    /*models.push_back(std::unique_ptr<Model>(new Model(L"../notes/codmap.mesh", L"../notes/me.dds")));
+    /*models.push_back(std::unique_ptr<Model>(new Model(L"codmap.mesh", L"me.dds")));
     if (models[1] == nullptr)
     {
         throw "model problem";
     }
 
-    if (!models[1]->Init(L"../../notes/codmap.mesh", L"../notes/me.dds"))
+    if (!models[1]->Init(L"codmap.mesh", L"me.dds"))
     {
         throw "other model problem";
     }

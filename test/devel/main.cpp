@@ -33,16 +33,16 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     std::vector<std::unique_ptr<blons::Model>> models;
 
     // Model 1
-    models.push_back(graphics->MakeModel("../../notes/teapot_highpoly.bms"));
+    models.push_back(graphics->MakeModel("teapot_highpoly.bms"));
     models[0]->set_pos(0.0, 0.0, 20.0);
 
     // Model 2
-    models.push_back(graphics->MakeModel("../../notes/cube.bms"));
+    models.push_back(graphics->MakeModel("cube.bms"));
     models[1]->set_pos(10.0, 0.0, 20.0);
-    //models = blons::temp::load_codmap("../../notes/bms_test", std::move(models), graphics.get());
+    //models = blons::temp::load_codmap("bms_test", std::move(models), graphics.get());
 
     // Sprite 1
-    auto sprite = graphics->MakeSprite("../../notes/me.dds");
+    auto sprite = graphics->MakeSprite("me.dds");
     sprite->set_pos(0, 0, 32, 32);
 
     // GUI testing

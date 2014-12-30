@@ -153,19 +153,6 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ui.frag.glsl" />
-    <None Include="mesh.frag.glsl" />
-    <None Include="mesh.vert.glsl" />
-    <None Include="sprite.frag.glsl" />
-    <None Include="sprite.vert.glsl" />
-    <None Include="test.frag.fx">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="test.vert.fx">
-      <FileType>Document</FileType>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\src\engine.vcxproj">
       <Project>{b830743e-a80c-4703-8f6c-ad0ed8a1fb8a}</Project>
     </ProjectReference>

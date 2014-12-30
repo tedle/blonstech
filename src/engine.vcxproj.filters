@@ -26,6 +26,9 @@
     <Filter Include="src\system">
       <UniqueIdentifier>{26a604fb-f88a-4ca6-a2cd-964adcb23926}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\shaders">
+      <UniqueIdentifier>{ab1f975c-b6af-4410-9e06-4e2cef9da0d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons\debug\console.h">
@@ -273,5 +276,30 @@
     <ClCompile Include="graphics\resource.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\mesh.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\mesh.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\sprite.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\sprite.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\ui.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\test.frag.fx">
+      <Filter>src\shaders</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\test.vert.fx">
+      <Filter>src\shaders</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>
