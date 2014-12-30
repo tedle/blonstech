@@ -32,11 +32,8 @@ namespace blons
 {
 namespace console
 {
-namespace internal
-{
 // Forward declarations
 class Variable;
-} // namespace internal
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Parses console input text into a list of function arguments
@@ -47,7 +44,7 @@ class Variable;
 /// \return A list of function arguments. The first argument is always the
 /// function name.
 ////////////////////////////////////////////////////////////////////////////////
-std::vector<internal::Variable> ParseCommand(const std::string& command);
+std::vector<Variable> ParseCommand(const std::string& command);
 } // namespace console
 } // namespace blons
 

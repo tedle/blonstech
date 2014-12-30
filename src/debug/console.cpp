@@ -34,7 +34,6 @@ namespace blons
 namespace console
 {
 using internal::Function;
-using internal::Variable;
 
 namespace
 {
@@ -151,12 +150,12 @@ void internal::__registervariable(const std::string& name, const Variable& varia
     g_state.variables[name] = variable;
 }
 
-const Variable& internal::__var(const std::string& name)
+const Variable* internal::__var(const std::string& name)
 {
     auto v = g_state.variables.find(name);
     if (v != g_state.variables.end())
     {
-        return v->second;
+        return &v->second;
     }
     else
     {

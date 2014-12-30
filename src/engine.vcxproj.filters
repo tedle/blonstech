@@ -133,9 +133,6 @@
     <ClInclude Include="debug\consoleparser.h">
       <Filter>src\debug</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\debug\consolefunction.inl.h">
-      <Filter>src\debug</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\debug.h">
       <Filter>src</Filter>
     </ClInclude>
@@ -163,7 +160,10 @@
     <ClInclude Include="graphics\resource.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\debug\consolevariable.inl.h">
+    <ClInclude Include="..\include\blons\debug\consoleinternal.inl.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\debug\consolevariable.h">
       <Filter>src\debug</Filter>
     </ClInclude>
   </ItemGroup>

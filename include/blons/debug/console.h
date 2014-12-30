@@ -29,6 +29,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+// Public Includes
+#include <blons/debug/consolevariable.h>
 
 namespace blons
 {
@@ -40,8 +42,7 @@ namespace console
 // Since template generation is done at compile time, user needs
 // access to function generation code. You probably don't want
 // to touch anything in here
-#include <blons/debug/consolevariable.inl.h>
-#include <blons/debug/consolefunction.inl.h>
+#include <blons/debug/consoleinternal.inl.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Prototype for functions called everytime the console prints.
@@ -76,7 +77,9 @@ void out(const std::string& fmt, ...);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Retrieves a global console variable by name. See blons::console for
-/// valid return types. Will throw if the variable has not been declared
+/// valid return types. If a return type is not defined, a constant pointer to
+/// the generic variable is returned instead. Will throw if the variable has not
+/// been declared
 ///
 /// \param name Name of the variable to retrieve
 /// \tparam T Type to return value as
@@ -85,7 +88,12 @@ void out(const std::string& fmt, ...);
 template <typename T>
 T var(const std::string& name)
 {
-    return internal::__var(name).to<T>();
+    return internal::__var(name)->to<T>();
+}
+
+inline const Variable* var(const std::string& name)
+{
+    return internal::__var(name);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +106,7 @@ T var(const std::string& name)
 template <typename T>
 void set_var(const std::string& name, T value)
 {
-    internal::Variable v(value);
+    Variable v(value);
     internal::__set_var(name, v);
 }
 
@@ -163,7 +171,7 @@ inline void RegisterFunction(const std::string& name, std::function<void()> func
 template <typename T>
 void RegisterVariable(const std::string& name, T value)
 {
-    internal::Variable v(value);
+    Variable v(value);
     internal::__registervariable(name, v);
 }
 

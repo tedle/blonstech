@@ -125,4 +125,13 @@ private:
 
 // Registers a function the console
 void __registerfunction(const std::string& name, Function* func);
+
+// Registers a variable the console
+void __registervariable(const std::string& name, const Variable& var);
+
+// Retrieves a variable from the console
+const Variable* __var(const std::string& name);
+
+// Sets the value of an existing variable in the console
+void __set_var(const std::string& name, const Variable& var);
 } // namespace internal

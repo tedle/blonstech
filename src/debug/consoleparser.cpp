@@ -29,8 +29,6 @@ namespace blons
 {
 namespace console
 {
-using internal::Variable;
-
 namespace
 {
 struct ParseState
