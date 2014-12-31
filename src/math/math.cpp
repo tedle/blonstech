@@ -52,7 +52,7 @@ Matrix MatrixLookAt(Vector3 pos, Vector3 look, Vector3 up)
     xm_up.y = up.y;
     xm_up.z = up.z;
 
-    XMStoreFloat4x4(&xm, XMMatrixLookAtLH(XMLoadFloat3(&xm_pos),
+    XMStoreFloat4x4(&xm, XMMatrixLookAtRH(XMLoadFloat3(&xm_pos),
                                           XMLoadFloat3(&xm_look),
                                           XMLoadFloat3(&xm_up)));
 
@@ -79,10 +79,10 @@ Matrix MatrixOrthographic(float screen_width, float screen_height,
     Matrix ortho_matrix;
     XMFLOAT4X4 xm;
     // Top left origin
-    XMStoreFloat4x4(&xm, XMMatrixOrthographicOffCenterLH(0, screen_width, screen_height, 0,
+    XMStoreFloat4x4(&xm, XMMatrixOrthographicOffCenterRH(0, screen_width, screen_height, 0,
                                                          screen_near, screen_depth));
     // Bottom left origin
-    //XMStoreFloat4x4(&xm, XMMatrixOrthographicOffCenterLH(0, screen_width, 0, screen_height,
+    //XMStoreFloat4x4(&xm, XMMatrixOrthographicOffCenterRH(0, screen_width, 0, screen_height,
     //                                                     screen_near, screen_depth));
     ortho_matrix = xm;
     return ortho_matrix;
@@ -93,7 +93,7 @@ Matrix MatrixPerspectiveFov(float fov, float screen_aspect,
 {
     Matrix proj_matrix;
     XMFLOAT4X4 xm;
-    XMStoreFloat4x4(&xm, XMMatrixPerspectiveFovLH(fov, screen_aspect,
+    XMStoreFloat4x4(&xm, XMMatrixPerspectiveFovRH(fov, screen_aspect,
                                                   screen_near, screen_depth));
     proj_matrix = xm;
     return proj_matrix;
@@ -159,7 +159,7 @@ Matrix MatrixView(Vector3 pos, Vector3 rot)
     // Translate look_vector back to possey
     look_vector = pos_vector + look_vector;
 
-    XMStoreFloat4x4(&xm, XMMatrixLookAtLH(pos_vector, look_vector, up_vector));
+    XMStoreFloat4x4(&xm, XMMatrixLookAtRH(pos_vector, look_vector, up_vector));
     view_matrix = xm;
     return view_matrix;
 }
@@ -181,6 +181,7 @@ Vector3 Vector3Normalize(Vector3 n)
     n.z /= dist;
     return n;
 }
+
 Vector3 Vector3PitchYawRoll(Matrix view_matrix)
 {
     Vector3 rot;

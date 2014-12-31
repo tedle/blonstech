@@ -50,7 +50,7 @@ void noclip(Input* input, Camera* camera)
     {
         Vector3 rot = camera->rot();
         rot.x += input->mouse_delta_y() * 0.003f;
-        rot.y += input->mouse_delta_x() * 0.003f;
+        rot.y -= input->mouse_delta_x() * 0.003f;
         camera->set_rot(rot.x, rot.y, 0.0);
     }
 
@@ -84,11 +84,11 @@ void noclip(Input* input, Camera* camera)
         }
         if (input->IsKeyDown(Input::CHAR_A))
         {
-            lr -= 1;
+            lr += 1;
         }
         if (input->IsKeyDown(Input::CHAR_D))
         {
-            lr += 1;
+            lr -= 1;
         }
 
         // We do ud and lr separately because lr is NOT affected by pitch, but ud is

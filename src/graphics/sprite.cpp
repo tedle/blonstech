@@ -53,7 +53,7 @@ bool Sprite::Init(RenderContext& context)
 
     mesh_.indices.resize(6);
     // Order to render the quad's vertices in
-    mesh_.indices = { 0, 1, 2, 1, 3, 2 };
+    mesh_.indices = { 0, 1, 2, 0, 2, 3 };
 
     mesh_.vertices.resize(4);
     BuildQuad();
@@ -192,9 +192,9 @@ void Sprite::BuildQuad()
     auto* vs = mesh_.vertices.data();
 
     vs[0].pos.x = pos_.x;          vs[0].pos.y = pos_.y;
-    vs[1].pos.x = pos_.x + pos_.w; vs[1].pos.y = pos_.y;
-    vs[2].pos.x = pos_.x;          vs[2].pos.y = pos_.y + pos_.h;
-    vs[3].pos.x = pos_.x + pos_.w; vs[3].pos.y = pos_.y + pos_.h;
+    vs[1].pos.x = pos_.x;          vs[1].pos.y = pos_.y + pos_.h;
+    vs[2].pos.x = pos_.x + pos_.w; vs[2].pos.y = pos_.y + pos_.h;
+    vs[3].pos.x = pos_.x + pos_.w; vs[3].pos.y = pos_.y;
 
     // Texture region is stored in pixels, but graphics API needs it normalized as [0,1]
     Texture::Info info = texture_->info();
@@ -204,8 +204,8 @@ void Sprite::BuildQuad()
                    tex_map_.h / info.height);
 
     vs[0].tex.x = normal_tex.x;                vs[0].tex.y = normal_tex.y;
-    vs[1].tex.x = normal_tex.x + normal_tex.w; vs[1].tex.y = normal_tex.y;
-    vs[2].tex.x = normal_tex.x;                vs[2].tex.y = normal_tex.y + normal_tex.h;
-    vs[3].tex.x = normal_tex.x + normal_tex.w; vs[3].tex.y = normal_tex.y + normal_tex.h;
+    vs[1].tex.x = normal_tex.x;                vs[1].tex.y = normal_tex.y + normal_tex.h;
+    vs[2].tex.x = normal_tex.x + normal_tex.w; vs[2].tex.y = normal_tex.y + normal_tex.h;
+    vs[3].tex.x = normal_tex.x + normal_tex.w; vs[3].tex.y = normal_tex.y;
 }
 } // namespace blons

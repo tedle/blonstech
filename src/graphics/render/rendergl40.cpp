@@ -368,7 +368,7 @@ RenderGL40::RenderGL40(units::pixel screen_width, units::pixel screen_height, bo
     // Configure how we render tris
     // TODO: re enable back face cullin
     glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
+    glFrontFace(GL_CCW);
     glCullFace(GL_BACK);
     //glDisable(GL_CULL_FACE);
 
