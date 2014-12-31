@@ -46,6 +46,7 @@ public:
     void EndScene() override;
 
     BufferResource* MakeBufferResource() override;
+    FramebufferResource* MakeFramebufferResource() override;
     TextureResource* MakeTextureResource() override;
     ShaderResource* MakeShaderResource() override;
 
@@ -55,6 +56,9 @@ public:
     bool Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                         Vertex* vertices, unsigned int vert_count,
                         unsigned int* indices, unsigned int index_count) override;
+    bool RegisterFramebuffer(FramebufferResource* frame_buffer,
+                             units::pixel width, units::pixel height,
+                             unsigned int texture_count) override;
     bool RegisterTexture(TextureResource* texture, PixelData* pixel_data) override;
     bool RegisterShader(ShaderResource* program,
                         std::string vertex_filename, std::string pixel_filename,
@@ -62,6 +66,9 @@ public:
 
     void RenderShader(ShaderResource* program, unsigned int index_count) override;
 
+    void BindFramebuffer(FramebufferResource* frame_buffer) override;
+    std::vector<const TextureResource*> FramebufferTextures(FramebufferResource* frame_buffer) override;
+    const TextureResource* FramebufferDepthTexture(FramebufferResource* frame_buffer) override;
     void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer) override;
     void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                      const Vertex* vertices, unsigned int vert_count,
@@ -75,11 +82,11 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, Matrix value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value) override;
-    bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource& value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value) override;
 
     bool SetDepthTesting(bool enable) override;
 
-    void GetVideoCardInfo(char* buffer, int& len_buffer) override;
+    void VideoCardInfo(char* buffer, int& len_buffer) override;
 
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
     bool LoadPixelData(std::string filename, PixelData* pixel_data) override;

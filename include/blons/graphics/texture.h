@@ -93,11 +93,11 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Info info() const;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves a reference of the texture resource for rendering
+    /// \brief Retrieves a pointer to the texture resource for rendering
     ///
     /// \return Texture resource reference
     ////////////////////////////////////////////////////////////////////////////////
-    const TextureResource& texture() const;
+    const TextureResource* texture() const;
 
 private:
     bool Init(std::string filename, Type type, RenderContext& context);

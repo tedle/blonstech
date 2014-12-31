@@ -106,8 +106,8 @@ Texture::Info Texture::info() const
     return info_;
 }
 
-const TextureResource& Texture::texture() const
+const TextureResource* Texture::texture() const
 {
-    return *texture_;
+    return texture_.get();
 }
 } // namespace blons

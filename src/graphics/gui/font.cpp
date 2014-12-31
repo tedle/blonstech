@@ -448,7 +448,7 @@ units::pixel Font::pixel_size() const
     return pixel_size_;
 }
 
-const TextureResource& Font::texture() const
+const TextureResource* Font::texture() const
 {
     return fontsheet_->texture();
 }

@@ -84,6 +84,21 @@ public:
     unsigned int context_id_;
 };
 
+class FramebufferResourceGL40 : public FramebufferResource
+{
+public:
+    FramebufferResourceGL40(RenderGL40* context) : context_(context), depth_(TextureResourceGL40(context)) {}
+    ~FramebufferResourceGL40() override;
+
+    GLuint framebuffer_;
+    units::pixel width, height;
+    std::vector<TextureResourceGL40> targets_;
+    TextureResourceGL40 depth_;
+    GLuint depth_render_;
+    RenderGL40* context_;
+    unsigned int context_id_;
+};
+
 class ShaderResourceGL40 : public ShaderResource
 {
 public:
@@ -130,6 +145,19 @@ BufferResourceGL40::~BufferResourceGL40()
 
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &vertex_array_id_);
+}
+
+FramebufferResourceGL40::~FramebufferResourceGL40()
+{
+    if (context_id_ != g_active_context)
+    {
+        return;
+    }
+
+    glDeleteRenderbuffers(1, &depth_render_);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glDeleteFramebuffers(1, &framebuffer_);
 }
 
 TextureResourceGL40::~TextureResourceGL40()
@@ -382,6 +410,11 @@ BufferResource* RenderGL40::MakeBufferResource()
     return new BufferResourceGL40(this);
 }
 
+FramebufferResource* RenderGL40::MakeFramebufferResource()
+{
+    return new FramebufferResourceGL40(this);
+}
+
 TextureResource* RenderGL40::MakeTextureResource()
 {
     return new TextureResourceGL40(this);
@@ -484,6 +517,77 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
     glBindVertexArray(0);
 
     return true;
+}
+
+bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
+                                     units::pixel width, units::pixel height,
+                                     unsigned int texture_count)
+{
+    FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
+
+    fbo->width = width;
+    fbo->height = height;
+
+    // Create the frame buffer
+    glGenFramebuffers(1, &fbo->framebuffer_);
+
+    // Bind it so we can put stuff in it
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
+
+    // Creates empty render targets
+    auto make_texture = [&](bool is_depth)
+    {
+        TextureResourceGL40 tex(this);
+        tex.texture_unit_ = 0;
+
+        // Set the texture unit in which to store the data.
+        glActiveTexture(GL_TEXTURE0 + tex.texture_unit_);
+
+        // Generate an ID for the texture.
+        glGenTextures(1, &tex.texture_);
+
+        // Bind the texture as a 2D texture.
+        glBindTexture(GL_TEXTURE_2D, tex.texture_);
+
+        // Set the parameters and fill it with empty image data
+        if (!is_depth)
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+        }
+        else
+        {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+        }
+         
+        // Always rendered as unstretched 2D for now...
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+        return tex;
+    };
+
+    // Create and bind all of our render targets
+    std::unique_ptr<GLenum[]> drawbuffers(new GLenum[texture_count]);
+    for (unsigned int i = 0; i < texture_count; i++)
+    {
+        fbo->targets_.push_back(make_texture(false));
+        auto attachment = GL_COLOR_ATTACHMENT0 + i;
+        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, attachment, fbo->targets_.back().texture_, 0);
+        drawbuffers[i] = attachment;
+    }
+    glDrawBuffers(texture_count, drawbuffers.get());
+
+    // Render with a depth buffer
+    glGenRenderbuffers(1, &fbo->depth_render_);
+    glBindRenderbuffer(GL_RENDERBUFFER, fbo->depth_render_);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo->depth_render_);
+
+    // Create and bind the depth target
+    fbo->depth_ = make_texture(true);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_.texture_, 0);
+
+    return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 }
 
 bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
@@ -637,6 +741,42 @@ void RenderGL40::RenderShader(ShaderResource* program, unsigned int index_count)
     glBindVertexArray(0);
 }
 
+void RenderGL40::BindFramebuffer(FramebufferResource* frame_buffer)
+{
+    if (frame_buffer != nullptr)
+    {
+        FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
+        glViewport(0, 0, fbo->width, fbo->height);
+    }
+    else
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        // TODO: use actual window dimensions
+        glViewport(0, 0, 800, 600);
+    }
+}
+
+std::vector<const TextureResource*> RenderGL40::FramebufferTextures(FramebufferResource* frame_buffer)
+{
+    FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
+
+    std::vector<const TextureResource*> targets;
+    for (const auto& tex : fbo->targets_)
+    {
+        targets.push_back(&tex);
+    }
+
+    return targets;
+}
+
+const TextureResource* RenderGL40::FramebufferDepthTexture(FramebufferResource* frame_buffer)
+{
+    FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
+
+    return &fbo->depth_;
+}
+
 void RenderGL40::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
     UnmapBuffers();
@@ -738,9 +878,9 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vecto
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource& value)
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value)
 {
-    const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(&value);
+    const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(value);
     glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
     glBindTexture(GL_TEXTURE_2D, tex->texture_);
     return SetShaderInput(program, name, tex->texture_unit_);
@@ -759,7 +899,7 @@ bool RenderGL40::SetDepthTesting(bool enable)
     return true;
 }
 
-void RenderGL40::GetVideoCardInfo(char* name, int& memory)
+void RenderGL40::VideoCardInfo(char* name, int& memory)
 {
     strcpy_s(name, 128, video_card_desc_.c_str());
     memory = video_card_memory_;

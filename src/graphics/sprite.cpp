@@ -113,7 +113,7 @@ unsigned int Sprite::index_count() const
     return static_cast<unsigned int>(index_count);
 }
 
-const TextureResource& Sprite::texture() const
+const TextureResource* Sprite::texture() const
 {
     return texture_->texture();
 }

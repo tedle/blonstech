@@ -106,6 +106,14 @@ public:
     virtual ~BufferResource() {};
 };
 ////////////////////////////////////////////////////////////////////////////////
+/// \brief Contains identifying data to render data to various textures
+////////////////////////////////////////////////////////////////////////////////
+class FramebufferResource
+{
+public:
+    virtual ~FramebufferResource() {};
+};
+////////////////////////////////////////////////////////////////////////////////
 /// \brief Contains identifying data to activate and ineract with shaders
 ////////////////////////////////////////////////////////////////////////////////
 class ShaderResource
@@ -160,6 +168,13 @@ public:
     /// \return New BufferResource
     ////////////////////////////////////////////////////////////////////////////////
     virtual BufferResource* MakeBufferResource()=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates an implementation specific FramebufferResource to be stored
+    /// as its base class
+    ///
+    /// \return New FramebufferResource
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual FramebufferResource* MakeFramebufferResource()=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates an implementation specific TextureResource to be stored as its
     /// base class
@@ -217,6 +232,20 @@ public:
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count)=0;
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a FramebufferResource and binds it to the graphics API
+    /// permitting its use for rendering calls. Expects an output to the supplied
+    /// number of render targets.
+    ///
+    /// \param frame_buffer Framebuffer for to bind
+    /// \param width Width of the textures to render to in pixels
+    /// \param height Height of the textures to render to in pixels
+    /// \param texture_count Number of textures for the framebuffer to render to
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool RegisterFramebuffer(FramebufferResource* frame_buffer,
+                                     units::pixel width, units::pixel height,
+                                     unsigned int texture_count)=0;
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a TextureResource and binds it, combined with the supplied
     /// PixelData, to the graphics API permitting their use for rendering calls.
     ///
@@ -250,6 +279,27 @@ public:
     /// \param index_count Number of vertices to render
     ////////////////////////////////////////////////////////////////////////////////
     virtual void RenderShader(ShaderResource* program, unsigned int index_count)=0;
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a FramebufferResource and binds it to the graphics API,
+    /// prepping it for a draw call. Passing a value of nullptr will bind the
+    /// back buffer as the current framebuffer.
+    ///
+    /// \param frame_buffer Frame buffer resource
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void BindFramebuffer(FramebufferResource* frame_buffer)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves a list of all the render targets bound to a frame buffer
+    ///
+    /// \return Ordered list of TextureResources representing each render target
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual std::vector<const TextureResource*> FramebufferTextures(FramebufferResource* frame_buffer)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves a pointer to the depth texture bound to a frame buffer
+    ///
+    /// \return TextureResource representing the depth buffer
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual const TextureResource* FramebufferDepthTexture(FramebufferResource* frame_buffer)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a supplied vertex and index buffer resource and binds them
@@ -334,7 +384,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc SetShaderInput
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource& value)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets depth testing to be either enabled or disabled
@@ -350,7 +400,7 @@ public:
     /// \param[out] buffer Pointer to the string containing information
     /// \param[out] len_buffer Number of bytes copied into buffer
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void GetVideoCardInfo(char* buffer, int& len_buffer)=0;
+    virtual void VideoCardInfo(char* buffer, int& len_buffer)=0;
 
     // TODO: do this MANULLY in texture class later
     ////////////////////////////////////////////////////////////////////////////////

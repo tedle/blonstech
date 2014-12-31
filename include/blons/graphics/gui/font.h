@@ -164,7 +164,7 @@ public:
     ///
     /// \return Reference to the font texture
     ////////////////////////////////////////////////////////////////////////////////
-    const TextureResource& texture() const;
+    const TextureResource* texture() const;
 
 private:
     struct Glyph;

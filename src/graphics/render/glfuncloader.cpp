@@ -59,6 +59,18 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glBindBuffer");
     }
 
+    glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)glGetProcAddress("glBindFramebuffer");
+    if (glBindFramebuffer == nullptr)
+    {
+        failed.push_back("glBindFramebuffer");
+    }
+
+    glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)glGetProcAddress("glBindRenderbuffer");
+    if (glBindRenderbuffer == nullptr)
+    {
+        failed.push_back("glBindRenderbuffer");
+    }
+
     glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)glGetProcAddress("glBindVertexArray");
     if (glBindVertexArray == nullptr)
     {
@@ -75,6 +87,12 @@ std::vector<std::string> LoadGLFunctions()
     if (glBufferSubData == nullptr)
     {
         failed.push_back("glBufferSubData");
+    }
+
+    glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)glGetProcAddress("glCheckFramebufferStatus");
+    if (glCheckFramebufferStatus == nullptr)
+    {
+        failed.push_back("glCheckFramebufferStatus");
     }
 
     glMapBuffer = (PFNGLMAPBUFFERPROC)glGetProcAddress("glMapBuffer");
@@ -113,10 +131,22 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glDeleteBuffers");
     }
 
+    glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)glGetProcAddress("glDeleteFramebuffers");
+    if (glDeleteFramebuffers == nullptr)
+    {
+        failed.push_back("glDeleteFramebuffers");
+    }
+
     glDeleteProgram = (PFNGLDELETEPROGRAMPROC)glGetProcAddress("glDeleteProgram");
     if (glDeleteProgram == nullptr)
     {
         failed.push_back("glDeleteProgram");
+    }
+
+    glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)glGetProcAddress("glDeleteRenderbuffers");
+    if (glDeleteRenderbuffers == nullptr)
+    {
+        failed.push_back("glDeleteRenderbuffers");
     }
 
     glDeleteShader = (PFNGLDELETESHADERPROC)glGetProcAddress("glDeleteShader");
@@ -143,10 +173,28 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glDisableVertexAttribArray");
     }
 
+    glDrawBuffers = (PFNGLDRAWBUFFERSPROC)glGetProcAddress("glDrawBuffers");
+    if (glDrawBuffers == nullptr)
+    {
+        failed.push_back("glDrawBuffers");
+    }
+
     glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)glGetProcAddress("glEnableVertexAttribArray");
     if (glEnableVertexAttribArray == nullptr)
     {
         failed.push_back("glEnableVertexAttribArray");
+    }
+
+    glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)glGetProcAddress("glFramebufferRenderbuffer");
+    if (glFramebufferRenderbuffer == nullptr)
+    {
+        failed.push_back("glFramebufferRenderbuffer");
+    }
+
+    glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)glGetProcAddress("glFramebufferTexture");
+    if (glFramebufferTexture == nullptr)
+    {
+        failed.push_back("glFramebufferTexture");
     }
 
     glGenBuffers = (PFNGLGENBUFFERSPROC)glGetProcAddress("glGenBuffers");
@@ -155,10 +203,22 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glGenBuffers");
     }
 
+    glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)glGetProcAddress("glGenFramebuffers");
+    if (glGenFramebuffers == nullptr)
+    {
+        failed.push_back("glGenFramebuffers");
+    }
+
     glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)glGetProcAddress("glGenerateMipmap");
     if (glGenerateMipmap == nullptr)
     {
         failed.push_back("glGenerateMipmap");
+    }
+
+    glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)glGetProcAddress("glGenRenderbuffers");
+    if (glGenRenderbuffers == nullptr)
+    {
+        failed.push_back("glGenRenderbuffers");
     }
 
     glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)glGetProcAddress("glGenVertexArrays");
@@ -207,6 +267,12 @@ std::vector<std::string> LoadGLFunctions()
     if (glLinkProgram == nullptr)
     {
         failed.push_back("glLinkProgram");
+    }
+
+    glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)glGetProcAddress("glRenderbufferStorage");
+    if (glRenderbufferStorage == nullptr)
+    {
+        failed.push_back("glRenderbufferStorage");
     }
 
     glShaderSource = (PFNGLSHADERSOURCEPROC)glGetProcAddress("glShaderSource");
@@ -283,23 +349,33 @@ PFNGLACTIVETEXTUREPROC glActiveTexture;
 PFNGLATTACHSHADERPROC glAttachShader;
 PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
 PFNGLBINDBUFFERPROC glBindBuffer;
+PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 PFNGLBUFFERDATAPROC glBufferData;
 PFNGLBUFFERSUBDATAPROC glBufferSubData;
+PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 PFNGLMAPBUFFERPROC glMapBuffer;
 PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 PFNGLCOMPILESHADERPROC glCompileShader;
 PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLCREATESHADERPROC glCreateShader;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 PFNGLDELETEPROGRAMPROC glDeleteProgram;
+PFNGLDELETERENDERBUFFERSPROC glDeleteRenderbuffers;
 PFNGLDELETESHADERPROC glDeleteShader;
 PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 PFNGLDETACHSHADERPROC glDetachShader;
 PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+PFNGLDRAWBUFFERSPROC glDrawBuffers;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
+PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 PFNGLGENBUFFERSPROC glGenBuffers;
+PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
+PFNGLGENRENDERBUFFERSPROC glGenRenderbuffers;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLGETBUFFERPARAMETERIVPROC glGetBufferParameteriv;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
@@ -308,6 +384,7 @@ PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLGETSHADERIVPROC glGetShaderiv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLLINKPROGRAMPROC glLinkProgram;
+PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLUNIFORM1IPROC glUniform1i;
 PFNGLUNIFORM3FVPROC glUniform3fv;
