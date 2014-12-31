@@ -24,6 +24,9 @@
 #include <blons/blons.h>
 #include <blons/temphelpers.h>
 
+void InitTestUI(blons::gui::Manager* gui);
+void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info);
+
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
     auto client = std::unique_ptr<blons::Client>(new blons::Client);
@@ -39,13 +42,39 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     // Model 2
     models.push_back(graphics->MakeModel("cube.bms"));
     models[1]->set_pos(10.0, 0.0, 20.0);
-    //models = blons::temp::load_codmap("bms_test", std::move(models), graphics.get());
+
+    // Model 3
+    models.push_back(graphics->MakeModel("plane.bms"));
+    models[2]->set_pos(20.0, 0.0, 20.0);
+
+    // Big scene
+    models = blons::temp::load_codmap("bms_test", std::move(models), graphics.get());
 
     // Sprite 1
     auto sprite = graphics->MakeSprite("me.dds");
     sprite->set_pos(0, 0, 32, 32);
 
-    // GUI testing
+    InitTestConsole(graphics.get(), info);
+
+    bool quit = false;
+    while (!quit)
+    {
+        quit = client->Frame();
+        blons::temp::FPS();
+        bool gui_used_input = gui->Update(*client->input());
+        // Handles mouselook and wasd movement
+        if (!gui_used_input)
+        {
+            blons::temp::noclip(client->input(), graphics->camera());
+        }
+        graphics->Render();
+    }
+
+    return 0;
+}
+
+void InitTestUI(blons::gui::Manager* gui)
+{
     gui->MakeWindow("yoyo", 450, 250, 300, 300, "Amicable window");
     gui->MakeWindow("test", 20, 80, 400, 200, "Friendly window");
 
@@ -79,60 +108,39 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     gui->window("test")->MakeButton(10, 150, 120, 40, "Print!")->set_callback(print);
     gui->window("test")->MakeButton(10, 105, 380, 40, "Clear!")->set_callback(textareaclear);
 
-    // Animation testing
-    blons::Animation::Callback cbd = [](float d){ blons::log::Debug("%.4f\n", d); };
-    blons::Animation::Callback cbx = [&](float d){ gui->window("test")->set_pos(d * 600 - 500, gui->window("test")->pos().y); };
-    blons::Animation::Callback cby = [&](float d){ gui->window("test")->set_pos(gui->window("test")->pos().x, 362 - d * 300); };
-    blons::Animation animatex(800, cbx, blons::Animation::QUINT_OUT);
-    //blons::Animation animatey(500, cby, blons::Animation::QUINT_OUT);
+    gui->window("yoyo")->MakeButton(10, 250, 280, 40, "New stuff maybe!");
+}
 
-    gui->window("yoyo")->MakeButton(10, 250, 280, 40, "New window!")->set_callback([&animatex](){ animatex.Reset(); });
-
+void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
+{
     blons::console::out("Testing a string!\n");
 
     std::function<void(int)> test_func = [](int i){ blons::console::out("%i gamers in the house!\n", i); };
     std::function<void(const char*)> test_func_s = [](const char* i){ blons::console::out("%s stringers in the house!\n", i); };
     std::function<void(int, int)> test_func_ii = [](int i, int j){ blons::console::out("%i, %i double inters in the house!\n", i, j); };
-    blons::console::RegisterFunction("testo", test_func);
-    blons::console::RegisterFunction("testo", test_func_s);
-    blons::console::RegisterFunction("testo", test_func_ii);
+    blons::console::RegisterFunction("dbg:testo", test_func);
+    blons::console::RegisterFunction("dbg:testo", test_func_s);
+    blons::console::RegisterFunction("dbg:testo", test_func_ii);
 
-    blons::console::RegisterVariable("sv_cool", 5);
-    blons::console::RegisterVariable("gfx:pi", 3.14f);
-    blons::console::RegisterVariable("greeting", "heyo heyo heyo heyo");
+    blons::console::RegisterVariable("sv:cool", 5);
+    blons::console::RegisterVariable("math:pi", 3.14f);
+    blons::console::RegisterVariable("sv:greeting", "heyo heyo heyo heyo");
 
-    blons::console::set_var("sv_cool", 10);
+    blons::console::set_var("sv:cool", 10);
 
-    auto v_a = blons::console::var<int>("sv_cool");
-    auto v_b = blons::console::var<float>("gfx:pi");
-    auto v_c = blons::console::var<std::string>("greeting");
+    auto v_a = blons::console::var<int>("sv:cool");
+    auto v_b = blons::console::var<float>("math:pi");
+    auto v_c = blons::console::var<std::string>("sv:greeting");
 
-    blons::console::RegisterFunction("vid_restart", [&](){ graphics->Reload(info.width, info.height, info.hwnd); });
+    blons::console::RegisterFunction("gfx:reload", [&](){ graphics->Reload(info.width, info.height, info.hwnd); });
 
-    blons::console::RegisterFunction("history", [&]()
+    blons::console::RegisterFunction("dbg:test-ui", std::bind(InitTestUI, graphics->gui()));
+
+    blons::console::RegisterFunction("dbg:console-history", [&]()
     {
         for (const auto& line : blons::console::history())
         {
             blons::console::out("%s\n", line.c_str());
         }
     });
-
-    bool quit = false;
-    while (!quit)
-    {
-        quit = client->Frame();
-        blons::temp::FPS();
-        bool gui_used_input = gui->Update(*client->input());
-        // TODO: THIS IS TEMP DELETE LATER
-        // Handles mouselook and wasd movement
-        if (!gui_used_input)
-        {
-            blons::temp::noclip(client->input(), graphics->camera());
-        }
-        animatex.Update();
-        //animatey.Update();
-        graphics->Render();
-    }
-
-    return 0;
 }
