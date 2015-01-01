@@ -34,7 +34,7 @@ Sprite::Sprite(std::string texture_filename, RenderContext& context)
     }
 }
 
-Sprite::Sprite(PixelData* texture_data, RenderContext& context)
+Sprite::Sprite(const PixelData& texture_data, RenderContext& context)
 {
     texture_.reset(new Texture(texture_data, Texture::Type::SPRITE, context));
     if (!Init(context))

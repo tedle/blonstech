@@ -75,7 +75,7 @@ public:
     /// \param type Usage of the texture
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Texture(PixelData* pixels, Type type, RenderContext& context);
+    Texture(const PixelData& pixels, Type type, RenderContext& context);
     ~Texture() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -101,13 +101,12 @@ public:
 
 private:
     bool Init(std::string filename, Type type, RenderContext& context);
-    bool Init(PixelData* pixels, Type type, RenderContext& context);
+    bool Init(const PixelData& pixels, Type type, RenderContext& context);
 
     // Empty if initialized from PixelData
     std::string filename_;
     // nullptr if initialized from filename
-    PixelData* pixel_data_;
-    //std::unique_ptr<PixelData> pixel_data_;
+    std::unique_ptr<PixelData> pixel_data_;
 
     std::shared_ptr<TextureResource> texture_;
     Info info_;

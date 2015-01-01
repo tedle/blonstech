@@ -49,7 +49,7 @@ bool Texture::Init(std::string filename, Type type, RenderContext& context)
     return true;
 }
 
-Texture::Texture(PixelData* pixels, Type type, RenderContext& context)
+Texture::Texture(const PixelData& pixels, Type type, RenderContext& context)
 {
     if (!Init(pixels, type, context))
     {
@@ -57,11 +57,36 @@ Texture::Texture(PixelData* pixels, Type type, RenderContext& context)
     }
 }
 
-bool Texture::Init(PixelData* pixels, Type type, RenderContext& context)
+bool Texture::Init(const PixelData& pixels, Type type, RenderContext& context)
 {
     filename_ = "";
-    pixel_data_ = pixels;
+    pixel_data_.reset(new PixelData);
 
+    // TODO: Should prolly make an actual copy constructor for PixelData
+    // Copy the pixel data to internal storage
+    std::size_t texture_size = sizeof(unsigned char) * pixels.width * pixels.height;
+    switch (pixels.bits)
+    {
+    case PixelData::A8:
+        break;
+    case PixelData::R8G8B8:
+        texture_size *= 3;
+        break;
+    case PixelData::R8G8B8A8:
+        texture_size *= 4;
+        break;
+    default:
+        throw "Unknown texture size";
+        break;
+    }
+    pixel_data_->pixels.reset(new unsigned char[texture_size]);
+    memcpy(pixel_data_->pixels.get(), pixels.pixels.get(), texture_size);
+    pixel_data_->width = pixels.width;
+    pixel_data_->height = pixels.height;
+    pixel_data_->bits = pixels.bits;
+    pixel_data_->format = pixels.format;
+
+    // Make the actual texture
     texture_.reset(context->MakeTextureResource());
     if (texture_ == nullptr)
     {
@@ -71,16 +96,16 @@ bool Texture::Init(PixelData* pixels, Type type, RenderContext& context)
     if (type == Type::SPRITE)
     {
         // No DDS compression or mipmaps + nearest neighbour filtering
-        pixels->format = PixelData::RAW;
+        pixel_data_->format = PixelData::RAW;
     }
 
-    if (!context->RegisterTexture(texture_.get(), pixels))
+    if (!context->RegisterTexture(texture_.get(), pixel_data_.get()))
     {
         return false;
     }
 
-    info_.width = pixels->width;
-    info_.height = pixels->height;
+    info_.width = pixel_data_->width;
+    info_.height = pixel_data_->height;
     info_.type = type;
 
     return true;
@@ -95,7 +120,7 @@ bool Texture::Reload(RenderContext& context)
 
     else if (pixel_data_ != nullptr)
     {
-        return Init(pixel_data_, info_.type, context);
+        return Init(*pixel_data_, info_.type, context);
     }
 
     return false;

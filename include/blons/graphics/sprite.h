@@ -51,7 +51,7 @@ public:
     /// \param texture_data Pixel buffer and format info
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Sprite(PixelData* texture_data, RenderContext& context);
+    Sprite(const PixelData& texture_data, RenderContext& context);
     virtual ~Sprite() {}
 
     ////////////////////////////////////////////////////////////////////////////////

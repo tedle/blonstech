@@ -167,7 +167,7 @@ Font::Font(std::string font_filename, units::pixel pixel_size, RenderContext& co
     // No compression or mipmaps
     font.format = PixelData::RAW;
     // Make it a sprite!
-    fontsheet_.reset(new Sprite(&font, context));
+    fontsheet_.reset(new Sprite(font, context));
 
     if (FT_Done_FreeType(library) != 0)
     {
