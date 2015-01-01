@@ -223,6 +223,7 @@
     <ClInclude Include="..\include\blons\system\timer.h" />
     <ClInclude Include="..\include\blons\temphelpers.h" />
     <ClInclude Include="debug\consoleparser.h" />
+    <ClInclude Include="graphics\internalresource.h" />
     <ClInclude Include="graphics\render\glfuncloader.h" />
     <ClInclude Include="graphics\render\renderd3d11.h" />
     <ClInclude Include="graphics\render\rendergl40.h" />
@@ -248,6 +249,7 @@
     <ClCompile Include="graphics\gui\textarea.cpp" />
     <ClCompile Include="graphics\gui\textbox.cpp" />
     <ClCompile Include="graphics\gui\window.cpp" />
+    <ClCompile Include="graphics\internalresource.cpp" />
     <ClCompile Include="graphics\mesh.cpp" />
     <ClCompile Include="graphics\meshimporter.cpp" />
     <ClCompile Include="graphics\model.cpp" />

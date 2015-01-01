@@ -95,6 +95,18 @@ struct PixelData
         DDS,  ///< Uses mipmaps & compression from image file
         RAW   ///< Will not generate mipmaps, will not compress on GPU, use nearest neighbour filtering
     } format; ///< \copybrief Format
+
+    PixelData() {}
+    PixelData(const PixelData& p)
+    {
+        this->width = p.width;
+        this->height = p.height;
+        this->bits = p.bits;
+        this->format = p.format;
+        std::size_t texture_size = p.width * p.height * (p.bits / 4);
+        this->pixels.reset(new unsigned char[texture_size]);
+        memcpy(this->pixels.get(), p.pixels.get(), texture_size);
+    }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

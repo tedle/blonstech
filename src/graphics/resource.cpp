@@ -25,6 +25,8 @@
 
 // Includes
 #include <unordered_map>
+// Local Includes
+#include "internalresource.h"
 
 namespace blons
 {
@@ -49,14 +51,19 @@ std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Textur
     // Have we loaded the pixels yet?
     if (tex.pixels == nullptr)
     {
-        std::unique_ptr<PixelData> pixels(new PixelData);
-        if (!context->LoadPixelData(filename, pixels.get()))
+        if (internal::ValidEngineTexture(filename))
         {
-            return nullptr;
+            tex.pixels.reset(new PixelData(internal::MakeEngineTexture(filename)));
         }
-
-        // Save it to the cache
-        tex.pixels = std::move(pixels);
+        else
+        {
+            std::unique_ptr<PixelData> pixels(new PixelData);
+            if (!context->LoadPixelData(filename, pixels.get()))
+            {
+                return nullptr;
+            }
+            tex.pixels = std::move(pixels);
+        }
     }
 
     // Have we made a resource for this context?

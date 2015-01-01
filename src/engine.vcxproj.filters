@@ -172,6 +172,9 @@
     <ClInclude Include="..\include\blons\graphics\framebuffer.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\internalresource.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -280,6 +283,9 @@
       <Filter>src\graphics</Filter>
     </ClCompile>
     <ClCompile Include="graphics\framebuffer.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\internalresource.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
   </ItemGroup>

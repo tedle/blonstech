@@ -60,31 +60,7 @@ Texture::Texture(const PixelData& pixels, Type type, RenderContext& context)
 bool Texture::Init(const PixelData& pixels, Type type, RenderContext& context)
 {
     filename_ = "";
-    pixel_data_.reset(new PixelData);
-
-    // TODO: Should prolly make an actual copy constructor for PixelData
-    // Copy the pixel data to internal storage
-    std::size_t texture_size = sizeof(unsigned char) * pixels.width * pixels.height;
-    switch (pixels.bits)
-    {
-    case PixelData::A8:
-        break;
-    case PixelData::R8G8B8:
-        texture_size *= 3;
-        break;
-    case PixelData::R8G8B8A8:
-        texture_size *= 4;
-        break;
-    default:
-        throw "Unknown texture size";
-        break;
-    }
-    pixel_data_->pixels.reset(new unsigned char[texture_size]);
-    memcpy(pixel_data_->pixels.get(), pixels.pixels.get(), texture_size);
-    pixel_data_->width = pixels.width;
-    pixel_data_->height = pixels.height;
-    pixel_data_->bits = pixels.bits;
-    pixel_data_->format = pixels.format;
+    pixel_data_.reset(new PixelData(pixels));
 
     // Make the actual texture
     texture_.reset(context->MakeTextureResource());
