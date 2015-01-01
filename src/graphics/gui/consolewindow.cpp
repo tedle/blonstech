@@ -86,7 +86,14 @@ void ConsoleWindow::Render(RenderContext& context)
 bool ConsoleWindow::Update(const Input& input)
 {
     slide_.Update();
-    return Window::Update(input);
+    if (!hiding_)
+    {
+        return Window::Update(input);
+    }
+    else
+    {
+        return false;
+    }
 }
 
 void ConsoleWindow::hide()
