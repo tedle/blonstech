@@ -158,7 +158,7 @@ void FPS()
 
     max_frame = max(max_frame, st.ms() - last_frame);
 
-    if (st.ms() > 1000)
+    if (st.ms() > 1000 && max_frame > 0)
     {
         log::Debug("FPS: %i(min:%llu), (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, 1000 / max_frame, cur_pos.x, cur_pos.y, cur_pos.z);
         max_frame = 0;

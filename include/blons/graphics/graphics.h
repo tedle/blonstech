@@ -85,9 +85,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Initializes a graphics manager for a given client window
     ///
-    /// \param screen_width Width of the screen to render to in pixels
-    /// \param screen_height Height of the screen to render to in pixels
-    /// \param hwnd Handle of Win32 window to bind to (**temporary**)
+    /// \param screen Dimensions and handle of the client window
     ////////////////////////////////////////////////////////////////////////////////
     Graphics(Client::Info screen);
     ~Graphics();

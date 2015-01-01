@@ -97,6 +97,10 @@ struct PixelData
     } format; ///< \copybrief Format
 
     PixelData() {}
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Performs a full copy of the given PixelData, including a byte for
+    /// byte copy of the pixel buffer
+    ////////////////////////////////////////////////////////////////////////////////
     PixelData(const PixelData& p)
     {
         this->width = p.width;

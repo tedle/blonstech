@@ -36,12 +36,16 @@ namespace blons
 namespace resource
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Loads a texture from disk, or from cache if available.
+/// \brief Loads a texture from disk or engine, or from cache if available.
 ///
 /// If the texture is cached and loaded into the supplied context, a pointer to
 /// its resource buffer is returned. If cached, but in a different context, a
 /// new resource is created and bound to the context. If uncached the file is
 /// loaded from disk and bound to the context
+///
+/// List of valid engine textures include:
+/// * `blons:none` Error diffuse texture
+/// * `blons:normal` Plain normal map
 ///
 /// \param filename Filename of the texture to load
 /// \param type Texture parameters to bind
