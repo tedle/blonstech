@@ -29,9 +29,9 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info);
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
-    auto client = std::unique_ptr<blons::Client>(new blons::Client);
+    auto client = std::make_unique<blons::Client>();
     auto info = client->screen_info();
-    auto graphics = std::unique_ptr<blons::Graphics>(new blons::Graphics(info.width, info.height, info.hwnd));
+    auto graphics = std::make_unique<blons::Graphics>(info);
     auto gui = graphics->gui();
     std::vector<std::unique_ptr<blons::Model>> models;
 
@@ -132,7 +132,7 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
     auto v_b = blons::console::var<float>("math:pi");
     auto v_c = blons::console::var<std::string>("sv:greeting");
 
-    blons::console::RegisterFunction("gfx:reload", [&](){ graphics->Reload(info.width, info.height, info.hwnd); });
+    blons::console::RegisterFunction("gfx:reload", [=](){ graphics->Reload(info); });
 
     blons::console::RegisterFunction("dbg:test-ui", std::bind(InitTestUI, graphics->gui()));
 

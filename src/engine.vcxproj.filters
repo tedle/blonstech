@@ -169,6 +169,9 @@
     <ClInclude Include="..\include\blons\debug\consolevariable.h">
       <Filter>src\debug</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\framebuffer.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -276,6 +279,9 @@
     <ClCompile Include="graphics\resource.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\framebuffer.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\mesh.frag.glsl">
@@ -293,13 +299,7 @@
     <None Include="shaders\ui.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="shaders\test.frag.fx">
-      <Filter>src\shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\test.vert.fx">
-      <Filter>src\shaders</Filter>
-    </FxCompile>
+    <None Include="shaders\test.frag.fx" />
+    <None Include="shaders\test.vert.fx" />
   </ItemGroup>
 </Project>

@@ -29,9 +29,11 @@
 #include <set>
 #include <Windows.h>
 // Public Includes
+#include <blons/graphics/framebuffer.h>
 #include <blons/graphics/model.h>
 #include <blons/graphics/sprite.h>
 #include <blons/graphics/render/render.h>
+#include <blons/system/client.h>
 
 namespace blons
 {
@@ -87,7 +89,7 @@ public:
     /// \param screen_height Height of the screen to render to in pixels
     /// \param hwnd Handle of Win32 window to bind to (**temporary**)
     ////////////////////////////////////////////////////////////////////////////////
-    Graphics(units::pixel screen_width, units::pixel screen_height, HWND hwnd);
+    Graphics(Client::Info screen);
     ~Graphics();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +125,7 @@ public:
     /// \brief Reloads graphics API. Used for applying new video settings. **Never**
     /// call this in the middle of rendering a frame (callbacks beware!).
     ////////////////////////////////////////////////////////////////////////////////
-    void Reload(units::pixel width, units::pixel height, HWND hwnd);
+    void Reload(Client::Info screen);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Returns a pointer to the camera owned by the blons::Graphics manager
@@ -141,13 +143,14 @@ public:
     gui::Manager* gui() const;
 
 private:
-    bool MakeContext(units::pixel width, units::pixel height, HWND hwnd);
+    bool MakeContext(Client::Info screen);
 
     RenderContext context_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<gui::Manager> gui_;
     std::unique_ptr<Shader> shader3d_;
     std::unique_ptr<Shader> shader2d_;
+    std::unique_ptr<Framebuffer> geometry_buffer_;
 
     Matrix proj_matrix_, ortho_matrix_;
 

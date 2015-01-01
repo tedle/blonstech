@@ -21,6 +21,7 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include <Windows.h>
 #include "rendergl40.h"
 
 // Includes
@@ -221,7 +222,7 @@ bool ShaderResourceGL40::SetUniform(const char* name, T value)
     return true;
 }
 
-RenderGL40::RenderGL40(units::pixel screen_width, units::pixel screen_height, bool vsync, HWND hwnd, bool fullscreen)
+RenderGL40::RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen)
 {
     g_context_count++;
     id_ = g_context_count;
@@ -229,6 +230,8 @@ RenderGL40::RenderGL40(units::pixel screen_width, units::pixel screen_height, bo
 
     // Mitigates repeated calls to glUseProgram
     active_shader_ = 0;
+
+    screen_ = screen_info;
 
     // Defining the pixel format we want OpenGL to use
     const int color_depth = 24;
@@ -305,7 +308,7 @@ RenderGL40::RenderGL40(units::pixel screen_width, units::pixel screen_height, bo
     DestroyWindow(dummy_hwnd);
 
     // Get the real device context handle
-    device_context_ = GetDC(hwnd);
+    device_context_ = GetDC(screen_.hwnd);
 
     // Set the proper pixel format
     unsigned int num_formats;
@@ -572,7 +575,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     {
         fbo->targets_.push_back(make_texture(false));
         auto attachment = GL_COLOR_ATTACHMENT0 + i;
-        glFramebufferTexture(GL_DRAW_FRAMEBUFFER, attachment, fbo->targets_.back().texture_, 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, attachment, fbo->targets_.back().texture_, 0);
         drawbuffers[i] = attachment;
     }
     glDrawBuffers(texture_count, drawbuffers.get());
@@ -752,8 +755,7 @@ void RenderGL40::BindFramebuffer(FramebufferResource* frame_buffer)
     else
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        // TODO: use actual window dimensions
-        glViewport(0, 0, 800, 600);
+        glViewport(0, 0, screen_.width, screen_.height);
     }
 }
 

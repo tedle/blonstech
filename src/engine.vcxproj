@@ -188,6 +188,7 @@
     <ClInclude Include="..\include\blons\debug\log.h" />
     <ClInclude Include="..\include\blons\graphics.h" />
     <ClInclude Include="..\include\blons\graphics\camera.h" />
+    <ClInclude Include="..\include\blons\graphics\framebuffer.h" />
     <ClInclude Include="..\include\blons\graphics\graphics.h" />
     <ClInclude Include="..\include\blons\graphics\gui\button.h" />
     <ClInclude Include="..\include\blons\graphics\gui\colourstring.h" />
@@ -232,6 +233,7 @@
     <ClCompile Include="debug\consoleparser.cpp" />
     <ClCompile Include="debug\log.cpp" />
     <ClCompile Include="graphics\camera.cpp" />
+    <ClCompile Include="graphics\framebuffer.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />
     <ClCompile Include="graphics\gui\button.cpp" />
     <ClCompile Include="graphics\gui\colourstring.cpp" />

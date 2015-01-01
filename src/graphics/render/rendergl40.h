@@ -28,18 +28,17 @@
 #pragma comment(lib, "opengl32.lib")
 
 // Includes
-#include <Windows.h>
 #include <gl/GL.h>
 // Public Includes
 #include <blons/graphics/render/render.h>
+#include <blons/system/client.h>
 
 namespace blons
 {
 class RenderGL40 : public Render
 {
 public:
-    RenderGL40(units::pixel screen_width, units::pixel screen_height, bool vsync,
-               HWND hwnd, bool fullscreen);
+    RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen);
     ~RenderGL40() override;
 
     void BeginScene() override;
@@ -97,6 +96,7 @@ public:
 
 private:
     unsigned int id_;
+    Client::Info screen_;
     void LogCompileErrors(GLuint resource, bool is_shader);
     bool vsync_;
     int video_card_memory_;

@@ -24,8 +24,6 @@
 #include <blons/graphics/graphics.h>
 
 // Public Includes
-#include <blons/graphics/model.h>
-#include <blons/graphics/sprite.h>
 #include <blons/graphics/camera.h>
 #include <blons/graphics/gui/gui.h>
 #include <blons/graphics/render/drawbatcher.h>
@@ -62,9 +60,9 @@ private:
     std::function<void(ManagedSprite*)> deleter_;
 };
 
-Graphics::Graphics(units::pixel screen_width, units::pixel screen_height, HWND hwnd)
+Graphics::Graphics(Client::Info screen)
 {
-    if (!MakeContext(screen_width, screen_height, hwnd))
+    if (!MakeContext(screen))
     {
         log::Fatal("Failed to initialize rendering context\n");
         throw "Failed to initiralize rendering context";
@@ -124,6 +122,16 @@ std::unique_ptr<Sprite> Graphics::MakeSprite(std::string filename)
 
 bool Graphics::Render()
 {
+    // TODO: TEMP DEBUG CODE. CLEAN THIS UP!!!
+    static bool init = true;
+    static const console::Variable* target = nullptr;
+    if (init)
+    {
+        console::RegisterVariable("gfx:target", 0);
+        target = console::var("gfx:target");
+        init = false;
+    }
+
     Matrix world_matrix, view_matrix;
 
     // Clear buffers
@@ -135,6 +143,10 @@ bool Graphics::Render()
     // 3D Rendering pass
     // Needed so models dont render over themselves
     context_->SetDepthTesting(true);
+
+    // Bind the geometry framebuffer to render all models onto
+    geometry_buffer_->Bind(context_);
+
     // TODO: 3D pass ->
     //      Render static world geo as batches without world matrix
     //      Render movable objects singularly with world matrix
@@ -160,9 +172,30 @@ bool Graphics::Render()
         }
     }
 
+    // Unbind the G-buffer, rebind the back buffer
+    geometry_buffer_->Unbind(context_);
+
     // 2D Rendering pass
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
+
+    // Render the geometry as a sprite
+    geometry_buffer_->Render(context_);
+
+    // Set the inputs
+    if (!shader2d_->SetInput("world_matrix", MatrixIdentity() , context_) ||
+        !shader2d_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !shader2d_->SetInput("diffuse", geometry_buffer_->textures()[target->to<int>()], context_))
+    {
+        return false;
+    }
+
+    // Finally do the render
+    if (!shader2d_->Render(geometry_buffer_->index_count(), context_))
+    {
+        return false;
+    }
+
     for (const auto& sprite : sprites_)
     {
         // Prep the pipeline 4 drawering
@@ -192,12 +225,12 @@ bool Graphics::Render()
     return true;
 }
 
-void Graphics::Reload(units::pixel screen_width, units::pixel screen_height, HWND hwnd)
+void Graphics::Reload(Client::Info screen)
 {
     log::Debug("Reloading ... ");
     Timer timer;
     resource::ClearBufferCache();
-    MakeContext(screen_width, screen_height, hwnd);
+    MakeContext(screen);
     for (auto& m : models_)
     {
         m->Reload(context_);
@@ -219,15 +252,14 @@ gui::Manager* Graphics::gui() const
     return gui_.get();
 }
 
-bool Graphics::MakeContext(units::pixel screen_width, units::pixel screen_height, HWND hwnd)
+bool Graphics::MakeContext(Client::Info screen)
 {
     // DirectX
     //context_ = RenderContext(new RenderD3D11);
 
     // OpenGL
     context_.reset();
-    context_ = RenderContext(new RenderGL40(screen_width, screen_height, kEnableVsync, hwnd,
-                                            (kRenderMode == RenderMode::FULLSCREEN)));
+    context_ = RenderContext(new RenderGL40(screen, kEnableVsync, (kRenderMode == RenderMode::FULLSCREEN)));
     if (!context_)
     {
         return false;
@@ -235,12 +267,12 @@ bool Graphics::MakeContext(units::pixel screen_width, units::pixel screen_height
 
     // Projection matrix (3D space->2D screen)
     float fov = kPi / 4.0f;
-    float screen_aspect = static_cast<float>(screen_width) / static_cast<float>(screen_height);
+    float screen_aspect = static_cast<float>(screen.width) / static_cast<float>(screen.height);
 
     proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, kScreenNear, kScreenDepth);
 
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
-    ortho_matrix_ = MatrixOrthographic(units::pixel_to_subpixel(screen_width), units::pixel_to_subpixel(screen_height),
+    ortho_matrix_ = MatrixOrthographic(units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height),
                                        kScreenNear, kScreenDepth);
 
     // Shaders
@@ -267,14 +299,17 @@ bool Graphics::MakeContext(units::pixel screen_width, units::pixel screen_height
         return false;
     }
 
+    // Framebuffers
+    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 2, context_));
+
     // GUI
     if (gui_ == nullptr)
     {
-        gui_.reset(new gui::Manager(screen_width, screen_height, std::move(ui_shader), context_));
+        gui_.reset(new gui::Manager(screen.width, screen.height, std::move(ui_shader), context_));
     }
     else
     {
-        gui_->Reload(screen_width, screen_height, std::move(ui_shader), context_);
+        gui_->Reload(screen.width, screen.height, std::move(ui_shader), context_);
     }
 
     return true;

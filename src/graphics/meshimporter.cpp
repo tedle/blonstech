@@ -201,7 +201,7 @@ MeshImporter::MeshImporter(std::string filename, bool invert_y)
             v21 = v2 - v1;
             v31 = v3 - v1;
             current_normal = Vector3Cross(v21, v31);
-            // Normal x+y+z must be 1
+            // Normal distance must be 1
             current_normal = Vector3Normalize(current_normal);
             // Normals range from -1, 1 but we need to store as 0, 1
             current_normal.x = (current_normal.x + 1) / 2;
