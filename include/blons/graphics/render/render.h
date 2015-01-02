@@ -107,7 +107,7 @@ struct PixelData
         this->height = p.height;
         this->bits = p.bits;
         this->format = p.format;
-        std::size_t texture_size = p.width * p.height * (p.bits / 4);
+        std::size_t texture_size = p.width * p.height * (p.bits / 8);
         this->pixels.reset(new unsigned char[texture_size]);
         memcpy(this->pixels.get(), p.pixels.get(), texture_size);
     }
