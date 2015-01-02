@@ -81,7 +81,7 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, Matrix value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value) override;
-    bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
 
     bool SetDepthTesting(bool enable) override;
 

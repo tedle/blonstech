@@ -80,6 +80,12 @@ public:
     /// \copydoc SetInput
     ////////////////////////////////////////////////////////////////////////////////
     bool SetInput(const char* field, const TextureResource* value, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetInput
+    ///
+    /// \param texture_index The slot to bind the texture to. Defaults to 0
+    ////////////////////////////////////////////////////////////////////////////////
+    bool SetInput(const char* field, const TextureResource* value, unsigned int texture_index, RenderContext& context);
 
 private:
     std::unique_ptr<ShaderResource> program_;

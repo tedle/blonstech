@@ -9,9 +9,10 @@ out vec4 norm_colour;
 
 // Globals
 uniform sampler2D diffuse;
+uniform sampler2D normal;
 
 void main(void)
 {
-    norm_colour = vec4(norm, 1.0);
+    norm_colour = texture(normal, tex_coord);
     frag_colour = texture(diffuse, tex_coord);
 }

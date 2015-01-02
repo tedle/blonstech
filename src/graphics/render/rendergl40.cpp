@@ -80,7 +80,7 @@ public:
     TextureResourceGL40(RenderGL40* context) : context_(context) {}
     ~TextureResourceGL40() override;
 
-    GLuint texture_, texture_unit_;
+    GLuint texture_;
     RenderGL40* context_;
     unsigned int context_id_;
 };
@@ -541,10 +541,6 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     auto make_texture = [&](bool is_depth)
     {
         TextureResourceGL40 tex(this);
-        tex.texture_unit_ = 0;
-
-        // Set the texture unit in which to store the data.
-        glActiveTexture(GL_TEXTURE0 + tex.texture_unit_);
 
         // Generate an ID for the texture.
         glGenTextures(1, &tex.texture_);
@@ -596,10 +592,6 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
 bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
 {
     TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
-    tex->texture_unit_ = 0;
-
-    // Set the texture unit in which to store the data.
-    glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
 
     // Generate an ID for the texture.
     glGenTextures(1, &tex->texture_);
@@ -880,12 +872,12 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vecto
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value)
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)
 {
     const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(value);
-    glActiveTexture(GL_TEXTURE0 + tex->texture_unit_);
+    glActiveTexture(GL_TEXTURE0 + texture_index);
     glBindTexture(GL_TEXTURE_2D, tex->texture_);
-    return SetShaderInput(program, name, tex->texture_unit_);
+    return SetShaderInput(program, name, texture_index);
 }
 
 bool RenderGL40::SetDepthTesting(bool enable)

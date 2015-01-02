@@ -399,8 +399,10 @@ public:
     virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc SetShaderInput
+    ///
+    /// \param texture_index The slot to bind the texture to
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets depth testing to be either enabled or disabled

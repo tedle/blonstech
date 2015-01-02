@@ -69,6 +69,11 @@ bool Shader::SetInput(const char* field, Vector4 value, RenderContext& context)
 
 bool Shader::SetInput(const char* field, const TextureResource* value, RenderContext& context)
 {
-    return context->SetShaderInput(program_.get(), field, value);
+    return context->SetShaderInput(program_.get(), field, value, 0);
+}
+
+bool Shader::SetInput(const char* field, const TextureResource* value, unsigned int texture_index, RenderContext& context)
+{
+    return context->SetShaderInput(program_.get(), field, value, texture_index);
 }
 } // namespace blons
