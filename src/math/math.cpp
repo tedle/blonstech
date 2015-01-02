@@ -173,6 +173,13 @@ Vector3 Vector3Cross(Vector3 a, Vector3 b)
     return product;
 }
 
+units::world Vector3Dot(Vector3 a, Vector3 b)
+{
+    units::world product;
+    product = a.x * b.x + a.y * b.y + a.z * b.z;
+    return product;
+}
+
 Vector3 Vector3Normalize(Vector3 n)
 {
     float dist = sqrt(n.x * n.x + n.y * n.y + n.z * n.z);

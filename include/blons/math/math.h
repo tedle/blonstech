@@ -100,19 +100,30 @@ struct Vector2
     /// \brief Addition operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector2& operator+= (const Vector2& vec) { x += vec.x; y += vec.y; return *this; }
+    Vector2& operator+= (const units::world& f) { x += f; y += f; return *this; }
     Vector2 operator+ (const Vector2& vec) const { return Vector2(x + vec.x, y + vec.y); }
+    Vector2 operator+ (const units::world& f) const { return Vector2(x + f, y + f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Subtraction operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector2& operator-= (const Vector2& vec) { x -= vec.x; y -= vec.y; return *this; }
+    Vector2& operator-= (const units::world& f) { x -= f; y -= f; return *this; }
     Vector2 operator- (const Vector2& vec) const { return Vector2(x - vec.x, y - vec.y); }
+    Vector2 operator- (const units::world& f) const { return Vector2(x - f, y - f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Multiplication operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector2& operator*= (const Vector2& vec) { x *= vec.x; y *= vec.y; return *this; }
-    Vector2& operator*= (const float& f) { x *= f; y *= f; return *this; }
+    Vector2& operator*= (const units::world& f) { x *= f; y *= f; return *this; }
     Vector2 operator* (const Vector2& vec) const { return Vector2(x * vec.x, y * vec.y); }
-    Vector2 operator* (const float& f) const { return Vector2(x * f, y * f); }
+    Vector2 operator* (const units::world& f) const { return Vector2(x * f, y * f); }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Division operator
+    ////////////////////////////////////////////////////////////////////////////////
+    Vector2& operator/= (const Vector2& vec) { x /= vec.x; y /= vec.y; return *this; }
+    Vector2& operator/= (const units::world& f) { x /= f; y /= f; return *this; }
+    Vector2 operator/ (const Vector2& vec) const { return Vector2(x / vec.x, y / vec.y); }
+    Vector2 operator/ (const units::world& f) const { return Vector2(x / f, y / f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Equality operator
     ////////////////////////////////////////////////////////////////////////////////
@@ -153,19 +164,30 @@ struct Vector3
     /// \brief Addition operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector3& operator+= (const Vector3& vec) { x += vec.x; y += vec.y; z += vec.z; return *this; }
+    Vector3& operator+= (const units::world& f) { x += f; y += f; z += f; return *this; }
     Vector3 operator+ (const Vector3& vec) const { return Vector3(x + vec.x, y + vec.y, z + vec.z); }
+    Vector3 operator+ (const units::world& f) const { return Vector3(x + f, y + f, z + f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Subtraction operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector3& operator-= (const Vector3& vec) { x -= vec.x; y -= vec.y; z -= vec.z; return *this; }
+    Vector3& operator-= (const units::world& f) { x -= f; y -= f; z -= f; return *this; }
     Vector3 operator- (const Vector3& vec) const { return Vector3(x - vec.x, y - vec.y, z - vec.z); }
+    Vector3 operator- (const units::world& f) const { return Vector3(x - f, y - f, z - f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Multiplication operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector3& operator*= (const Vector3& vec) {x *= vec.x; y *= vec.y; z *= vec.z; return *this;}
-    Vector3& operator*= (const float& f) {x *= f; y *= f; z *= f; return *this;}
+    Vector3& operator*= (const units::world& f) {x *= f; y *= f; z *= f; return *this;}
     Vector3 operator* (const Vector3& vec) const { return Vector3(x * vec.x, y * vec.y, z * vec.z); }
-    Vector3 operator* (const float& f) const { return Vector3(x * f, y * f, z * f); }
+    Vector3 operator* (const units::world& f) const { return Vector3(x * f, y * f, z * f); }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Division operator
+    ////////////////////////////////////////////////////////////////////////////////
+    Vector3& operator/= (const Vector3& vec) {x /= vec.x; y /= vec.y; z /= vec.z; return *this;}
+    Vector3& operator/= (const units::world& f) {x /= f; y /= f; z /= f; return *this;}
+    Vector3 operator/ (const Vector3& vec) const { return Vector3(x / vec.x, y / vec.y, z / vec.z); }
+    Vector3 operator/ (const units::world& f) const { return Vector3(x / f, y / f, z / f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Equality operator
     ////////////////////////////////////////////////////////////////////////////////
@@ -211,19 +233,30 @@ struct Vector4
     /// \brief Addition operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector4& operator+= (const Vector4& vec) { x += vec.x; y += vec.y; z += vec.z; w = vec.w; return *this; }
+    Vector4& operator+= (const units::world& f) { x += f; y += f; z += f; w = f; return *this; }
     Vector4 operator+ (const Vector4& vec) const { return Vector4(x + vec.x, y + vec.y, z + vec.z, vec.w); }
+    Vector4 operator+ (const units::world& f) const { return Vector4(x + f, y + f, z + f, f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Subtraction operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector4& operator-= (const Vector4& vec) { x -= vec.x; y -= vec.y; z -= vec.z; w = vec.w; return *this; }
+    Vector4& operator-= (const units::world& f) { x -= f; y -= f; z -= f; w = f; return *this; }
     Vector4 operator- (const Vector4& vec) const { return Vector4(x - vec.x, y - vec.y, z - vec.z, vec.w); }
+    Vector4 operator- (const units::world& f) const { return Vector4(x - f, y - f, z - f, f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Multiplication operator
     ////////////////////////////////////////////////////////////////////////////////
     Vector4& operator*= (const Vector4& vec) { x *= vec.x; y *= vec.y; z *= vec.z; w = vec.w; return *this; }
-    Vector4& operator*= (const float& f) { x *= f; y *= f; z *= f; return *this; }
+    Vector4& operator*= (const units::world& f) { x *= f; y *= f; z *= f; return *this; }
     Vector4 operator* (const Vector4& vec) const { return Vector4(x * vec.x, y * vec.y, z * vec.z, vec.w); }
-    Vector4 operator* (const float& f) const { return Vector4(x * f, y * f, z * f, w); }
+    Vector4 operator* (const units::world& f) const { return Vector4(x * f, y * f, z * f, w); }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Division operator
+    ////////////////////////////////////////////////////////////////////////////////
+    Vector4& operator/= (const Vector4& vec) { x /= vec.x; y /= vec.y; z /= vec.z; w = vec.w; return *this; }
+    Vector4& operator/= (const units::world& f) { x /= f; y /= f; z /= f; return *this; }
+    Vector4 operator/ (const Vector4& vec) const { return Vector4(x / vec.x, y / vec.y, z / vec.z, vec.w); }
+    Vector4 operator/ (const units::world& f) const { return Vector4(x / f, y / f, z / f, w); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Equality operator
     ////////////////////////////////////////////////////////////////////////////////
@@ -324,7 +357,7 @@ Matrix MatrixPerspectiveFov(float fov, float screen_aspect,
 /// \param z Z coordinate of the new matrix
 /// \return Translated matrix
 ////////////////////////////////////////////////////////////////////////////////
-Matrix MatrixTranslation(float x, float y, float z);
+Matrix MatrixTranslation(units::world x, units::world y, units::world z);
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
 /// \brief Transposes the supplied matrix and returns the result
@@ -352,6 +385,15 @@ Matrix MatrixView(Vector3 pos, Vector3 rot);
 /// \return Calculated cross product
 ////////////////////////////////////////////////////////////////////////////////
 Vector3 Vector3Cross(Vector3 a, Vector3 b);
+////////////////////////////////////////////////////////////////////////////////
+/// \ingroup math
+/// \brief Calculates the dot product of 2 given vectors
+///
+/// \param a The first vector
+/// \param b The second vector
+/// \return Calculated dot product
+////////////////////////////////////////////////////////////////////////////////
+units::world Vector3Dot(Vector3 a, Vector3 b);
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
 /// \brief Normalizes the supplied vector
