@@ -95,23 +95,32 @@ struct Vector2
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Assignment operator
     ////////////////////////////////////////////////////////////////////////////////
-    Vector2& operator= (const Vector2& vec) {x = vec.x; y = vec.y; return *this;}
+    Vector2& operator= (const Vector2& vec) { x = vec.x; y = vec.y; return *this; }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Addition operator
     ////////////////////////////////////////////////////////////////////////////////
-    Vector2& operator+ (const Vector2& vec) {x += vec.x; y += vec.y; return *this;}
+    Vector2& operator+= (const Vector2& vec) { x += vec.x; y += vec.y; return *this; }
+    Vector2 operator+ (const Vector2& vec) const { return Vector2(x + vec.x, y + vec.y); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Subtraction operator
     ////////////////////////////////////////////////////////////////////////////////
-    Vector2& operator- (const Vector2& vec) {x -= vec.x; y -= vec.y; return *this;}
+    Vector2& operator-= (const Vector2& vec) { x -= vec.x; y -= vec.y; return *this; }
+    Vector2 operator- (const Vector2& vec) const { return Vector2(x - vec.x, y - vec.y); }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Multiplication operator
+    ////////////////////////////////////////////////////////////////////////////////
+    Vector2& operator*= (const Vector2& vec) { x *= vec.x; y *= vec.y; return *this; }
+    Vector2& operator*= (const float& f) { x *= f; y *= f; return *this; }
+    Vector2 operator* (const Vector2& vec) const { return Vector2(x * vec.x, y * vec.y); }
+    Vector2 operator* (const float& f) const { return Vector2(x * f, y * f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Equality operator
     ////////////////////////////////////////////////////////////////////////////////
-    bool operator== (const Vector2& vec) {return x == vec.x && y == vec.y;}
+    bool operator== (const Vector2& vec) const { return x == vec.x && y == vec.y; }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Inequality operator
     ////////////////////////////////////////////////////////////////////////////////
-    bool operator!= (const Vector2& vec) {return !(*this == vec);}
+    bool operator!= (const Vector2& vec) const { return !(*this == vec); }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -143,19 +152,28 @@ struct Vector3
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Addition operator
     ////////////////////////////////////////////////////////////////////////////////
-    Vector3& operator+ (const Vector3& vec) { x += vec.x; y += vec.y; z += vec.z; return *this; }
+    Vector3& operator+= (const Vector3& vec) { x += vec.x; y += vec.y; z += vec.z; return *this; }
+    Vector3 operator+ (const Vector3& vec) const { return Vector3(x + vec.x, y + vec.y, z + vec.z); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Subtraction operator
     ////////////////////////////////////////////////////////////////////////////////
-    Vector3& operator- (const Vector3& vec) { x -= vec.x; y -= vec.y; z -= vec.z; return *this; }
+    Vector3& operator-= (const Vector3& vec) { x -= vec.x; y -= vec.y; z -= vec.z; return *this; }
+    Vector3 operator- (const Vector3& vec) const { return Vector3(x - vec.x, y - vec.y, z - vec.z); }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Multiplication operator
+    ////////////////////////////////////////////////////////////////////////////////
+    Vector3& operator*= (const Vector3& vec) {x *= vec.x; y *= vec.y; z *= vec.z; return *this;}
+    Vector3& operator*= (const float& f) {x *= f; y *= f; z *= f; return *this;}
+    Vector3 operator* (const Vector3& vec) const { return Vector3(x * vec.x, y * vec.y, z * vec.z); }
+    Vector3 operator* (const float& f) const { return Vector3(x * f, y * f, z * f); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Equality operator
     ////////////////////////////////////////////////////////////////////////////////
-    bool operator== (const Vector3& vec) { return x == vec.x && y == vec.y && z == vec.z; }
+    bool operator== (const Vector3& vec) const { return x == vec.x && y == vec.y && z == vec.z; }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Inequality operator
     ////////////////////////////////////////////////////////////////////////////////
-    bool operator!= (const Vector3& vec) { return !(*this == vec); }
+    bool operator!= (const Vector3& vec) const { return !(*this == vec); }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -188,23 +206,32 @@ struct Vector4
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Assignment operator
     ////////////////////////////////////////////////////////////////////////////////
-    Vector4& operator= (const Vector4& vec) {x = vec.x; y = vec.y; z = vec.z; w = vec.w; return *this;}
+    Vector4& operator= (const Vector4& vec) { x = vec.x; y = vec.y; z = vec.z; w = vec.w; return *this; }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Addition operator
     ////////////////////////////////////////////////////////////////////////////////
-    Vector4& operator+ (const Vector4& vec) {x += vec.x; y += vec.y; z += vec.z; w = vec.w; return *this;}
+    Vector4& operator+= (const Vector4& vec) { x += vec.x; y += vec.y; z += vec.z; w = vec.w; return *this; }
+    Vector4 operator+ (const Vector4& vec) const { return Vector4(x + vec.x, y + vec.y, z + vec.z, vec.w); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Subtraction operator
     ////////////////////////////////////////////////////////////////////////////////
-    Vector4& operator- (const Vector4& vec) {x -= vec.x; y -= vec.y; z -= vec.z; w = vec.w; return *this;}
+    Vector4& operator-= (const Vector4& vec) { x -= vec.x; y -= vec.y; z -= vec.z; w = vec.w; return *this; }
+    Vector4 operator- (const Vector4& vec) const { return Vector4(x - vec.x, y - vec.y, z - vec.z, vec.w); }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Multiplication operator
+    ////////////////////////////////////////////////////////////////////////////////
+    Vector4& operator*= (const Vector4& vec) { x *= vec.x; y *= vec.y; z *= vec.z; w = vec.w; return *this; }
+    Vector4& operator*= (const float& f) { x *= f; y *= f; z *= f; return *this; }
+    Vector4 operator* (const Vector4& vec) const { return Vector4(x * vec.x, y * vec.y, z * vec.z, vec.w); }
+    Vector4 operator* (const float& f) const { return Vector4(x * f, y * f, z * f, w); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Equality operator
     ////////////////////////////////////////////////////////////////////////////////
-    bool operator== (const Vector4& vec) { return x == vec.x && y == vec.y && z == vec.z && w == vec.w; }
+    bool operator== (const Vector4& vec) const { return x == vec.x && y == vec.y && z == vec.z && w == vec.w; }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Inequality operator
     ////////////////////////////////////////////////////////////////////////////////
-    bool operator!= (const Vector4& vec) { return !(*this == vec); }
+    bool operator!= (const Vector4& vec) const { return !(*this == vec); }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
