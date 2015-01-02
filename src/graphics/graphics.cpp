@@ -160,7 +160,7 @@ bool Graphics::Render()
         if (!shader3d_->SetInput("world_matrix", world_matrix, context_) ||
             !shader3d_->SetInput("view_matrix", view_matrix, context_) ||
             !shader3d_->SetInput("proj_matrix", proj_matrix_, context_) ||
-            !shader3d_->SetInput("diffuse", model->texture(), context_))
+            !shader3d_->SetInput("diffuse", model->diffuse(), context_))
         {
             return false;
         }

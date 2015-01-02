@@ -82,33 +82,26 @@ Model::Model(std::string mesh_filename, RenderContext& context)
         {
             diffuse_texture_ = std::move(texture);
         }
-
         else if (tex.type == Texture::NORMAL)
         {
             normal_texture_ = std::move(texture);
         }
-
         else if (tex.type == Texture::LIGHT)
         {
             light_texture_ = std::move(texture);
         }
     }
-    // TODO: make a proper solution for no diffuse texture
     if (diffuse_texture_ == nullptr)
     {
         diffuse_texture_.reset(new Texture("blons:none", Texture::DIFFUSE, context));
-        if (diffuse_texture_ == nullptr)
-        {
-            throw "Failed to load diffuse texture";
-        }
     }
     if (normal_texture_ == nullptr)
     {
         normal_texture_.reset(new Texture("blons:normal", Texture::NORMAL, context));
-        if (normal_texture_ == nullptr)
-        {
-            throw "Failed to load normal texture";
-        }
+    }
+    if (light_texture_ == nullptr)
+    {
+        light_texture_.reset(new Texture("blons:normal", Texture::LIGHT, context));
     }
     log::Debug("[%ims]\n", timer.ms());
 }
@@ -118,8 +111,6 @@ void Model::Render(RenderContext& context)
     // TODO: Clean this up with operator overloads
     world_matrix_ = MatrixMultiply(MatrixIdentity(), MatrixTranslation(pos_.x, pos_.y, pos_.z));
     context->BindMeshBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
-
-    return;
 }
 
 bool Model::Reload(RenderContext& context)
@@ -128,15 +119,15 @@ bool Model::Reload(RenderContext& context)
     {
         return false;
     }
-    if (diffuse_texture_ != nullptr && !diffuse_texture_->Reload(context))
+    if (!diffuse_texture_->Reload(context))
     {
         return false;
     }
-    if (normal_texture_ != nullptr && !normal_texture_->Reload(context))
+    if (!normal_texture_->Reload(context))
     {
         return false;
     }
-    if (light_texture_ != nullptr && !light_texture_->Reload(context))
+    if (!light_texture_->Reload(context))
     {
         return false;
     }
@@ -149,10 +140,19 @@ int Model::index_count() const
     return mesh_->index_count();
 }
 
-const TextureResource* Model::texture() const
+const TextureResource* Model::diffuse() const
 {
-    // TODO: getters for all types of textures
     return diffuse_texture_->texture();
+}
+
+const TextureResource* Model::normal() const
+{
+    return normal_texture_->texture();
+}
+
+const TextureResource* Model::lightmap() const
+{
+    return light_texture_->texture();
 }
 
 Vector3 Model::pos() const
