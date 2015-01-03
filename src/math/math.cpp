@@ -208,6 +208,19 @@ Vector3 Vector3PitchYawRoll(Matrix view_matrix)
     return rot;
 }
 
+unsigned int FastHash(const void* data, std::size_t size)
+{
+    static const unsigned int kPrime = 16777619;
+    static const unsigned int kOffset = 2166136261;
+    unsigned int hash = kOffset;
+    for (int i = 0; i < size; i++)
+    {
+        hash ^= reinterpret_cast<const char*>(data)[i];
+        hash *= kPrime;
+    }
+    return hash;
+}
+
 unsigned int FastHash(const char* str)
 {
     static const unsigned int kPrime = 16777619;

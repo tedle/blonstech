@@ -27,6 +27,8 @@
 // TODO: write own funcs instead of wrapping dxmath
 #include <DirectXMath.h>
 using namespace DirectX;
+// Includes
+#include <cstddef>
 #include <string.h>
 // Public Includes
 #include <blons/math/units.h>
@@ -408,6 +410,16 @@ Vector3 Vector3Normalize(Vector3 n);
 /// \return Vector with rotation info where X is pitch, Y is yaw, and Z is roll
 ////////////////////////////////////////////////////////////////////////////////
 Vector3 Vector3PitchYawRoll(Matrix view_matrix);
+
+////////////////////////////////////////////////////////////////////////////////
+/// \ingroup math
+/// \brief Retrieves the FNV-1a hash of a given block of memory
+///
+/// \param data Data to be hashed
+/// \param data Size of memory in bytes
+/// \return 32-bit hash value
+////////////////////////////////////////////////////////////////////////////////
+unsigned int FastHash(const void* data, std::size_t size);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
