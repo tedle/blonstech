@@ -281,6 +281,8 @@ bool Graphics::MakeContext(Client::Info screen)
     inputs3d.push_back(ShaderAttribute(0, "input_pos"));
     inputs3d.push_back(ShaderAttribute(1, "input_uv"));
     inputs3d.push_back(ShaderAttribute(2, "input_norm"));
+    inputs3d.push_back(ShaderAttribute(3, "input_tan"));
+    inputs3d.push_back(ShaderAttribute(4, "input_bitan"));
     shader3d_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", inputs3d, context_));
 
     ShaderAttributeList inputs2d;
@@ -301,7 +303,7 @@ bool Graphics::MakeContext(Client::Info screen)
     }
 
     // Framebuffers
-    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 2, context_));
+    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 3, context_));
 
     // GUI
     if (gui_ == nullptr)

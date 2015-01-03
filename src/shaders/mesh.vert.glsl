@@ -4,9 +4,11 @@
 in vec3 input_pos;
 in vec2 input_uv;
 in vec3 input_norm;
+in vec3 input_tan;
+in vec3 input_bitan;
 
 out vec2 tex_coord;
-out vec3 norm;
+out mat3 norm;
 
 // Globals
 uniform mat4 world_matrix;
@@ -20,5 +22,5 @@ void main(void)
     gl_Position = proj_matrix * gl_Position;
 
     tex_coord = input_uv;
-    norm = input_norm;
+    norm = transpose(mat3(input_tan, input_bitan, input_norm));
 }

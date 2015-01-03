@@ -158,6 +158,8 @@ MeshImporter::MeshImporter(std::string filename, bool invert_y)
     // In case we need to manually calculate normals, need some way
     // to cache normal value as its updated once every 3 iterations (once per tri)
     Vector3 current_normal(0.0, 0.0, 0.0);
+    Vector3 current_tangent(0.0, 0.0, 0.0);
+    Vector3 current_bitangent(0.0, 0.0, 0.0);
 
     // If true: loads about 2x slower, but +10%~ perf and -50%~ memory
     const bool vbo_indexing = false;
@@ -182,10 +184,6 @@ MeshImporter::MeshImporter(std::string filename, bool invert_y)
         if (normal_count_ > 0)
         {
             current_normal = normals[faces[face_offset+norm_offset]-1];
-            // Normals range from -1, 1 be we need to store as 0, 1
-            current_normal.x = (current_normal.x + 1) / 2;
-            current_normal.y = (current_normal.y + 1) / 2;
-            current_normal.z = (current_normal.z + 1) / 2;
         }
         // Normal data isn't baked in, calculate defaults
         // We only do this once per tri since we need 3 vertices to calculate
@@ -196,27 +194,95 @@ MeshImporter::MeshImporter(std::string filename, bool invert_y)
             v1 = vertices[faces[face_offset+(face_index_size*0)]-1];
             v2 = vertices[faces[face_offset+(face_index_size*1)]-1];
             v3 = vertices[faces[face_offset+(face_index_size*2)]-1];
-            // (v2-v1) * (v3-v1)
-            Vector3 v21, v31;
-            v21 = v2 - v1;
-            v31 = v3 - v1;
-            current_normal = Vector3Cross(v21, v31);
-            // Normal distance must be 1
+
+            current_normal = Vector3Cross(v2 - v1, v3 - v1);
             current_normal = Vector3Normalize(current_normal);
-            // Normals range from -1, 1 but we need to store as 0, 1
-            current_normal.x = (current_normal.x + 1) / 2;
-            current_normal.y = (current_normal.y + 1) / 2;
-            current_normal.z = (current_normal.z + 1) / 2;
         }
         new_vert.norm = current_normal;
 
+        // Calculate tangent space matrix components
+        // TODO: Tangent smoothing for when vbo indexing is disabled
+        if (i % 3 == 0)
+        {
+            Vector3 v1, v2, v3;
+            size_t face_index_size = face_size / 3;
+            v1 = vertices[faces[face_offset+(face_index_size*0)]-1];
+            v2 = vertices[faces[face_offset+(face_index_size*1)]-1];
+            v3 = vertices[faces[face_offset+(face_index_size*2)]-1];
+
+            Vector2 uv1, uv2, uv3;
+            if (uv_count_ > 0)
+            {
+                uv1 = uvs[faces[face_offset + 1 + (face_index_size * 0)] - 1];
+                uv2 = uvs[faces[face_offset + 1 + (face_index_size * 1)] - 1];
+                uv3 = uvs[faces[face_offset + 1 + (face_index_size * 2)] - 1];
+            }
+
+            // q  = position vectors from origin
+            // st = uv vectors from origin
+            // Solve for T & B
+            // [q1.xyz]   [st1.uv][T.xyz]
+            // [      ] = [      ][     ]
+            // [q2.xyz]   [st2.uv][B.xyz]
+            // ---> multiply by inverse of st matrix
+            // [T.xyz]               1             [st2.v, -st1.v][q1.xyz]
+            // [     ] = ------------------------- [             ][      ]
+            // [B.xyz]   st1.u*st2.v - st2.u*st1.v [-st2.u, st1.u][q2.xyz]
+
+            // v1 as origin
+            Vector3 q1, q2;
+            q1 = v2 - v1;
+            q2 = v3 - v1;
+
+            // uv1 as origin
+            Vector2 st1, st2;
+            st1 = uv2 - uv1;
+            st2 = uv3 - uv1;
+
+            // Reciprocal used to scale the inverse st matrix properly
+            float k = st1.x * st2.y - st2.x * st1.y;
+
+            // Tangents & bitangents are based off UVs, if we get invalid UVs or they don't exist...
+            // We build vectors to make up an identity matrix instead
+            if (k == 0)
+            {
+                current_tangent = Vector3(1.0, 0.0, 0.0);
+                current_bitangent = Vector3(0.0, 1.0, 0.0);
+            }
+            else
+            {
+                // Coefficient for the inverse of the st matrix
+                float inv_st = 1.0f / k;
+                // Direction of s vector
+                Vector3 s_dir = ((q1 * st2.y - q2 * st1.y) * inv_st);
+                // Direction of t vector
+                Vector3 t_dir = ((q2 * st1.x - q1 * st2.x) * inv_st);
+
+                // Orthogonalize tangent (s_dir)
+                current_tangent = (s_dir - current_normal * Vector3Dot(current_normal, s_dir));
+                current_bitangent = t_dir;
+
+                // Ensure right handedness
+                // Have to invert comparison for some reason I don't understand
+                // "Correct" comparison causes certain X normals to invert
+                if (Vector3Dot(Vector3Cross(current_normal, current_tangent), t_dir) > 0.0f)
+                {
+                    current_tangent *= -1.0f;
+                }
+            }
+        }
+        new_vert.tan = current_tangent;
+        new_vert.bitan = current_bitangent;
 
         if (vbo_indexing)
         {
-            auto index_match = vert_lookup.find(new_vert);
+            auto& index_match = vert_lookup.find(new_vert);
             if (index_match != vert_lookup.end())
             {
                 mesh_data_.indices[i] = index_match->second;
+                // Tangent smoothing (have to normalize at the end of loop)
+                mesh_data_.vertices[index_match->second].tan += new_vert.tan;
+                mesh_data_.vertices[index_match->second].bitan += new_vert.bitan;
             }
             else
             {
@@ -230,6 +296,12 @@ MeshImporter::MeshImporter(std::string filename, bool invert_y)
             mesh_data_.vertices.push_back(new_vert);
             mesh_data_.indices[i] = static_cast<unsigned int>(mesh_data_.vertices.size()) - 1;
         }
+    }
+    // Normalize tangents
+    for (auto& v : mesh_data_.vertices)
+    {
+        v.tan = Vector3Normalize(v.tan);
+        v.bitan = Vector3Normalize(v.bitan);
     }
     // Update vertex count to account for removed duplicates
     log::Debug("%.1f%%v", (((float)vertex_count - (float)mesh_data_.vertices.size()) / (float)vertex_count) * 100.0);

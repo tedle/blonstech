@@ -48,8 +48,11 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     Timer timer;
 
     timer.start();
+    static Timer total_timer;
+    total_timer.start();
     MeshImporter mesh(mesh_filename, true);
-    log::Debug("[%ims]\n", timer.ms());
+    total_timer.pause();
+    log::Debug("[%ims(%ims)]\n", timer.ms(), total_timer.ms());
 
     mesh_.reset(new Mesh(mesh.mesh_data(), context));
 

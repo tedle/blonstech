@@ -450,10 +450,12 @@ bool RenderGL40::Register3DMesh(BufferResource* vertex_buffer, BufferResource* i
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
-    // Enable pos and uv inputs ??
+    // Enable vertex inputs
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
+    glEnableVertexAttribArray(3);
+    glEnableVertexAttribArray(4);
 
     // Layout the Vertex struct type to gpu vertex attributes
     // Position declaration
@@ -465,6 +467,12 @@ bool RenderGL40::Register3DMesh(BufferResource* vertex_buffer, BufferResource* i
     // Normal declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(5*sizeof(float)));
+    // Tangent declaration
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(8*sizeof(float)));
+    // Bitangent declaration
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(11*sizeof(float)));
 
     // Setup the index buffer
     glGenBuffers(1, &index_buf->buffer_);

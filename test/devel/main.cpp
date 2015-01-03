@@ -44,8 +44,12 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models[1]->set_pos(10.0, 0.0, 20.0);
 
     // Model 3
-    models.push_back(graphics->MakeModel("plane.bms"));
+    models.push_back(graphics->MakeModel("bumpy_cube/mesh/cube.bms"));
     models[2]->set_pos(20.0, 0.0, 20.0);
+
+    // Model 4
+    models.push_back(graphics->MakeModel("plane.bms"));
+    models[3]->set_pos(30.0, 0.0, 20.0);
 
     // Big scene
     models = blons::temp::load_codmap("bms_test", std::move(models), graphics.get());
@@ -113,7 +117,7 @@ void InitTestUI(blons::gui::Manager* gui)
 
 void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
 {
-    blons::console::out("Testing a string!\n");
+    blons::console::out("Welcome, gamer -- to the blonstech universe!\n");
 
     std::function<void(int)> test_func = [](int i){ blons::console::out("%i gamers in the house!\n", i); };
     std::function<void(const char*)> test_func_s = [](const char* i){ blons::console::out("%s stringers in the house!\n", i); };
