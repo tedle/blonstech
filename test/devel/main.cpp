@@ -44,7 +44,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models[1]->set_pos(10.0, 0.0, 20.0);
 
     // Model 3
-    models.push_back(graphics->MakeModel("bumpy_cube/mesh/cube.bms"));
+    models.push_back(graphics->MakeModel("bumpy_cube/mesh/bumpy_cube.bms"));
     models[2]->set_pos(20.0, 0.0, 20.0);
 
     // Model 4
