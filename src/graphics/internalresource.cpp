@@ -35,7 +35,32 @@ namespace internal
 {
 namespace
 {
-std::unordered_map<std::string, std::function<PixelData()>> g_generators =
+std::unordered_map<std::string, std::function<MeshData()>> g_mesh_generators =
+{
+    {
+        "blons:sphere", []()
+        {
+            MeshData sphere;
+            unsigned int count = 10;
+            float dist = (2 * kPi) / count;
+            for (unsigned int i = 0; i < 1; i++)
+            {
+                for (unsigned int j = 0; j < count; j++)
+                {
+                    Vertex v;
+                    v.pos = Vector3(sin(j * dist) * 10, cos(j * dist) * 10, tan(j * dist) * 10);
+
+                    v.tex = Vector2(0.0, 0.0);
+                    v.norm = Vector3(0.0, 0.0, 1.0);
+                    v.tan = Vector3(1.0, 0.0, 0.0);
+                    v.bitan = Vector3(0.0, 1.0, 0.0);
+                }
+            }
+            return sphere;
+        }
+    }
+};
+std::unordered_map<std::string, std::function<PixelData()>> g_texture_generators =
 {
     {
         "blons:none", []()
@@ -70,14 +95,24 @@ std::unordered_map<std::string, std::function<PixelData()>> g_generators =
 };
 } // namespace
 
+MeshData MakeEngineMesh(const std::string& name)
+{
+    return g_mesh_generators.at(name)();
+}
+
+bool ValidEngineMesh(const std::string& name)
+{
+    return (g_mesh_generators.find(name) != g_mesh_generators.end());
+}
+
 PixelData MakeEngineTexture(const std::string& name)
 {
-    return g_generators.at(name)();
+    return g_texture_generators.at(name)();
 }
 
 bool ValidEngineTexture(const std::string& name)
 {
-    return (g_generators.find(name) != g_generators.end());
+    return (g_texture_generators.find(name) != g_texture_generators.end());
 }
 } // namespace internal
 } // namespace resource

@@ -26,6 +26,7 @@
 
 // Public Includes
 #include <blons/graphics/render/render.h>
+#include <blons/graphics/mesh.h>
 
 namespace blons
 {
@@ -33,6 +34,21 @@ namespace resource
 {
 namespace internal
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Generates an internal engine mesh of the specified name. If an
+/// invalid name is supplied this function will throw.
+///
+/// \param name Name of the mesh to generate
+/// \return MeshData of the generated mesh
+////////////////////////////////////////////////////////////////////////////////
+MeshData MakeEngineMesh(const std::string& name);
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Checks if the supplied mesh name is valid
+///
+/// \param name Name of the mesh to check
+/// \return True if mesh can be generated
+////////////////////////////////////////////////////////////////////////////////
+bool ValidEngineMesh(const std::string& name);
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Generates an internal engine texture of the specified name. If an
 /// invalid name is supplied this function will throw.
