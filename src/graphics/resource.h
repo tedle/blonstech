@@ -26,6 +26,7 @@
 
 // Public Includes
 #include <blons/graphics/render/render.h>
+#include <blons/graphics/mesh.h>
 #include <blons/graphics/texture.h>
 
 namespace blons
@@ -35,6 +36,37 @@ namespace blons
 ////////////////////////////////////////////////////////////////////////////////
 namespace resource
 {
+struct MeshBuffer
+{
+    std::shared_ptr<BufferResource> vertex;
+    std::shared_ptr<BufferResource> index;
+    unsigned int vertex_count;
+    unsigned int index_count;
+    std::vector<Mesh::TextureInfo> texture_list;
+};
+
+struct TextureBuffer
+{
+    std::shared_ptr<TextureResource> texture;
+    Texture::Info info;
+};
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Loads a mesh from disk or engine, or from cache if available.
+///
+/// If the mesh is cached and loaded into the supplied context, a pointer to
+/// its resource buffer is returned. If cached, but in a different context, a
+/// new resource is created and bound to the context. If uncached the file is
+/// loaded from disk and bound to the context
+///
+/// List of valid engine meshes include:
+/// * `blons:sphere` Sphere mesh
+///
+/// \param filename Filename of the mesh to load
+/// \param context Handle to the current rendering context
+/// \return MeshBuffer containing shared BufferResource pointers that will be
+/// nullptr on failure, as well as mesh information
+////////////////////////////////////////////////////////////////////////////////
+MeshBuffer LoadMesh(const std::string& filename, RenderContext& context);
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Loads a texture from disk or engine, or from cache if available.
 ///
@@ -49,11 +81,11 @@ namespace resource
 ///
 /// \param filename Filename of the texture to load
 /// \param type Texture parameters to bind
-/// \param[out] info Texture info like width, height, and type
 /// \param context Handle to the current rendering context
-/// \return Shared TextureResource pointer, or nullptr on failure
+/// \return TextureBuffer containing shared TextureResource pointer that will be
+/// nullptr on failure, as well as texture information
 ////////////////////////////////////////////////////////////////////////////////
-std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Texture::Type type, Texture::Info* info, RenderContext& context);
+TextureBuffer LoadTexture(const std::string& filename, Texture::Type type, RenderContext& context);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Clears all cached resource buffers, but not cached resource data

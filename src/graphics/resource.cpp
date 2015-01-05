@@ -25,6 +25,8 @@
 
 // Includes
 #include <unordered_map>
+// Public Includes
+#include <blons/graphics/meshimporter.h>
 // Local Includes
 #include "internalresource.h"
 
@@ -43,8 +45,44 @@ struct TextureCache
 std::unordered_map<std::string, TextureCache> g_texture_cache;
 } // namespace
 
-std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Texture::Type type, Texture::Info* info, RenderContext& context)
+MeshBuffer LoadMesh(const std::string& filename, RenderContext& context)
 {
+    MeshBuffer buffer;
+    MeshImporter blonsmesh(filename, true);
+    MeshData mesh_data = blonsmesh.mesh_data();
+    buffer.texture_list = blonsmesh.textures();
+
+    // Graphics APIs dont support having more than 4 billion vertices...
+    // I'm OK with that
+    if (mesh_data.vertices.size() >= ULONG_MAX)
+    {
+        return MeshBuffer();
+    }
+    buffer.vertex_count = static_cast<unsigned int>(mesh_data.vertices.size());
+
+    if (mesh_data.indices.size() >= ULONG_MAX)
+    {
+        return MeshBuffer();
+    }
+    buffer.index_count = static_cast<unsigned int>(mesh_data.indices.size());
+
+    buffer.vertex.reset(context->MakeBufferResource());
+    buffer.index.reset(context->MakeBufferResource());
+
+    if (!context->Register3DMesh(buffer.vertex.get(), buffer.index.get(),
+                                 mesh_data.vertices.data(), buffer.vertex_count,
+                                 mesh_data.indices.data(), buffer.index_count))
+    {
+        return MeshBuffer();
+    }
+
+    return buffer;
+}
+
+TextureBuffer LoadTexture(const std::string& filename, Texture::Type type, RenderContext& context)
+{
+    TextureBuffer buffer;
+
     // Get texture data for file, or create fresh texture data if new
     auto& tex = g_texture_cache[filename];
 
@@ -60,7 +98,7 @@ std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Textur
             std::unique_ptr<PixelData> pixels(new PixelData);
             if (!context->LoadPixelData(filename, pixels.get()))
             {
-                return nullptr;
+                return TextureBuffer();
             }
             tex.pixels = std::move(pixels);
         }
@@ -73,7 +111,7 @@ std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Textur
 
         if (texture == nullptr)
         {
-            return nullptr;
+            return TextureBuffer();
         }
 
         if (type == Texture::SPRITE)
@@ -84,7 +122,7 @@ std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Textur
 
         if (!context->RegisterTexture(texture.get(), tex.pixels.get()))
         {
-            return nullptr;
+            return TextureBuffer();
         }
 
         // Save it to the cache
@@ -92,11 +130,12 @@ std::shared_ptr<TextureResource> LoadTexture(const std::string& filename, Textur
     }
 
     // Write the output info
-    info->width = tex.pixels->width;
-    info->height = tex.pixels->height;
-    info->type = type;
+    buffer.texture = tex.texture;
+    buffer.info.width = tex.pixels->width;
+    buffer.info.height = tex.pixels->height;
+    buffer.info.type = type;
 
-    return tex.texture;
+    return buffer;
 }
 
 void ClearBufferCache()

@@ -41,7 +41,9 @@ bool Texture::Init(std::string filename, Type type, RenderContext& context)
     filename_ = filename;
     pixel_data_ = nullptr;
 
-    texture_ = resource::LoadTexture(filename, type, &info_, context);
+    auto tex = resource::LoadTexture(filename, type, context);
+    texture_ = std::move(tex.texture);
+    info_ = tex.info;
     if (texture_ == nullptr)
     {
         return false;

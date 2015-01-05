@@ -25,51 +25,35 @@
 
 // Public Includes
 #include <blons/graphics/meshimporter.h>
+// Local Includes
+#include "resource.h"
 
 namespace blons
 {
-Mesh::Mesh(const MeshData& mesh_data, RenderContext& context)
+Mesh::Mesh(const std::string& mesh_filename, RenderContext& context)
 {
-    if (!Init(mesh_data, context))
+    if (!Init(mesh_filename, context))
     {
         throw "Failed to initialize mesh";
     }
 }
 
-bool Mesh::Init(const MeshData& mesh_data, RenderContext& context)
+bool Mesh::Init(const std::string& mesh_filename, RenderContext& context)
 {
-    vertex_buffer_.reset(context->MakeBufferResource());
-    index_buffer_.reset(context->MakeBufferResource());
-    mesh_data_.vertices = mesh_data.vertices;
-    mesh_data_.indices = mesh_data.indices;
-
-    // Graphics APIs dont support having more than 4 billion vertices...
-    // I'm OK with that
-    if (mesh_data_.vertices.size() >= ULONG_MAX)
-    {
-        return false;
-    }
-
-    if (mesh_data_.indices.size() >= ULONG_MAX)
-    {
-        return false;
-    }
-
-    if (!context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(),
-                                 mesh_data_.vertices.data(), vertex_count(),
-                                 mesh_data_.indices.data(), index_count()))
-    {
-        return false;
-    }
+    filename_ = mesh_filename;
+    auto mesh = resource::LoadMesh(mesh_filename, context);
+    vertex_buffer_ = std::move(mesh.vertex);
+    index_buffer_ = std::move(mesh.index);
+    vertex_count_ = mesh.vertex_count;
+    index_count_ = mesh.index_count;
+    texture_list_ = mesh.texture_list;
 
     return true;
 }
 
 bool Mesh::Reload(RenderContext& context)
 {
-    // Make a copy of mesh data so we dont try to overwrite our own object, could be ugly?
-    auto temp_data = mesh_data_;
-    return Init(temp_data, context);
+    return Init(filename_, context);
 }
 
 BufferResource* Mesh::vertex_buffer() const
@@ -84,13 +68,16 @@ BufferResource* Mesh::index_buffer() const
 
 unsigned int Mesh::vertex_count() const
 {
-    std::size_t vertex_count = mesh_data_.vertices.size();
-    return static_cast<unsigned int>(vertex_count);
+    return vertex_count_;
 }
 
 unsigned int Mesh::index_count() const
 {
-    std::size_t index_count = mesh_data_.indices.size();
-    return static_cast<unsigned int>(index_count);
+    return index_count_;
+}
+
+const std::vector<Mesh::TextureInfo>& Mesh::textures() const
+{
+    return texture_list_;
 }
 } // namespace blons

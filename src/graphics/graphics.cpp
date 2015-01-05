@@ -303,7 +303,7 @@ bool Graphics::MakeContext(Client::Info screen)
     }
 
     // Framebuffers
-    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 3, context_));
+    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 4, context_));
 
     // GUI
     if (gui_ == nullptr)

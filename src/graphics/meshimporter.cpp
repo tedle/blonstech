@@ -79,7 +79,7 @@ MeshImporter::MeshImporter(std::string filename, bool invert_y)
     // Load in texture data
     for (unsigned int i = 0; i < texture_count; i++)
     {
-        TextureInfo tex;
+        Mesh::TextureInfo tex;
         unsigned int tex_string_len;
         fread(&tex.type, sizeof(unsigned int), 1, file);
         fread(&tex_string_len, sizeof(unsigned int), 1, file);
@@ -126,7 +126,7 @@ const MeshData& MeshImporter::mesh_data() const
     return mesh_data_;
 }
 
-const std::vector<MeshImporter::TextureInfo>& MeshImporter::textures() const
+const std::vector<Mesh::TextureInfo>& MeshImporter::textures() const
 {
     return textures_;
 }
