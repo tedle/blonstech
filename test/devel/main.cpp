@@ -51,6 +51,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models.push_back(graphics->MakeModel("plane.bms"));
     models[3]->set_pos(30.0, 0.0, 20.0);
 
+    // Model 5
+    models.push_back(graphics->MakeModel("blons:sphere"));
+    models[4]->set_pos(0.0, 5.0, 0.0);
+
     // Big scene
     models = blons::temp::load_codmap("bms_test", std::move(models), graphics.get());
 

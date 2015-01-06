@@ -42,6 +42,12 @@ bool Mesh::Init(const std::string& mesh_filename, RenderContext& context)
 {
     filename_ = mesh_filename;
     auto mesh = resource::LoadMesh(mesh_filename, context);
+
+    if (mesh.vertex == nullptr || mesh.index == nullptr)
+    {
+        return false;
+    }
+
     vertex_buffer_ = std::move(mesh.vertex);
     index_buffer_ = std::move(mesh.index);
     vertex_count_ = mesh.vertex_count;

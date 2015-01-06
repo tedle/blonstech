@@ -41,20 +41,51 @@ std::unordered_map<std::string, std::function<MeshData()>> g_mesh_generators =
         "blons:sphere", []()
         {
             MeshData sphere;
-            unsigned int count = 10;
-            float dist = (2 * kPi) / count;
-            for (unsigned int i = 0; i < 1; i++)
-            {
-                for (unsigned int j = 0; j < count; j++)
-                {
-                    Vertex v;
-                    v.pos = Vector3(sin(j * dist) * 10, cos(j * dist) * 10, tan(j * dist) * 10);
 
-                    v.tex = Vector2(0.0, 0.0);
-                    v.norm = Vector3(0.0, 0.0, 1.0);
+            const unsigned int count = 20;
+            const unsigned int semi_count = count / 2 + 1;
+            const unsigned int vert_count = count * semi_count;
+            const float scale = 1.0f;
+            const float dist = (2 * kPi) / count;
+
+            static_assert(count % 2 == 0, "Sphere vertex ring size must be an even number");
+
+            // count + 1 to generate a duplicate origin ring
+            // this allows a starting ring with UV.x = 0 and
+            // an ending ring with UV.x = 1
+            for (unsigned int i = 0; i < count + 1; i++)
+            {
+                for (unsigned int j = 0; j < semi_count; j++)
+                {
+                    // Offset by half pi because semispheres are parallel
+                    // to the Y-axis
+                    float d1 = j * dist + kPi / 2;
+                    float d2 = i * dist + kPi / 2;
+                    Vertex v;
+                    v.pos.x = cos(d1) * cos(d2);
+                    v.pos.y = sin(d1);
+                    v.pos.z = cos(d1) * sin(d2);
+                    v.pos *= scale;
+
+                    v.tex = Vector2(static_cast<float>(i) / static_cast<float>(count),
+                                    static_cast<float>(j) / static_cast<float>(semi_count));
+                    v.norm = Vector3Normalize(v.pos);
                     v.tan = Vector3(1.0, 0.0, 0.0);
                     v.bitan = Vector3(0.0, 1.0, 0.0);
+                    sphere.vertices.push_back(v);
                 }
+            }
+
+            for (unsigned int i = 0; i < vert_count; i++)
+            {
+                // Don't need modulo for these because of the bonus ring we generated
+                sphere.indices.push_back(i);
+                sphere.indices.push_back(i + semi_count);
+                sphere.indices.push_back(i + 1);
+
+                sphere.indices.push_back(i + 1);
+                sphere.indices.push_back(i + semi_count);
+                sphere.indices.push_back(i + semi_count + 1);
             }
             return sphere;
         }
@@ -66,14 +97,21 @@ std::unordered_map<std::string, std::function<PixelData()>> g_texture_generators
         "blons:none", []()
         {
             PixelData none;
-            none.format = PixelData::AUTO;
+            none.format = PixelData::RAW;
             none.bits = PixelData::R8G8B8;
-            none.width = 1;
-            none.height = 1;
+            none.width = 16;
+            none.height = 16;
             none.pixels.reset(new unsigned char[none.width * none.height * 3]);
-            none.pixels.get()[0] = 255;
-            none.pixels.get()[1] = 0;
-            none.pixels.get()[2] = 0;
+            for (int x = 0; x < none.width; x++)
+            {
+                for (int y = 0; y < none.height; y++)
+                {
+                    auto offset = y * none.width + x;
+                    none.pixels.get()[offset * 3 + 0] = 100 * ((y + x) % 2);
+                    none.pixels.get()[offset * 3 + 1] = 200 * ((y + x) % 2);
+                    none.pixels.get()[offset * 3 + 2] = 100 * ((y + x) % 2);
+                }
+            }
             return none;
         }
     },
