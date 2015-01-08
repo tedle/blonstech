@@ -143,12 +143,19 @@ public:
 private:
     bool MakeContext(Client::Info screen);
 
+    bool RenderGeometry(Matrix view_matrix);
+    bool RenderLighting(Matrix view_matrix);
+    bool RenderComposite();
+    bool RenderSprites();
+
     RenderContext context_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<gui::Manager> gui_;
-    std::unique_ptr<Shader> shader3d_;
+    std::unique_ptr<Shader> shadergeo_;
+    std::unique_ptr<Shader> shaderlight_;
     std::unique_ptr<Shader> shader2d_;
     std::unique_ptr<Framebuffer> geometry_buffer_;
+    std::unique_ptr<Framebuffer> light_buffer_;
 
     Matrix proj_matrix_, ortho_matrix_;
 

@@ -122,6 +122,116 @@ std::unique_ptr<Sprite> Graphics::MakeSprite(std::string filename)
 
 bool Graphics::Render()
 {
+    // Calculates view_matrix from scratch, so we cache it
+    Matrix view_matrix = camera_->view_matrix();
+
+    // Clear buffers
+    context_->BeginScene();
+
+    // 3D Rendering pass
+    // Needed so models dont render over themselves
+    context_->SetDepthTesting(true);
+
+    // Bind the geometry framebuffer to render all models onto
+    geometry_buffer_->Bind(context_);
+    // Render all of the geometry and accompanying info (normal, depth, etc)
+    if (!RenderGeometry(view_matrix))
+    {
+        return false;
+    }
+
+    // 2D Rendering pass
+    // Needed so sprites can render over themselves
+    context_->SetDepthTesting(false);
+
+    // Bind the buffer to do all lighting calculations on
+    light_buffer_->Bind(context_);
+    if (!RenderLighting(view_matrix))
+    {
+        return false;
+    }
+    // Unbind the light buffer, rebind the back buffer
+    light_buffer_->Unbind(context_);
+
+    // Render the final composite of the geometry and lighting passes
+    if (!RenderComposite())
+    {
+        return false;
+    }
+
+    // Render all 2D sprites
+    if (!RenderSprites())
+    {
+        return false;
+    }
+
+    // Render the GUI
+    gui_->Render(context_);
+
+    // Swap buffers
+    context_->EndScene();
+
+    return true;
+}
+
+bool Graphics::RenderGeometry(Matrix view_matrix)
+{
+    // TODO: 3D pass ->
+    //      Render static world geo as batches without world matrix
+    //      Render movable objects singularly with world matrix
+    for (const auto& model : models_)
+    {
+        // Bind the vertex data
+        model->Render(context_);
+
+        // Set the inputs
+        if (!shadergeo_->SetInput("world_matrix", model->world_matrix(), context_) ||
+            !shadergeo_->SetInput("view_matrix", view_matrix, context_) ||
+            !shadergeo_->SetInput("proj_matrix", proj_matrix_, context_) ||
+            !shadergeo_->SetInput("albedo", model->albedo(), 0, context_) ||
+            !shadergeo_->SetInput("normal", model->normal(), 1, context_))
+        {
+            return false;
+        }
+
+        // Make the draw call
+        if (!shadergeo_->Render(model->index_count(), context_))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Graphics::RenderLighting(Matrix view_matrix)
+{
+    // Render the geometry as a sprite
+    geometry_buffer_->Render(context_);
+
+    // Used to turn pixel fragments into world coordinates
+    Matrix inv_proj_view = MatrixInverse(MatrixMultiply(view_matrix, proj_matrix_));
+
+    // Set the inputs
+    if (!shaderlight_->SetInput("world_matrix", MatrixIdentity() , context_) ||
+        !shaderlight_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !shaderlight_->SetInput("inv_proj_view_matrix", inv_proj_view, context_) ||
+        !shaderlight_->SetInput("albedo", geometry_buffer_->textures()[0], 0, context_) ||
+        !shaderlight_->SetInput("normal", geometry_buffer_->textures()[1], 1, context_) ||
+        !shaderlight_->SetInput("depth", geometry_buffer_->depth(), 2, context_))
+    {
+        return false;
+    }
+
+    // Finally do the render
+    if (!shaderlight_->Render(geometry_buffer_->index_count(), context_))
+    {
+        return false;
+    }
+    return true;
+}
+
+bool Graphics::RenderComposite()
+{
     // TODO: TEMP DEBUG CODE. CLEAN THIS UP!!!
     static bool init = true;
     static const console::Variable* target = nullptr;
@@ -131,72 +241,47 @@ bool Graphics::Render()
         target = console::var("gfx:target");
         init = false;
     }
-
-    Matrix world_matrix, view_matrix;
-
-    // Clear buffers
-    context_->BeginScene();
-
-    // Get matrices
-    view_matrix = camera_->view_matrix();
-
-    // 3D Rendering pass
-    // Needed so models dont render over themselves
-    context_->SetDepthTesting(true);
-
-    // Bind the geometry framebuffer to render all models onto
-    geometry_buffer_->Bind(context_);
-
-    // TODO: 3D pass ->
-    //      Render static world geo as batches without world matrix
-    //      Render movable objects singularly with world matrix
-    for (const auto& model : models_)
+    const TextureResource* screen_texture;
+    switch (target->to<int>())
     {
-        // Prep the pipeline 4 drawering
-        model->Render(context_);
-        world_matrix = model->world_matrix();
-
-        // Set the inputs
-        if (!shader3d_->SetInput("world_matrix", world_matrix, context_) ||
-            !shader3d_->SetInput("view_matrix", view_matrix, context_) ||
-            !shader3d_->SetInput("proj_matrix", proj_matrix_, context_) ||
-            !shader3d_->SetInput("diffuse", model->diffuse(), 0, context_) ||
-            !shader3d_->SetInput("normal", model->normal(), 1, context_))
-        {
-            return false;
-        }
-
-        // Finally do the render
-        if (!shader3d_->Render(model->index_count(), context_))
-        {
-            return false;
-        }
+    case 1:
+        screen_texture = geometry_buffer_->textures()[0];
+        break;
+    case 2:
+        screen_texture = geometry_buffer_->textures()[1];
+        break;
+    case 3:
+        screen_texture = geometry_buffer_->textures()[2];
+        break;
+    case 4:
+        screen_texture = geometry_buffer_->depth();
+        break;
+    case 0:
+    default:
+        screen_texture = light_buffer_->textures()[0];
+        break;
     }
 
-    // Unbind the G-buffer, rebind the back buffer
-    geometry_buffer_->Unbind(context_);
-
-    // 2D Rendering pass
-    // Needed so sprites can render over themselves
-    context_->SetDepthTesting(false);
-
-    // Render the geometry as a sprite
-    geometry_buffer_->Render(context_);
+    // Push the full screen quad used to render FBO
+    light_buffer_->Render(context_);
 
     // Set the inputs
     if (!shader2d_->SetInput("world_matrix", MatrixIdentity() , context_) ||
         !shader2d_->SetInput("proj_matrix", ortho_matrix_, context_) ||
-        !shader2d_->SetInput("diffuse", geometry_buffer_->textures()[target->to<int>()], context_))
+        !shader2d_->SetInput("sprite", screen_texture, context_))
     {
         return false;
     }
 
-    // Finally do the render
-    if (!shader2d_->Render(geometry_buffer_->index_count(), context_))
+    if (!shader2d_->Render(light_buffer_->index_count(), context_))
     {
         return false;
     }
+    return true;
+}
 
+bool Graphics::RenderSprites()
+{
     for (const auto& sprite : sprites_)
     {
         // Prep the pipeline 4 drawering
@@ -205,24 +290,17 @@ bool Graphics::Render()
         // Set the inputs
         if (!shader2d_->SetInput("world_matrix", MatrixIdentity() , context_) ||
             !shader2d_->SetInput("proj_matrix", ortho_matrix_, context_) ||
-            !shader2d_->SetInput("diffuse", sprite->texture(), context_))
+            !shader2d_->SetInput("sprite", sprite->texture(), context_))
         {
             return false;
         }
 
-        // Finally do the render
+        // Make the draw call
         if (!shader2d_->Render(sprite->index_count(), context_))
         {
             return false;
         }
     }
-
-    // 2D UI Pass
-    gui_->Render(context_);
-
-    // Swap buffers
-    context_->EndScene();
-
     return true;
 }
 
@@ -277,13 +355,18 @@ bool Graphics::MakeContext(Client::Info screen)
                                        kScreenNear, kScreenDepth);
 
     // Shaders
-    ShaderAttributeList inputs3d;
-    inputs3d.push_back(ShaderAttribute(0, "input_pos"));
-    inputs3d.push_back(ShaderAttribute(1, "input_uv"));
-    inputs3d.push_back(ShaderAttribute(2, "input_norm"));
-    inputs3d.push_back(ShaderAttribute(3, "input_tan"));
-    inputs3d.push_back(ShaderAttribute(4, "input_bitan"));
-    shader3d_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", inputs3d, context_));
+    ShaderAttributeList inputsgeo;
+    inputsgeo.push_back(ShaderAttribute(0, "input_pos"));
+    inputsgeo.push_back(ShaderAttribute(1, "input_uv"));
+    inputsgeo.push_back(ShaderAttribute(2, "input_norm"));
+    inputsgeo.push_back(ShaderAttribute(3, "input_tan"));
+    inputsgeo.push_back(ShaderAttribute(4, "input_bitan"));
+    shadergeo_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", inputsgeo, context_));
+
+    ShaderAttributeList inputslight;
+    inputslight.push_back(ShaderAttribute(0, "input_pos"));
+    inputslight.push_back(ShaderAttribute(1, "input_uv"));
+    shaderlight_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/light.frag.glsl", inputslight, context_));
 
     ShaderAttributeList inputs2d;
     inputs2d.push_back(ShaderAttribute(0, "input_pos"));
@@ -295,7 +378,8 @@ bool Graphics::MakeContext(Client::Info screen)
     inputs_ui.push_back(ShaderAttribute(1, "input_uv"));
     auto ui_shader = std::unique_ptr<Shader>(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", inputs_ui, context_));
 
-    if (shader3d_ == nullptr ||
+    if (shadergeo_ == nullptr ||
+        shaderlight_ == nullptr ||
         shader2d_ == nullptr ||
         ui_shader == nullptr)
     {
@@ -304,6 +388,7 @@ bool Graphics::MakeContext(Client::Info screen)
 
     // Framebuffers
     geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 4, context_));
+    light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, context_));
 
     // GUI
     if (gui_ == nullptr)
@@ -327,7 +412,7 @@ void ManagedModel::Finish()
     }
 
     mesh_.reset();
-    diffuse_texture_.reset();
+    albedo_texture_.reset();
     normal_texture_.reset();
     light_texture_.reset();
 }

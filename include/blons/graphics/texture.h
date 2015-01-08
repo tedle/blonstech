@@ -43,10 +43,10 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum Type
     {
-        DIFFUSE, ///< Used for colouring 3D models
-        NORMAL,  ///< Used for bump mapping 3D models
-        LIGHT,   ///< Used for lighting 3D models
-        SPRITE   ///< Used for 2D rendering, ensures PixelData::RAW texture format
+        ALBEDO, ///< Used for colouring 3D models
+        NORMAL, ///< Used for bump mapping 3D models
+        LIGHT,  ///< Used for lighting 3D models
+        SPRITE  ///< Used for 2D rendering, ensures PixelData::RAW texture format
     };
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +122,7 @@ private:
 /// // Using a texture is as simple as pushing it to a shader
 /// // Though sprites & models are almost always more suitable
 /// blons::Texture tex("sprite.png", blons::Texture::SPRITE, context);
-/// shader->SetInput("diffuse", tex.texture(), context);
+/// shader->SetInput("sprite", tex.texture(), context);
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

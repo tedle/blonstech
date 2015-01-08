@@ -117,7 +117,7 @@ private:
 /// // Set up various shader inputs...
 /// shader->SetInput("world_matrix", MatrixIdentity(), context);
 /// shader->SetInput("proj_matrix", orthographic_matrix, context);
-/// shader->SetInput("diffuse", sprite->texture(), context);
+/// shader->SetInput("sprite", sprite->texture(), context);
 ///
 /// // Push the batch's mesh data to the rendering pipeline
 /// batch.Render(context);

@@ -138,14 +138,14 @@ void Manager::Render(RenderContext& context)
         if (batch.first.is_text)
         {
             auto font = skin_->font(batch.first.font_style);
-            ui_shader_->SetInput("diffuse", font->texture(), context);
+            ui_shader_->SetInput("skin", font->texture(), context);
             ui_shader_->SetInput("is_text", true, context);
             ui_shader_->SetInput("text_colour", batch.first.colour, context);
         }
         else
         {
             ui_shader_->SetInput("is_text", false, context);
-            ui_shader_->SetInput("diffuse", skin_->sprite()->texture(), context);
+            ui_shader_->SetInput("skin", skin_->sprite()->texture(), context);
         }
         ui_shader_->SetInput("crop", batch.first.crop, context);
         ui_shader_->SetInput("feather", batch.first.crop_feather, context);

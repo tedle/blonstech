@@ -39,7 +39,7 @@ class Mesh
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Stores the filename of a texture as well as its purpose (diffuse,
+    /// \brief Stores the filename of a texture as well as its purpose (albedo,
     /// normal, etc)
     ////////////////////////////////////////////////////////////////////////////////
     struct TextureInfo

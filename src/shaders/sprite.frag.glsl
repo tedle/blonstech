@@ -6,9 +6,9 @@ in vec2 tex_coord;
 out vec4 frag_colour;
 
 // Globals
-uniform sampler2D diffuse;
+uniform sampler2D sprite;
 
 void main(void)
 {
-    frag_colour = texture(diffuse, tex_coord);
+    frag_colour = texture(sprite, tex_coord);
 }

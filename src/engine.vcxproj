@@ -204,6 +204,7 @@
     <ClInclude Include="..\include\blons\graphics\gui\textarea.h" />
     <ClInclude Include="..\include\blons\graphics\gui\textbox.h" />
     <ClInclude Include="..\include\blons\graphics\gui\window.h" />
+    <ClInclude Include="..\include\blons\graphics\light.h" />
     <ClInclude Include="..\include\blons\graphics\mesh.h" />
     <ClInclude Include="..\include\blons\graphics\meshimporter.h" />
     <ClInclude Include="..\include\blons\graphics\model.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="graphics\gui\textbox.cpp" />
     <ClCompile Include="graphics\gui\window.cpp" />
     <ClCompile Include="graphics\internalresource.cpp" />
+    <ClCompile Include="graphics\light.cpp" />
     <ClCompile Include="graphics\mesh.cpp" />
     <ClCompile Include="graphics\meshimporter.cpp" />
     <ClCompile Include="graphics\model.cpp" />
@@ -269,6 +271,7 @@
     <ClCompile Include="temphelpers.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\light.frag.glsl" />
     <None Include="shaders\mesh.frag.glsl" />
     <None Include="shaders\mesh.vert.glsl" />
     <None Include="shaders\sprite.frag.glsl" />

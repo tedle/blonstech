@@ -116,7 +116,7 @@ private:
 ///
 ///     // Set various global variables of the shader
 ///     if (!shader->SetInput("world_matrix", model->world_matrix(), context) ||
-///         !shader->SetInput("diffuse", model->texture(), context))
+///         !shader->SetInput("albedo", model->texture(), context))
 ///     {
 ///         blons::log::Debug("Could not set shader inputs!\n");
 ///         continue;

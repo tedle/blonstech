@@ -257,7 +257,7 @@ protected:
 ///         sprite->Render(context);
 ///
 ///         // Set the shader's inputs
-///         shader->SetInput("diffuse", sprite->texture(), context);
+///         shader->SetInput("sprite", sprite->texture(), context);
 ///
 ///         // Make the draw call
 ///         shader->Render(sprite->index_count(), context);

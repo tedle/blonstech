@@ -144,8 +144,6 @@ void move_camera_around_origin(float delta, Camera* camera)
 
         camera->set_pos(x, y, z);
         camera->LookAt(0.0f, 2.0f, 0.0f);
-        //camera->set_pos(0.0f, -2000.0f, 500.0f);
-        //camera->LookAt(0.0f, 0.0f, 0.0f);
     }
 }
 

@@ -76,7 +76,7 @@ MeshBuffer LoadMesh(const std::string& filename, RenderContext& context);
 /// loaded from disk and bound to the context
 ///
 /// List of valid engine textures include:
-/// * `blons:none` Error diffuse texture
+/// * `blons:none` Error colour texture
 /// * `blons:normal` Plain normal map
 ///
 /// \param filename Filename of the texture to load

@@ -470,7 +470,7 @@ protected:
 ///     if (!shader->SetInput("world_matrix", world_matrix, context) ||
 ///         !shader->SetInput("view_matrix", view_matrix, context) ||
 ///         !shader->SetInput("proj_matrix", proj_matrix, context) ||
-///         !shader->SetInput("diffuse", model->texture(), context))
+///         !shader->SetInput("albedo", model->texture(), context))
 ///     {
 ///         return false;
 ///     }

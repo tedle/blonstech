@@ -34,6 +34,16 @@ Matrix MatrixIdentity()
     return mid;
 }
 
+Matrix MatrixInverse(Matrix mat)
+{
+    XMFLOAT4X4 xm_mat, xm_ret;
+    Matrix inv;
+    memcpy(xm_mat.m, mat.m, sizeof(float)*4*4);
+    XMStoreFloat4x4(&xm_ret, XMMatrixInverse(nullptr, XMLoadFloat4x4(&xm_mat)));
+    inv = xm_ret;
+    return inv;
+}
+
 Matrix MatrixLookAt(Vector3 pos, Vector3 look, Vector3 up)
 {
     XMFLOAT4X4 xm;

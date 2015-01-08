@@ -38,7 +38,7 @@ namespace blons
 Model::Model(std::string mesh_filename, RenderContext& context)
 {
     mesh_ = nullptr;
-    diffuse_texture_ = nullptr;
+    albedo_texture_ = nullptr;
     normal_texture_ = nullptr;
     light_texture_ = nullptr;
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
@@ -80,9 +80,9 @@ Model::Model(std::string mesh_filename, RenderContext& context)
         }
 
         // Transfer new texture to aproppriate member
-        if (tex.type == Texture::DIFFUSE)
+        if (tex.type == Texture::ALBEDO)
         {
-            diffuse_texture_ = std::move(texture);
+            albedo_texture_ = std::move(texture);
         }
         else if (tex.type == Texture::NORMAL)
         {
@@ -93,9 +93,9 @@ Model::Model(std::string mesh_filename, RenderContext& context)
             light_texture_ = std::move(texture);
         }
     }
-    if (diffuse_texture_ == nullptr)
+    if (albedo_texture_ == nullptr)
     {
-        diffuse_texture_.reset(new Texture("blons:none", Texture::DIFFUSE, context));
+        albedo_texture_.reset(new Texture("blons:none", Texture::ALBEDO, context));
     }
     if (normal_texture_ == nullptr)
     {
@@ -121,7 +121,7 @@ bool Model::Reload(RenderContext& context)
     {
         return false;
     }
-    if (!diffuse_texture_->Reload(context))
+    if (!albedo_texture_->Reload(context))
     {
         return false;
     }
@@ -142,9 +142,9 @@ int Model::index_count() const
     return mesh_->index_count();
 }
 
-const TextureResource* Model::diffuse() const
+const TextureResource* Model::albedo() const
 {
-    return diffuse_texture_->texture();
+    return albedo_texture_->texture();
 }
 
 const TextureResource* Model::normal() const

@@ -7,7 +7,7 @@ layout(origin_upper_left) in vec4 gl_FragCoord;
 out vec4 frag_colour;
 
 // Globals
-uniform sampler2D diffuse;
+uniform sampler2D skin;
 uniform vec4 text_colour;
 uniform int is_text;
 uniform vec4 crop;
@@ -17,12 +17,12 @@ void main(void)
 {
 	if (is_text == 1)
 	{
-		float alpha = texture(diffuse, tex_coord).r;
+		float alpha = texture(skin, tex_coord).r;
 		frag_colour = vec4(text_colour.rgb, text_colour.a * alpha);
 	}
 	else
 	{
-		frag_colour = texture(diffuse, tex_coord);
+		frag_colour = texture(skin, tex_coord);
 	}
 	// Cropping!
 	if (feather > 0)

@@ -175,6 +175,9 @@
     <ClInclude Include="graphics\internalresource.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\light.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -288,6 +291,9 @@
     <ClCompile Include="graphics\internalresource.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\light.cpp">
+      <Filter>src\graphics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\mesh.frag.glsl">
@@ -307,5 +313,8 @@
     </None>
     <None Include="shaders\test.frag.fx" />
     <None Include="shaders\test.vert.fx" />
+    <None Include="shaders\light.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
