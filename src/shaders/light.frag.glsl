@@ -37,15 +37,20 @@ void main(void)
 	vec3 view_dir = normalize(eye_pos.xyz - pos.xyz);
 
 	vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
-	vec3 half = normalize((-light_dir) + view_dir);
+	vec3 half = normalize(-light_dir + view_dir);
 
 	// Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
 	float specular = pow(clamp(dot(half, surface_normal), 0.0, 1.0), 20.0);
 
+	float light_angle = dot(surface_normal, -light_dir);
 	// Black out surfaces not facing a light
-	if (dot(surface_normal, -light_dir) < 0.0)
+	if (light_angle < 0.1)
 	{
-		specular = 0;
+		specular *= light_angle * 10;
+		if (light_angle < 0.0)
+		{
+			specular = 0;
+		}
 	}
 
 	// Linear blend specular with camera angle, based on fresnel coefficient
@@ -53,8 +58,7 @@ void main(void)
 	specular *= fresnel;
 
 	// Diffuse lighting (temporary)
-	float diffuse = (dot(-light_dir, surface_normal) + 1.0) / 2.0;
-	diffuse = clamp(dot(-light_dir, surface_normal), 0.0, 1.0);
+	float diffuse = clamp(dot(-light_dir, surface_normal), 0.0, 1.0);
 	// Ambient lighting
 	diffuse += 0.1;
 
