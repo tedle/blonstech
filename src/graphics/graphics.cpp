@@ -217,7 +217,11 @@ bool Graphics::RenderLighting(Matrix view_matrix)
         !shaderlight_->SetInput("inv_proj_view_matrix", inv_proj_view, context_) ||
         !shaderlight_->SetInput("albedo", geometry_buffer_->textures()[0], 0, context_) ||
         !shaderlight_->SetInput("normal", geometry_buffer_->textures()[1], 1, context_) ||
-        !shaderlight_->SetInput("depth", geometry_buffer_->depth(), 2, context_))
+        !shaderlight_->SetInput("depth", geometry_buffer_->depth(), 2, context_) ||
+        !shaderlight_->SetInput("sun.dir", Vector3Normalize(Vector3(-10.0, -2.0, -5.0)), context_) ||
+        !shaderlight_->SetInput("sun.specular", Vector3(1.0f, 0.5f, 0.1f), context_) ||
+        !shaderlight_->SetInput("sun.ambient", Vector3(0.1f, 0.08f, 0.08f), context_) ||
+        !shaderlight_->SetInput("sun.colour", Vector3(1.0f, 0.8f, 0.3f), context_))
     {
         return false;
     }
