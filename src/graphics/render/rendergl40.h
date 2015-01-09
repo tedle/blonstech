@@ -77,10 +77,10 @@ public:
                         const unsigned int* indices, unsigned int index_offset, unsigned int index_count) override;
     void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                      Vertex** vertex_data, unsigned int** index_data) override;
-    bool SetShaderInput(ShaderResource* program, const char* name, int value) override;
-    bool SetShaderInput(ShaderResource* program, const char* name, Matrix value) override;
-    bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value) override;
-    bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const int value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const Matrix value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const Vector3 value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const Vector4 value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
 
     bool SetDepthTesting(bool enable) override;

@@ -856,25 +856,25 @@ void RenderGL40::MapMeshData(BufferResource* vertex_buffer, BufferResource* inde
     mapped_buffers_.index_data = *index_data;
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, int value)
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const int value)
 {
     auto prog = static_cast<ShaderResourceGL40*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Matrix value)
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Matrix value)
 {
     auto prog = static_cast<ShaderResourceGL40*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector3 value)
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Vector3 value)
 {
     auto prog = static_cast<ShaderResourceGL40*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, Vector4 value)
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Vector4 value)
 {
     auto prog = static_cast<ShaderResourceGL40*>(program);
     return prog->SetUniform(name, value);

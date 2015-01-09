@@ -376,19 +376,19 @@ public:
     /// \param value Value to set global variable to
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetShaderInput(ShaderResource* program, const char* name, int value)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const int value)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc SetShaderInput
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetShaderInput(ShaderResource* program, const char* name, Matrix value)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const Matrix value)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc SetShaderInput
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector3 value)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const Vector3 value)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc SetShaderInput
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetShaderInput(ShaderResource* program, const char* name, Vector4 value)=0;
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const Vector4 value)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc SetShaderInput
     ///
