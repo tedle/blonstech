@@ -205,10 +205,10 @@ Vector3 Vector3PitchYawRoll(Matrix view_matrix)
 
     XMFLOAT4X4 xm;
     memcpy(xm.m, view_matrix.m, sizeof(float)*4*4);
-    float pitch = atan2(-xm._23,
-                        sqrt(xm._13*xm._13 +
-                             xm._33*xm._33));
-    float yaw   = atan2(-xm._31, xm._11);
+    float pitch = atan2(xm._23,
+                        sqrt(xm._13 * xm._13 +
+                             xm._33 * xm._33));
+    float yaw   = atan2(xm._31, -xm._11);
 
     rot.x = pitch;
     rot.y = yaw;
