@@ -11,11 +11,14 @@ uniform sampler2D albedo;
 uniform sampler2D normal;
 uniform sampler2D depth;
 
+// Used to give stronger specular when light bounces at shallower angles
 float refraction_index = 0.5;
 float extinction_coef = 0.5;
 float fresnel_coef = (pow(refraction_index - 1, 2) + pow(extinction_coef, 2)) / (pow(refraction_index + 1, 2) + pow(extinction_coef, 2));
 
+// Noon
 //vec3 light_dir = normalize(vec3(-10.0, -20.0, -5.0));
+// Sunset
 vec3 light_dir = normalize(vec3(-10.0, -2.0, -5.0));
 
 void main(void)
@@ -45,18 +48,20 @@ void main(void)
 		specular = 0;
 	}
 
-	// Linear blend specular with fresnel angle, based on coefficient
+	// Linear blend specular with camera angle, based on fresnel coefficient
 	float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, half), 5.0);
 	specular *= fresnel;
 
 	// Diffuse lighting (temporary)
 	float diffuse = (dot(-light_dir, surface_normal) + 1.0) / 2.0;
+	diffuse = clamp(dot(-light_dir, surface_normal), 0.0, 1.0);
 	// Ambient lighting
-	diffuse = min(1.0, diffuse + 0.1);
+	diffuse += 0.1;
 
-	vec3 surface_colour = texture(albedo, tex_coord).rgb;
+	vec3 surface_colour = pow(texture(albedo, tex_coord).rgb, vec3(2.2));
 	surface_colour *= diffuse;
-	surface_colour += diffuse * specular;
+	surface_colour += specular;
 
+	surface_colour = pow(surface_colour, vec3(1/2.2));
 	frag_colour = vec4(surface_colour, 1.0);
 }
