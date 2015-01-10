@@ -44,7 +44,7 @@ Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader
 void Manager::Init(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
 {
     screen_dimensions_ = Box(0, 0, width, height);
-    ortho_matrix_ = MatrixOrthographic(screen_dimensions_.w, screen_dimensions_.h,
+    ortho_matrix_ = MatrixOrthographic(0, screen_dimensions_.w, screen_dimensions_.h, 0,
                                        kScreenNear, kScreenDepth);
 
     ui_shader_ = std::move(ui_shader);

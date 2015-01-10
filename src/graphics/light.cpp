@@ -34,7 +34,14 @@ Light::Light(Type type, Vector3 pos, Vector3 dir, Vector3 colour)
     type_ = type;
     set_colour(colour);
     set_direction(dir);
-    set_pos(pos);
+    if (type_ != DIRECTIONAL)
+    {
+        set_pos(pos);
+    }
+    else
+    {
+        pos_ = Vector3(0, 0, 0);
+    }
 }
 
 const Vector3& Light::colour() const
@@ -73,8 +80,11 @@ void Light::set_direction(const Vector3& dir)
 
 void Light::set_pos(const Vector3& pos)
 {
-    pos_ = pos;
-    // Set the camera's position too
-    view_->set_pos(pos.x, pos.y, pos.z);
+    if (type_ != DIRECTIONAL)
+    {
+        pos_ = pos;
+        // Set the camera's position too
+        view_->set_pos(pos.x, pos.y, pos.z);
+    }
 }
 } // namespace blons

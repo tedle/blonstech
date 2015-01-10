@@ -83,13 +83,13 @@ Matrix MatrixMultiply(Matrix first, Matrix second)
     return mul;
 }
 
-Matrix MatrixOrthographic(float screen_width, float screen_height,
+Matrix MatrixOrthographic(float left, float right, float bottom, float top,
                           float screen_near, float screen_depth)
 {
     Matrix ortho_matrix;
     XMFLOAT4X4 xm;
     // Top left origin
-    XMStoreFloat4x4(&xm, XMMatrixOrthographicOffCenterRH(0, screen_width, screen_height, 0,
+    XMStoreFloat4x4(&xm, XMMatrixOrthographicOffCenterRH(left, right, bottom, top,
                                                          screen_near, screen_depth));
     // Bottom left origin
     //XMStoreFloat4x4(&xm, XMMatrixOrthographicOffCenterRH(0, screen_width, 0, screen_height,
@@ -130,7 +130,6 @@ Matrix MatrixTranspose(Matrix in)
 
 Matrix MatrixView(Vector3 pos, Vector3 rot)
 {
-
     Matrix view_matrix;
 
     XMFLOAT3 view_up, view_pos, view_look;
@@ -216,6 +215,25 @@ Vector3 Vector3PitchYawRoll(Matrix view_matrix)
     // TODO: actually calculate roll here
 
     return rot;
+}
+
+Vector3 Vector3Transform(Vector3 v, Matrix m)
+{
+    Vector3 ret;
+    XMFLOAT4X4 xm;
+    XMFLOAT4 xv;
+    memcpy(xm.m, m.m, sizeof(float)*4*4);
+    memcpy(&xv, &v, sizeof(float)*3);
+    xv.w = 1.0f;
+
+    auto xret = XMVector3Transform(XMLoadFloat4(&xv), XMLoadFloat4x4(&xm));
+    XMStoreFloat4(&xv, xret);
+    xv.x /= xv.w;
+    xv.y /= xv.w;
+    xv.z /= xv.w;
+    memcpy(&ret, &xv, sizeof(float)*3);
+
+    return ret;
 }
 
 unsigned int FastHash(const void* data, std::size_t size)

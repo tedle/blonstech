@@ -269,7 +269,7 @@ public:
             Box bottom_left = Box(0, 39, 5, 5);  ///< Texture coordinates for the bottom left region
             Box bottom = Box(6, 39, 1, 5);       ///< Texture coordinates for the bottom edge region
             Box bottom_right = Box(8, 39, 5, 5); ///< Texture coordinates for the bottom right region
-            Vector4 colour = Vector4(1.0, 0.0, 1.0, 1.0); ///< Default colour of labels
+            Vector4 colour = Vector4(1.0, 1.0, 1.0, 1.0); ///< Default colour of labels
         } window; ///< Layout for windows
 
         ////////////////////////////////////////////////////////////////////////////////

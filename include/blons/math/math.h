@@ -350,13 +350,15 @@ Matrix MatrixMultiply(Matrix a, Matrix b);
 /// \ingroup math
 /// \brief Generates an orthographic projection matrix for 2D rendering
 ///
-/// \param screen_width The width of the screen in subpixel resolution
-/// \param screen_height The height of the screen in subpixel resolution
+/// \param left The leftmost position to be rendered on screen
+/// \param right The rightmost position to be rendered on screen
+/// \param bottom The bottommost position to be rendered on screen
+/// \param top The topmost position to be rendered on screen
 /// \param screen_near The near clipping plane distance from the camera
 /// \param screen_depth The far clipping plane distance from the camera
 /// \return Orthographic projection matrix
 ////////////////////////////////////////////////////////////////////////////////
-Matrix MatrixOrthographic(units::subpixel screen_width, units::subpixel screen_height,
+Matrix MatrixOrthographic(units::world left, units::world right, units::world bottom, units::world top,
                           units::world screen_near, units::world screen_depth);
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
@@ -430,6 +432,15 @@ Vector3 Vector3Normalize(Vector3 n);
 /// \return Vector with rotation info where X is pitch, Y is yaw, and Z is roll
 ////////////////////////////////////////////////////////////////////////////////
 Vector3 Vector3PitchYawRoll(Matrix view_matrix);
+////////////////////////////////////////////////////////////////////////////////
+/// \ingroup math
+/// \brief Calculates a vector transformed by a given matrix
+///
+/// \param v Vector to be transformed
+/// \param m Matrix to transform by
+/// \return Transformed vector
+////////////////////////////////////////////////////////////////////////////////
+Vector3 Vector3Transform(Vector3 v, Matrix m);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math

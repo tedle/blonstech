@@ -53,6 +53,12 @@ void Label::Render(RenderContext& context)
             auto batcher = gui_->font_batch(font_style_, frag.colour, crop_, feather_, context);
             for (const auto& c : frag.text)
             {
+                if (c == '\n')
+                {
+                    x = pos_.x + parent_pos.x;
+                    y += font->line_height();
+                    continue;
+                }
                 auto mesh = font->BuildMesh(c, x, y, crop_);
                 if (mesh != nullptr)
                 {
@@ -67,6 +73,12 @@ void Label::Render(RenderContext& context)
         auto batcher = gui_->font_batch(font_style_, text_.base_colour(), crop_, feather_, context);
         for (const auto& c : text_.raw_str())
         {
+            if (c == '\n')
+            {
+                x = pos_.x + parent_pos.x;
+                y += font->line_height();
+                continue;
+            }
             auto mesh = font->BuildMesh(c, x, y, crop_);
             if (mesh != nullptr)
             {
@@ -80,6 +92,11 @@ void Label::Render(RenderContext& context)
 bool Label::Update(const Input& input)
 {
     return false;
+}
+
+void Label::set_style(Skin::FontStyle style)
+{
+    font_style_ = style;
 }
 
 void Label::set_text(std::string text)

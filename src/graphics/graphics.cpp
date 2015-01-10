@@ -404,7 +404,7 @@ bool Graphics::MakeContext(Client::Info screen)
     proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, kScreenNear, kScreenDepth);
 
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
-    ortho_matrix_ = MatrixOrthographic(units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height),
+    ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height), 0,
                                        kScreenNear, kScreenDepth);
 
     // Shaders
