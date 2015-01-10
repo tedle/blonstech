@@ -24,8 +24,8 @@
 #include <blons/graphics/graphics.h>
 
 // Public Includes
-#include <blons/graphics/camera.h>
 #include <blons/graphics/gui/gui.h>
+#include <blons/graphics/light.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
 #include <blons/math/math.h>
@@ -76,6 +76,13 @@ Graphics::Graphics(Client::Info screen)
     }
 
     camera_->set_pos(0.0f, 0.0f, -10.0f);
+
+    // Sunlight
+    // TODO: User should be doing this somehow
+    sun_.reset(new Light(Light::DIRECTIONAL,
+                         Vector3(20.0f, 20.0f, 5.0f),   // position
+                         Vector3(-10.0f, -2.0f, -5.0f), // direction
+                         Vector3(1.0f, 0.8f, 0.3f)));   // colour
 }
 
 Graphics::~Graphics()
@@ -140,6 +147,14 @@ bool Graphics::Render()
         return false;
     }
 
+    // Bind the shadow map framebuffer to render all models onto
+    shadow_buffer_->Bind(context_);
+    // Render all of the geometry and accompanying info (normal, depth, etc)
+    if (!RenderShadowMaps(view_matrix))
+    {
+        return false;
+    }
+
     // 2D Rendering pass
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
@@ -185,17 +200,43 @@ bool Graphics::RenderGeometry(Matrix view_matrix)
         model->Render(context_);
 
         // Set the inputs
-        if (!shadergeo_->SetInput("world_matrix", model->world_matrix(), context_) ||
-            !shadergeo_->SetInput("view_matrix", view_matrix, context_) ||
-            !shadergeo_->SetInput("proj_matrix", proj_matrix_, context_) ||
-            !shadergeo_->SetInput("albedo", model->albedo(), 0, context_) ||
-            !shadergeo_->SetInput("normal", model->normal(), 1, context_))
+        if (!geo_shader_->SetInput("world_matrix", model->world_matrix(), context_) ||
+            !geo_shader_->SetInput("view_matrix", view_matrix, context_) ||
+            !geo_shader_->SetInput("proj_matrix", proj_matrix_, context_) ||
+            !geo_shader_->SetInput("albedo", model->albedo(), 0, context_) ||
+            !geo_shader_->SetInput("normal", model->normal(), 1, context_))
         {
             return false;
         }
 
         // Make the draw call
-        if (!shadergeo_->Render(model->index_count(), context_))
+        if (!geo_shader_->Render(model->index_count(), context_))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool Graphics::RenderShadowMaps(Matrix view_matrix)
+{
+    // TODO: 3D pass ->
+    //      Render everything as a batch as this is untextured
+    for (const auto& model : models_)
+    {
+        // Bind the vertex data
+        model->Render(context_);
+
+        // Set the inputs
+        if (!shadow_map_shader_->SetInput("world_matrix", model->world_matrix(), context_) ||
+            !shadow_map_shader_->SetInput("view_matrix", sun_->view_matrix(), context_) ||
+            !shadow_map_shader_->SetInput("proj_matrix", proj_matrix_, context_))
+        {
+            return false;
+        }
+
+        // Make the draw call
+        if (!shadow_map_shader_->Render(model->index_count(), context_))
         {
             return false;
         }
@@ -212,22 +253,23 @@ bool Graphics::RenderLighting(Matrix view_matrix)
     Matrix inv_proj_view = MatrixInverse(MatrixMultiply(view_matrix, proj_matrix_));
 
     // Set the inputs
-    if (!shaderlight_->SetInput("world_matrix", MatrixIdentity() , context_) ||
-        !shaderlight_->SetInput("proj_matrix", ortho_matrix_, context_) ||
-        !shaderlight_->SetInput("inv_proj_view_matrix", inv_proj_view, context_) ||
-        !shaderlight_->SetInput("albedo", geometry_buffer_->textures()[0], 0, context_) ||
-        !shaderlight_->SetInput("normal", geometry_buffer_->textures()[1], 1, context_) ||
-        !shaderlight_->SetInput("depth", geometry_buffer_->depth(), 2, context_) ||
-        !shaderlight_->SetInput("sun.dir", Vector3Normalize(Vector3(-10.0, -2.0, -5.0)), context_) ||
-        !shaderlight_->SetInput("sun.specular", Vector3(1.0f, 0.5f, 0.1f), context_) ||
-        !shaderlight_->SetInput("sun.ambient", Vector3(0.1f, 0.08f, 0.08f), context_) ||
-        !shaderlight_->SetInput("sun.colour", Vector3(1.0f, 0.8f, 0.3f), context_))
+    if (!light_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
+        !light_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !light_shader_->SetInput("inv_proj_view_matrix", inv_proj_view, context_) ||
+        !light_shader_->SetInput("albedo", geometry_buffer_->textures()[0], 0, context_) ||
+        !light_shader_->SetInput("normal", geometry_buffer_->textures()[1], 1, context_) ||
+        !light_shader_->SetInput("depth", geometry_buffer_->depth(), 2, context_) ||
+        !light_shader_->SetInput("sun.dir", sun_->direction(), context_) ||
+        // TODO: Better ambient and specular values
+        !light_shader_->SetInput("sun.specular", sun_->colour() * sun_->colour(), context_) ||
+        !light_shader_->SetInput("sun.ambient", sun_->colour() * 0.1f, context_) ||
+        !light_shader_->SetInput("sun.colour", sun_->colour(), context_))
     {
         return false;
     }
 
     // Finally do the render
-    if (!shaderlight_->Render(geometry_buffer_->index_count(), context_))
+    if (!light_shader_->Render(geometry_buffer_->index_count(), context_))
     {
         return false;
     }
@@ -260,6 +302,13 @@ bool Graphics::RenderComposite()
     case 4:
         screen_texture = geometry_buffer_->depth();
         break;
+    case 5:
+        screen_texture = shadow_buffer_->depth();
+        break;
+    // TODO: Remove this debug output
+    case 6:
+        screen_texture = shadow_buffer_->textures()[0];
+        break;
     case 0:
     default:
         screen_texture = light_buffer_->textures()[0];
@@ -270,14 +319,14 @@ bool Graphics::RenderComposite()
     light_buffer_->Render(context_);
 
     // Set the inputs
-    if (!shader2d_->SetInput("world_matrix", MatrixIdentity() , context_) ||
-        !shader2d_->SetInput("proj_matrix", ortho_matrix_, context_) ||
-        !shader2d_->SetInput("sprite", screen_texture, context_))
+    if (!sprite_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
+        !sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !sprite_shader_->SetInput("sprite", screen_texture, context_))
     {
         return false;
     }
 
-    if (!shader2d_->Render(light_buffer_->index_count(), context_))
+    if (!sprite_shader_->Render(light_buffer_->index_count(), context_))
     {
         return false;
     }
@@ -292,15 +341,15 @@ bool Graphics::RenderSprites()
         sprite->Render(context_);
 
         // Set the inputs
-        if (!shader2d_->SetInput("world_matrix", MatrixIdentity() , context_) ||
-            !shader2d_->SetInput("proj_matrix", ortho_matrix_, context_) ||
-            !shader2d_->SetInput("sprite", sprite->texture(), context_))
+        if (!sprite_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
+            !sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+            !sprite_shader_->SetInput("sprite", sprite->texture(), context_))
         {
             return false;
         }
 
         // Make the draw call
-        if (!shader2d_->Render(sprite->index_count(), context_))
+        if (!sprite_shader_->Render(sprite->index_count(), context_))
         {
             return false;
         }
@@ -359,32 +408,36 @@ bool Graphics::MakeContext(Client::Info screen)
                                        kScreenNear, kScreenDepth);
 
     // Shaders
-    ShaderAttributeList inputsgeo;
-    inputsgeo.push_back(ShaderAttribute(0, "input_pos"));
-    inputsgeo.push_back(ShaderAttribute(1, "input_uv"));
-    inputsgeo.push_back(ShaderAttribute(2, "input_norm"));
-    inputsgeo.push_back(ShaderAttribute(3, "input_tan"));
-    inputsgeo.push_back(ShaderAttribute(4, "input_bitan"));
-    shadergeo_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", inputsgeo, context_));
+    ShaderAttributeList geo_inputs;
+    geo_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    geo_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    geo_inputs.push_back(ShaderAttribute(2, "input_norm"));
+    geo_inputs.push_back(ShaderAttribute(3, "input_tan"));
+    geo_inputs.push_back(ShaderAttribute(4, "input_bitan"));
+    geo_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", geo_inputs, context_));
 
-    ShaderAttributeList inputslight;
-    inputslight.push_back(ShaderAttribute(0, "input_pos"));
-    inputslight.push_back(ShaderAttribute(1, "input_uv"));
-    shaderlight_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/light.frag.glsl", inputslight, context_));
+    ShaderAttributeList shadow_inputs;
+    shadow_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    shadow_map_shader_.reset(new Shader("shaders/shadow.vert.glsl", "shaders/shadow.frag.glsl", shadow_inputs, context_));
 
-    ShaderAttributeList inputs2d;
-    inputs2d.push_back(ShaderAttribute(0, "input_pos"));
-    inputs2d.push_back(ShaderAttribute(1, "input_uv"));
-    shader2d_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", inputs2d, context_));
+    ShaderAttributeList light_inputs;
+    light_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    light_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/light.frag.glsl", light_inputs, context_));
 
-    ShaderAttributeList inputs_ui;
-    inputs_ui.push_back(ShaderAttribute(0, "input_pos"));
-    inputs_ui.push_back(ShaderAttribute(1, "input_uv"));
-    auto ui_shader = std::unique_ptr<Shader>(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", inputs_ui, context_));
+    ShaderAttributeList sprite_inputs;
+    sprite_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    sprite_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    sprite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", sprite_inputs, context_));
 
-    if (shadergeo_ == nullptr ||
-        shaderlight_ == nullptr ||
-        shader2d_ == nullptr ||
+    ShaderAttributeList ui_inputs;
+    ui_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    ui_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    auto ui_shader = std::unique_ptr<Shader>(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", ui_inputs, context_));
+
+    if (geo_shader_ == nullptr ||
+        light_shader_ == nullptr ||
+        sprite_shader_ == nullptr ||
         ui_shader == nullptr)
     {
         return false;
@@ -392,6 +445,8 @@ bool Graphics::MakeContext(Client::Info screen)
 
     // Framebuffers
     geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 4, context_));
+    // TODO: Remove debug output from shadow map buffer
+    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, 1, context_));
     light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, context_));
 
     // GUI

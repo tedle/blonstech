@@ -21,60 +21,12 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/light.h>
+#version 400
 
-// Public Includes
-#include <blons/graphics/camera.h>
+// Ins n outs
+out vec4 frag_colour;
 
-namespace blons
+void main(void)
 {
-Light::Light(Type type, Vector3 pos, Vector3 dir, Vector3 colour)
-{
-    view_.reset(new Camera);
-    type_ = type;
-    set_colour(colour);
-    set_direction(dir);
-    set_pos(pos);
+	frag_colour = vec4(1.0, 1.0, 1.0, 1.0);
 }
-
-const Vector3& Light::colour() const
-{
-    return colour_;
-}
-
-const Vector3& Light::direction() const
-{
-    return direction_;
-}
-
-const Vector3& Light::pos() const
-{
-    return pos_;
-}
-
-Matrix Light::view_matrix() const
-{
-    return view_->view_matrix();
-}
-
-void Light::set_colour(const Vector3& colour)
-{
-    colour_ = colour;
-}
-
-void Light::set_direction(const Vector3& dir)
-{
-    direction_ = Vector3Normalize(dir);
-    // Set the camera's direction too
-    view_->set_pos(0, 0, 0);
-    view_->LookAt(dir.x, dir.y, dir.z);
-    view_->set_pos(pos_.x, pos_.y, pos_.z);
-}
-
-void Light::set_pos(const Vector3& pos)
-{
-    pos_ = pos;
-    // Set the camera's position too
-    view_->set_pos(pos.x, pos.y, pos.z);
-}
-} // namespace blons

@@ -24,10 +24,16 @@
 #ifndef BLONSTECH_GRAPHICS_LIGHT_H_
 #define BLONSTECH_GRAPHICS_LIGHT_H_
 
+// Includes
+#include <memory>
+// Public Includes
 #include <blons/math.h>
 
 namespace blons
 {
+// Forward declarations
+class Camera;
+
 class Light
 {
 public:
@@ -49,6 +55,7 @@ public:
     const Vector3& colour() const;
     const Vector3& direction() const;
     const Vector3& pos() const;
+    Matrix view_matrix() const;
 
     void set_colour(const Vector3& colour);
     void set_direction(const Vector3& dir);
@@ -60,6 +67,8 @@ private:
     Vector3 direction_;
     Vector3 colour_;
     float intensity_;
+    // Used for shadow maps
+    std::unique_ptr<Camera> view_;
 };
 } // namespace blons
 
