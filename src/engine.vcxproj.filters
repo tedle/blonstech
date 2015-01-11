@@ -316,10 +316,10 @@
     <None Include="shaders\light.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\shadow.frag.glsl">
+    <None Include="shaders\shadow-depth.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\shadow.vert.glsl">
+    <None Include="shaders\shadow-depth.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>

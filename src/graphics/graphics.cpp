@@ -23,9 +23,6 @@
 
 #include <blons/graphics/graphics.h>
 
-// Includes
-// TODO: Remove this include when shadow maps get their own TU
-#include <algorithm>
 // Public Includes
 #include <blons/graphics/gui/gui.h>
 #include <blons/graphics/light.h>
@@ -138,38 +135,26 @@ bool Graphics::Render()
     // Clear buffers
     context_->BeginScene();
 
-    // 3D Rendering pass
-    // Needed so models dont render over themselves
-    context_->SetDepthTesting(true);
-
-    // Bind the geometry framebuffer to render all models onto
-    geometry_buffer_->Bind(context_);
     // Render all of the geometry and accompanying info (normal, depth, etc)
     if (!RenderGeometry(view_matrix))
     {
         return false;
     }
 
-    // Bind the shadow map framebuffer to render all models onto
-    shadow_buffer_->Bind(context_);
-    // Render all of the geometry and accompanying info (normal, depth, etc)
+    // Render all of the geometry and get their depth from the light
+    // Then render a shadow map from the depth information
     if (!RenderShadowMaps(view_matrix))
     {
         return false;
     }
 
-    // 2D Rendering pass
-    // Needed so sprites can render over themselves
-    context_->SetDepthTesting(false);
-
-    // Bind the buffer to do all lighting calculations on
-    light_buffer_->Bind(context_);
     if (!RenderLighting(view_matrix))
     {
         return false;
     }
-    // Unbind the light buffer, rebind the back buffer
-    light_buffer_->Unbind(context_);
+
+    // Bind the back buffer
+    context_->BindFramebuffer(nullptr);
 
     // Render the final composite of the geometry and lighting passes
     if (!RenderComposite())
@@ -194,6 +179,12 @@ bool Graphics::Render()
 
 bool Graphics::RenderGeometry(Matrix view_matrix)
 {
+    // Needed so models dont render over themselves
+    context_->SetDepthTesting(true);
+
+    // Bind the geometry framebuffer to render all models onto
+    geometry_buffer_->Bind(context_);
+
     Matrix view_proj = view_matrix * proj_matrix_;
     // TODO: 3D pass ->
     //      Render static world geo as batches without world matrix
@@ -223,53 +214,10 @@ bool Graphics::RenderGeometry(Matrix view_matrix)
 
 bool Graphics::RenderShadowMaps(Matrix view_matrix)
 {
-    Matrix light_view_matrix = sun_->view_matrix();
-    Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix_);
-    // Make a box that we will transform to be shaped like the camera's frustum
-    // Z ranges from [0,1] because -1 would be behind the camera. This represents
-    // the screen near/far distances and would be where to apply split points
-    Vector3 ndc_box[8];
-    Vector3 min, max;
-    for (int x = 0; x < 2; x++)
-    {
-        for (int y = 0; y < 2; y++)
-        {
-            for (int z = 0; z < 2; z++)
-            {
-                auto i = x * 4 + y * 2 + z;
-                // Generate a unique vertex of the clip box
-                ndc_box[i] = Vector3(x % 2 ? -1.0f : 1.0f,
-                                     y % 2 ? -1.0f : 1.0f,
-                                     z % 2 ?  0.0f : 1.0f);
-                // Shape the box like the camera frustum
-                ndc_box[i] = inv_proj_view * ndc_box[i];
-                // Align the box to the light's view space
-                ndc_box[i] = light_view_matrix * ndc_box[i];
-                if (i == 0)
-                {
-                    min.x = max.x = ndc_box[i].x;
-                    min.y = max.y = ndc_box[i].y;
-                    min.z = max.z = ndc_box[i].z;
-                }
-                // Form a bounding box aligned to the light around the camera's frustum
-                min.x = (std::min)(ndc_box[i].x, min.x);
-                min.y = (std::min)(ndc_box[i].y, min.y);
-                min.z = (std::min)(ndc_box[i].z, min.z);
-                max.x = (std::max)(ndc_box[i].x, max.x);
-                max.y = (std::max)(ndc_box[i].y, max.y);
-                max.z = (std::max)(ndc_box[i].z, max.z);
-            }
-        }
-    }
-    // Modify the clip range to max out at the camera view distance and bottom out
-    // at a negative kScreenFar away from the player, allowing distant objects
-    // to cast shadows from off screen
-    max.z =  kScreenDepth - max.z;
-    min.z = -kScreenDepth - min.z;
-    // Make a projection matrix that perfectly views the camera's frustum
-    Matrix light_frustum = MatrixOrthographic(min.x, max.x, min.y, max.y, min.z, max.z);
+    // Bind the shadow depth framebuffer to render all models onto
+    shadow_depth_buffer_->Bind(context_);
 
-    Matrix view_proj = light_view_matrix * light_frustum;
+    Matrix light_vp_matrix = sun_->ViewFrustum(view_matrix * proj_matrix_, kScreenDepth);
     // TODO: 3D pass ->
     //      Render everything as a batch as this is untextured
     for (const auto& model : models_)
@@ -277,24 +225,58 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
         // Bind the vertex data
         model->Render(context_);
 
-        Matrix model_view_proj = model->world_matrix() * view_proj;
+        Matrix mvp_matrix = model->world_matrix() * light_vp_matrix;
         // Set the inputs
-        if (!shadow_map_shader_->SetInput("mvp_matrix", model_view_proj, context_))
+        if (!shadow_depth_shader_->SetInput("mvp_matrix", mvp_matrix, context_))
         {
             return false;
         }
 
         // Make the draw call
-        if (!shadow_map_shader_->Render(model->index_count(), context_))
+        if (!shadow_depth_shader_->Render(model->index_count(), context_))
         {
             return false;
         }
+    }
+
+    // Not doing this part yet...
+    return true;
+    // Needed so sprites can render over themselves
+    context_->SetDepthTesting(false);
+
+    // Bind the shadow depth framebuffer to render all models onto
+    shadow_map_buffer_->Bind(context_);
+
+    // Render the geometry as a sprite
+    geometry_buffer_->Render(context_);
+
+    // Used to turn pixel fragments into world coordinates
+    Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix_);
+
+    // Set the inputs
+    if (!shadow_map_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !shadow_map_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||
+        !shadow_map_shader_->SetInput("depth", geometry_buffer_->depth(), 0, context_))
+    {
+        return false;
+    }
+
+    // Finally do the render
+    if (!shadow_map_shader_->Render(geometry_buffer_->index_count(), context_))
+    {
+        return false;
     }
     return true;
 }
 
 bool Graphics::RenderLighting(Matrix view_matrix)
 {
+    // Bind the buffer to do all lighting calculations on
+    light_buffer_->Bind(context_);
+
+    // Needed so sprites can render over themselves
+    context_->SetDepthTesting(false);
+
     // Render the geometry as a sprite
     geometry_buffer_->Render(context_);
 
@@ -303,7 +285,7 @@ bool Graphics::RenderLighting(Matrix view_matrix)
 
     // Set the inputs
     if (!light_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
-        !light_shader_->SetInput("inv_proj_view_matrix", inv_proj_view, context_) ||
+        !light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||
         !light_shader_->SetInput("albedo", geometry_buffer_->textures()[0], 0, context_) ||
         !light_shader_->SetInput("normal", geometry_buffer_->textures()[1], 1, context_) ||
         !light_shader_->SetInput("depth", geometry_buffer_->depth(), 2, context_) ||
@@ -355,18 +337,21 @@ bool Graphics::RenderComposite()
         screen_texture = geometry_buffer_->depth();
         break;
     case 5:
-        screen_texture = shadow_buffer_->depth();
+        screen_texture = shadow_depth_buffer_->depth();
         break;
     // TODO: Remove this debug output
     case 6:
-        screen_texture = shadow_buffer_->textures()[0];
+        screen_texture = shadow_depth_buffer_->textures()[0];
         break;
     case 0:
     default:
         screen_texture = light_buffer_->textures()[0];
         break;
     }
-    alt_screen_texture = shadow_buffer_->textures()[0];
+    alt_screen_texture = shadow_depth_buffer_->depth();
+
+    // Needed so sprites can render over themselves
+    context_->SetDepthTesting(false);
 
     // Push the full screen quad used to render FBO
     light_buffer_->Render(context_);
@@ -402,6 +387,9 @@ bool Graphics::RenderComposite()
 
 bool Graphics::RenderSprites()
 {
+    // Needed so sprites can render over themselves
+    context_->SetDepthTesting(false);
+
     for (const auto& sprite : sprites_)
     {
         // Prep the pipeline 4 drawering
@@ -482,9 +470,14 @@ bool Graphics::MakeContext(Client::Info screen)
     geo_inputs.push_back(ShaderAttribute(4, "input_bitan"));
     geo_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", geo_inputs, context_));
 
-    ShaderAttributeList shadow_inputs;
-    shadow_inputs.push_back(ShaderAttribute(0, "input_pos"));
-    shadow_map_shader_.reset(new Shader("shaders/shadow.vert.glsl", "shaders/shadow.frag.glsl", shadow_inputs, context_));
+    ShaderAttributeList shadow_depth_inputs;
+    shadow_depth_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    shadow_depth_shader_.reset(new Shader("shaders/shadow-depth.vert.glsl", "shaders/shadow-depth.frag.glsl", shadow_depth_inputs, context_));
+
+    ShaderAttributeList shadow_map_inputs;
+    shadow_map_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    shadow_map_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    shadow_map_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/shadow-map.frag.glsl", shadow_map_inputs, context_));
 
     ShaderAttributeList light_inputs;
     light_inputs.push_back(ShaderAttribute(0, "input_pos"));
@@ -511,8 +504,8 @@ bool Graphics::MakeContext(Client::Info screen)
 
     // Framebuffers
     geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 4, context_));
-    // TODO: Remove debug output from shadow map buffer
-    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, 1, context_));
+    shadow_depth_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, 0, context_));
+    shadow_map_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, context_));
     light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, context_));
 
     // GUI

@@ -108,6 +108,7 @@ private:
 
     // Caching to prevent unnecessary API calls
     GLuint active_shader_;
+    bool depth_testing_;
     struct MappedBuffers
     {
         GLuint vertex = 0;

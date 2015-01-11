@@ -29,7 +29,7 @@ in vec2 tex_coord;
 out vec4 frag_colour;
 
 // Globals
-uniform mat4 inv_proj_view_matrix;
+uniform mat4 inv_vp_matrix;
 uniform sampler2D albedo;
 uniform sampler2D normal;
 uniform sampler2D depth;
@@ -55,11 +55,11 @@ void main(void)
 					tex_coord.y + 1, // Invert and shift Y because FBOs are top-left origin
 					texture(depth, tex_coord).r,
 					1.0);
-	pos = inv_proj_view_matrix * (pos * 2.0 - 1.0);
+	pos = inv_vp_matrix * (pos * 2.0 - 1.0);
 	pos /= pos.w;
 
 	// For directional lights
-	vec4 eye_pos = inv_proj_view_matrix * vec4(0.0, 0.0, 0.0, 1.0);
+	vec4 eye_pos = inv_vp_matrix * vec4(0.0, 0.0, 0.0, 1.0);
 	eye_pos /= eye_pos.w;
 	vec3 view_dir = normalize(eye_pos.xyz - pos.xyz);
 

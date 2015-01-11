@@ -365,6 +365,7 @@ RenderGL40::RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen)
     video_card_memory_ = 0;
 
     // Enable depth testing, with a default of 1.0
+    depth_testing_ = true;
     glClearDepth(1.0);
     glEnable(GL_DEPTH_TEST);
 
@@ -890,6 +891,12 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const
 
 bool RenderGL40::SetDepthTesting(bool enable)
 {
+    if (enable == depth_testing_)
+    {
+        return true;
+    }
+
+    depth_testing_ = enable;
     if (enable)
     {
         glEnable(GL_DEPTH_TEST);

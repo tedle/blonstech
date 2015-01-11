@@ -158,11 +158,13 @@ private:
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<gui::Manager> gui_;
     std::unique_ptr<Shader> geo_shader_;
+    std::unique_ptr<Shader> shadow_depth_shader_;
     std::unique_ptr<Shader> shadow_map_shader_;
     std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Shader> sprite_shader_;
     std::unique_ptr<Framebuffer> geometry_buffer_;
-    std::unique_ptr<Framebuffer> shadow_buffer_;
+    std::unique_ptr<Framebuffer> shadow_depth_buffer_;
+    std::unique_ptr<Framebuffer> shadow_map_buffer_;
     std::unique_ptr<Framebuffer> light_buffer_;
 
     Matrix proj_matrix_, ortho_matrix_;

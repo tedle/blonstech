@@ -52,6 +52,10 @@ public:
         : Light(POINT) {}
     ~Light() {}
 
+    // Used for shadow maps
+    // Returns light's view*proj matrix
+    Matrix ViewFrustum(Matrix frustum, units::world depth) const;
+
     const Vector3& colour() const;
     const Vector3& direction() const;
     const Vector3& pos() const;
