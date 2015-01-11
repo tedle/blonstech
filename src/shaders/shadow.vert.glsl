@@ -27,13 +27,9 @@
 in vec3 input_pos;
 
 // Globals
-uniform mat4 world_matrix;
-uniform mat4 view_matrix;
-uniform mat4 proj_matrix;
+uniform mat4 mvp_matrix;
 
 void main(void)
 {
-    gl_Position = world_matrix * vec4(input_pos, 1.0);
-    gl_Position = view_matrix * gl_Position;
-    gl_Position = proj_matrix * gl_Position;
+    gl_Position = mvp_matrix * vec4(input_pos, 1.0);
 }

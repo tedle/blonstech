@@ -194,6 +194,7 @@ bool Graphics::Render()
 
 bool Graphics::RenderGeometry(Matrix view_matrix)
 {
+    Matrix view_proj = view_matrix * proj_matrix_;
     // TODO: 3D pass ->
     //      Render static world geo as batches without world matrix
     //      Render movable objects singularly with world matrix
@@ -202,10 +203,9 @@ bool Graphics::RenderGeometry(Matrix view_matrix)
         // Bind the vertex data
         model->Render(context_);
 
+        Matrix model_view_proj = model->world_matrix() * view_proj;
         // Set the inputs
-        if (!geo_shader_->SetInput("world_matrix", model->world_matrix(), context_) ||
-            !geo_shader_->SetInput("view_matrix", view_matrix, context_) ||
-            !geo_shader_->SetInput("proj_matrix", proj_matrix_, context_) ||
+        if (!geo_shader_->SetInput("mvp_matrix", model_view_proj, context_) ||
             !geo_shader_->SetInput("albedo", model->albedo(), 0, context_) ||
             !geo_shader_->SetInput("normal", model->normal(), 1, context_))
         {
@@ -269,6 +269,7 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
     // Make a projection matrix that perfectly views the camera's frustum
     Matrix light_frustum = MatrixOrthographic(min.x, max.x, min.y, max.y, min.z, max.z);
 
+    Matrix view_proj = light_view_matrix * light_frustum;
     // TODO: 3D pass ->
     //      Render everything as a batch as this is untextured
     for (const auto& model : models_)
@@ -276,10 +277,9 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
         // Bind the vertex data
         model->Render(context_);
 
+        Matrix model_view_proj = model->world_matrix() * view_proj;
         // Set the inputs
-        if (!shadow_map_shader_->SetInput("world_matrix", model->world_matrix(), context_) ||
-            !shadow_map_shader_->SetInput("view_matrix", light_view_matrix, context_) ||
-            !shadow_map_shader_->SetInput("proj_matrix", light_frustum, context_))
+        if (!shadow_map_shader_->SetInput("mvp_matrix", model_view_proj, context_))
         {
             return false;
         }
@@ -302,8 +302,7 @@ bool Graphics::RenderLighting(Matrix view_matrix)
     Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix_);
 
     // Set the inputs
-    if (!light_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
-        !light_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+    if (!light_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
         !light_shader_->SetInput("inv_proj_view_matrix", inv_proj_view, context_) ||
         !light_shader_->SetInput("albedo", geometry_buffer_->textures()[0], 0, context_) ||
         !light_shader_->SetInput("normal", geometry_buffer_->textures()[1], 1, context_) ||
@@ -373,8 +372,7 @@ bool Graphics::RenderComposite()
     light_buffer_->Render(context_);
 
     // Set the inputs
-    if (!sprite_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
-        !sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+    if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
         !sprite_shader_->SetInput("sprite", screen_texture, context_))
     {
         return false;
@@ -389,8 +387,7 @@ bool Graphics::RenderComposite()
     alt_target->Render(context_);
 
     // Set the inputs
-    if (!sprite_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
-        !sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+    if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
         !sprite_shader_->SetInput("sprite", alt_screen_texture, context_))
     {
         return false;
@@ -411,8 +408,7 @@ bool Graphics::RenderSprites()
         sprite->Render(context_);
 
         // Set the inputs
-        if (!sprite_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
-            !sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
             !sprite_shader_->SetInput("sprite", sprite->texture(), context_))
         {
             return false;

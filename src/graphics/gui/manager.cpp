@@ -130,7 +130,6 @@ void Manager::Render(RenderContext& context)
     }
 
     // Draw pass
-    ui_shader_->SetInput("world_matrix", MatrixIdentity(), context);
     ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
     for (int i = 0; i < batch_index_; i++)
     {
