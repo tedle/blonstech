@@ -60,7 +60,7 @@ void Camera::LookAt(units::world x, units::world y, units::world z)
     Vector3 up = Vector3(0.0f, 1.0f, 0.0f);
     Vector3 rotation;
 
-    rotation = Vector3PitchYawRoll(MatrixLookAt(pos_, look, up));
+    rotation = VectorPitchYawRoll(MatrixLookAt(pos_, look, up));
     
     set_rot(rotation.x, rotation.y, rotation.z);
 }

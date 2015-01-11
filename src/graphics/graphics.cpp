@@ -250,7 +250,7 @@ bool Graphics::RenderLighting(Matrix view_matrix)
     geometry_buffer_->Render(context_);
 
     // Used to turn pixel fragments into world coordinates
-    Matrix inv_proj_view = MatrixInverse(MatrixMultiply(view_matrix, proj_matrix_));
+    Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix_);
 
     // Set the inputs
     if (!light_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
@@ -401,7 +401,7 @@ bool Graphics::MakeContext(Client::Info screen)
     float fov = kPi / 4.0f;
     float screen_aspect = static_cast<float>(screen.width) / static_cast<float>(screen.height);
 
-    proj_matrix_ = MatrixPerspectiveFov(fov, screen_aspect, kScreenNear, kScreenDepth);
+    proj_matrix_ = MatrixPerspective(fov, screen_aspect, kScreenNear, kScreenDepth);
 
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height), 0,

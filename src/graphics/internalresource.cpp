@@ -69,7 +69,7 @@ std::unordered_map<std::string, std::function<MeshData()>> g_mesh_generators =
 
                     v.tex = Vector2(static_cast<float>(i) / static_cast<float>(count),
                                     static_cast<float>(j) / static_cast<float>(semi_count));
-                    v.norm = Vector3Normalize(v.pos);
+                    v.norm = VectorNormalize(v.pos);
                     v.tan = Vector3(1.0, 0.0, 0.0);
                     v.bitan = Vector3(0.0, 1.0, 0.0);
                     sphere.vertices.push_back(v);

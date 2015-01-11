@@ -71,7 +71,7 @@ void Light::set_colour(const Vector3& colour)
 
 void Light::set_direction(const Vector3& dir)
 {
-    direction_ = Vector3Normalize(dir);
+    direction_ = VectorNormalize(dir);
     // Set the camera's direction too
     view_->set_pos(0, 0, 0);
     view_->LookAt(dir.x, dir.y, dir.z);
