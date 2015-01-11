@@ -29,9 +29,39 @@ in vec2 tex_coord;
 out vec4 frag_colour;
 
 // Globals
-uniform sampler2D sprite;
+uniform mat4 inv_vp_matrix;
+uniform mat4 light_vp_matrix;
+uniform sampler2D view_depth;
+uniform sampler2D light_depth;
 
 void main(void)
 {
-    frag_colour = texture(sprite, tex_coord);
+	// World coordinates of the pixel we're rendering
+	vec4 pos = vec4(tex_coord.x,
+					tex_coord.y + 1, // Invert and shift Y because FBOs are top-left origin
+					texture(view_depth, tex_coord).r,
+					1.0);
+	pos = inv_vp_matrix * (pos * 2.0 - 1.0);
+	pos /= pos.w;
+
+	vec4 light_pos = light_vp_matrix * pos;
+
+	// Shouldn't need this I think? Cus orthographic matrix...
+	// Maybe spot lights use perspective tho?? duno!
+	// TODO: Check if this is needed
+	light_pos /= light_pos.w;
+
+	// Adjust for [0,1] space
+	light_pos = (light_pos + 1.0) / 2.0;
+
+	// In shadow
+	if (light_pos.z > texture(light_depth, light_pos.xy).r)
+	{
+		frag_colour = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+	// In light
+	else
+	{
+		frag_colour = vec4(1.0, 1.0, 1.0, 1.0);
+	}
 }

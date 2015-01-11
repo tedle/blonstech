@@ -89,7 +89,10 @@ Matrix Light::ViewFrustum(Matrix frustum, units::world depth) const
     // Modify the clip range to max out at the camera view distance and bottom out
     // at a negative kScreenFar away from the player, allowing distant objects
     // to cast shadows from off screen
-    max.z =  depth - max.z;
+    //
+    // We multiply max.z's depth by 1.3f to account for some floating point
+    // imprecision behind the player when facing a light
+    max.z =  depth * 1.3f - max.z;
     min.z = -depth - min.z;
     // Make a projection matrix that perfectly views the camera's frustum
     Matrix light_frustum = MatrixOrthographic(min.x, max.x, min.y, max.y, min.z, max.z);
