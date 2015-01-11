@@ -61,7 +61,16 @@ const Vector3& Light::pos() const
 
 Matrix Light::view_matrix() const
 {
-    return view_->view_matrix();
+    // The camera's view matrix should work fine, but this is calculated faster
+    // And has less margin for rounding errors
+    if (type_ == DIRECTIONAL)
+    {
+        return MatrixLookAt(Vector3(0, 0, 0), direction_, Vector3(0, 1, 0));
+    }
+    else
+    {
+        return view_->view_matrix();
+    }
 }
 
 void Light::set_colour(const Vector3& colour)

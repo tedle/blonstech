@@ -23,6 +23,9 @@
 
 #include <blons/graphics/graphics.h>
 
+// Includes
+// TODO: Remove this include when shadow maps get their own TU
+#include <algorithm>
 // Public Includes
 #include <blons/graphics/gui/gui.h>
 #include <blons/graphics/light.h>
@@ -220,6 +223,52 @@ bool Graphics::RenderGeometry(Matrix view_matrix)
 
 bool Graphics::RenderShadowMaps(Matrix view_matrix)
 {
+    Matrix light_view_matrix = sun_->view_matrix();
+    Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix_);
+    // Make a box that we will transform to be shaped like the camera's frustum
+    // Z ranges from [0,1] because -1 would be behind the camera. This represents
+    // the screen near/far distances and would be where to apply split points
+    Vector3 ndc_box[8];
+    Vector3 min, max;
+    for (int x = 0; x < 2; x++)
+    {
+        for (int y = 0; y < 2; y++)
+        {
+            for (int z = 0; z < 2; z++)
+            {
+                auto i = x * 4 + y * 2 + z;
+                // Generate a unique vertex of the clip box
+                ndc_box[i] = Vector3(x % 2 ? -1.0f : 1.0f,
+                                     y % 2 ? -1.0f : 1.0f,
+                                     z % 2 ?  0.0f : 1.0f);
+                // Shape the box like the camera frustum
+                ndc_box[i] = inv_proj_view * ndc_box[i];
+                // Align the box to the light's view space
+                ndc_box[i] = light_view_matrix * ndc_box[i];
+                if (i == 0)
+                {
+                    min.x = max.x = ndc_box[i].x;
+                    min.y = max.y = ndc_box[i].y;
+                    min.z = max.z = ndc_box[i].z;
+                }
+                // Form a bounding box aligned to the light around the camera's frustum
+                min.x = (std::min)(ndc_box[i].x, min.x);
+                min.y = (std::min)(ndc_box[i].y, min.y);
+                min.z = (std::min)(ndc_box[i].z, min.z);
+                max.x = (std::max)(ndc_box[i].x, max.x);
+                max.y = (std::max)(ndc_box[i].y, max.y);
+                max.z = (std::max)(ndc_box[i].z, max.z);
+            }
+        }
+    }
+    // Modify the clip range to max out at the camera view distance and bottom out
+    // at a negative kScreenFar away from the player, allowing distant objects
+    // to cast shadows from off screen
+    max.z =  kScreenDepth - max.z;
+    min.z = -kScreenDepth - min.z;
+    // Make a projection matrix that perfectly views the camera's frustum
+    Matrix light_frustum = MatrixOrthographic(min.x, max.x, min.y, max.y, min.z, max.z);
+
     // TODO: 3D pass ->
     //      Render everything as a batch as this is untextured
     for (const auto& model : models_)
@@ -229,8 +278,8 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
 
         // Set the inputs
         if (!shadow_map_shader_->SetInput("world_matrix", model->world_matrix(), context_) ||
-            !shadow_map_shader_->SetInput("view_matrix", sun_->view_matrix(), context_) ||
-            !shadow_map_shader_->SetInput("proj_matrix", proj_matrix_, context_))
+            !shadow_map_shader_->SetInput("view_matrix", light_view_matrix, context_) ||
+            !shadow_map_shader_->SetInput("proj_matrix", light_frustum, context_))
         {
             return false;
         }
@@ -281,13 +330,17 @@ bool Graphics::RenderComposite()
     // TODO: TEMP DEBUG CODE. CLEAN THIS UP!!!
     static bool init = true;
     static const console::Variable* target = nullptr;
+    static std::unique_ptr<Sprite> alt_target(new Sprite("blons:none", context_));
     if (init)
     {
         console::RegisterVariable("gfx:target", 0);
         target = console::var("gfx:target");
         init = false;
+        alt_target->set_pos(580, 360, 200, 200);
+        alt_target->set_subtexture(0, 0, 16, -16);
     }
     const TextureResource* screen_texture;
+    const TextureResource* alt_screen_texture;
     switch (target->to<int>())
     {
     case 1:
@@ -314,6 +367,7 @@ bool Graphics::RenderComposite()
         screen_texture = light_buffer_->textures()[0];
         break;
     }
+    alt_screen_texture = shadow_buffer_->textures()[0];
 
     // Push the full screen quad used to render FBO
     light_buffer_->Render(context_);
@@ -327,6 +381,22 @@ bool Graphics::RenderComposite()
     }
 
     if (!sprite_shader_->Render(light_buffer_->index_count(), context_))
+    {
+        return false;
+    }
+
+    // Push the mini screen quad used to render alt FBO
+    alt_target->Render(context_);
+
+    // Set the inputs
+    if (!sprite_shader_->SetInput("world_matrix", MatrixIdentity() , context_) ||
+        !sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !sprite_shader_->SetInput("sprite", alt_screen_texture, context_))
+    {
+        return false;
+    }
+
+    if (!sprite_shader_->Render(alt_target->index_count(), context_))
     {
         return false;
     }
