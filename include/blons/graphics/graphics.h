@@ -67,7 +67,7 @@ const units::world kScreenNear = 0.1f;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief **Temporary** config option for shadow map resolution
 ////////////////////////////////////////////////////////////////////////////////
-const units::pixel kShadowMapResolution = 2048;
+const units::pixel kShadowMapResolution = 1024;
 
 // Forward declarations
 class Light;

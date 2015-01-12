@@ -242,15 +242,41 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
         }
     }
 
+    // Bit of an awkward hack to save VRAM:
+    //     Bind blur buffer, use shadow depth as input and write a horizontal blur to blur buffer out
+    //     Bind shadow buffer, use horizontal blur buffer as input and write a vertical blur to shadow buffer out
+    // Result is an efficient O(2n) box blur (instead of O(n^2)!) needing only 2 textures (instead of 3)
+
     // Blur the shadow map to make soft shadows
     blur_buffer_->Bind(context_);
 
     // Using geometry buffer's quad mesh because it matches our ortho matrix better
     geometry_buffer_->Render(context_);
 
+    // Horizontal blur
     if (!blur_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
         !blur_shader_->SetInput("blur_texture", shadow_buffer_->textures()[0], context_) ||
-        !blur_shader_->SetInput("texture_resolution", kShadowMapResolution, context_))
+        !blur_shader_->SetInput("texture_resolution", kShadowMapResolution, context_) ||
+        !blur_shader_->SetInput("direction", 0, context_))
+    {
+        return false;
+    }
+    if (!blur_shader_->Render(geometry_buffer_->index_count(), context_))
+    {
+        return false;
+    }
+
+    // Blur the shadow map to make soft shadows
+    shadow_buffer_->Bind(context_);
+
+    // Using geometry buffer's quad mesh because it matches our ortho matrix better
+    geometry_buffer_->Render(context_);
+
+    // Veritcal blur
+    if (!blur_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !blur_shader_->SetInput("blur_texture", blur_buffer_->textures()[0], context_) ||
+        !blur_shader_->SetInput("texture_resolution", kShadowMapResolution, context_) ||
+        !blur_shader_->SetInput("direction", 1, context_))
     {
         return false;
     }
@@ -276,7 +302,7 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
         !direct_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||
         !direct_light_shader_->SetInput("light_vp_matrix", light_vp_matrix, context_) ||
         !direct_light_shader_->SetInput("view_depth", geometry_buffer_->depth(), 0, context_) ||
-        !direct_light_shader_->SetInput("light_depth", blur_buffer_->textures()[0], 1, context_))
+        !direct_light_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 1, context_))
     {
         return false;
     }
@@ -358,7 +384,7 @@ bool Graphics::RenderComposite()
         screen_texture = geometry_buffer_->depth();
         break;
     case 5:
-        screen_texture = shadow_buffer_->depth();
+        screen_texture = shadow_buffer_->textures()[0];
         break;
     case 6:
         screen_texture = direct_light_buffer_->textures()[0];
