@@ -533,7 +533,7 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
 
 bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
                                      units::pixel width, units::pixel height,
-                                     unsigned int texture_count)
+                                     std::vector<TextureFormat> formats, bool store_depth)
 {
     FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
 
@@ -547,7 +547,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
 
     // Creates empty render targets
-    auto make_texture = [&](bool is_depth)
+    auto make_texture = [&](TextureFormat format, bool is_depth)
     {
         TextureResourceGL40 tex(this);
 
@@ -560,7 +560,19 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         // Set the parameters and fill it with empty image data
         if (!is_depth)
         {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+            GLint internalformat;
+            switch (format)
+            {
+            case R16G16:
+                internalformat = GL_RG16;
+                break;
+            case NONE:
+            case R8G8B8:
+            default:
+                internalformat = GL_RGB;
+                break;
+            }
+            glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
         }
         else
         {
@@ -575,25 +587,31 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     };
 
     // Create and bind all of our render targets
-    std::unique_ptr<GLenum[]> drawbuffers(new GLenum[texture_count]);
-    for (unsigned int i = 0; i < texture_count; i++)
+    std::unique_ptr<GLenum[]> drawbuffers(new GLenum[formats.size()]);
+    for (unsigned int i = 0; i < formats.size(); i++)
     {
-        fbo->targets_.push_back(make_texture(false));
-        auto attachment = GL_COLOR_ATTACHMENT0 + i;
-        glFramebufferTexture(GL_FRAMEBUFFER, attachment, fbo->targets_.back().texture_, 0);
-        drawbuffers[i] = attachment;
+        if (formats[i] != NONE)
+        {
+            fbo->targets_.push_back(make_texture(formats[i], false));
+            auto attachment = GL_COLOR_ATTACHMENT0 + i;
+            glFramebufferTexture(GL_FRAMEBUFFER, attachment, fbo->targets_.back().texture_, 0);
+            drawbuffers[i] = attachment;
+        }
     }
-    glDrawBuffers(texture_count, drawbuffers.get());
+    glDrawBuffers(static_cast<GLsizei>(formats.size()), drawbuffers.get());
 
-    // Render with a depth buffer
-    glGenRenderbuffers(1, &fbo->depth_render_);
-    glBindRenderbuffer(GL_RENDERBUFFER, fbo->depth_render_);
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo->depth_render_);
+    if (store_depth)
+    {
+        // Render with a depth buffer
+        glGenRenderbuffers(1, &fbo->depth_render_);
+        glBindRenderbuffer(GL_RENDERBUFFER, fbo->depth_render_);
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo->depth_render_);
 
-    // Create and bind the depth target
-    fbo->depth_ = make_texture(true);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_.texture_, 0);
+        // Create and bind the depth target
+        fbo->depth_ = make_texture(NONE, true);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_.texture_, 0);
+    }
 
     return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 }

@@ -25,10 +25,20 @@
 
 namespace blons
 {
-Framebuffer::Framebuffer(units::pixel width, units::pixel height, unsigned int texture_outputs, RenderContext& context)
+Framebuffer::Framebuffer(units::pixel width, units::pixel height, std::vector<TextureFormat> texture_formats, bool store_depth, RenderContext& context)
+{
+    Init(width, height, texture_formats, store_depth, context);
+}
+
+Framebuffer::Framebuffer(units::pixel width, units::pixel height, std::vector<TextureFormat> texture_formats, RenderContext& context)
+{
+    Init(width, height, texture_formats, true, context);
+}
+
+void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<TextureFormat> texture_formats, bool store_depth, RenderContext& context)
 {
     fbo_.reset(context->MakeFramebufferResource());
-    if (!context->RegisterFramebuffer(fbo_.get(), width, height, texture_outputs))
+    if (!context->RegisterFramebuffer(fbo_.get(), width, height, texture_formats, store_depth))
     {
         fbo_.reset();
         throw "Failed to initialize framebuffer";

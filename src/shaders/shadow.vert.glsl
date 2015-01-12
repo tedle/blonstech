@@ -25,11 +25,13 @@
 
 // Ins n outs
 in vec3 input_pos;
+out float depth;
 
 // Globals
 uniform mat4 mvp_matrix;
 
 void main(void)
 {
-    gl_Position = mvp_matrix * vec4(input_pos, 1.0);
+	gl_Position = mvp_matrix * vec4(input_pos, 1.0);
+	depth = gl_Position.z / gl_Position.w;
 }

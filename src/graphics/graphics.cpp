@@ -259,7 +259,7 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
         !direct_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||
         !direct_light_shader_->SetInput("light_vp_matrix", light_vp_matrix, context_) ||
         !direct_light_shader_->SetInput("view_depth", geometry_buffer_->depth(), 0, context_) ||
-        !direct_light_shader_->SetInput("light_depth", shadow_buffer_->depth(), 1, context_))
+        !direct_light_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 1, context_))
     {
         return false;
     }
@@ -351,7 +351,7 @@ bool Graphics::RenderComposite()
         screen_texture = light_buffer_->textures()[0];
         break;
     }
-    alt_screen_texture = shadow_buffer_->depth();
+    alt_screen_texture = shadow_buffer_->textures()[0];
 
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
@@ -506,10 +506,13 @@ bool Graphics::MakeContext(Client::Info screen)
     }
 
     // Framebuffers
-    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 4, context_));
-    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, 0, context_));
-    direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, context_));
-    light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, context_));
+    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height,
+                                           { TextureFormat::R8G8B8, TextureFormat::R8G8B8,
+                                             TextureFormat::R8G8B8, TextureFormat::R8G8B8 },
+                                           context_));
+    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { TextureFormat::R16G16 }, context_));
+    direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, { TextureFormat::R8G8B8 }, false, context_));
+    light_buffer_.reset(new Framebuffer(screen.width, screen.height, { TextureFormat::R8G8B8 }, false, context_));
 
     // GUI
     if (gui_ == nullptr)

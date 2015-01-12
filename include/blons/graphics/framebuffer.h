@@ -41,10 +41,16 @@ public:
     ///
     /// \param width Width of the render target in pixels
     /// \param height Height of the render target in pixels
-    /// \param texture_outputs Number of render targets
+    /// \param texture_formats The format of the output textures
+    /// \param store_depth If true will store the depth buffer as a texture
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Framebuffer(units::pixel width, units::pixel height, unsigned int texture_outputs, RenderContext& context);
+    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureFormat> texture_formats, bool store_depth, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureFormat>, bool, RenderContext&)
+    /// with a default store_depth of true
+    ////////////////////////////////////////////////////////////////////////////////
+    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureFormat> texture_formats, RenderContext& context);
     ~Framebuffer() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +109,8 @@ public:
     const TextureResource* depth();
 
 private:
+    void Init(units::pixel width, units::pixel height, std::vector<TextureFormat> texture_formats, bool store_depth, RenderContext& context);
+
     std::unique_ptr<FramebufferResource> fbo_;
 
     // These are cleaned up by the FramebufferResource itself

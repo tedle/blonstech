@@ -35,6 +35,13 @@
 
 namespace blons
 {
+enum TextureFormat
+{
+    NONE,
+    R8G8B8,
+    R16G16
+};
+
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Stores the vertices and indices of a mesh
 ////////////////////////////////////////////////////////////////////////////////
@@ -247,12 +254,13 @@ public:
     /// \param frame_buffer Framebuffer for to bind
     /// \param width Width of the textures to render to in pixels
     /// \param height Height of the textures to render to in pixels
-    /// \param texture_count Number of textures for the framebuffer to render to
+    /// \param formats List of formatted textures to output to
+    /// \param store_depth Store the depth buffer from each render to a texture
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterFramebuffer(FramebufferResource* frame_buffer,
                                      units::pixel width, units::pixel height,
-                                     unsigned int texture_count)=0;
+                                     std::vector<TextureFormat> formats, bool store_depth)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a TextureResource and binds it, combined with the supplied
     /// PixelData, to the graphics API permitting their use for rendering calls.
