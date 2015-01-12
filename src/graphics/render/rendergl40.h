@@ -57,7 +57,7 @@ public:
                         unsigned int* indices, unsigned int index_count) override;
     bool RegisterFramebuffer(FramebufferResource* frame_buffer,
                              units::pixel width, units::pixel height,
-                             std::vector<TextureFormat> formats, bool store_depth) override;
+                             std::vector<TextureHint> formats, bool store_depth) override;
     bool RegisterTexture(TextureResource* texture, PixelData* pixel_data) override;
     bool RegisterShader(ShaderResource* program,
                         std::string vertex_filename, std::string pixel_filename,

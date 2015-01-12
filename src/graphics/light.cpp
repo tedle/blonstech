@@ -96,7 +96,7 @@ Matrix Light::ViewFrustum(Matrix frustum, units::world depth) const
     min.z = -depth - min.z;
 
     // TODO: Get rid of this when we do variance shadow maps (helps with swimming... a bit)
-    const float step = 2048.0f; ///< shadow map resolution, hardcoded because this is temporary
+    const float step = 1024.0f; ///< shadow map resolution, hardcoded because this is temporary
     min.x = ceil(min.x * step) / step;
     max.x = (ceil((max.x - min.x) * step) / step) + min.x;
     min.y = ceil(min.y * step) / step;

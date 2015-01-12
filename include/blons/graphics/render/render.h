@@ -35,11 +35,20 @@
 
 namespace blons
 {
-enum TextureFormat
+// TODO: Unify this struct and PixelData::Format
+struct TextureHint
 {
-    NONE,
-    R8G8B8,
-    R16G16
+    enum Format
+    {
+        NONE,
+        R8G8B8,
+        R16G16
+    } format;
+    enum Filter
+    {
+        NEAREST,
+        LINEAR
+    } filter;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -260,7 +269,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterFramebuffer(FramebufferResource* frame_buffer,
                                      units::pixel width, units::pixel height,
-                                     std::vector<TextureFormat> formats, bool store_depth)=0;
+                                     std::vector<TextureHint> formats, bool store_depth)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a TextureResource and binds it, combined with the supplied
     /// PixelData, to the graphics API permitting their use for rendering calls.

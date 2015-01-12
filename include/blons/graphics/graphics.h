@@ -157,13 +157,16 @@ private:
     RenderContext context_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<gui::Manager> gui_;
+    // TODO: Document the pipeline
     std::unique_ptr<Shader> geo_shader_;
     std::unique_ptr<Shader> shadow_shader_;
+    std::unique_ptr<Shader> blur_shader_;
     std::unique_ptr<Shader> direct_light_shader_;
     std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Shader> sprite_shader_;
     std::unique_ptr<Framebuffer> geometry_buffer_;
     std::unique_ptr<Framebuffer> shadow_buffer_;
+    std::unique_ptr<Framebuffer> blur_buffer_;
     std::unique_ptr<Framebuffer> direct_light_buffer_;
     std::unique_ptr<Framebuffer> light_buffer_;
 

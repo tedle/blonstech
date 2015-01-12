@@ -533,7 +533,7 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
 
 bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
                                      units::pixel width, units::pixel height,
-                                     std::vector<TextureFormat> formats, bool store_depth)
+                                     std::vector<TextureHint> formats, bool store_depth)
 {
     FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
 
@@ -547,7 +547,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
 
     // Creates empty render targets
-    auto make_texture = [&](TextureFormat format, bool is_depth)
+    auto make_texture = [&](TextureHint hint, bool is_depth)
     {
         TextureResourceGL40 tex(this);
 
@@ -561,13 +561,13 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         if (!is_depth)
         {
             GLint internalformat;
-            switch (format)
+            switch (hint.format)
             {
-            case R16G16:
+            case TextureHint::R16G16:
                 internalformat = GL_RG16;
                 break;
-            case NONE:
-            case R8G8B8:
+            case TextureHint::NONE:
+            case TextureHint::R8G8B8:
             default:
                 internalformat = GL_RGB;
                 break;
@@ -580,8 +580,18 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         }
          
         // Always rendered as unstretched 2D for now...
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        switch (hint.filter)
+        {
+        case TextureHint::NEAREST:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            break;
+        case TextureHint::LINEAR:
+        default:
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            break;
+        }
 
         return tex;
     };
@@ -590,7 +600,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     std::unique_ptr<GLenum[]> drawbuffers(new GLenum[formats.size()]);
     for (unsigned int i = 0; i < formats.size(); i++)
     {
-        if (formats[i] != NONE)
+        if (formats[i].format != TextureHint::NONE)
         {
             fbo->targets_.push_back(make_texture(formats[i], false));
             auto attachment = GL_COLOR_ATTACHMENT0 + i;
@@ -609,7 +619,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo->depth_render_);
 
         // Create and bind the depth target
-        fbo->depth_ = make_texture(NONE, true);
+        fbo->depth_ = make_texture({ TextureHint::NONE, TextureHint::LINEAR }, true);
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_.texture_, 0);
     }
 

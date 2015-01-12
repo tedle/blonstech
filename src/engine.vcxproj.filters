@@ -325,5 +325,11 @@
     <None Include="shaders\shadow.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\blur.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\blur.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

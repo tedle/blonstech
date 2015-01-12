@@ -242,6 +242,23 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
         }
     }
 
+    // Blur the shadow map to make soft shadows
+    blur_buffer_->Bind(context_);
+
+    // Using geometry buffer's quad mesh because it matches our ortho matrix better
+    geometry_buffer_->Render(context_);
+
+    if (!blur_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !blur_shader_->SetInput("blur_texture", shadow_buffer_->textures()[0], context_) ||
+        !blur_shader_->SetInput("texture_resolution", kShadowMapResolution, context_))
+    {
+        return false;
+    }
+    if (!blur_shader_->Render(geometry_buffer_->index_count(), context_))
+    {
+        return false;
+    }
+
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
 
@@ -259,7 +276,7 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
         !direct_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||
         !direct_light_shader_->SetInput("light_vp_matrix", light_vp_matrix, context_) ||
         !direct_light_shader_->SetInput("view_depth", geometry_buffer_->depth(), 0, context_) ||
-        !direct_light_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 1, context_))
+        !direct_light_shader_->SetInput("light_depth", blur_buffer_->textures()[0], 1, context_))
     {
         return false;
     }
@@ -477,6 +494,11 @@ bool Graphics::MakeContext(Client::Info screen)
     shadow_inputs.push_back(ShaderAttribute(0, "input_pos"));
     shadow_shader_.reset(new Shader("shaders/shadow.vert.glsl", "shaders/shadow.frag.glsl", shadow_inputs, context_));
 
+    ShaderAttributeList blur_inputs;
+    blur_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    blur_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/blur.frag.glsl", blur_inputs, context_));
+
     ShaderAttributeList direct_light_inputs;
     direct_light_inputs.push_back(ShaderAttribute(0, "input_pos"));
     direct_light_inputs.push_back(ShaderAttribute(1, "input_uv"));
@@ -506,13 +528,11 @@ bool Graphics::MakeContext(Client::Info screen)
     }
 
     // Framebuffers
-    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height,
-                                           { TextureFormat::R8G8B8, TextureFormat::R8G8B8,
-                                             TextureFormat::R8G8B8, TextureFormat::R8G8B8 },
-                                           context_));
-    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { TextureFormat::R16G16 }, context_));
-    direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, { TextureFormat::R8G8B8 }, false, context_));
-    light_buffer_.reset(new Framebuffer(screen.width, screen.height, { TextureFormat::R8G8B8 }, false, context_));
+    geometry_buffer_.reset(new Framebuffer(screen.width, screen.height, 4, context_));
+    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
+    blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
+    direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
+    light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
 
     // GUI
     if (gui_ == nullptr)
