@@ -69,8 +69,14 @@ void main(void)
 	float p_max = variance / (variance + (local_delta * local_delta));
 
 	// p_max is invalid if the measured depth is greater than the local depth
-	// Clamp to 1 if so
-	float lit = (moments.x >= light_pos.z) ? 1.0 : p_max;
+	// Use a smoothstep function to blend to 1 as we approach this
+	// Increases light bleeding, but looks way less gritty
+	float p = smoothstep(light_pos.z - 0.01, light_pos.z - 0.005, moments.x);
+	// Use a smoothstep on pmax to decrease lightbleeding, both mitigating the bleed
+	// incurred by the p smoothing as well as the natural bleed induced by VSM
+	p_max = smoothstep(0.2, 1.0, p_max);
+	// The actual percent amount that the fragment is affected by the light source
+	float lit = max(p, p_max);
 
 	frag_colour = vec4(lit, lit, lit, 1.0f);
 }
