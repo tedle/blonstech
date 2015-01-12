@@ -292,10 +292,11 @@ bool Graphics::RenderLighting(Matrix view_matrix)
         !light_shader_->SetInput("albedo", geometry_buffer_->textures()[0], 0, context_) ||
         !light_shader_->SetInput("normal", geometry_buffer_->textures()[1], 1, context_) ||
         !light_shader_->SetInput("depth", geometry_buffer_->depth(), 2, context_) ||
+        !light_shader_->SetInput("direct_light", direct_light_buffer_->textures()[0], 3, context_) ||
         !light_shader_->SetInput("sun.dir", sun_->direction(), context_) ||
         // TODO: Better ambient and specular values
         !light_shader_->SetInput("sun.specular", sun_->colour() * sun_->colour(), context_) ||
-        !light_shader_->SetInput("sun.ambient", sun_->colour() * 0.1f, context_) ||
+        !light_shader_->SetInput("sun.ambient", sun_->colour() * 0.05f, context_) ||
         !light_shader_->SetInput("sun.colour", sun_->colour(), context_))
     {
         return false;

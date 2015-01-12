@@ -54,8 +54,9 @@ void main(void)
 	// Adjust for [0,1] space
 	light_pos = (light_pos + 1.0) / 2.0;
 
+	const float bias = 0.01f;
 	// In shadow
-	if (light_pos.z > texture(light_depth, light_pos.xy).r)
+	if (light_pos.z - bias > texture(light_depth, light_pos.xy).r)
 	{
 		frag_colour = vec4(0.0, 0.0, 0.0, 1.0);
 	}

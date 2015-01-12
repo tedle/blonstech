@@ -94,6 +94,14 @@ Matrix Light::ViewFrustum(Matrix frustum, units::world depth) const
     // imprecision behind the player when facing a light
     max.z =  depth * 1.3f - max.z;
     min.z = -depth - min.z;
+
+    // TODO: Get rid of this when we do variance shadow maps (helps with swimming... a bit)
+    const float step = 2048.0f; ///< shadow map resolution, hardcoded because this is temporary
+    min.x = ceil(min.x * step) / step;
+    max.x = (ceil((max.x - min.x) * step) / step) + min.x;
+    min.y = ceil(min.y * step) / step;
+    max.y = (ceil((max.y - min.y) * step) / step) + min.y;
+
     // Make a projection matrix that perfectly views the camera's frustum
     Matrix light_frustum = MatrixOrthographic(min.x, max.x, min.y, max.y, min.z, max.z);
 

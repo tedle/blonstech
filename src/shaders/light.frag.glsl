@@ -33,6 +33,7 @@ uniform mat4 inv_vp_matrix;
 uniform sampler2D albedo;
 uniform sampler2D normal;
 uniform sampler2D depth;
+uniform sampler2D direct_light;
 
 // Used to give stronger specular when light bounces at shallower angles
 const float refraction_index = 0.5;
@@ -80,12 +81,16 @@ void main(void)
 		}
 	}
 
+	// Get the direct lighting value
+	vec3 direct = texture(direct_light, tex_coord).rgb;
+
 	// Linear blend specular with camera angle, based on fresnel coefficient
 	float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, half), 5.0);
 	specular *= fresnel;
+	specular *= direct;
 
 	// Diffuse lighting (temporary)
-	vec3 diffuse = sun.colour * clamp(light_angle, 0.0, 1.0);
+	vec3 diffuse = sun.colour * clamp(direct, 0.1, 1.0) * clamp(light_angle, 0.0, 1.0);
 	// Ambient lighting
 	diffuse += sun.ambient;
 
