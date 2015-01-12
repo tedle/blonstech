@@ -54,15 +54,23 @@ void main(void)
 	// Adjust for [0,1] space
 	light_pos = (light_pos + 1.0) / 2.0;
 
-	const float bias = 0.01f;
-	// In shadow
-	if (light_pos.z - bias > texture(light_depth, light_pos.xy).r)
-	{
-		frag_colour = vec4(0.0, 0.0, 0.0, 1.0);
-	}
-	// In light
-	else
-	{
-		frag_colour = vec4(1.0, 1.0, 1.0, 1.0);
-	}
+	// Variance shadow maping
+	vec2 moments = texture(light_depth, light_pos.xy).rg;
+
+	// (local_depth - mean_depth)
+	float local_delta = light_pos.z - moments.r;
+
+	// o^2 = M2 - M1^2
+	float variance = moments.g - (moments.r * moments.r);
+	float bias = 0.00001;
+	variance = max(variance, bias);
+
+	// P = o^2 / (o^2 + (local_depth - mean_depth)^2) = probability of surface being lit
+	float p_max = variance / (variance + (local_delta * local_delta));
+
+	// p_max is invalid if the measured depth is greater than the local depth
+	// Clamp to 1 if so
+	float lit = (moments.x >= light_pos.z) ? 1.0 : p_max;
+
+	frag_colour = vec4(lit, lit, lit, 1.0f);
 }
