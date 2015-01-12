@@ -197,6 +197,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glFramebufferTexture");
     }
 
+    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)glGetProcAddress("glFramebufferTexture2D");
+    if (glFramebufferTexture2D == nullptr)
+    {
+        failed.push_back("glFramebufferTexture2D");
+    }
+
     glGenBuffers = (PFNGLGENBUFFERSPROC)glGetProcAddress("glGenBuffers");
     if (glGenBuffers == nullptr)
     {
@@ -279,6 +285,12 @@ std::vector<std::string> LoadGLFunctions()
     if (glShaderSource == nullptr)
     {
         failed.push_back("glShaderSource");
+    }
+
+    glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)glGetProcAddress("glTexImage2DMultisample");
+    if (glTexImage2DMultisample == nullptr)
+    {
+        failed.push_back("glTexImage2DMultisample");
     }
 
     glUniform1i = (PFNGLUNIFORM1IPROC)glGetProcAddress("glUniform1i");
@@ -372,6 +384,7 @@ PFNGLDRAWBUFFERSPROC glDrawBuffers;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
 PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
+PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 PFNGLGENBUFFERSPROC glGenBuffers;
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
@@ -386,6 +399,7 @@ PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLLINKPROGRAMPROC glLinkProgram;
 PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
 PFNGLSHADERSOURCEPROC glShaderSource;
+PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
 PFNGLUNIFORM1IPROC glUniform1i;
 PFNGLUNIFORM3FVPROC glUniform3fv;
 PFNGLUNIFORM4FVPROC glUniform4fv;
