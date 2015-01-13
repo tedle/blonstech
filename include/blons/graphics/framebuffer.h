@@ -76,14 +76,16 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds the framebuffer to the supplied rendering context causing all
-    /// subsequent draw calls to be drawn to this buffer
+    /// subsequent draw calls to be drawn to this buffer. Updates the viewport to
+    /// match the size of the buffer's output texture
     ///
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     void Bind(RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Unbinds the framebuffer causing all subsequent draw calls to be drawn
-    /// to the default back buffer
+    /// to the default back buffer. Updates the viewport to match the size of the
+    /// back buffer
     ///
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////

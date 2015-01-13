@@ -946,6 +946,15 @@ bool RenderGL40::SetDepthTesting(bool enable)
     return true;
 }
 
+bool RenderGL40::SetViewport(Box viewport)
+{
+    glViewport(static_cast<GLint>(viewport.x),
+               static_cast<GLint>(viewport.y),
+               static_cast<GLint>(viewport.w),
+               static_cast<GLint>(viewport.h));
+    return true;
+}
+
 void RenderGL40::VideoCardInfo(char* name, int& memory)
 {
     strcpy_s(name, 128, video_card_desc_.c_str());

@@ -335,7 +335,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a FramebufferResource and binds it to the graphics API,
     /// prepping it for a draw call. Passing a value of nullptr will bind the
-    /// back buffer as the current framebuffer.
+    /// back buffer as the current framebuffer. Updates the viewport to match the
+    /// texture size of the buffer
     ///
     /// \param frame_buffer Frame buffer resource
     ////////////////////////////////////////////////////////////////////////////////
@@ -447,6 +448,13 @@ public:
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetDepthTesting(bool enable)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets the region of the buffer to render to during drawcalls
+    ///
+    /// \param viewport Box defining the render region
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetViewport(Box viewport)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the video card information

@@ -80,6 +80,8 @@ namespace gui { class Manager; }
 //              shader->SetInputCallback(std::function<void(Shader*)>)
 //                  ^ but what about model world matrix??
 
+// TODO: Refactor a lot of this into a pipeline/DeferredPipeline class
+
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Manager for efficiently creating & rendering sprites, models, and UI
 ////////////////////////////////////////////////////////////////////////////////

@@ -84,6 +84,7 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
 
     bool SetDepthTesting(bool enable) override;
+    bool SetViewport(Box viewport) override;
 
     void VideoCardInfo(char* buffer, int& len_buffer) override;
 
