@@ -103,7 +103,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     }
     if (light_texture_ == nullptr)
     {
-        light_texture_.reset(new Texture("blons:normal", Texture::LIGHT, context));
+        light_texture_.reset(new Texture("blons:none", Texture::LIGHT, context));
     }
     log::Debug("[%ims]\n", timer.ms());
 }
