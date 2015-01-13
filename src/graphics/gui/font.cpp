@@ -163,9 +163,10 @@ Font::Font(std::string font_filename, units::pixel pixel_size, RenderContext& co
     font.width = tex_width;
     font.height = tex_height;
     // Single channel monochrome
-    font.bits = PixelData::A8;
+    font.hint.format = TextureHint::A8;
+    font.hint.filter = TextureHint::NEAREST;
     // No compression or mipmaps
-    font.format = PixelData::RAW;
+    font.compression = PixelData::RAW;
     // Make it a sprite!
     fontsheet_.reset(new Sprite(font, context));
 

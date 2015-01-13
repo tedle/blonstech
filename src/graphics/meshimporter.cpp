@@ -105,6 +105,7 @@ MeshImporter::MeshImporter(std::string filename, bool invert_y)
         for (auto& v : mesh_data_.vertices)
         {
             v.tex.y = 1.0f - v.tex.y;
+            v.light_tex.y = 1.0f - v.light_tex.y;
         }
     }
 }

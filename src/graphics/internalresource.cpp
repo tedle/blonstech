@@ -97,8 +97,9 @@ std::unordered_map<std::string, std::function<PixelData()>> g_texture_generators
         "blons:none", []()
         {
             PixelData none;
-            none.format = PixelData::RAW;
-            none.bits = PixelData::R8G8B8;
+            none.compression = PixelData::RAW;
+            none.hint.format = TextureHint::R8G8B8;
+            none.hint.filter = TextureHint::NEAREST;
             none.width = 16;
             none.height = 16;
             none.pixels.reset(new unsigned char[none.width * none.height * 3]);
@@ -119,8 +120,9 @@ std::unordered_map<std::string, std::function<PixelData()>> g_texture_generators
         "blons:normal", []()
         {
             PixelData normal;
-            normal.format = PixelData::AUTO;
-            normal.bits = PixelData::R8G8B8;
+            normal.compression = PixelData::RAW;
+            normal.hint.format = TextureHint::R8G8B8;
+            normal.hint.filter = TextureHint::LINEAR;
             normal.width = 1;
             normal.height = 1;
             normal.pixels.reset(new unsigned char[normal.width * normal.height * 3]);

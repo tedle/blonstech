@@ -74,7 +74,18 @@ bool Texture::Init(const PixelData& pixels, Type type, RenderContext& context)
     if (type == Type::SPRITE)
     {
         // No DDS compression or mipmaps + nearest neighbour filtering
-        pixel_data_->format = PixelData::RAW;
+        pixel_data_->compression = PixelData::RAW;
+        pixel_data_->hint.filter = TextureHint::NEAREST;
+    }
+    else
+    {
+        pixel_data_->hint.filter = TextureHint::LINEAR;
+    }
+
+    // Get the most out of our lightmaps...
+    if (type == Type::LIGHT)
+    {
+        pixel_data_->compression = PixelData::RAW;
     }
 
     if (!context->RegisterTexture(texture_.get(), pixel_data_.get()))

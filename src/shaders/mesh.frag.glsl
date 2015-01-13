@@ -25,6 +25,7 @@
 
 // Ins n outs
 in vec2 tex_coord;
+in vec2 lightmap_coord;
 in mat3 norm;
 
 out vec4 frag_colour;

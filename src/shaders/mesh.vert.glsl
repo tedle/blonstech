@@ -26,11 +26,13 @@
 // Ins n outs
 in vec3 input_pos;
 in vec2 input_uv;
+in vec2 input_light_uv;
 in vec3 input_norm;
 in vec3 input_tan;
 in vec3 input_bitan;
 
 out vec2 tex_coord;
+out vec2 lightmap_coord;
 out mat3 norm;
 
 // Globals
@@ -41,5 +43,6 @@ void main(void)
     gl_Position = mvp_matrix * vec4(input_pos, 1.0);
 
     tex_coord = input_uv;
+	lightmap_coord = input_light_uv;
     norm = transpose(mat3(input_tan, input_bitan, input_norm));
 }

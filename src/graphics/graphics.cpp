@@ -509,40 +509,41 @@ bool Graphics::MakeContext(Client::Info screen)
 
     // Shaders
     ShaderAttributeList geo_inputs;
-    geo_inputs.push_back(ShaderAttribute(0, "input_pos"));
-    geo_inputs.push_back(ShaderAttribute(1, "input_uv"));
-    geo_inputs.push_back(ShaderAttribute(2, "input_norm"));
-    geo_inputs.push_back(ShaderAttribute(3, "input_tan"));
-    geo_inputs.push_back(ShaderAttribute(4, "input_bitan"));
+    geo_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    geo_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    geo_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
+    geo_inputs.push_back(ShaderAttribute(NORMAL, "input_norm"));
+    geo_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
+    geo_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
     geo_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", geo_inputs, context_));
 
     ShaderAttributeList shadow_inputs;
-    shadow_inputs.push_back(ShaderAttribute(0, "input_pos"));
+    shadow_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     shadow_shader_.reset(new Shader("shaders/shadow.vert.glsl", "shaders/shadow.frag.glsl", shadow_inputs, context_));
 
     ShaderAttributeList blur_inputs;
-    blur_inputs.push_back(ShaderAttribute(0, "input_pos"));
-    blur_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    blur_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    blur_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/blur.frag.glsl", blur_inputs, context_));
 
     ShaderAttributeList direct_light_inputs;
-    direct_light_inputs.push_back(ShaderAttribute(0, "input_pos"));
-    direct_light_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    direct_light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    direct_light_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     direct_light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/direct-light.frag.glsl", direct_light_inputs, context_));
 
     ShaderAttributeList light_inputs;
-    light_inputs.push_back(ShaderAttribute(0, "input_pos"));
-    light_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    light_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/light.frag.glsl", light_inputs, context_));
 
     ShaderAttributeList sprite_inputs;
-    sprite_inputs.push_back(ShaderAttribute(0, "input_pos"));
-    sprite_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    sprite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    sprite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     sprite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", sprite_inputs, context_));
 
     ShaderAttributeList ui_inputs;
-    ui_inputs.push_back(ShaderAttribute(0, "input_pos"));
-    ui_inputs.push_back(ShaderAttribute(1, "input_uv"));
+    ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     auto ui_shader = std::unique_ptr<Shader>(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", ui_inputs, context_));
 
     if (geo_shader_ == nullptr ||

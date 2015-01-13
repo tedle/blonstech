@@ -457,23 +457,27 @@ bool RenderGL40::Register3DMesh(BufferResource* vertex_buffer, BufferResource* i
     glEnableVertexAttribArray(2);
     glEnableVertexAttribArray(3);
     glEnableVertexAttribArray(4);
+    glEnableVertexAttribArray(5);
 
     // Layout the Vertex struct type to gpu vertex attributes
     // Position declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(POS, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     // UV declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
+    glVertexAttribPointer(TEX, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
+    // Lightmap UV declaration
+    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glVertexAttribPointer(LIGHT_TEX, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(5*sizeof(float)));
     // Normal declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(5*sizeof(float)));
+    glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(7*sizeof(float)));
     // Tangent declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(8*sizeof(float)));
+    glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(9*sizeof(float)));
     // Bitangent declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(11*sizeof(float)));
+    glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(13*sizeof(float)));
 
     // Setup the index buffer
     glGenBuffers(1, &index_buf->buffer_);
@@ -515,10 +519,10 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
     // Layout the Vertex struct type to gpu vertex attributes
     // Position declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
+    glVertexAttribPointer(POS, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     // UV declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
+    glVertexAttribPointer(TEX, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
 
     // Setup the index buffer
     glGenBuffers(1, &index_buf->buffer_);
@@ -638,27 +642,28 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data
 
     // Load the texture onto GPU
     unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
-    if (pixel_data->format == PixelData::DDS)
+    if (pixel_data->compression == PixelData::DDS)
     {
         soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
     }
-    else if (pixel_data->format == PixelData::AUTO)
+    else if (pixel_data->compression == PixelData::AUTO)
     {
         soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_GL_MIPMAPS;
     }
     int channels = 0;
-    switch (pixel_data->bits)
+    switch (pixel_data->hint.format)
     {
-    case PixelData::A8:
+    case TextureHint::A8:
         channels = 1;
         break;
-    case PixelData::R8G8B8:
+    case TextureHint::R8G8B8:
         channels = 3;
         break;
-    case PixelData::R8G8B8A8:
+    case TextureHint::R8G8B8A8:
         channels = 4;
         break;
     default:
+        assert(false);
         return false;
     }
     tex->texture_ = SOIL_create_OGL_texture(pixel_data->pixels.get(), &pixel_data->width, &pixel_data->height,
@@ -674,10 +679,15 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // Raw textures use nearest neighbour filtering
-    if (pixel_data->format == PixelData::RAW)
+    if (pixel_data->hint.filter == TextureHint::NEAREST)
     {
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
+    else
+    {
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
 
     // TODO: attach this to a setting + safety check for max
@@ -959,26 +969,26 @@ bool RenderGL40::LoadPixelData(std::string filename, PixelData* data)
 
     if (filetype == ".dds")
     {
-        data->format = PixelData::DDS;
+        data->compression = PixelData::DDS;
     }
     else
     {
-        data->format = PixelData::AUTO;
+        data->compression = PixelData::AUTO;
     }
 
     switch (channels)
     {
     case 1:
-        data->bits = PixelData::A8;
+        data->hint.format = TextureHint::A8;
         break;
     case 3:
-        data->bits = PixelData::R8G8B8;
+        data->hint.format = TextureHint::R8G8B8;
         break;
     case 4:
-        data->bits = PixelData::R8G8B8A8;
+        data->hint.format = TextureHint::R8G8B8A8;
         break;
     default:
-        data->bits = PixelData::R8G8B8A8;
+        data->hint.format = TextureHint::R8G8B8A8;
         break;
     }
     return true;

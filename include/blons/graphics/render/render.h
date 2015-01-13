@@ -41,8 +41,10 @@ struct TextureHint
     enum Format
     {
         NONE,
+        A8,
         R8G8B8,
-        R16G16
+        R16G16,
+        R8G8B8A8
     } format;
     enum Filter
     {
@@ -85,24 +87,19 @@ struct PixelData
     ////////////////////////////////////////////////////////////////////////////////
     units::pixel height;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Determines the pixel format of a texture
+    /// \brief Determines the pixel format and filtering of a texture
     ////////////////////////////////////////////////////////////////////////////////
-    enum BitDepth
-    {
-        A8       = 8,  ///< Monochrome 8-bit
-        R8G8B8   = 24, ///< 24-bit full colour, no alpha
-        R8G8B8A8 = 32  ///< 32-bit full colour with alpha
-    } bits;            ///< \copybrief BitDepth
+    TextureHint hint;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Determines the format and rendering options of a texture
     ////////////////////////////////////////////////////////////////////////////////
-    enum Format
+    enum Compression
     {
-        AUTO, ///< Compresses to DXT5 & generates mipmaps
-        DDS,  ///< Uses mipmaps & compression from image file
-        RAW   ///< Will not generate mipmaps, will not compress on GPU, use nearest neighbour filtering
-    } format; ///< \copybrief Format
+        AUTO,      ///< Compresses to DXT5 & generates mipmaps
+        DDS,       ///< Uses mipmaps & compression from image file
+        RAW        ///< Will not generate mipmaps, will not compress on GPU
+    } compression; ///< \copybrief Format
 
     PixelData() {}
     ////////////////////////////////////////////////////////////////////////////////
@@ -113,9 +110,27 @@ struct PixelData
     {
         this->width = p.width;
         this->height = p.height;
-        this->bits = p.bits;
-        this->format = p.format;
-        std::size_t texture_size = p.width * p.height * (p.bits / 8);
+        this->hint = p.hint;
+        this->compression = p.compression;
+        int bits;
+        switch (this->hint.format)
+        {
+        case TextureHint::A8:
+            bits = 8;
+            break;
+        case TextureHint::R8G8B8:
+            bits = 24;
+            break;
+        case TextureHint::R16G16:
+        case TextureHint::R8G8B8A8:
+            bits = 32;
+            break;
+        case TextureHint::NONE:
+        default:
+            assert(false);
+            break;
+        }
+        std::size_t texture_size = p.width * p.height * (bits / 8);
         this->pixels.reset(new unsigned char[texture_size]);
         memcpy(this->pixels.get(), p.pixels.get(), texture_size);
     }
@@ -155,9 +170,21 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+/// \brief List of valid shader attributes indices
+////////////////////////////////////////////////////////////////////////////////
+enum ShaderAttributeIndex
+{
+    POS,       ///< Position input
+    TEX,       ///< Diffuse texture UV input
+    LIGHT_TEX, ///< Lightmap texture UV input
+    NORMAL,    ///< Normal input
+    TANGENT,   ///< Tangent input
+    BITANGENT  ///< Bitangent input
+};
+////////////////////////////////////////////////////////////////////////////////
 /// \brief Holds a shader attribute's index and name
 ////////////////////////////////////////////////////////////////////////////////
-typedef std::pair<unsigned int, std::string> ShaderAttribute;
+typedef std::pair<ShaderAttributeIndex, std::string> ShaderAttribute;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Holds a list of shader attributes
 ////////////////////////////////////////////////////////////////////////////////

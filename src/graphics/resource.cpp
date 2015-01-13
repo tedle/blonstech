@@ -153,7 +153,13 @@ TextureBuffer LoadTexture(const std::string& filename, Texture::Type type, Rende
         if (type == Texture::SPRITE)
         {
             // No DDS compression or mipmaps + nearest neighbour filtering
-            tex.pixels->format = PixelData::RAW;
+            tex.pixels->compression = PixelData::RAW;
+            tex.pixels->hint.filter = TextureHint::NEAREST;
+        }
+        else if (type == Texture::LIGHT)
+        {
+            // Get the most out of our lightmaps...
+            tex.pixels->compression = PixelData::RAW;
         }
 
         if (!context->RegisterTexture(texture.get(), tex.pixels.get()))
