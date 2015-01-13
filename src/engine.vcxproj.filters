@@ -331,5 +331,11 @@
     <None Include="shaders\blur.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\probe-map.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\probe-map.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

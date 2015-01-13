@@ -58,6 +58,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     // Big scene
     models = blons::temp::load_codmap("bms_test2uv", std::move(models), graphics.get());
 
+    graphics->BuildLighting();
+
     // Sprite 1
     auto sprite = graphics->MakeSprite("me.dds");
     sprite->set_pos(0, 0, 32, 32);

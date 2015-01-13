@@ -77,6 +77,13 @@ Graphics::Graphics(Client::Info screen)
 
     camera_->set_pos(0.0f, 0.0f, -10.0f);
 
+    // Probe camera
+    probe_view_.reset(new Camera);
+    if (probe_view_ == nullptr)
+    {
+        throw "Failed to initialize probe camera";
+    }
+
     // Sunlight
     // TODO: User should be doing this somehow
     sun_.reset(new Light(Light::DIRECTIONAL,
@@ -174,6 +181,86 @@ bool Graphics::Render()
     // Swap buffers
     context_->EndScene();
 
+    return true;
+}
+
+bool Graphics::RenderProbeMaps()
+{
+    context_->SetDepthTesting(true);
+
+    probe_buffer_->Bind(context_);
+
+    auto render_models = [&](const Matrix& view)
+    {
+        // TODO: This can be batch for sure
+        // TODO: Make sure only static objects are rendered
+        for (const auto& model : models_)
+        {
+            Matrix view_proj = view * probe_proj_matrix_;
+
+            // Bind the vertex data
+            model->Render(context_);
+
+            Matrix model_view_proj = model->world_matrix() * view_proj;
+            // Set the inputs
+            if (!probe_shader_->SetInput("mvp_matrix", model_view_proj, context_) ||
+                !probe_shader_->SetInput("albedo", model->albedo(), 0, context_))
+            {
+                return false;
+            }
+
+            // Make the draw call
+            if (!probe_shader_->Render(model->index_count(), context_))
+            {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // Render a 2 cubemaps per probe
+    //     One containing diffuse colour
+    //     One containing lightmap coords to use for sampling from/writing to lightmap
+    for (int i = 0; i < probes_.size(); i++)
+    {
+        probe_view_->set_pos(probes_[i].x, probes_[i].y, probes_[i].z);
+        bool success = true;
+        // Front view
+        context_->SetViewport(Box(kProbeMapSize * 0, kProbeMapSize * i, kProbeMapSize, kProbeMapSize));
+        probe_view_->set_rot(0.0f, 0.0f, 0.0f);
+        success &= render_models(probe_view_->view_matrix());
+
+        // Rear view
+        context_->SetViewport(Box(kProbeMapSize * 1, kProbeMapSize * i, kProbeMapSize, kProbeMapSize));
+        probe_view_->set_rot(0.0f, kPi, 0.0f);
+        success &= render_models(probe_view_->view_matrix());
+
+        // Right view
+        context_->SetViewport(Box(kProbeMapSize * 2, kProbeMapSize * i, kProbeMapSize, kProbeMapSize));
+        probe_view_->set_rot(0.0f, kPi / -2.0f, 0.0f);
+        success &= render_models(probe_view_->view_matrix());
+
+        // Left view
+        context_->SetViewport(Box(kProbeMapSize * 3, kProbeMapSize * i, kProbeMapSize, kProbeMapSize));
+        probe_view_->set_rot(0.0f, kPi / 2.0f, 0.0f);
+        success &= render_models(probe_view_->view_matrix());
+
+        // Up view
+        context_->SetViewport(Box(kProbeMapSize * 4, kProbeMapSize * i, kProbeMapSize, kProbeMapSize));
+        probe_view_->set_rot(kPi / -2.0f, 0.0f, 0.0f);
+        success &= render_models(probe_view_->view_matrix());
+
+        // Down view
+        context_->SetViewport(Box(kProbeMapSize * 5, kProbeMapSize * i, kProbeMapSize, kProbeMapSize));
+        probe_view_->set_rot(kPi / 2.0f, 0.0f, 0.0f);
+        success &= render_models(probe_view_->view_matrix());
+
+        if (!success)
+        {
+            return false;
+        }
+    }
+    probe_buffer_->Unbind(context_);
     return true;
 }
 
@@ -389,6 +476,12 @@ bool Graphics::RenderComposite()
     case 6:
         screen_texture = direct_light_buffer_->textures()[0];
         break;
+    case 7:
+        screen_texture = probe_buffer_->textures()[0];
+        break;
+    case 8:
+        screen_texture = probe_buffer_->textures()[1];
+        break;
     case 0:
     default:
         screen_texture = light_buffer_->textures()[0];
@@ -472,6 +565,21 @@ void Graphics::Reload(Client::Info screen)
         s->Reload(context_);
     }
     log::Debug("%ims!\n", timer.ms());
+    BuildLighting();
+}
+
+bool Graphics::BuildLighting()
+{
+    log::Debug("Building irradiance volumes... ");
+    Timer timer;
+    context_->BeginScene();
+    // Render out a cube map for every probe to sample scene data from (should only be called once per map load... put in make context?)
+    if (!RenderProbeMaps())
+    {
+        return false;
+    }
+    log::Debug("%ims!\n", timer.ms());
+    return true;
 }
 
 Camera* Graphics::camera() const
@@ -507,6 +615,17 @@ bool Graphics::MakeContext(Client::Info screen)
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height), 0,
                                        kScreenNear, kScreenDepth);
 
+    // Probe projection matrix (cube map perspective)
+    // 90 degree FOV to make seems between edges add up perfectly to 360
+    // Cube map aspect ratio, of course, is 1
+    probe_proj_matrix_ = MatrixPerspective(kPi / 2, 1.0f, kScreenNear, kScreenDepth);
+
+    // Initialize our light probes...
+    // TODO: Should be in map data somewhere, probably
+    probes_ = { Vector3(0.0f, 5.0f, 0.0f),
+                Vector3(5.0f, 5.0f, 0.0f),
+                Vector3(-5.0f, 5.0f, 0.0f) };
+
     // Shaders
     ShaderAttributeList geo_inputs;
     geo_inputs.push_back(ShaderAttribute(POS, "input_pos"));
@@ -541,14 +660,24 @@ bool Graphics::MakeContext(Client::Info screen)
     sprite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     sprite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", sprite_inputs, context_));
 
+    ShaderAttributeList probe_inputs;
+    probe_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    probe_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    probe_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
+    probe_shader_.reset(new Shader("shaders/probe-map.vert.glsl", "shaders/probe-map.frag.glsl", probe_inputs, context_));
+
     ShaderAttributeList ui_inputs;
     ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     auto ui_shader = std::unique_ptr<Shader>(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", ui_inputs, context_));
 
     if (geo_shader_ == nullptr ||
+        shadow_shader_ == nullptr ||
+        blur_shader_ == nullptr ||
+        direct_light_shader_ == nullptr ||
         light_shader_ == nullptr ||
         sprite_shader_ == nullptr ||
+        probe_shader_ == nullptr ||
         ui_shader == nullptr)
     {
         return false;
@@ -560,6 +689,10 @@ bool Graphics::MakeContext(Client::Info screen)
     blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
     light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
+    // TODO: Should tex map buffer be linearly sampled or nearest? (Currently linear)
+    //     Linear would make smoother lightmaps
+    //     Nearest would prevent bleeding between geometry edges
+    probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 2, context_));
 
     // GUI
     if (gui_ == nullptr)

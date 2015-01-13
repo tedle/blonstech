@@ -133,6 +133,14 @@ public:
     void Reload(Client::Info screen);
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to build global illumination for the scene. Should be called
+    /// **once** after all static geometry has been loaded.
+    ///
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    bool BuildLighting();
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Returns a pointer to the camera owned by the blons::Graphics manager
     /// that is used each frame to view renderable models
     ///
@@ -149,6 +157,9 @@ public:
 
 private:
     bool MakeContext(Client::Info screen);
+
+    // Should only be called once per map load
+    bool RenderProbeMaps();
 
     bool RenderGeometry(Matrix view_matrix);
     bool RenderShadowMaps(Matrix view_matrix);
@@ -171,6 +182,14 @@ private:
     std::unique_ptr<Framebuffer> blur_buffer_;
     std::unique_ptr<Framebuffer> direct_light_buffer_;
     std::unique_ptr<Framebuffer> light_buffer_;
+
+    // Light probe stuff
+    std::vector<Vector3> probes_;
+    std::unique_ptr<Camera> probe_view_;
+    std::unique_ptr<Shader> probe_shader_;
+    std::unique_ptr<Framebuffer> probe_buffer_;
+    Matrix probe_proj_matrix_;
+    const int kProbeMapSize = 32;
 
     Matrix proj_matrix_, ortho_matrix_;
 
