@@ -474,7 +474,7 @@ bool RenderGL40::Register3DMesh(BufferResource* vertex_buffer, BufferResource* i
     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(7*sizeof(float)));
     // Tangent declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(9*sizeof(float)));
+    glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(10*sizeof(float)));
     // Bitangent declaration
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(13*sizeof(float)));
