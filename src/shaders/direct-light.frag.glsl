@@ -33,17 +33,16 @@ uniform mat4 inv_vp_matrix;
 uniform mat4 light_vp_matrix;
 uniform sampler2D view_depth;
 uniform sampler2D light_depth;
+uniform sampler2D normal;
 
-void main(void)
+struct DirectionalLight
 {
-	// World coordinates of the pixel we're rendering
-	vec4 pos = vec4(tex_coord.x,
-					tex_coord.y + 1, // Invert and shift Y because FBOs are top-left origin
-					texture(view_depth, tex_coord).r,
-					1.0);
-	pos = inv_vp_matrix * (pos * 2.0 - 1.0);
-	pos /= pos.w;
+	vec3 dir;
+};
+uniform DirectionalLight sun;
 
+float PercentageList(vec4 pos)
+{
 	vec4 light_pos = light_vp_matrix * pos;
 
 	// Shouldn't need this I think? Cus orthographic matrix...
@@ -76,7 +75,27 @@ void main(void)
 	// incurred by the p smoothing as well as the natural bleed induced by VSM
 	p_max = smoothstep(0.2, 1.0, p_max);
 	// The actual percent amount that the fragment is affected by the light source
-	float lit = max(p, p_max);
+	return max(p, p_max);
+}
 
-	frag_colour = vec4(lit, lit, lit, 1.0f);
+void main(void)
+{
+	// World coordinates of the pixel we're rendering
+	vec4 pos = vec4(tex_coord.x,
+					tex_coord.y + 1, // Invert and shift Y because FBOs are top-left origin
+					texture(view_depth, tex_coord).r,
+					1.0);
+	pos = inv_vp_matrix * (pos * 2.0 - 1.0);
+	pos /= pos.w;
+
+	float lit = PercentageList(pos);
+
+	// For directional lights
+	vec4 eye_pos = inv_vp_matrix * vec4(0.0, 0.0, 0.0, 1.0);
+	eye_pos /= eye_pos.w;
+	vec3 view_dir = normalize(eye_pos.xyz - pos.xyz);
+	vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
+	float light_angle = clamp(dot(surface_normal, -sun.dir), 0.0, 1.0);
+
+	frag_colour = vec4(vec3(lit * light_angle), 1.0f);
 }

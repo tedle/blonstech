@@ -44,8 +44,6 @@ struct DirectionalLight
 {
 	vec3 dir;
 	vec3 colour;
-	vec3 ambient;
-	vec3 specular;
 };
 uniform DirectionalLight sun;
 
@@ -90,13 +88,13 @@ void main(void)
 	specular *= direct;
 
 	// Diffuse lighting (temporary)
-	vec3 diffuse = sun.colour * clamp(direct, 0.1, 1.0) * clamp(light_angle, 0.0, 1.0);
-	// Ambient lighting
-	diffuse += sun.ambient;
+	vec3 diffuse = sun.colour * clamp(direct, 0.0, 1.0);
+	// Ambient lighting (temporary)
+	diffuse += sun.colour * 0.01;
 
 	vec3 surface_colour = pow(texture(albedo, tex_coord).rgb, vec3(2.2));
 	surface_colour *= diffuse;
-	surface_colour += specular * sun.specular;
+	surface_colour += specular;
 
 	surface_colour = pow(surface_colour, vec3(1/2.2));
 	frag_colour = vec4(surface_colour, 1.0);

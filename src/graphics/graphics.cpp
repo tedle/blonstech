@@ -389,7 +389,9 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
         !direct_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||
         !direct_light_shader_->SetInput("light_vp_matrix", light_vp_matrix, context_) ||
         !direct_light_shader_->SetInput("view_depth", geometry_buffer_->depth(), 0, context_) ||
-        !direct_light_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 1, context_))
+        !direct_light_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 1, context_) ||
+        !direct_light_shader_->SetInput("normal", geometry_buffer_->textures()[1], 2, context_) ||
+        !direct_light_shader_->SetInput("sun.dir", sun_->direction(), context_))
     {
         return false;
     }
@@ -424,9 +426,6 @@ bool Graphics::RenderLighting(Matrix view_matrix)
         !light_shader_->SetInput("depth", geometry_buffer_->depth(), 2, context_) ||
         !light_shader_->SetInput("direct_light", direct_light_buffer_->textures()[0], 3, context_) ||
         !light_shader_->SetInput("sun.dir", sun_->direction(), context_) ||
-        // TODO: Better ambient and specular values
-        !light_shader_->SetInput("sun.specular", sun_->colour() * sun_->colour(), context_) ||
-        !light_shader_->SetInput("sun.ambient", sun_->colour() * 0.05f, context_) ||
         !light_shader_->SetInput("sun.colour", sun_->colour(), context_))
     {
         return false;

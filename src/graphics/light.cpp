@@ -92,7 +92,7 @@ Matrix Light::ViewFrustum(Matrix frustum, units::world depth) const
     //
     // We multiply max.z's depth by 1.3f to account for some floating point
     // imprecision behind the player when facing a light
-    max.z =  depth * 1.3f - max.z;
+    max.z =  depth * 1.5f - max.z;
     min.z = -depth - min.z;
 
     // TODO: Get rid of this when we do variance shadow maps (helps with swimming... a bit)
