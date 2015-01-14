@@ -139,6 +139,7 @@ bool Graphics::Render()
 {
     // Calculates view_matrix from scratch, so we cache it
     Matrix view_matrix = camera_->view_matrix();
+    Matrix light_vp_matrix = sun_->ViewFrustum(view_matrix * proj_matrix_, kScreenDepth);
 
     // Clear buffers
     context_->BeginScene(Vector3(0, 0, 0));
@@ -151,7 +152,15 @@ bool Graphics::Render()
 
     // Render all of the geometry and get their depth from the light
     // Then render a shadow map from the depth information
-    if (!RenderShadowMaps(view_matrix))
+    if (!RenderShadowMaps(view_matrix, light_vp_matrix))
+    {
+        return false;
+    }
+
+    // Render all of the geometry a few more times... :(
+    // Builds a direct light map and then bounce lighting
+    // Need to render geometry to get fragment position right
+    if (!RenderLightMaps(light_vp_matrix))
     {
         return false;
     }
@@ -323,7 +332,7 @@ bool Graphics::RenderGeometry(Matrix view_matrix)
     return true;
 }
 
-bool Graphics::RenderShadowMaps(Matrix view_matrix)
+bool Graphics::RenderShadowMaps(Matrix view_matrix, Matrix light_vp_matrix)
 {
     // TODO: Parallel split shadow maps
     //     Shouldn't be much harder than splitting clip distance in ndc_box of sun_->ViewFrustum
@@ -331,7 +340,6 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
     // Bind the shadow depth framebuffer to render all models onto
     shadow_buffer_->Bind(context_);
 
-    Matrix light_vp_matrix = sun_->ViewFrustum(view_matrix * proj_matrix_, kScreenDepth);
     // TODO: 3D pass ->
     //      Render everything as a batch as this is untextured
     for (const auto& model : models_)
@@ -428,6 +436,44 @@ bool Graphics::RenderShadowMaps(Matrix view_matrix)
     return true;
 }
 
+// Renders the scene geometry to a lightmap by using the light-depth buffer
+// with the lightmap UVs as vertex coordinates
+bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
+{
+    // Rendering to a 2D map so whatever!!!
+    context_->SetDepthTesting(false);
+    // Incase lightmap UVs are imperfect, allow them to overwrite themselves
+    context_->SetBlendMode(ADDITIVE);
+    // Since lightmap UVs have no regard for vertex winding
+    context_->SetCullMode(DISABLE);
+
+    direct_light_map_buffer_->Bind(Vector3(0, 0, 0), context_);
+    // TODO: 3D pass ->
+    //      Render everything as a batch as this is untextured
+    for (const auto& model : models_)
+    {
+        // Bind the vertex data
+        model->Render(context_);
+
+        // Set the inputs
+        if (!direct_light_map_shader_->SetInput("light_vp_matrix", light_vp_matrix, context_) ||
+            !direct_light_map_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 0, context_) ||
+            !direct_light_map_shader_->SetInput("sun.dir", sun_->direction(), context_))
+        {
+            return false;
+        }
+
+        // Make the draw call
+        if (!direct_light_map_shader_->Render(model->index_count(), context_))
+        {
+            return false;
+        }
+    }
+    context_->SetBlendMode(ALPHA);
+    context_->SetCullMode(ENABLE_CCW);
+    return true;
+}
+
 bool Graphics::RenderLighting(Matrix view_matrix)
 {
     // Bind the buffer to do all lighting calculations on
@@ -505,6 +551,9 @@ bool Graphics::RenderComposite()
         break;
     case 8:
         screen_texture = probe_map_buffer_->textures()[1];
+        break;
+    case 9:
+        screen_texture = direct_light_map_buffer_->textures()[0];
         break;
     case 0:
     default:
@@ -654,7 +703,6 @@ bool Graphics::MakeContext(Client::Info screen)
     ShaderAttributeList geo_inputs;
     geo_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     geo_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    geo_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
     geo_inputs.push_back(ShaderAttribute(NORMAL, "input_norm"));
     geo_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
     geo_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
@@ -673,6 +721,12 @@ bool Graphics::MakeContext(Client::Info screen)
     direct_light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     direct_light_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     direct_light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/direct-light.frag.glsl", direct_light_inputs, context_));
+
+    ShaderAttributeList direct_light_map_inputs;
+    direct_light_map_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    direct_light_map_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
+    direct_light_map_inputs.push_back(ShaderAttribute(NORMAL, "input_norm"));
+    direct_light_map_shader_.reset(new Shader("shaders/direct-light-map.vert.glsl", "shaders/direct-light-map.frag.glsl", direct_light_map_inputs, context_));
 
     ShaderAttributeList light_inputs;
     light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
@@ -703,6 +757,7 @@ bool Graphics::MakeContext(Client::Info screen)
         shadow_shader_ == nullptr ||
         blur_shader_ == nullptr ||
         direct_light_shader_ == nullptr ||
+        direct_light_map_shader_ == nullptr ||
         light_shader_ == nullptr ||
         sprite_shader_ == nullptr ||
         probe_map_shader_ == nullptr ||
@@ -716,6 +771,8 @@ bool Graphics::MakeContext(Client::Info screen)
     shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
+    // Direct light only stores intensity so we use single channel A8
+    direct_light_map_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::A8, TextureHint::LINEAR } }, false, context_));
     light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
     // TODO: Should tex map buffer be linearly sampled or nearest? (Currently linear)
     //     Linear would make smoother lightmaps

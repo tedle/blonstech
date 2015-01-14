@@ -83,6 +83,8 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector4 value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
 
+    bool SetBlendMode(BlendMode mode) override;
+    bool SetCullMode(CullMode mode) override;
     bool SetDepthTesting(bool enable) override;
     bool SetViewport(Box viewport) override;
 

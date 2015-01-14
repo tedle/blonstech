@@ -340,5 +340,11 @@
     <None Include="shaders\probe-map-clear.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\direct-light-map.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\direct-light-map.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

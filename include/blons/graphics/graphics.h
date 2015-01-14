@@ -68,6 +68,10 @@ const units::world kScreenNear = 0.1f;
 /// \brief **Temporary** config option for shadow map resolution
 ////////////////////////////////////////////////////////////////////////////////
 const units::pixel kShadowMapResolution = 1024;
+////////////////////////////////////////////////////////////////////////////////
+/// \brief **Temporary** config option for light map resolution
+////////////////////////////////////////////////////////////////////////////////
+const units::pixel kLightMapResolution = 512;
 
 // Forward declarations
 class Light;
@@ -162,7 +166,8 @@ private:
     bool RenderProbeMaps();
 
     bool RenderGeometry(Matrix view_matrix);
-    bool RenderShadowMaps(Matrix view_matrix);
+    bool RenderShadowMaps(Matrix view_matrix, Matrix light_vp_matrix);
+    bool RenderLightMaps(Matrix light_vp_matrix);
     bool RenderLighting(Matrix view_matrix);
     bool RenderComposite();
     bool RenderSprites();
@@ -175,12 +180,14 @@ private:
     std::unique_ptr<Shader> shadow_shader_;
     std::unique_ptr<Shader> blur_shader_;
     std::unique_ptr<Shader> direct_light_shader_;
+    std::unique_ptr<Shader> direct_light_map_shader_;
     std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Shader> sprite_shader_;
     std::unique_ptr<Framebuffer> geometry_buffer_;
     std::unique_ptr<Framebuffer> shadow_buffer_;
     std::unique_ptr<Framebuffer> blur_buffer_;
     std::unique_ptr<Framebuffer> direct_light_buffer_;
+    std::unique_ptr<Framebuffer> direct_light_map_buffer_;
     std::unique_ptr<Framebuffer> light_buffer_;
 
     // Light probe stuff

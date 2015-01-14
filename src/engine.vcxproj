@@ -273,6 +273,8 @@
   <ItemGroup>
     <None Include="shaders\blur.frag.glsl" />
     <None Include="shaders\blur.vert.glsl" />
+    <None Include="shaders\direct-light-map.frag.glsl" />
+    <None Include="shaders\direct-light-map.vert.glsl" />
     <None Include="shaders\light.frag.glsl" />
     <None Include="shaders\mesh.frag.glsl" />
     <None Include="shaders\mesh.vert.glsl" />

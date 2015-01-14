@@ -24,26 +24,18 @@
 #version 400
 
 // Ins n outs
-in vec2 tex_coord;
-in mat3 norm;
+in vec3 input_pos;
+in vec2 input_light_uv;
+in vec3 input_norm;
 
-out vec4 frag_colour;
-out vec4 norm_colour;
-out vec4 debug_colour;
-
-// Globals
-uniform sampler2D albedo;
-uniform sampler2D normal;
+out vec3 pos;
+out vec3 normal;
 
 void main(void)
 {
-	// Albedo
-	frag_colour = texture(albedo, tex_coord);
+	vec2 texture_pos = (input_light_uv * 2) - 1;
+    gl_Position = vec4(texture_pos, 0.0, 1.0);
 
-	// Normal
-	vec3 norm_map = texture(normal, tex_coord).rgb * 2 - 1;
-	norm_colour = vec4((norm_map * norm + 1) / 2, 1.0);
-
-	// Debug out (UV coords)
-	debug_colour = vec4(tex_coord.xy, 0.0, 1.0);
+	pos = input_pos;
+	normal = input_norm;
 }

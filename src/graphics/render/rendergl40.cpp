@@ -941,6 +941,49 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const
     return SetShaderInput(program, name, texture_index);
 }
 
+bool RenderGL40::SetBlendMode(BlendMode mode)
+{
+    GLint sfunc, dfunc;
+    switch (mode)
+    {
+    case ADDITIVE:
+        sfunc = GL_ONE;
+        dfunc = GL_ONE;
+        break;
+    default:
+    case ALPHA:
+        sfunc = GL_SRC_ALPHA;
+        dfunc = GL_ONE_MINUS_SRC_ALPHA;
+        break;
+    }
+    glBlendFunc(sfunc, dfunc);
+
+    return true;
+}
+
+bool RenderGL40::SetCullMode(CullMode mode)
+{
+    switch (mode)
+    {
+    case DISABLE:
+        glDisable(GL_CULL_FACE);
+        break;
+    case ENABLE_CW:
+        glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CW);
+        glCullFace(GL_BACK);
+        break;
+    case ENABLE_CCW:
+    default:
+        glEnable(GL_CULL_FACE);
+        glFrontFace(GL_CCW);
+        glCullFace(GL_BACK);
+        break;
+    }
+
+    return true;
+}
+
 bool RenderGL40::SetDepthTesting(bool enable)
 {
     if (enable == depth_testing_)
