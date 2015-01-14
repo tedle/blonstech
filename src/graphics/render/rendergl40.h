@@ -41,7 +41,7 @@ public:
     RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen);
     ~RenderGL40() override;
 
-    void BeginScene() override;
+    void BeginScene(Vector3 clear_colour) override;
     void EndScene() override;
 
     BufferResource* MakeBufferResource() override;

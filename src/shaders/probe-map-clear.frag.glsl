@@ -25,19 +25,16 @@
 
 // Ins n outs
 in vec2 tex_coord;
-in vec2 lightmap_coord;
 
 out vec4 albedo_colour;
 out vec4 tex_colour;
 
 // Globals
-uniform sampler2D albedo;
+uniform vec3 clear_colour;
+uniform vec3 sky_colour;
 
 void main(void)
 {
-	// Albedo
-	albedo_colour = texture(albedo, tex_coord);
-
-	// Texture lookup
-	tex_colour = vec4(lightmap_coord.xy, 0.0, 1.0);
+    albedo_colour = vec4(sky_colour, 1.0);
+	tex_colour = vec4(clear_colour, 1.0);
 }

@@ -398,9 +398,9 @@ RenderGL40::~RenderGL40()
     g_active_context = 0;
 }
 
-void RenderGL40::BeginScene()
+void RenderGL40::BeginScene(Vector3 clear_colour)
 {
-    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClearColor(clear_colour.r, clear_colour.g, clear_colour.b, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 

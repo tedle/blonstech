@@ -94,6 +94,11 @@ Matrix Light::ViewFrustum(Matrix frustum, units::world depth) const
     // imprecision behind the player when facing a light
     max.z =  depth * 1.5f - max.z;
     min.z = -depth - min.z;
+    // The sides also get a bit of a buffer to help the accuracy of indirect lighting
+    min.x -= 10.0f;
+    max.x += 10.0f;
+    min.y -= 10.0f;
+    max.y += 10.0f;
 
     // TODO: Get rid of this when we do variance shadow maps (helps with swimming... a bit)
     const float step = 1024.0f; ///< shadow map resolution, hardcoded because this is temporary

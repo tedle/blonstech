@@ -77,11 +77,18 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds the framebuffer to the supplied rendering context causing all
     /// subsequent draw calls to be drawn to this buffer. Updates the viewport to
-    /// match the size of the buffer's output texture
+    /// match the size of the buffer's output texture and clears all textures to the
+    /// given colour
     ///
+    /// \param clear_colour Colour to fill the screen with
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
+    void Bind(Vector3 clear_colour, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls Bind(Vector3, RenderContext&) with a default colour black
+    ////////////////////////////////////////////////////////////////////////////////
     void Bind(RenderContext& context);
+
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Unbinds the framebuffer causing all subsequent draw calls to be drawn
     /// to the default back buffer. Updates the viewport to match the size of the

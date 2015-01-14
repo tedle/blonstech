@@ -186,8 +186,9 @@ private:
     // Light probe stuff
     std::vector<Vector3> probes_;
     std::unique_ptr<Camera> probe_view_;
-    std::unique_ptr<Shader> probe_shader_;
-    std::unique_ptr<Framebuffer> probe_buffer_;
+    std::unique_ptr<Shader> probe_map_shader_;
+    std::unique_ptr<Shader> probe_map_clear_shader_;
+    std::unique_ptr<Framebuffer> probe_map_buffer_;
     Matrix probe_proj_matrix_;
     const int kProbeMapSize = 32;
 
@@ -195,6 +196,7 @@ private:
 
     // TODO: Make this user customizable
     std::unique_ptr<Light> sun_;
+    Vector3 sky_colour_;
 
     std::set<class ManagedModel*> models_;
     std::set<class ManagedSprite*> sprites_;

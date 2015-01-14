@@ -46,13 +46,20 @@ struct DirectionalLight
 	vec3 colour;
 };
 uniform DirectionalLight sun;
+uniform vec3 sky_colour;
 
 void main(void)
 {
+	float depth_sample = texture(depth, tex_coord).r;
+	if (depth_sample == 1.0)
+	{
+		frag_colour = vec4(sky_colour, 1.0);
+		return;
+	}
 	// World coordinates of the pixel we're rendering
 	vec4 pos = vec4(tex_coord.x,
 					tex_coord.y + 1, // Invert and shift Y because FBOs are top-left origin
-					texture(depth, tex_coord).r,
+					depth_sample,
 					1.0);
 	pos = inv_vp_matrix * (pos * 2.0 - 1.0);
 	pos /= pos.w;

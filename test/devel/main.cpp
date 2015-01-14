@@ -35,30 +35,31 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     auto gui = graphics->gui();
     std::vector<std::unique_ptr<blons::Model>> models;
 
-    // Model 1
-    models.push_back(graphics->MakeModel("teapot_highpoly.bms"));
-    models[0]->set_pos(0.0, 0.0, 20.0);
-
-    // Model 2
-    models.push_back(graphics->MakeModel("cube.bms"));
-    models[1]->set_pos(10.0, 0.0, 20.0);
-
-    // Model 3
-    models.push_back(graphics->MakeModel("bumpy_cube/mesh/bumpy_cube.bms"));
-    models[2]->set_pos(20.0, 0.0, 20.0);
-
-    // Model 4
-    models.push_back(graphics->MakeModel("plane.bms"));
-    models[3]->set_pos(30.0, 0.0, 20.0);
-
-    // Model 5
-    models.push_back(graphics->MakeModel("blons:sphere"));
-    models[4]->set_pos(0.0, 5.0, 0.0);
-
     // Big scene
     models = blons::temp::load_codmap("bms_test2uv", std::move(models), graphics.get());
 
+    // The extra models don't have unique lightmap UVs yet, so we build without them
     graphics->BuildLighting();
+
+    // Model 1
+    models.push_back(graphics->MakeModel("teapot_highpoly.bms"));
+    models.back()->set_pos(0.0, 0.0, 20.0);
+
+    // Model 2
+    models.push_back(graphics->MakeModel("cube.bms"));
+    models.back()->set_pos(10.0, 0.0, 20.0);
+
+    // Model 3
+    models.push_back(graphics->MakeModel("bumpy_cube/mesh/bumpy_cube.bms"));
+    models.back()->set_pos(20.0, 0.0, 20.0);
+
+    // Model 4
+    models.push_back(graphics->MakeModel("plane.bms"));
+    models.back()->set_pos(30.0, 0.0, 20.0);
+
+    // Model 5
+    models.push_back(graphics->MakeModel("blons:sphere"));
+    models.back()->set_pos(0.0, 5.0, 0.0);
 
     // Sprite 1
     auto sprite = graphics->MakeSprite("me.dds");

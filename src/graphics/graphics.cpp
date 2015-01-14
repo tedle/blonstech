@@ -90,6 +90,7 @@ Graphics::Graphics(Client::Info screen)
                          Vector3(20.0f, 20.0f, 5.0f),   // position
                          Vector3(-10.0f, -2.0f, -5.0f), // direction
                          Vector3(1.0f, 0.8f, 0.3f)));   // colour
+    sky_colour_ = Vector3(0.3f, 0.6f, 1.0f);
 }
 
 Graphics::~Graphics()
@@ -140,7 +141,7 @@ bool Graphics::Render()
     Matrix view_matrix = camera_->view_matrix();
 
     // Clear buffers
-    context_->BeginScene();
+    context_->BeginScene(Vector3(0, 0, 0));
 
     // Render all of the geometry and accompanying info (normal, depth, etc)
     if (!RenderGeometry(view_matrix))
@@ -186,10 +187,33 @@ bool Graphics::Render()
 
 bool Graphics::RenderProbeMaps()
 {
+    // Since the UV pass only writes to 2 channels, we want the clear colour
+    // to be "all on" in the third channel so we can tell when there is no
+    // valid value to sample (looking at the sky)
+    // However the diffuse pass should use the sky_colour_ when looking at the
+    // sky... so we solve this by doing a clear-pass over the textures where we
+    // write the proper clear colours to each one (like a unique pseudo-skybox)
+    context_->SetDepthTesting(false);
+    probe_map_buffer_->Bind(context_);
+
+    Matrix clear_matrix = MatrixOrthographic(0,
+                                             static_cast<units::world>(6 * kProbeMapSize),
+                                             static_cast<units::world>(probes_.size() * kProbeMapSize),
+                                             0, 0, 1);
+    probe_map_buffer_->Render(context_);
+    if (!probe_map_clear_shader_->SetInput("proj_matrix", clear_matrix, context_) ||
+        !probe_map_clear_shader_->SetInput("clear_colour", Vector3(0.0, 0.0, 1.0), context_) ||
+        !probe_map_clear_shader_->SetInput("sky_colour", sky_colour_, context_))
+    {
+        return false;
+    }
+    if (!probe_map_clear_shader_->Render(probe_map_buffer_->index_count(), context_))
+    {
+        return false;
+    }
+
+    // And now we actually render the scene into the probe maps...
     context_->SetDepthTesting(true);
-
-    probe_buffer_->Bind(context_);
-
     auto render_models = [&](const Matrix& view)
     {
         // TODO: This can be batch for sure
@@ -203,14 +227,14 @@ bool Graphics::RenderProbeMaps()
 
             Matrix model_view_proj = model->world_matrix() * view_proj;
             // Set the inputs
-            if (!probe_shader_->SetInput("mvp_matrix", model_view_proj, context_) ||
-                !probe_shader_->SetInput("albedo", model->albedo(), 0, context_))
+            if (!probe_map_shader_->SetInput("mvp_matrix", model_view_proj, context_) ||
+                !probe_map_shader_->SetInput("albedo", model->albedo(), 0, context_))
             {
                 return false;
             }
 
             // Make the draw call
-            if (!probe_shader_->Render(model->index_count(), context_))
+            if (!probe_map_shader_->Render(model->index_count(), context_))
             {
                 return false;
             }
@@ -260,7 +284,7 @@ bool Graphics::RenderProbeMaps()
             return false;
         }
     }
-    probe_buffer_->Unbind(context_);
+    probe_map_buffer_->Unbind(context_);
     return true;
 }
 
@@ -426,7 +450,8 @@ bool Graphics::RenderLighting(Matrix view_matrix)
         !light_shader_->SetInput("depth", geometry_buffer_->depth(), 2, context_) ||
         !light_shader_->SetInput("direct_light", direct_light_buffer_->textures()[0], 3, context_) ||
         !light_shader_->SetInput("sun.dir", sun_->direction(), context_) ||
-        !light_shader_->SetInput("sun.colour", sun_->colour(), context_))
+        !light_shader_->SetInput("sun.colour", sun_->colour(), context_) ||
+        !light_shader_->SetInput("sky_colour", sky_colour_, context_))
     {
         return false;
     }
@@ -476,10 +501,10 @@ bool Graphics::RenderComposite()
         screen_texture = direct_light_buffer_->textures()[0];
         break;
     case 7:
-        screen_texture = probe_buffer_->textures()[0];
+        screen_texture = probe_map_buffer_->textures()[0];
         break;
     case 8:
-        screen_texture = probe_buffer_->textures()[1];
+        screen_texture = probe_map_buffer_->textures()[1];
         break;
     case 0:
     default:
@@ -571,7 +596,7 @@ bool Graphics::BuildLighting()
 {
     log::Debug("Building irradiance volumes... ");
     Timer timer;
-    context_->BeginScene();
+    context_->BeginScene(Vector3(0, 0, 0));
     // Render out a cube map for every probe to sample scene data from (should only be called once per map load... put in make context?)
     if (!RenderProbeMaps())
     {
@@ -659,11 +684,15 @@ bool Graphics::MakeContext(Client::Info screen)
     sprite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     sprite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", sprite_inputs, context_));
 
-    ShaderAttributeList probe_inputs;
-    probe_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    probe_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    probe_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
-    probe_shader_.reset(new Shader("shaders/probe-map.vert.glsl", "shaders/probe-map.frag.glsl", probe_inputs, context_));
+    ShaderAttributeList probe_map_inputs;
+    probe_map_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    probe_map_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    probe_map_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
+    probe_map_shader_.reset(new Shader("shaders/probe-map.vert.glsl", "shaders/probe-map.frag.glsl", probe_map_inputs, context_));
+
+    ShaderAttributeList probe_map_clear_inputs;
+    probe_map_clear_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    probe_map_clear_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/probe-map-clear.frag.glsl", probe_map_clear_inputs, context_));
 
     ShaderAttributeList ui_inputs;
     ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
@@ -676,7 +705,7 @@ bool Graphics::MakeContext(Client::Info screen)
         direct_light_shader_ == nullptr ||
         light_shader_ == nullptr ||
         sprite_shader_ == nullptr ||
-        probe_shader_ == nullptr ||
+        probe_map_shader_ == nullptr ||
         ui_shader == nullptr)
     {
         return false;
@@ -691,7 +720,7 @@ bool Graphics::MakeContext(Client::Info screen)
     // TODO: Should tex map buffer be linearly sampled or nearest? (Currently linear)
     //     Linear would make smoother lightmaps
     //     Nearest would prevent bleeding between geometry edges
-    probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 2, context_));
+    probe_map_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 2, context_));
 
     // GUI
     if (gui_ == nullptr)

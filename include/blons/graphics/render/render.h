@@ -204,8 +204,10 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Called at the beginning of each frame, allows for any necessary setup
+    ///
+    /// \param clear_colour The colour to fill empty space with
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void BeginScene()=0;
+    virtual void BeginScene(Vector3 clear_colour)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Called at the end of each frame, allows for any necessary teardown
     /// and framebuffer swapping
