@@ -88,7 +88,10 @@ Graphics::Graphics(Client::Info screen)
     // TODO: User should be doing this somehow
     sun_.reset(new Light(Light::DIRECTIONAL,
                          Vector3(20.0f, 20.0f, 5.0f),   // position
-                         Vector3(-10.0f, -2.0f, -5.0f), // direction
+                         // Sunset
+                         //Vector3(-10.0f, -2.0f, -5.0f), // direction
+                         // Noon
+                         Vector3(-2.0f, -5.0f, -0.5f),
                          Vector3(1.0f, 0.8f, 0.3f)));   // colour
     sky_colour_ = Vector3(0.3f, 0.6f, 1.0f);
 }
@@ -205,12 +208,8 @@ bool Graphics::RenderProbeMaps()
     context_->SetDepthTesting(false);
     probe_map_buffer_->Bind(context_);
 
-    Matrix clear_matrix = MatrixOrthographic(0,
-                                             static_cast<units::world>(6 * kProbeMapSize),
-                                             static_cast<units::world>(probes_.size() * kProbeMapSize),
-                                             0, 0, 1);
     probe_map_buffer_->Render(context_);
-    if (!probe_map_clear_shader_->SetInput("proj_matrix", clear_matrix, context_) ||
+    if (!probe_map_clear_shader_->SetInput("proj_matrix", probe_ortho_matrix_, context_) ||
         !probe_map_clear_shader_->SetInput("clear_colour", Vector3(0.0, 0.0, 1.0), context_) ||
         !probe_map_clear_shader_->SetInput("sky_colour", sky_colour_, context_))
     {
@@ -447,7 +446,7 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
     // Since lightmap UVs have no regard for vertex winding
     context_->SetCullMode(DISABLE);
 
-    direct_light_map_buffer_->Bind(Vector3(0, 0, 0), context_);
+    light_map_accumulation_buffer_->Bind(Vector3(0, 0, 0), context_);
     // TODO: 3D pass ->
     //      Render everything as a batch as this is untextured
     for (const auto& model : models_)
@@ -458,6 +457,7 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
         // Set the inputs
         if (!direct_light_map_shader_->SetInput("light_vp_matrix", light_vp_matrix, context_) ||
             !direct_light_map_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 0, context_) ||
+            !direct_light_map_shader_->SetInput("sun.colour", sun_->colour(), context_) ||
             !direct_light_map_shader_->SetInput("sun.dir", sun_->direction(), context_))
         {
             return false;
@@ -471,6 +471,25 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
     }
     context_->SetBlendMode(ALPHA);
     context_->SetCullMode(ENABLE_CCW);
+
+    // Render lightmap to our light probes
+    probe_buffer_->Bind(context_);
+    probe_buffer_->Render(context_);
+    // Set the inputs
+    if (!probe_shader_->SetInput("proj_matrix", probe_ortho_matrix_, context_) ||
+        !probe_shader_->SetInput("probe_albedo", probe_map_buffer_->textures()[0], 0, context_) ||
+        !probe_shader_->SetInput("probe_texmap", probe_map_buffer_->textures()[1], 1, context_) ||
+        !probe_shader_->SetInput("lightmap", light_map_accumulation_buffer_->textures()[0], 2, context_) ||
+        !probe_shader_->SetInput("sky_colour", sky_colour_, context_))
+    {
+        return false;
+    }
+
+    // Make the draw call
+    if (!probe_shader_->Render(probe_buffer_->index_count(), context_))
+    {
+        return false;
+    }
     return true;
 }
 
@@ -515,15 +534,18 @@ bool Graphics::RenderComposite()
     // TODO: TEMP DEBUG CODE. CLEAN THIS UP!!!
     static bool init = true;
     static const console::Variable* target = nullptr;
+    static std::unique_ptr<Sprite> target_sprite(new Sprite("blons:none", context_));
     static std::unique_ptr<Sprite> alt_target(new Sprite("blons:none", context_));
     if (init)
     {
         console::RegisterVariable("gfx:target", 0);
         target = console::var("gfx:target");
         init = false;
-        alt_target->set_pos(580, 360, 200, 200);
+        alt_target->set_pos(1380, 660, 200, 200);
         alt_target->set_subtexture(0, 0, 16, -16);
     }
+    target_sprite->set_pos(0, 0, screen_.width, screen_.height);
+    target_sprite->set_subtexture(0, 0, 16, -16);
     const TextureResource* screen_texture;
     const TextureResource* alt_screen_texture;
     switch (target->to<int>())
@@ -548,25 +570,31 @@ bool Graphics::RenderComposite()
         break;
     case 7:
         screen_texture = probe_map_buffer_->textures()[0];
+        target_sprite->set_pos(0, 0, screen_.width / 8, screen_.height);
         break;
     case 8:
         screen_texture = probe_map_buffer_->textures()[1];
+        target_sprite->set_pos(0, 0, screen_.width / 8, screen_.height);
         break;
     case 9:
-        screen_texture = direct_light_map_buffer_->textures()[0];
+        screen_texture = light_map_accumulation_buffer_->textures()[0];
+        break;
+    case 10:
+        screen_texture = probe_buffer_->textures()[0];
+        target_sprite->set_pos(0, 0, screen_.width / 8, screen_.height);
         break;
     case 0:
     default:
         screen_texture = light_buffer_->textures()[0];
         break;
     }
-    alt_screen_texture = shadow_buffer_->textures()[0];
+    alt_screen_texture = geometry_buffer_->textures()[0];
 
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
 
     // Push the full screen quad used to render FBO
-    light_buffer_->Render(context_);
+    target_sprite->Render(context_);
 
     // Set the inputs
     if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
@@ -575,7 +603,7 @@ bool Graphics::RenderComposite()
         return false;
     }
 
-    if (!sprite_shader_->Render(light_buffer_->index_count(), context_))
+    if (!sprite_shader_->Render(target_sprite->index_count(), context_))
     {
         return false;
     }
@@ -667,6 +695,8 @@ gui::Manager* Graphics::gui() const
 
 bool Graphics::MakeContext(Client::Info screen)
 {
+    screen_ = screen;
+
     // DirectX
     //context_ = RenderContext(new RenderD3D11);
 
@@ -688,17 +718,37 @@ bool Graphics::MakeContext(Client::Info screen)
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height), 0,
                                        kScreenNear, kScreenDepth);
 
+    // Initialize our light probes...
+    // TODO: Should be in map data somewhere, probably
+    for (int x = -15; x <= 15; x += 5)
+    {
+        for (int y = 3; y <= 8; y += 5)
+        {
+            for (int z = -5; z <= 5; z += 5)
+            {
+                probes_.push_back(Vector3(static_cast<units::world>(x),
+                                          static_cast<units::world>(y),
+                                          static_cast<units::world>(z)));
+            }
+        }
+    }
+    for (int x = -8; x <= 8; x += 4)
+    {
+        int y = 12;
+        int z = 0;
+        probes_.push_back(Vector3(static_cast<units::world>(x),
+                                  static_cast<units::world>(y),
+                                  static_cast<units::world>(z)));
+    }
     // Probe projection matrix (cube map perspective)
     // 90 degree FOV to make seems between edges add up perfectly to 360
     // Cube map aspect ratio, of course, is 1
     probe_proj_matrix_ = MatrixPerspective(kPi / 2, 1.0f, kScreenNear, kScreenDepth);
-
-    // Initialize our light probes...
-    // TODO: Should be in map data somewhere, probably
-    probes_ = { Vector3(0.0f, 5.0f, 0.0f),
-                Vector3(5.0f, 5.0f, 0.0f),
-                Vector3(-5.0f, 5.0f, 0.0f) };
-
+    // For when we do probe lookups and renders
+    probe_ortho_matrix_ = MatrixOrthographic(0,
+                                             static_cast<units::world>(6 * kProbeMapSize),
+                                             static_cast<units::world>(probes_.size() * kProbeMapSize),
+                                             0, 0, 1);
     // Shaders
     ShaderAttributeList geo_inputs;
     geo_inputs.push_back(ShaderAttribute(POS, "input_pos"));
@@ -748,6 +798,11 @@ bool Graphics::MakeContext(Client::Info screen)
     probe_map_clear_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     probe_map_clear_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/probe-map-clear.frag.glsl", probe_map_clear_inputs, context_));
 
+    ShaderAttributeList probe_inputs;
+    probe_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    probe_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    probe_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/probe.frag.glsl", probe_inputs, context_));
+
     ShaderAttributeList ui_inputs;
     ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
@@ -761,6 +816,8 @@ bool Graphics::MakeContext(Client::Info screen)
         light_shader_ == nullptr ||
         sprite_shader_ == nullptr ||
         probe_map_shader_ == nullptr ||
+        probe_map_clear_shader_ == nullptr ||
+        probe_shader_ == nullptr ||
         ui_shader == nullptr)
     {
         return false;
@@ -771,13 +828,13 @@ bool Graphics::MakeContext(Client::Info screen)
     shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
-    // Direct light only stores intensity so we use single channel A8
-    direct_light_map_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::A8, TextureHint::LINEAR } }, false, context_));
+    light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context_));
     light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
     // TODO: Should tex map buffer be linearly sampled or nearest? (Currently linear)
     //     Linear would make smoother lightmaps
     //     Nearest would prevent bleeding between geometry edges
     probe_map_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 2, context_));
+    probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 1, context_));
 
     // GUI
     if (gui_ == nullptr)

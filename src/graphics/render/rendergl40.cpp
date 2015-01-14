@@ -567,8 +567,17 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
             GLint internalformat;
             switch (hint.format)
             {
+            case TextureHint::A8:
+                internalformat = GL_R8;
+                break;
+            case TextureHint::R8G8B8A8:
+                internalformat = GL_RGBA8;
+                break;
             case TextureHint::R16G16:
                 internalformat = GL_RG16;
+                break;
+            case TextureHint::R32G32B32A32:
+                internalformat = GL_RGBA32F;
                 break;
             case TextureHint::NONE:
             case TextureHint::R8G8B8:

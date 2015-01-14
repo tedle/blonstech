@@ -165,8 +165,8 @@ void Client::InitWindow(units::pixel* screen_width, units::pixel* screen_height)
     }
     else if (kRenderMode == RenderMode::WINDOW)
     {
-        r_width  = 800;
-        r_height = 600;
+        r_width  = 1600;
+        r_height = 900;
 
         pos_x = (GetSystemMetrics(SM_CXSCREEN) - r_width)  / 2;
         pos_y = (GetSystemMetrics(SM_CYSCREEN) - r_height) / 2;

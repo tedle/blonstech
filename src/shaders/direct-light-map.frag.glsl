@@ -35,6 +35,7 @@ uniform sampler2D light_depth;
 
 struct DirectionalLight
 {
+	vec3 colour;
 	vec3 dir;
 };
 uniform DirectionalLight sun;
@@ -82,5 +83,8 @@ void main(void)
 
 	float light_angle = clamp(dot(normal, -sun.dir), 0.0, 1.0);
 
-	frag_colour = vec4(vec3(lit * light_angle), 1.0);
+	// Use 0 alpha because blend mode is set to additive and we already
+	// filled with a clear colour of 0,0,0,1 before calling this shader
+	// Pretty hacky, but lets us combine the direct and indirect lightmap safely
+	frag_colour = vec4(lit * light_angle * sun.colour, 0.0);
 }

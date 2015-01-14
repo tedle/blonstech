@@ -59,7 +59,7 @@ const bool kEnableVsync = false;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief **Temporary** config option for max render distance
 ////////////////////////////////////////////////////////////////////////////////
-const units::world kScreenDepth = 50.0f;
+const units::world kScreenDepth = 100.0f;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief **Temporary** config option for nearest render distance
 ////////////////////////////////////////////////////////////////////////////////
@@ -173,6 +173,7 @@ private:
     bool RenderSprites();
 
     RenderContext context_;
+    Client::Info screen_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<gui::Manager> gui_;
     // TODO: Document the pipeline
@@ -187,7 +188,7 @@ private:
     std::unique_ptr<Framebuffer> shadow_buffer_;
     std::unique_ptr<Framebuffer> blur_buffer_;
     std::unique_ptr<Framebuffer> direct_light_buffer_;
-    std::unique_ptr<Framebuffer> direct_light_map_buffer_;
+    std::unique_ptr<Framebuffer> light_map_accumulation_buffer_;
     std::unique_ptr<Framebuffer> light_buffer_;
 
     // Light probe stuff
@@ -195,8 +196,10 @@ private:
     std::unique_ptr<Camera> probe_view_;
     std::unique_ptr<Shader> probe_map_shader_;
     std::unique_ptr<Shader> probe_map_clear_shader_;
+    std::unique_ptr<Shader> probe_shader_;
     std::unique_ptr<Framebuffer> probe_map_buffer_;
-    Matrix probe_proj_matrix_;
+    std::unique_ptr<Framebuffer> probe_buffer_;
+    Matrix probe_proj_matrix_, probe_ortho_matrix_;
     const int kProbeMapSize = 32;
 
     Matrix proj_matrix_, ortho_matrix_;

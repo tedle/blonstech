@@ -107,6 +107,8 @@ Matrix Light::ViewFrustum(Matrix frustum, units::world depth) const
     min.y = ceil(min.y * step) / step;
     max.y = (ceil((max.y - min.y) * step) / step) + min.y;
 
+    // TODO: TEMPORARY disabling shadow map frustum calculations
+    min.x = -25; max.x = 15; min.y = -20; max.y = 25; min.z = -30; max.z = 100;
     // Make a projection matrix that perfectly views the camera's frustum
     Matrix light_frustum = MatrixOrthographic(min.x, max.x, min.y, max.y, min.z, max.z);
 

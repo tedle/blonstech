@@ -281,6 +281,7 @@
     <None Include="shaders\probe-map-clear.frag.glsl" />
     <None Include="shaders\probe-map.frag.glsl" />
     <None Include="shaders\probe-map.vert.glsl" />
+    <None Include="shaders\probe.frag.glsl" />
     <None Include="shaders\shadow.frag.glsl" />
     <None Include="shaders\shadow.vert.glsl" />
     <None Include="shaders\direct-light.frag.glsl" />
