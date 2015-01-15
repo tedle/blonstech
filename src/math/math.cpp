@@ -281,7 +281,7 @@ Matrix MatrixView(Vector3 pos, Vector3 rot)
     // Default viewing angle (0 pitch/yaw points this way!)
     view_look.x = 0.0f;
     view_look.y = 0.0f;
-    view_look.z = 1.0f;
+    view_look.z = -1.0f;
 
     // 0.017 = pi/180 , converts to radians BUT WE LIVE IN RADIANS
     pitch = rot.x; // * 0.0174532925f;

@@ -76,6 +76,7 @@ Graphics::Graphics(Client::Info screen)
     }
 
     camera_->set_pos(0.0f, 0.0f, -10.0f);
+    camera_->set_rot(0, kPi, 0);
 
     // Probe camera
     probe_view_.reset(new Camera);
@@ -305,12 +306,12 @@ bool Graphics::BuildProbeMaps()
 
         // Up view
         context_->SetViewport(Box(kProbeMapSize * 4, kProbeMapSize * i, kProbeMapSize, kProbeMapSize));
-        probe_view_->set_rot(kPi / -2.0f, 0.0f, 0.0f);
+        probe_view_->set_rot(kPi / 2.0f, 0.0f, 0.0f);
         success &= render_models(probe_view_->view_matrix());
 
         // Down view
         context_->SetViewport(Box(kProbeMapSize * 5, kProbeMapSize * i, kProbeMapSize, kProbeMapSize));
-        probe_view_->set_rot(kPi / 2.0f, 0.0f, 0.0f);
+        probe_view_->set_rot(kPi / -2.0f, 0.0f, 0.0f);
         success &= render_models(probe_view_->view_matrix());
 
         if (!success)

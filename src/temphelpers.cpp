@@ -49,7 +49,7 @@ void noclip(Input* input, Camera* camera)
     if (input->IsMouseDown(0))
     {
         Vector3 rot = camera->rot();
-        rot.x += input->mouse_delta_y() * 0.003f;
+        rot.x -= input->mouse_delta_y() * 0.003f;
         rot.y -= input->mouse_delta_x() * 0.003f;
         camera->set_rot(rot.x, rot.y, 0.0);
     }
@@ -76,19 +76,19 @@ void noclip(Input* input, Camera* camera)
         // Figure out which way we wanna move, to be plugged into atan2
         if (input->IsKeyDown(Input::CHAR_W))
         {
-            ud += 1;
+            ud -= 1;
         }
         if (input->IsKeyDown(Input::CHAR_S))
         {
-            ud -= 1;
+            ud += 1;
         }
         if (input->IsKeyDown(Input::CHAR_A))
         {
-            lr += 1;
+            lr -= 1;
         }
         if (input->IsKeyDown(Input::CHAR_D))
         {
-            lr -= 1;
+            lr += 1;
         }
 
         // We do ud and lr separately because lr is NOT affected by pitch, but ud is
