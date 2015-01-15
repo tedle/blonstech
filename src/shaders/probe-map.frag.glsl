@@ -36,7 +36,7 @@ uniform sampler2D albedo;
 void main(void)
 {
 	// Albedo
-	albedo_colour = texture(albedo, tex_coord);
+	albedo_colour = vec4(pow(texture(albedo, tex_coord).rgb, vec3(2.2)), 1.0);
 
 	// Texture lookup
 	tex_colour = vec4(lightmap_coord.xy, 0.0, 1.0);

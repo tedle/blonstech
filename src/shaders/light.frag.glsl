@@ -99,10 +99,11 @@ void main(void)
 	// Ambient lighting (temporary)
 	diffuse += sun.colour * 0.01;
 
-	vec3 surface_colour = pow(texture(albedo, tex_coord).rgb, vec3(2.2));
+	vec3 surface_colour = texture(albedo, tex_coord).rgb;
 	surface_colour *= diffuse;
 	surface_colour += specular;
 
+	// Final composite
 	surface_colour = pow(surface_colour, vec3(1/2.2));
 	frag_colour = vec4(surface_colour, 1.0);
 }

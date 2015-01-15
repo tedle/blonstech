@@ -38,7 +38,7 @@ uniform sampler2D normal;
 void main(void)
 {
 	// Albedo
-	frag_colour = texture(albedo, tex_coord);
+	frag_colour = vec4(pow(texture(albedo, tex_coord).rgb, vec3(2.2)), 1.0);
 
 	// Normal
 	vec3 norm_map = texture(normal, tex_coord).rgb * 2 - 1;

@@ -36,19 +36,19 @@ uniform vec3 sky_colour;
 
 void main(void)
 {
-	vec3 albedo = pow(texture(probe_albedo, tex_coord).rgb, vec3(2.2));
+	vec3 albedo = texture(probe_albedo, tex_coord).rgb;
 	vec3 light_coord = texture(probe_texmap, tex_coord).rgb;
 
 	// Should only ever be 1 or 0 but doesnt hurt to be safe
 	if (light_coord.b > 0.5)
 	{
-		frag_colour = vec4(sky_colour, 1.0);
+		frag_colour = vec4(pow(sky_colour, vec3(2.2)), 1.0);
 		return;
 	}
 	vec4 light_full = texture(lightmap, light_coord.xy);
 	vec3 light_colour = light_full.rgb / light_full.a;
 
-	vec3 diffuse = pow(albedo * light_colour, vec3(1 / 2.2));
+	vec3 diffuse = albedo * light_colour;
 
     frag_colour = vec4(diffuse, 1.0);
 }
