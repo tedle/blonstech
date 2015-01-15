@@ -490,6 +490,28 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
     {
         return false;
     }
+
+    // Render lightmap to our light probes
+    probe_coefficients_buffer_->Bind(context_);
+    probe_coefficients_buffer_->Render(context_);
+
+    Matrix coef_ortho_matrix = MatrixOrthographic(0,
+                                                  static_cast<units::world>(10),
+                                                  static_cast<units::world>(probes_.size()),
+                                                  0, 0, 1);
+    // Set the inputs
+    if (!probe_coefficients_shader_->SetInput("proj_matrix", coef_ortho_matrix, context_) ||
+        !probe_coefficients_shader_->SetInput("probe_irradiance", probe_buffer_->textures()[0], 0, context_) ||
+        !probe_coefficients_shader_->SetInput("probe_count", static_cast<int>(probes_.size()), context_) ||
+        !probe_coefficients_shader_->SetInput("probe_map_size", kProbeMapSize, context_))
+    {
+        return false;
+    }
+    // Make the draw call
+    if (!probe_coefficients_shader_->Render(probe_coefficients_buffer_->index_count(), context_))
+    {
+        return false;
+    }
     return true;
 }
 
@@ -581,7 +603,11 @@ bool Graphics::RenderComposite()
         break;
     case 10:
         screen_texture = probe_buffer_->textures()[0];
-        target_sprite->set_pos(0, 0, screen_.width / 8, screen_.height);
+        target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
+        break;
+    case 11:
+        screen_texture = probe_coefficients_buffer_->textures()[0];
+        target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
         break;
     case 0:
     default:
@@ -803,6 +829,10 @@ bool Graphics::MakeContext(Client::Info screen)
     probe_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     probe_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/probe.frag.glsl", probe_inputs, context_));
 
+    ShaderAttributeList probe_coefficients_inputs;
+    probe_coefficients_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    probe_coefficients_shader_.reset(new Shader("shaders/sh-coefficients.vert.glsl", "shaders/sh-coefficients.frag.glsl", probe_coefficients_inputs, context_));
+
     ShaderAttributeList ui_inputs;
     ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
@@ -818,6 +848,7 @@ bool Graphics::MakeContext(Client::Info screen)
         probe_map_shader_ == nullptr ||
         probe_map_clear_shader_ == nullptr ||
         probe_shader_ == nullptr ||
+        probe_coefficients_shader_ == nullptr ||
         ui_shader == nullptr)
     {
         return false;
@@ -834,7 +865,9 @@ bool Graphics::MakeContext(Client::Info screen)
     //     Linear would make smoother lightmaps
     //     Nearest would prevent bleeding between geometry edges
     probe_map_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 2, context_));
-    probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 1, context_));
+    probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context_));
+    // 9 coefficients + 1 light probe position per row
+    probe_coefficients_buffer_.reset(new Framebuffer(10, static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context_));
 
     // GUI
     if (gui_ == nullptr)

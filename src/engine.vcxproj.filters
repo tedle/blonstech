@@ -349,5 +349,11 @@
     <None Include="shaders\probe.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\sh-coefficients.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\sh-coefficients.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
