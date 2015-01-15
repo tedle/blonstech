@@ -53,21 +53,128 @@ const float kL2m1 = kL2m_1;
 // L2m2 = (sqrt(15) (x^2 - y^2)) / (4 sqrt(pi))
 const float kL2m2 = 0.546274;
 
-void SampleFace(int face_index)
+// Used for getting the normal of a cubemap sample point
+// These are row major, so we transpose the standard rot matrices here
+const mat3 kRotationFront = mat3
+(
+	1, 0, 0,
+	0, 1, 0,
+	0, 0, 1
+);
+const mat3 kRotationRear = mat3
+(
+	-1,  0,  0,
+	 0,  1,  0,
+	 0,  0, -1
+);
+const mat3 kRotationRight = mat3
+(
+	 0, 0, 1,
+	 0, 1, 0,
+	-1, 0, 0
+);
+const mat3 kRotationLeft = mat3
+(
+	0,  0, -1,
+	0,  1,  0,
+	1,  0,  0
+);
+const mat3 kRotationUp = mat3
+(
+	1,  0,  0,
+	0,  0,  1,
+	0, -1,  0
+);
+const mat3 kRotationDown = mat3
+(
+	1,  0,  0,
+	0,  0, -1,
+	0,  1,  0
+);
+
+// TODO: Figure out some decent way to remove branching
+// Could do SH sampling in 9 different passes with different
+// shaders... but is that even faster?
+float SHSample(int coef_index, vec3 n)
 {
+	switch (coef_index)
+	{
+	case 0:
+		return kL0m0;
+	case 1:
+		return kL1m_1 * n.y;
+	case 2:
+		return kL1m0 * n.z;
+	case 3:
+		return kL1m1 * n.x;
+	case 4:
+		return kL2m_2 * n.y * n.x;
+	case 5:
+		return kL2m_1 * n.y * n.z;
+	case 6:
+		return kL2m0 * (3 * (n.z * n.z) - 1);
+	case 7:
+		return kL2m1 * n.x * n.z;
+	case 8:
+		return kL2m2 * (n.x * n.x - n.y * n.y);
+	}
+	return 0;
+}
+
+vec3 SampleFaces(int coef_index)
+{
+	// Alpha stores the number of samples taken
+	vec4 coefficient = vec4(0.0);
+
 	// +-0.5 to account for cenetered pixels, dw about it...
-	vec2 tex_coord = vec2(float(face_index) / 6.0, (gl_FragCoord.y - 0.5) / floor(probe_count));
+	vec2 tex_coord = vec2(0.0, (gl_FragCoord.y - 0.5) / floor(probe_count));
+	// Do 6 samples per pixel (one for each face) instead of looping over the faces
+	// to avoid having to recalculate normals unnecessarily
+	// I hope this is actually faster and not just thrashing some GPU sampler cache...
 	for (float x = 0.5; x < probe_map_size; x++)
 	{
 		for (float y = 0.5; y < probe_map_size; y++)
 		{
 			vec2 sample_point = tex_coord;
-			sample_point.x += float(x) / float(probe_map_size * 6);
-			sample_point.y += float(y) / float(probe_map_size * probe_count);
-			// TODO: GAMMA!!!!!!!!
-			frag_colour += texture(probe_irradiance, sample_point);
+			sample_point.x += x / float(probe_map_size * 6);
+			sample_point.y += y / float(probe_map_size * probe_count);
+
+			vec2 d = vec2(x / float(probe_map_size), y / float(probe_map_size));
+			// Maps [x,y] = [0,0] to the normal [1,1,1]... [x,y] = [probe_map_size] to the normal [-1,-1,1]
+			// normal.z is -1 because we're right handed (but not irl...)
+			vec3 normal = normalize(vec3(d.xy * 2.0 - 1.0, -1.0));
+
+			vec3 sample_normal = kRotationFront * normal;
+			vec3 sample_colour = texture(probe_irradiance, sample_point).rgb;
+			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
+
+			sample_point.x += float(probe_map_size) / 6.0;
+			sample_normal = kRotationRear * normal;
+			sample_colour = texture(probe_irradiance, sample_point).rgb;
+			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
+
+			sample_point.x += float(probe_map_size) / 6.0;
+			sample_normal = kRotationRight * normal;
+			sample_colour = texture(probe_irradiance, sample_point).rgb;
+			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
+
+			sample_point.x += float(probe_map_size) / 6.0;
+			sample_normal = kRotationLeft * normal;
+			sample_colour = texture(probe_irradiance, sample_point).rgb;
+			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
+
+			sample_point.x += float(probe_map_size) / 6.0;
+			sample_normal = kRotationUp * normal;
+			sample_colour = texture(probe_irradiance, sample_point).rgb;
+			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
+
+			sample_point.x += float(probe_map_size) / 6.0;
+			sample_normal = kRotationDown * normal;
+			sample_colour = texture(probe_irradiance, sample_point).rgb;
+			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
 		}
 	}
+	return (coefficient.rgb / coefficient.a);
 }
 
 void main(void)
@@ -80,13 +187,7 @@ void main(void)
 	frag_colour = vec4(0.0f);
 	if (coef_index < 9)
 	{
-		SampleFace(0);
-		SampleFace(1);
-		SampleFace(2);
-		SampleFace(3);
-		SampleFace(4);
-		SampleFace(5);
-		frag_colour /= probe_map_size * probe_map_size;
+		frag_colour = vec4(SampleFaces(coef_index), 1.0);
 	}
 	else
 	{

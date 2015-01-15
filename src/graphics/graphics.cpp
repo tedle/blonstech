@@ -75,8 +75,7 @@ Graphics::Graphics(Client::Info screen)
         throw "Failed to initialize camera";
     }
 
-    camera_->set_pos(0.0f, 0.0f, -10.0f);
-    camera_->set_rot(0, kPi, 0);
+    camera_->set_pos(0.0f, 2.0f, 0.0f);
 
     // Probe camera
     probe_view_.reset(new Camera);
