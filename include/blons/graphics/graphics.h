@@ -163,7 +163,8 @@ private:
     bool MakeContext(Client::Info screen);
 
     // Should only be called once per map load
-    bool RenderProbeMaps();
+    bool BuildLightMapLookups();
+    bool BuildProbeMaps();
 
     bool RenderGeometry(Matrix view_matrix);
     bool RenderShadowMaps(Matrix view_matrix, Matrix light_vp_matrix);
@@ -181,15 +182,20 @@ private:
     std::unique_ptr<Shader> shadow_shader_;
     std::unique_ptr<Shader> blur_shader_;
     std::unique_ptr<Shader> direct_light_shader_;
-    std::unique_ptr<Shader> direct_light_map_shader_;
     std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Shader> sprite_shader_;
     std::unique_ptr<Framebuffer> geometry_buffer_;
     std::unique_ptr<Framebuffer> shadow_buffer_;
     std::unique_ptr<Framebuffer> blur_buffer_;
     std::unique_ptr<Framebuffer> direct_light_buffer_;
-    std::unique_ptr<Framebuffer> light_map_accumulation_buffer_;
     std::unique_ptr<Framebuffer> light_buffer_;
+
+    // Light map stuff
+    std::unique_ptr<Shader> direct_light_map_shader_;
+    std::unique_ptr<Shader> light_map_lookup_shader_;
+    std::unique_ptr<Framebuffer> light_map_lookup_buffer_;
+    std::unique_ptr<Framebuffer> light_map_accumulation_buffer_;
+    Matrix light_map_ortho_matrix_;
 
     // Light probe stuff
     std::vector<Vector3> probes_;

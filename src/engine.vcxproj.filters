@@ -355,5 +355,11 @@
     <None Include="shaders\sh-coefficients.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\light-map-lookup.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\light-map-lookup.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -197,15 +197,41 @@ bool Graphics::Render()
     return true;
 }
 
-bool Graphics::RenderProbeMaps()
+// Writes out the position and normal of every model vertex to
+// the lightmap. This makes it so we don't need to re-render scene
+// geometry when we do lightmap passes
+bool Graphics::BuildLightMapLookups()
 {
+    context_->SetDepthTesting(false);
+    // Since lightmap UVs have no regard for vertex winding
+    context_->SetCullMode(DISABLE);
+
+    light_map_lookup_buffer_->Bind(Vector3(0, 0, 0), context_);
+    for (const auto& model : models_)
+    {
+        // Bind the vertex data
+        model->Render(context_);
+
+        // Make the draw call
+        if (!light_map_lookup_shader_->Render(model->index_count(), context_))
+        {
+            return false;
+        }
+    }
+    context_->SetCullMode(ENABLE_CCW);
+
+    return true;
+}
+
+bool Graphics::BuildProbeMaps()
+{
+    context_->SetDepthTesting(false);
     // Since the UV pass only writes to 2 channels, we want the clear colour
     // to be "all on" in the third channel so we can tell when there is no
     // valid value to sample (looking at the sky)
     // However the diffuse pass should use the sky_colour_ when looking at the
     // sky... so we solve this by doing a clear-pass over the textures where we
     // write the proper clear colours to each one (like a unique pseudo-skybox)
-    context_->SetDepthTesting(false);
     probe_map_buffer_->Bind(context_);
 
     probe_map_buffer_->Render(context_);
@@ -447,27 +473,25 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
     context_->SetCullMode(DISABLE);
 
     light_map_accumulation_buffer_->Bind(Vector3(0, 0, 0), context_);
-    // TODO: 3D pass ->
-    //      Render everything as a batch as this is untextured
-    for (const auto& model : models_)
+    // Bind the vertex data
+    light_map_accumulation_buffer_->Render(context_);
+
+    // Set the inputs
+    if (!direct_light_map_shader_->SetInput("proj_matrix", light_map_ortho_matrix_, context_) ||
+        !direct_light_map_shader_->SetInput("light_vp_matrix", light_vp_matrix, context_) ||
+        !direct_light_map_shader_->SetInput("pos_lookup", light_map_lookup_buffer_->textures()[0], 0, context_) ||
+        !direct_light_map_shader_->SetInput("norm_lookup", light_map_lookup_buffer_->textures()[1], 1, context_) ||
+        !direct_light_map_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 2, context_) ||
+        !direct_light_map_shader_->SetInput("sun.colour", sun_->colour(), context_) ||
+        !direct_light_map_shader_->SetInput("sun.dir", sun_->direction(), context_))
     {
-        // Bind the vertex data
-        model->Render(context_);
+        return false;
+    }
 
-        // Set the inputs
-        if (!direct_light_map_shader_->SetInput("light_vp_matrix", light_vp_matrix, context_) ||
-            !direct_light_map_shader_->SetInput("light_depth", shadow_buffer_->textures()[0], 0, context_) ||
-            !direct_light_map_shader_->SetInput("sun.colour", sun_->colour(), context_) ||
-            !direct_light_map_shader_->SetInput("sun.dir", sun_->direction(), context_))
-        {
-            return false;
-        }
-
-        // Make the draw call
-        if (!direct_light_map_shader_->Render(model->index_count(), context_))
-        {
-            return false;
-        }
+    // Make the draw call
+    if (!direct_light_map_shader_->Render(light_map_accumulation_buffer_->index_count(), context_))
+    {
+        return false;
     }
     context_->SetBlendMode(ALPHA);
     context_->SetCullMode(ENABLE_CCW);
@@ -592,20 +616,26 @@ bool Graphics::RenderComposite()
         break;
     case 7:
         screen_texture = probe_map_buffer_->textures()[0];
-        target_sprite->set_pos(0, 0, screen_.width / 8, screen_.height);
+        target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
         break;
     case 8:
         screen_texture = probe_map_buffer_->textures()[1];
-        target_sprite->set_pos(0, 0, screen_.width / 8, screen_.height);
+        target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
         break;
     case 9:
-        screen_texture = light_map_accumulation_buffer_->textures()[0];
+        screen_texture = light_map_lookup_buffer_->textures()[0];
         break;
     case 10:
+        screen_texture = light_map_lookup_buffer_->textures()[1];
+        break;
+    case 11:
+        screen_texture = light_map_accumulation_buffer_->textures()[0];
+        break;
+    case 12:
         screen_texture = probe_buffer_->textures()[0];
         target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
         break;
-    case 11:
+    case 13:
         screen_texture = probe_coefficients_buffer_->textures()[0];
         target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
         break;
@@ -700,8 +730,13 @@ bool Graphics::BuildLighting()
     log::Debug("Building irradiance volumes... ");
     Timer timer;
     context_->BeginScene(Vector3(0, 0, 0));
+    // Mark the position and normal of every vertex on the lightmap
+    if (!BuildLightMapLookups())
+    {
+        return false;
+    }
     // Render out a cube map for every probe to sample scene data from (should only be called once per map load... put in make context?)
-    if (!RenderProbeMaps())
+    if (!BuildProbeMaps())
     {
         return false;
     }
@@ -743,6 +778,11 @@ bool Graphics::MakeContext(Client::Info screen)
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height), 0,
                                        kScreenNear, kScreenDepth);
+
+    light_map_ortho_matrix_ = MatrixOrthographic(0,
+                                                 static_cast<units::world>(kLightMapResolution),
+                                                 static_cast<units::world>(kLightMapResolution),
+                                                 0, 0, 1);
 
     // Initialize our light probes...
     // TODO: Should be in map data somewhere, probably
@@ -800,9 +840,14 @@ bool Graphics::MakeContext(Client::Info screen)
 
     ShaderAttributeList direct_light_map_inputs;
     direct_light_map_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    direct_light_map_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
-    direct_light_map_inputs.push_back(ShaderAttribute(NORMAL, "input_norm"));
+    direct_light_map_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     direct_light_map_shader_.reset(new Shader("shaders/direct-light-map.vert.glsl", "shaders/direct-light-map.frag.glsl", direct_light_map_inputs, context_));
+
+    ShaderAttributeList light_map_lookup_inputs;
+    light_map_lookup_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    light_map_lookup_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
+    light_map_lookup_inputs.push_back(ShaderAttribute(NORMAL, "input_norm"));
+    light_map_lookup_shader_.reset(new Shader("shaders/light-map-lookup.vert.glsl", "shaders/light-map-lookup.frag.glsl", light_map_lookup_inputs, context_));
 
     ShaderAttributeList light_inputs;
     light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
@@ -843,6 +888,7 @@ bool Graphics::MakeContext(Client::Info screen)
         blur_shader_ == nullptr ||
         direct_light_shader_ == nullptr ||
         direct_light_map_shader_ == nullptr ||
+        light_map_lookup_shader_ == nullptr ||
         light_shader_ == nullptr ||
         sprite_shader_ == nullptr ||
         probe_map_shader_ == nullptr ||
@@ -859,6 +905,7 @@ bool Graphics::MakeContext(Client::Info screen)
     shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
+    light_map_lookup_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32, TextureHint::NEAREST }, { TextureHint::R8G8B8, TextureHint::NEAREST } }, false, context_));
     light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context_));
     light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
     // TODO: Should tex map buffer be linearly sampled or nearest? (Currently linear)

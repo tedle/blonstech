@@ -24,16 +24,14 @@
 #version 400
 
 // Ins n outs
-in vec3 input_pos;
-in vec2 input_uv;
+in vec3 pos;
+in vec3 norm;
 
-out vec2 tex_coord;
-
-// Globals
-uniform mat4 proj_matrix;
+out vec4 pos_colour;
+out vec4 norm_colour;
 
 void main(void)
 {
-	gl_Position = proj_matrix * vec4(input_pos, 1.0);
-	tex_coord = input_uv;
+	pos_colour = vec4(pos, 1.0);
+	norm_colour = vec4((norm + 1) / 2, 1.0);
 }

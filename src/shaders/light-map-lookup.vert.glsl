@@ -25,15 +25,17 @@
 
 // Ins n outs
 in vec3 input_pos;
-in vec2 input_uv;
+in vec2 input_light_uv;
+in vec3 input_norm;
 
-out vec2 tex_coord;
-
-// Globals
-uniform mat4 proj_matrix;
+out vec3 pos;
+out vec3 norm;
 
 void main(void)
 {
-	gl_Position = proj_matrix * vec4(input_pos, 1.0);
-	tex_coord = input_uv;
+	vec2 texture_pos = (input_light_uv * 2) - 1;
+    gl_Position = vec4(texture_pos, 0.0, 1.0);
+
+	pos = input_pos;
+	norm = input_norm;
 }

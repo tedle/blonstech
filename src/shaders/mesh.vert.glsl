@@ -31,6 +31,7 @@ in vec3 input_tan;
 in vec3 input_bitan;
 
 out vec2 tex_coord;
+out vec2 light_coord;
 out mat3 norm;
 
 // Globals

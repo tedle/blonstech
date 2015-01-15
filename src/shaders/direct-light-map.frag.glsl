@@ -24,13 +24,14 @@
 #version 400
 
 // Ins n outs
-in vec3 pos;
-in vec3 normal;
+in vec2 tex_coord;
 
 out vec4 frag_colour;
 
 // Globals
 uniform mat4 light_vp_matrix;
+uniform sampler2D pos_lookup;
+uniform sampler2D norm_lookup;
 uniform sampler2D light_depth;
 
 struct DirectionalLight
@@ -79,6 +80,9 @@ float PercentageList(vec4 pos)
 
 void main(void)
 {
+	vec3 pos = texture(pos_lookup, tex_coord).rgb;
+	vec3 normal = texture(norm_lookup, tex_coord).rgb * 2 - 1;
+
 	float lit = PercentageList(vec4(pos, 1.0));
 
 	float light_angle = clamp(dot(normal, -sun.dir), 0.0, 1.0);

@@ -576,6 +576,9 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
             case TextureHint::R16G16:
                 internalformat = GL_RG16;
                 break;
+            case TextureHint::R32G32B32:
+                internalformat = GL_RGB32F;
+                break;
             case TextureHint::R32G32B32A32:
                 internalformat = GL_RGBA32F;
                 break;
