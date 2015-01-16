@@ -52,6 +52,7 @@ bool Mesh::Init(const std::string& mesh_filename, RenderContext& context)
     index_buffer_ = std::move(mesh.index);
     vertex_count_ = mesh.vertex_count;
     index_count_ = mesh.index_count;
+    data_ = std::move(mesh.data);
     texture_list_ = mesh.texture_list;
 
     return true;
@@ -80,6 +81,11 @@ unsigned int Mesh::vertex_count() const
 unsigned int Mesh::index_count() const
 {
     return index_count_;
+}
+
+const MeshData& Mesh::mesh() const
+{
+    return data_;
 }
 
 const std::vector<Mesh::TextureInfo>& Mesh::textures() const

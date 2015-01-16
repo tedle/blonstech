@@ -42,6 +42,7 @@ struct MeshBuffer
     std::shared_ptr<BufferResource> index;
     unsigned int vertex_count;
     unsigned int index_count;
+    MeshData data;
     std::vector<Mesh::TextureInfo> texture_list;
 };
 

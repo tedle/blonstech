@@ -87,6 +87,9 @@ std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_m
                 sphere.indices.push_back(i + semi_count);
                 sphere.indices.push_back(i + semi_count + 1);
             }
+            // We do need a modulo on the very last index
+            sphere.indices.back() = 0;
+
             return sphere;
         }
     }

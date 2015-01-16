@@ -36,12 +36,21 @@ namespace blons
 class DrawBatcher
 {
 public:
+    enum Type
+    {
+        MESH_2D,
+        MESH_3D
+    };
+
+public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes a DrawBatcher with empty buffers.
+    /// \brief Initializes a DrawBatcher with empty buffers of the specified mesh
+    /// type.
     ///
+    /// \param type Specifies whether to use 2D mesh or 3D mesh
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher(RenderContext& context);
+    DrawBatcher(Type type, RenderContext& context);
     ~DrawBatcher() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -53,18 +62,30 @@ public:
     /// recycle your batches!
     ///
     /// \param mesh_data Reference to the vertex and index data to store
+    /// \param world_matrix Matrix to transform vertices by
     /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
+    void Append(const MeshData& mesh_data, Matrix world_matrix, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// Calls Append(const MeshData&, Matrix, RenderContext&) with a default
+    /// identity matrix
     ////////////////////////////////////////////////////////////////////////////////
     void Append(const MeshData& mesh_data, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Pushes the DrawBatcher's buffers to the current rendering context,
     /// prepping it for a draw call
     ///
-    /// Clears all stored mesh data, preventing it from being pushed again by
-    /// subsequent calls (this does not actually free the memory, just invalidates
-    /// the current data from being re-used).
+    /// If clear_buffers is true all stored mesh data is removed, preventing it from
+    /// being pushed again by subsequent calls (this does not actually free the
+    /// memory, just invalidates the current data from being re-used).
     ///
+    /// \param clear_buffers Clear the vertex and index buffers if true
     /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
+    void Render(bool clear_buffers, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls Render(bool, RenderContext&) with a default clear_buffers of
+    /// true
     ////////////////////////////////////////////////////////////////////////////////
     void Render(RenderContext& context);
 
@@ -77,6 +98,8 @@ public:
     int index_count() const;
 
 private:
+    Type type_;
+
     std::unique_ptr<BufferResource> vertex_buffer_;
     std::unique_ptr<BufferResource> index_buffer_;
 

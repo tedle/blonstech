@@ -112,6 +112,7 @@ MeshBuffer LoadMesh(const std::string& filename, RenderContext& context)
     buffer.index = mesh.index;
     buffer.vertex_count = static_cast<unsigned int>(mesh.data->vertices.size());
     buffer.index_count = static_cast<unsigned int>(mesh.data->indices.size());
+    buffer.data = *mesh.data;
     buffer.texture_list = mesh.texture_list;
 
     return buffer;

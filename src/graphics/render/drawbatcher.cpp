@@ -28,11 +28,24 @@
 
 namespace blons
 {
-DrawBatcher::DrawBatcher(RenderContext& context)
+DrawBatcher::DrawBatcher(Type type, RenderContext& context)
 {
+    type_ = type;
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
-    context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0);
+
+    if (type_ == MESH_2D)
+    {
+        context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0);
+    }
+    else if (type_ == MESH_3D)
+    {
+        context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0);
+    }
+    else
+    {
+        throw "Unsupported mesh type";
+    }
 
     buffer_size_ = 0;
     vertex_count_ = 0;
@@ -41,7 +54,7 @@ DrawBatcher::DrawBatcher(RenderContext& context)
     index_idx_ = 0;
 }
 
-void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
+void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix, RenderContext& context)
 {
     const unsigned int vert_size = static_cast<unsigned int>(mesh_data.vertices.size());
     const unsigned int index_size = static_cast<unsigned int>(mesh_data.indices.size());
@@ -65,7 +78,14 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
         // Make the new, larger buffers
         vertex_buffer_.reset(context->MakeBufferResource());
         index_buffer_.reset(context->MakeBufferResource());
-        context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_);
+        if (type_ == MESH_2D)
+        {
+            context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_);
+        }
+        else if (type_ == MESH_3D)
+        {
+            context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_);
+        }
 
         // Move our backup copy of mesh data into the new buffer
         context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
@@ -77,7 +97,14 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
     context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vertices, &indices);
 
     // Append vertex data to the buffer
-    memcpy(vertices+vertex_idx_, mesh_data.vertices.data(), sizeof(Vertex) * vert_size);
+    memcpy(vertices + vertex_idx_, mesh_data.vertices.data(), sizeof(Vertex) * vert_size);
+    if (world_matrix != MatrixIdentity())
+    {
+        for (std::size_t i = 0; i < vert_size; i++)
+        {
+            vertices[vertex_idx_ + i].pos = world_matrix * vertices[vertex_idx_ + i].pos;
+        }
+    }
     // Caching this helps debug perf
     auto mesh_indices_ptr = mesh_data.indices.data();
     // Can't memcpy here because indices need to be incremented as meshes are appended
@@ -90,14 +117,27 @@ void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
     index_idx_ += index_size;
 }
 
-void DrawBatcher::Render(RenderContext& context)
+void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
+{
+    Append(mesh_data, MatrixIdentity(), context);
+}
+
+void DrawBatcher::Render(bool clear_buffers, RenderContext& context)
 {
     vertex_count_ = vertex_idx_;
     index_count_ = index_idx_;
     context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 
-    vertex_idx_ = 0;
-    index_idx_ = 0;
+    if (clear_buffers)
+    {
+        vertex_idx_ = 0;
+        index_idx_ = 0;
+    }
+}
+
+void DrawBatcher::Render(RenderContext& context)
+{
+    Render(true, context);
 }
 
 int DrawBatcher::index_count() const

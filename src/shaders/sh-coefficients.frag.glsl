@@ -23,6 +23,7 @@
 
 #version 400
 
+// TODO: Change this into a compute shader, so we can sample the entire cubemap asynchronously
 // Ins n outs
 in vec3 pos;
 

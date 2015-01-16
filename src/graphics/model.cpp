@@ -142,6 +142,11 @@ int Model::index_count() const
     return mesh_->index_count();
 }
 
+const MeshData& Model::mesh() const
+{
+    return mesh_->mesh();
+}
+
 const TextureResource* Model::albedo() const
 {
     return albedo_texture_->texture();

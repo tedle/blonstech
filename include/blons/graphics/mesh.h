@@ -97,6 +97,12 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     unsigned int index_count() const;
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the raw vertex and index data of the mesh
+    ///
+    /// \return Mesh data
+    ////////////////////////////////////////////////////////////////////////////////
+    const MeshData& mesh() const;
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a reference to the texture list used by this mesh.
     /// Note this data is only valid for the lifespan of this class
     ///
@@ -111,6 +117,7 @@ private:
 
     std::shared_ptr<BufferResource> vertex_buffer_, index_buffer_;
     unsigned int vertex_count_, index_count_;
+    MeshData data_;
 
     std::vector<Mesh::TextureInfo> texture_list_;
 };
