@@ -34,6 +34,7 @@ uniform sampler2D albedo;
 uniform sampler2D normal;
 uniform sampler2D depth;
 uniform sampler2D direct_light;
+uniform sampler2D indirect_light;
 
 // Used to give stronger specular when light bounces at shallower angles
 const float refraction_index = 0.5;
@@ -95,14 +96,15 @@ void main(void)
 	specular *= direct;
 
 	// Diffuse lighting (temporary)
-	vec3 diffuse = sun.colour * clamp(direct, 0.0, 1.0);
-	// Ambient lighting (temporary)
-	diffuse += sun.colour * 0.01;
+	vec4 indirect_full = texture(indirect_light, tex_coord);
+	vec3 diffuse = (direct * sun.colour) + (indirect_full.rgb / indirect_full.a);
 
 	vec3 surface_colour = texture(albedo, tex_coord).rgb;
 	surface_colour *= diffuse;
 	surface_colour += specular;
 
+	surface_colour *= 0.000001;
+	surface_colour += indirect_full.rgb / indirect_full.a;
 	// Final composite
 	surface_colour = pow(surface_colour, vec3(1/2.2));
 	frag_colour = vec4(surface_colour, 1.0);

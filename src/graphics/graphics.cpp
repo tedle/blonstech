@@ -321,7 +321,7 @@ bool Graphics::BuildProbeMaps()
     probe_map_buffer_->Unbind(context_);
 
     probe_meshes_.reset(new DrawBatcher(DrawBatcher::MESH_3D, context_));
-    for (const auto& probe : probes_)
+    for (int i = 0; i < probes_.size(); i++)
     {
         std::unique_ptr<Mesh> probe_sphere(new Mesh("blons:sphere~" + std::to_string(kProbeDistance), context_));
         MeshData probe_mesh = probe_sphere->mesh();
@@ -331,9 +331,10 @@ bool Graphics::BuildProbeMaps()
         // vertex's normal data
         for (auto& v : probe_mesh.vertices)
         {
-            v.norm = Vector3(probe.x, probe.y, probe.z);
+            v.tex.x = static_cast<float>(i);
+            v.norm = Vector3(probes_[i].x, probes_[i].y, probes_[i].z);
         }
-        probe_meshes_->Append(probe_mesh, MatrixTranslation(probe.x, probe.y, probe.z), context_);
+        probe_meshes_->Append(probe_mesh, MatrixTranslation(probes_[i].x, probes_[i].y, probes_[i].z), context_);
     }
     return true;
 }
@@ -536,7 +537,7 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
     probe_coefficients_buffer_->Render(context_);
 
     Matrix coef_ortho_matrix = MatrixOrthographic(0,
-                                                  static_cast<units::world>(10),
+                                                  static_cast<units::world>(9),
                                                   static_cast<units::world>(probes_.size()),
                                                   0, 0, 1);
     // Set the inputs
@@ -579,6 +580,7 @@ bool Graphics::RenderLighting(Matrix view_matrix)
         !indirect_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||
         !indirect_light_shader_->SetInput("screen", Vector2(units::pixel_to_subpixel(screen_.width),
                                                             units::pixel_to_subpixel(screen_.height)), context_) ||
+        !indirect_light_shader_->SetInput("probe_count", static_cast<float>(probes_.size()), context_) ||
         !indirect_light_shader_->SetInput("probe_distance", kProbeDistance, context_) ||
         !indirect_light_shader_->SetInput("normal", geometry_buffer_->textures()[1], 0, context_) ||
         !indirect_light_shader_->SetInput("view_depth", geometry_buffer_->depth(), 1, context_) ||
@@ -608,6 +610,7 @@ bool Graphics::RenderLighting(Matrix view_matrix)
         !light_shader_->SetInput("normal", geometry_buffer_->textures()[1], 1, context_) ||
         !light_shader_->SetInput("depth", geometry_buffer_->depth(), 2, context_) ||
         !light_shader_->SetInput("direct_light", direct_light_buffer_->textures()[0], 3, context_) ||
+        !light_shader_->SetInput("indirect_light", indirect_light_buffer_->textures()[0], 4, context_) ||
         !light_shader_->SetInput("sun.dir", sun_->direction(), context_) ||
         !light_shader_->SetInput("sun.colour", sun_->colour(), context_) ||
         !light_shader_->SetInput("sky_colour", sky_colour_, context_))
@@ -893,7 +896,8 @@ bool Graphics::MakeContext(Client::Info screen)
 
     ShaderAttributeList indirect_light_inputs;
     indirect_light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    indirect_light_inputs.push_back(ShaderAttribute(NORMAL, "input_norm"));
+    indirect_light_inputs.push_back(ShaderAttribute(TEX, "input_uv")); // Stores probe id
+    indirect_light_inputs.push_back(ShaderAttribute(NORMAL, "input_norm")); // Stores probe position
     indirect_light_shader_.reset(new Shader("shaders/indirect-light.vert.glsl", "shaders/indirect-light.frag.glsl", indirect_light_inputs, context_));
 
     ShaderAttributeList light_map_lookup_inputs;
@@ -968,7 +972,6 @@ bool Graphics::MakeContext(Client::Info screen)
     //     Nearest would prevent bleeding between geometry edges
     probe_map_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 2, context_));
     probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context_));
-    // 9 coefficients + 1 light probe position per row
     probe_coefficients_buffer_.reset(new Framebuffer(9, static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context_));
 
     // GUI

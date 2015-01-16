@@ -40,17 +40,17 @@ const float kL0m0 = 0.282095;
 // L1m-1 = -( (sqrt(3) y) / (2 sqrt(pi)))
 const float kL1m_1 = -0.488603;
 // L1m0 = (sqrt(3) z) / (2 sqrt(pi))
-const float kL1m0 = kL1m_1 * -1;
+const float kL1m0 = 0.488603;
 // L1m1 = -(sqrt(3) x) / (2 sqrt(pi))
-const float kL1m1 = kL1m_1;
+const float kL1m1 = -0.488603;
 // L2m-2 = (sqrt(15) y x) / (2 sqrt(pi))
 const float kL2m_2 = 1.092548;
 // L2m-1 = -(sqrt(15) y z) / (2 sqrt(pi))
-const float kL2m_1 = kL2m_2 * -1;
+const float kL2m_1 = -1.092548;
 // L2m0 = (sqrt(5) (3 z^2 - 1)) / (4 sqrt(pi))
 const float kL2m0 = 0.315392;
 // L2m1 = -(sqrt(15) x z) / (2 sqrt(pi))
-const float kL2m1 = kL2m_1;
+const float kL2m1 = -1.092548;
 // L2m2 = (sqrt(15) (x^2 - y^2)) / (4 sqrt(pi))
 const float kL2m2 = 0.546274;
 
@@ -113,7 +113,7 @@ float SHSample(int coef_index, vec3 n)
 	case 5:
 		return kL2m_1 * n.y * n.z;
 	case 6:
-		return kL2m0 * (3 * (n.z * n.z) - 1);
+		return kL2m0 * (3.0 * (n.z * n.z) - 1.0);
 	case 7:
 		return kL2m1 * n.x * n.z;
 	case 8:
@@ -124,8 +124,11 @@ float SHSample(int coef_index, vec3 n)
 
 vec3 SampleFaces(int coef_index)
 {
+	// TODO: Find texel solid angle for each point if we can spare the GPU power
 	// Alpha stores the number of samples taken
 	vec4 coefficient = vec4(0.0);
+
+	float texture_width = 6.0 * float(probe_map_size);
 
 	// +-0.5 to account for cenetered pixels, dw about it...
 	vec2 tex_coord = vec2(0.0, (gl_FragCoord.y - 0.5) / floor(probe_count));
@@ -149,27 +152,27 @@ vec3 SampleFaces(int coef_index)
 			vec3 sample_colour = texture(probe_irradiance, sample_point).rgb;
 			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
 
-			sample_point.x += float(probe_map_size) / 6.0;
+			sample_point.x += float(probe_map_size) / texture_width;
 			sample_normal = kRotationRear * normal;
 			sample_colour = texture(probe_irradiance, sample_point).rgb;
 			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
 
-			sample_point.x += float(probe_map_size) / 6.0;
+			sample_point.x += float(probe_map_size) / texture_width;
 			sample_normal = kRotationRight * normal;
 			sample_colour = texture(probe_irradiance, sample_point).rgb;
 			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
 
-			sample_point.x += float(probe_map_size) / 6.0;
+			sample_point.x += float(probe_map_size) / texture_width;
 			sample_normal = kRotationLeft * normal;
 			sample_colour = texture(probe_irradiance, sample_point).rgb;
 			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
 
-			sample_point.x += float(probe_map_size) / 6.0;
+			sample_point.x += float(probe_map_size) / texture_width;
 			sample_normal = kRotationUp * normal;
 			sample_colour = texture(probe_irradiance, sample_point).rgb;
 			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);
 
-			sample_point.x += float(probe_map_size) / 6.0;
+			sample_point.x += float(probe_map_size) / texture_width;
 			sample_normal = kRotationDown * normal;
 			sample_colour = texture(probe_irradiance, sample_point).rgb;
 			coefficient += vec4(SHSample(coef_index, sample_normal) * sample_colour, 1.0);

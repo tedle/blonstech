@@ -25,9 +25,11 @@
 
 // Ins n outs
 in vec3 input_pos;
+in vec2 input_uv; // Stores probe id
 in vec3 input_norm; // Stores probe position
 
 out vec3 probe_pos;
+out float probe_id;
 
 // Globals
 uniform mat4 mvp_matrix;
@@ -36,5 +38,6 @@ void main(void)
 {
     gl_Position = mvp_matrix * vec4(input_pos, 1.0);
 
-    probe_pos = input_norm;
+	probe_pos = input_norm;
+	probe_id = input_uv.x;
 }
