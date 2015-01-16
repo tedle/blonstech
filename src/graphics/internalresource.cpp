@@ -35,17 +35,17 @@ namespace internal
 {
 namespace
 {
-std::unordered_map<std::string, std::function<MeshData()>> g_mesh_generators =
+std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_mesh_generators =
 {
     {
-        "blons:sphere", []()
+        "blons:sphere", [](const std::string& args)
         {
             MeshData sphere;
 
             const unsigned int count = 20;
             const unsigned int semi_count = count / 2 + 1;
             const unsigned int vert_count = count * semi_count;
-            const float scale = 1.0f;
+            const float radius = atof(args.c_str());
             const float dist = (2 * kPi) / count;
 
             static_assert(count % 2 == 0, "Sphere vertex ring size must be an even number");
@@ -65,7 +65,7 @@ std::unordered_map<std::string, std::function<MeshData()>> g_mesh_generators =
                     v.pos.x = cos(d1) * cos(d2);
                     v.pos.y = sin(d1);
                     v.pos.z = cos(d1) * sin(d2);
-                    v.pos *= scale;
+                    v.pos *= radius;
 
                     v.tex = Vector2(static_cast<float>(i) / static_cast<float>(count),
                                     static_cast<float>(j) / static_cast<float>(semi_count));
@@ -91,10 +91,10 @@ std::unordered_map<std::string, std::function<MeshData()>> g_mesh_generators =
         }
     }
 };
-std::unordered_map<std::string, std::function<PixelData()>> g_texture_generators =
+std::unordered_map<std::string, std::function<PixelData(const std::string& args)>> g_texture_generators =
 {
     {
-        "blons:none", []()
+        "blons:none", [](const std::string& args)
         {
             PixelData none;
             none.compression = PixelData::RAW;
@@ -117,7 +117,7 @@ std::unordered_map<std::string, std::function<PixelData()>> g_texture_generators
         }
     },
     {
-        "blons:normal", []()
+        "blons:normal", [](const std::string& args)
         {
             PixelData normal;
             normal.compression = PixelData::RAW;
@@ -133,26 +133,37 @@ std::unordered_map<std::string, std::function<PixelData()>> g_texture_generators
         }
     }
 };
+
 } // namespace
 
 MeshData MakeEngineMesh(const std::string& name)
 {
-    return g_mesh_generators.at(name)();
+    auto split = name.find_first_of('~');
+    std::string func = name.substr(0, split);
+    std::string args = split != std::string::npos ? name.substr(split + 1) : "";
+    return g_mesh_generators.at(func)(args);
 }
 
 bool ValidEngineMesh(const std::string& name)
 {
-    return (g_mesh_generators.find(name) != g_mesh_generators.end());
+    auto split = name.find_first_of('~');
+    std::string func = name.substr(0, split);
+    return (g_mesh_generators.find(func) != g_mesh_generators.end());
 }
 
 PixelData MakeEngineTexture(const std::string& name)
 {
-    return g_texture_generators.at(name)();
+    auto split = name.find_first_of('~');
+    std::string func = name.substr(0, split);
+    std::string args = split != std::string::npos ? name.substr(split + 1) : "";
+    return g_texture_generators.at(func)(args);
 }
 
 bool ValidEngineTexture(const std::string& name)
 {
-    return (g_texture_generators.find(name) != g_texture_generators.end());
+    auto split = name.find_first_of('~');
+    std::string func = name.substr(0, split);
+    return (g_texture_generators.find(func) != g_texture_generators.end());
 }
 } // namespace internal
 } // namespace resource

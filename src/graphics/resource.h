@@ -59,7 +59,7 @@ struct TextureBuffer
 /// loaded from disk and bound to the context
 ///
 /// List of valid engine meshes include:
-/// * `blons:sphere` Sphere mesh
+/// * `blons:sphere~radius` Sphere mesh
 ///
 /// \param filename Filename of the mesh to load
 /// \param context Handle to the current rendering context
