@@ -361,5 +361,11 @@
     <None Include="shaders\light-map-lookup.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\indirect-light.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\indirect-light.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

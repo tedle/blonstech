@@ -319,6 +319,22 @@ bool Graphics::BuildProbeMaps()
         }
     }
     probe_map_buffer_->Unbind(context_);
+
+    probe_meshes_.reset(new DrawBatcher(DrawBatcher::MESH_3D, context_));
+    for (const auto& probe : probes_)
+    {
+        std::unique_ptr<Mesh> probe_sphere(new Mesh("blons:sphere~" + std::to_string(kProbeDistance), context_));
+        MeshData probe_mesh = probe_sphere->mesh();
+        // Hacky way to let us batch the probe sphere call:
+        // Instead of using a uniform with the probe's central position & a separate draw call
+        // for each probe, we can batch them all and inject the probe position into the
+        // vertex's normal data
+        for (auto& v : probe_mesh.vertices)
+        {
+            v.norm = Vector3(probe.x, probe.y, probe.z);
+        }
+        probe_meshes_->Append(probe_mesh, MatrixTranslation(probe.x, probe.y, probe.z), context_);
+    }
     return true;
 }
 
@@ -541,17 +557,49 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
 
 bool Graphics::RenderLighting(Matrix view_matrix)
 {
-    // Bind the buffer to do all lighting calculations on
-    light_buffer_->Bind(context_);
+    // Used to turn pixel fragments into world coordinates
+    Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix_);
 
     // Needed so sprites can render over themselves
     context_->SetDepthTesting(false);
 
+    // Add the sum of all overlapping probes per pixel
+    context_->SetBlendMode(ADDITIVE);
+    // Only render back faces... This is to prevent probes getting clipped
+    // as you enter their radius
+    context_->SetCullMode(ENABLE_CW);
+
+    indirect_light_buffer_->Bind(context_);
+
+    // Render all of the probes as spheres to find the pixels where they overlap
+    // with scene geometry. This is much faster than sampling 50 probes for every pixel
+    probe_meshes_->Render(false, context_);
+    // Do the indirect lighting from the SH coefficients
+    if (!indirect_light_shader_->SetInput("mvp_matrix", view_matrix * proj_matrix_, context_) ||
+        !indirect_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||
+        !indirect_light_shader_->SetInput("screen", Vector2(units::pixel_to_subpixel(screen_.width),
+                                                            units::pixel_to_subpixel(screen_.height)), context_) ||
+        !indirect_light_shader_->SetInput("probe_distance", kProbeDistance, context_) ||
+        !indirect_light_shader_->SetInput("normal", geometry_buffer_->textures()[1], 0, context_) ||
+        !indirect_light_shader_->SetInput("view_depth", geometry_buffer_->depth(), 1, context_) ||
+        !indirect_light_shader_->SetInput("probe_coefficients", probe_coefficients_buffer_->textures()[0], 2, context_))
+    {
+        return false;
+    }
+
+    // Finally do the render
+    if (!indirect_light_shader_->Render(probe_meshes_->index_count(), context_))
+    {
+        return false;
+    }
+    context_->SetBlendMode(ALPHA);
+    context_->SetCullMode(ENABLE_CCW);
+
+    // Bind the buffer to do all lighting calculations on
+    light_buffer_->Bind(context_);
+
     // Render the geometry as a sprite
     geometry_buffer_->Render(context_);
-
-    // Used to turn pixel fragments into world coordinates
-    Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix_);
 
     // Set the inputs
     if (!light_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
@@ -638,6 +686,9 @@ bool Graphics::RenderComposite()
     case 13:
         screen_texture = probe_coefficients_buffer_->textures()[0];
         target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
+        break;
+    case 14:
+        screen_texture = indirect_light_buffer_->textures()[0];
         break;
     case 0:
     default:
@@ -758,9 +809,6 @@ bool Graphics::MakeContext(Client::Info screen)
 {
     screen_ = screen;
 
-    // DirectX
-    //context_ = RenderContext(new RenderD3D11);
-
     // OpenGL
     context_.reset();
     context_ = RenderContext(new RenderGL40(screen, kEnableVsync, (kRenderMode == RenderMode::FULLSCREEN)));
@@ -843,6 +891,11 @@ bool Graphics::MakeContext(Client::Info screen)
     direct_light_map_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     direct_light_map_shader_.reset(new Shader("shaders/direct-light-map.vert.glsl", "shaders/direct-light-map.frag.glsl", direct_light_map_inputs, context_));
 
+    ShaderAttributeList indirect_light_inputs;
+    indirect_light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    indirect_light_inputs.push_back(ShaderAttribute(NORMAL, "input_norm"));
+    indirect_light_shader_.reset(new Shader("shaders/indirect-light.vert.glsl", "shaders/indirect-light.frag.glsl", indirect_light_inputs, context_));
+
     ShaderAttributeList light_map_lookup_inputs;
     light_map_lookup_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     light_map_lookup_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
@@ -887,6 +940,7 @@ bool Graphics::MakeContext(Client::Info screen)
         shadow_shader_ == nullptr ||
         blur_shader_ == nullptr ||
         direct_light_shader_ == nullptr ||
+        indirect_light_shader_ == nullptr ||
         direct_light_map_shader_ == nullptr ||
         light_map_lookup_shader_ == nullptr ||
         light_shader_ == nullptr ||
@@ -905,6 +959,7 @@ bool Graphics::MakeContext(Client::Info screen)
     shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context_));
     direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
+    indirect_light_buffer_.reset(new Framebuffer(screen.width, screen.height, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context_));
     light_map_lookup_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32, TextureHint::NEAREST }, { TextureHint::R8G8B8, TextureHint::NEAREST } }, false, context_));
     light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context_));
     light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
@@ -914,7 +969,7 @@ bool Graphics::MakeContext(Client::Info screen)
     probe_map_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 2, context_));
     probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context_));
     // 9 coefficients + 1 light probe position per row
-    probe_coefficients_buffer_.reset(new Framebuffer(10, static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context_));
+    probe_coefficients_buffer_.reset(new Framebuffer(9, static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context_));
 
     // GUI
     if (gui_ == nullptr)

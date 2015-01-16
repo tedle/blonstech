@@ -275,6 +275,8 @@
     <None Include="shaders\blur.vert.glsl" />
     <None Include="shaders\direct-light-map.frag.glsl" />
     <None Include="shaders\direct-light-map.vert.glsl" />
+    <None Include="shaders\indirect-light.frag.glsl" />
+    <None Include="shaders\indirect-light.vert.glsl" />
     <None Include="shaders\light-map-lookup.frag.glsl" />
     <None Include="shaders\light-map-lookup.vert.glsl" />
     <None Include="shaders\light.frag.glsl" />

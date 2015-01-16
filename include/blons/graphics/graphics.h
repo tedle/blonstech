@@ -34,6 +34,7 @@
 #include <blons/graphics/model.h>
 #include <blons/graphics/sprite.h>
 #include <blons/graphics/render/render.h>
+#include <blons/graphics/render/drawbatcher.h>
 #include <blons/system/client.h>
 
 namespace blons
@@ -182,12 +183,14 @@ private:
     std::unique_ptr<Shader> shadow_shader_;
     std::unique_ptr<Shader> blur_shader_;
     std::unique_ptr<Shader> direct_light_shader_;
+    std::unique_ptr<Shader> indirect_light_shader_;
     std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Shader> sprite_shader_;
     std::unique_ptr<Framebuffer> geometry_buffer_;
     std::unique_ptr<Framebuffer> shadow_buffer_;
     std::unique_ptr<Framebuffer> blur_buffer_;
     std::unique_ptr<Framebuffer> direct_light_buffer_;
+    std::unique_ptr<Framebuffer> indirect_light_buffer_;
     std::unique_ptr<Framebuffer> light_buffer_;
 
     // Light map stuff
@@ -199,6 +202,7 @@ private:
 
     // Light probe stuff
     std::vector<Vector3> probes_;
+    std::unique_ptr<DrawBatcher> probe_meshes_;
     std::unique_ptr<Camera> probe_view_;
     std::unique_ptr<Shader> probe_map_shader_;
     std::unique_ptr<Shader> probe_map_clear_shader_;
@@ -209,6 +213,7 @@ private:
     std::unique_ptr<Framebuffer> probe_coefficients_buffer_;
     Matrix probe_proj_matrix_, probe_ortho_matrix_;
     const int kProbeMapSize = 16;
+    const float kProbeDistance = 5.0f;
 
     Matrix proj_matrix_, ortho_matrix_;
 

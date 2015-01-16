@@ -293,10 +293,22 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glTexImage2DMultisample");
     }
 
+    glUniform1f = (PFNGLUNIFORM1FPROC)glGetProcAddress("glUniform1f");
+    if (glUniform1f == nullptr)
+    {
+        failed.push_back("glUniform1f");
+    }
+
     glUniform1i = (PFNGLUNIFORM1IPROC)glGetProcAddress("glUniform1i");
     if (glUniform1i == nullptr)
     {
         failed.push_back("glUniform1i");
+    }
+
+    glUniform2fv = (PFNGLUNIFORM2FVPROC)glGetProcAddress("glUniform2fv");
+    if (glUniform2fv == nullptr)
+    {
+        failed.push_back("glUniform2fv");
     }
 
     glUniform3fv = (PFNGLUNIFORM3FVPROC)glGetProcAddress("glUniform3fv");
@@ -400,7 +412,9 @@ PFNGLLINKPROGRAMPROC glLinkProgram;
 PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
+PFNGLUNIFORM1FPROC glUniform1f;
 PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLUNIFORM2FVPROC glUniform2fv;
 PFNGLUNIFORM3FVPROC glUniform3fv;
 PFNGLUNIFORM4FVPROC glUniform4fv;
 PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;

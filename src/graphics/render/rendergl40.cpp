@@ -44,6 +44,10 @@ static unsigned int g_active_context;
 static unsigned int g_context_count;
 
 // Overloaded glUniforms to keep things generic
+void Uniform(GLuint loc, float value)
+{
+    glUniform1f(loc, value);
+}
 void Uniform(GLuint loc, int value)
 {
     glUniform1i(loc, value);
@@ -51,6 +55,10 @@ void Uniform(GLuint loc, int value)
 void Uniform(GLuint loc, Matrix value)
 {
     glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)value.m);
+}
+void Uniform(GLuint loc, Vector2 value)
+{
+    glUniform2fv(loc, 1, &value.x);
 }
 void Uniform(GLuint loc, Vector3 value)
 {
@@ -921,6 +929,12 @@ void RenderGL40::MapMeshData(BufferResource* vertex_buffer, BufferResource* inde
     mapped_buffers_.index_data = *index_data;
 }
 
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const float value)
+{
+    auto prog = static_cast<ShaderResourceGL40*>(program);
+    return prog->SetUniform(name, value);
+}
+
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const int value)
 {
     auto prog = static_cast<ShaderResourceGL40*>(program);
@@ -928,6 +942,12 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const
 }
 
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Matrix value)
+{
+    auto prog = static_cast<ShaderResourceGL40*>(program);
+    return prog->SetUniform(name, value);
+}
+
+bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Vector2 value)
 {
     auto prog = static_cast<ShaderResourceGL40*>(program);
     return prog->SetUniform(name, value);
@@ -950,7 +970,7 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const
     const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(value);
     glActiveTexture(GL_TEXTURE0 + texture_index);
     glBindTexture(GL_TEXTURE_2D, tex->texture_);
-    return SetShaderInput(program, name, texture_index);
+    return SetShaderInput(program, name, static_cast<int>(texture_index));
 }
 
 bool RenderGL40::SetBlendMode(BlendMode mode)

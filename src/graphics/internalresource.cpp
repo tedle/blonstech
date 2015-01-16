@@ -45,7 +45,7 @@ std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_m
             const unsigned int count = 20;
             const unsigned int semi_count = count / 2 + 1;
             const unsigned int vert_count = count * semi_count;
-            const float radius = atof(args.c_str());
+            const float radius = static_cast<float>(atof(args.c_str()));
             const float dist = (2 * kPi) / count;
 
             static_assert(count % 2 == 0, "Sphere vertex ring size must be an even number");

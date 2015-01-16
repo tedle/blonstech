@@ -47,12 +47,22 @@ bool Shader::Render(unsigned int index_count, RenderContext& context)
     return true;
 }
 
+bool Shader::SetInput(const char* field, const float value, RenderContext& context)
+{
+    return context->SetShaderInput(program_.get(), field, value);
+}
+
 bool Shader::SetInput(const char* field, const int value, RenderContext& context)
 {
     return context->SetShaderInput(program_.get(), field, value);
 }
 
 bool Shader::SetInput(const char* field, const Matrix value, RenderContext& context)
+{
+    return context->SetShaderInput(program_.get(), field, value);
+}
+
+bool Shader::SetInput(const char* field, const Vector2 value, RenderContext& context)
 {
     return context->SetShaderInput(program_.get(), field, value);
 }

@@ -180,19 +180,6 @@ vec3 SampleFaces(int coef_index)
 
 void main(void)
 {
-	const int coef_count = 9;
-
 	int coef_index = int(gl_FragCoord.x);
-	int probe_index = int(gl_FragCoord.y);
-
-	frag_colour = vec4(0.0f);
-	if (coef_index < 9)
-	{
-		frag_colour = vec4(SampleFaces(coef_index), 1.0);
-	}
-	else
-	{
-		// Will store probe position, eventually, somehow
-		frag_colour = vec4(1.0, gl_FragCoord.y / probe_count, 1.0, 1.0);
-	}
+	frag_colour = vec4(SampleFaces(coef_index), 1.0);
 }
