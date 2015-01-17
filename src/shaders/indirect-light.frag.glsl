@@ -38,25 +38,33 @@ uniform sampler2D normal;
 uniform sampler2D view_depth;
 uniform sampler2D probe_coefficients;
 
+const float C0 = 1.0;
+const float C1 = 0.3;
+const float C2 = 0.5;
+const float C3 = 0.4;
+const float C4 = 0.4;
+
 // SH basis pre-computed constants (so we don't do a billion sqrts in the shader code)
+// I really don't understand spherical harmonics and had to randomly change stuff until it looked okay
+// Sorry. I'm leaving the more accurate stuff here in case I ever figure this stuff out
 // L0m0 = 1 / (2 sqrt(pi))
-const float kL0m0 = 0.282095;
+float kL0m0 = C0;
 // L1m-1 = -( (sqrt(3) y) / (2 sqrt(pi)))
-const float kL1m_1 = -0.488603;
+float kL1m_1 = C1;// * -1;
 // L1m0 = (sqrt(3) z) / (2 sqrt(pi))
-const float kL1m0 = 0.488603;
+float kL1m0 = C1;
 // L1m1 = -(sqrt(3) x) / (2 sqrt(pi))
-const float kL1m1 = -0.488603;
+float kL1m1 = C1;// * -1;
 // L2m-2 = (sqrt(15) y x) / (2 sqrt(pi))
-const float kL2m_2 = 1.092548;
+float kL2m_2 = C2;
 // L2m-1 = -(sqrt(15) y z) / (2 sqrt(pi))
-const float kL2m_1 = -1.092548;
+float kL2m_1 = C2;// * -1;
 // L2m0 = (sqrt(5) (3 z^2 - 1)) / (4 sqrt(pi))
-const float kL2m0 = 0.315392;
+float kL2m0 = C3;
 // L2m1 = -(sqrt(15) x z) / (2 sqrt(pi))
-const float kL2m1 = -1.092548;
+float kL2m1 = C2;// * -1;
 // L2m2 = (sqrt(15) (x^2 - y^2)) / (4 sqrt(pi))
-const float kL2m2 = 0.546274;
+float kL2m2 = C4;
 
 const float coef_count = 9;
 
@@ -112,12 +120,9 @@ void main(void)
 		discard;
 	}
 
-	//vec4 dump = texture(probe_coefficients, tex_coord) * surface_pos.x * surface_normal.x * light_dir.x * light_angle * probe_distance * depth * 0.0000001;
 	// Quadratic falloff makes a smoother transition between light probes
-	float dist_coef = pow((probe_distance - distance) / probe_distance, 2);
-	float intensity = dist_coef * light_angle;// + dump;;
-	const float gi_gain = 3.0f;
-	frag_colour = vec4(IrradianceFromSH(surface_normal) * gi_gain * intensity, intensity);
-	//frag_colour += vec4(surface_pos.rgb / 1, 1.0);
-	//frag_colour += vec4(((surface_normal + 1) / 2) * 0.2, 1.0);
+	float dist_coef = pow((probe_distance - distance) / probe_distance, 1.3);
+	float intensity = dist_coef * light_angle;
+	const float correction_factor = 0.1f;
+	frag_colour = vec4(IrradianceFromSH(surface_normal) * correction_factor * intensity, intensity);
 }

@@ -87,13 +87,20 @@ Graphics::Graphics(Client::Info screen)
     // Sunlight
     // TODO: User should be doing this somehow
     sun_.reset(new Light(Light::DIRECTIONAL,
-                         Vector3(20.0f, 20.0f, 5.0f),   // position
+                         Vector3(20.0f, 20.0f, 5.0f), // position
+                         // Midnight
+                         //Vector3(-10.0f, 0.0f, -5.0f), // direction
+                         //Vector3(0.1f, 0.05f, 0.03f))); // colour
                          // Sunset
                          //Vector3(-10.0f, -2.0f, -5.0f), // direction
+                         //Vector3(1.0f, 0.75, 0.4f))); // colour
                          // Noon
                          Vector3(-2.0f, -5.0f, -0.5f),
-                         Vector3(1.0f, 0.8f, 0.3f)));   // colour
+                         Vector3(1.0f, 0.95f, 0.8f))); // colour
+    // Sunny day
     sky_colour_ = Vector3(0.3f, 0.6f, 1.0f);
+    // Midnight
+    //sky_colour_ = Vector3(0.1f, 0.1f, 0.4f);
 }
 
 Graphics::~Graphics()
@@ -575,6 +582,7 @@ bool Graphics::RenderLighting(Matrix view_matrix)
     // Render all of the probes as spheres to find the pixels where they overlap
     // with scene geometry. This is much faster than sampling 50 probes for every pixel
     probe_meshes_->Render(false, context_);
+
     // Do the indirect lighting from the SH coefficients
     if (!indirect_light_shader_->SetInput("mvp_matrix", view_matrix * proj_matrix_, context_) ||
         !indirect_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context_) ||

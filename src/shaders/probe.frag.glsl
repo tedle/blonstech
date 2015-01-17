@@ -42,7 +42,9 @@ void main(void)
 	// Should only ever be 1 or 0 but doesnt hurt to be safe
 	if (light_coord.b > 0.5)
 	{
-		frag_colour = vec4(pow(sky_colour, vec3(2.2)), 1.0);
+		// Sky should be about 1/5th as strong as sun, i think
+		const float sky_correction = 0.2;
+		frag_colour = vec4(pow(sky_colour, vec3(2.2)) * sky_correction, 1.0);
 		return;
 	}
 	vec4 light_full = texture(lightmap, light_coord.xy);

@@ -34,25 +34,31 @@ uniform sampler2D probe_irradiance;
 uniform int probe_count;
 uniform int probe_map_size;
 
+const float A0 = 3.141593;
+const float A1 = 2.094395;
+const float A2 = 0.785398;
+
 // SH basis pre-computed constants (so we don't do a billion sqrts in the shader code)
+// I really don't understand spherical harmonics and had to randomly change stuff until it looked okay
+// Sorry. I'm leaving the more accurate stuff here in case I ever figure this stuff out
 // L0m0 = 1 / (2 sqrt(pi))
-const float kL0m0 = 0.282095;
+const float kL0m0 = 1;//A0;// * 0.282095;
 // L1m-1 = -( (sqrt(3) y) / (2 sqrt(pi)))
-const float kL1m_1 = -0.488603;
+const float kL1m_1 = 1;//A1;// * -0.488603;
 // L1m0 = (sqrt(3) z) / (2 sqrt(pi))
-const float kL1m0 = 0.488603;
+const float kL1m0 = 1;//A1;// * 0.488603;
 // L1m1 = -(sqrt(3) x) / (2 sqrt(pi))
-const float kL1m1 = -0.488603;
+const float kL1m1 = 1;//A1;// * -0.488603;
 // L2m-2 = (sqrt(15) y x) / (2 sqrt(pi))
-const float kL2m_2 = 1.092548;
+const float kL2m_2 = 1;//A2;// * 1.092548;
 // L2m-1 = -(sqrt(15) y z) / (2 sqrt(pi))
-const float kL2m_1 = -1.092548;
+const float kL2m_1 = 1;//A2;// * -1.092548;
 // L2m0 = (sqrt(5) (3 z^2 - 1)) / (4 sqrt(pi))
-const float kL2m0 = 0.315392;
+const float kL2m0 = 1;//A2;// * 0.315392;
 // L2m1 = -(sqrt(15) x z) / (2 sqrt(pi))
-const float kL2m1 = -1.092548;
+const float kL2m1 = 1;//A2;// * -1.092548;
 // L2m2 = (sqrt(15) (x^2 - y^2)) / (4 sqrt(pi))
-const float kL2m2 = 0.546274;
+const float kL2m2 = 1;//A2;// * 0.546274;
 
 // Used for getting the normal of a cubemap sample point
 // These are row major, so we transpose the standard rot matrices here
@@ -143,7 +149,7 @@ vec3 SampleFaces(int coef_index)
 			sample_point.x += x / float(probe_map_size * 6);
 			sample_point.y += y / float(probe_map_size * probe_count);
 
-			vec2 d = vec2(x / float(probe_map_size), y / float(probe_map_size));
+			vec2 d = vec2((x - 0.5) / float(probe_map_size), (y - 0.5) / float(probe_map_size));
 			// Maps [x,y] = [0,0] to the normal [1,1,1]... [x,y] = [probe_map_size] to the normal [-1,-1,1]
 			// normal.z is -1 because we're right handed (but not irl...)
 			vec3 normal = normalize(vec3(d.xy * 2.0 - 1.0, -1.0));
@@ -184,5 +190,5 @@ vec3 SampleFaces(int coef_index)
 void main(void)
 {
 	int coef_index = int(gl_FragCoord.x);
-	frag_colour = vec4(SampleFaces(coef_index), 1.0);
+	frag_colour = pow(vec4(SampleFaces(coef_index), 1.0), vec4(1 / 2.2));
 }

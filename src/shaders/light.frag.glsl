@@ -103,8 +103,10 @@ void main(void)
 	surface_colour *= diffuse;
 	surface_colour += specular;
 
-	surface_colour *= 0.000001;
-	surface_colour += indirect_full.rgb / indirect_full.a;
+	// Uncomment to see GI only
+	//surface_colour *= 0.000001;
+	//surface_colour += indirect_full.rgb / indirect_full.a;
+
 	// Final composite
 	surface_colour = pow(surface_colour, vec3(1/2.2));
 	frag_colour = vec4(surface_colour, 1.0);
