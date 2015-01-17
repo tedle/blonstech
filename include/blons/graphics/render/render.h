@@ -35,7 +35,6 @@
 
 namespace blons
 {
-// TODO: Unify this struct and PixelData::Format
 struct TextureHint
 {
     enum Format

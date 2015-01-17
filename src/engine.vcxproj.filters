@@ -29,6 +29,9 @@
     <Filter Include="src\shaders">
       <UniqueIdentifier>{ab1f975c-b6af-4410-9e06-4e2cef9da0d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\graphics\pipeline">
+      <UniqueIdentifier>{0a8df85e-ec87-433f-8327-680f6ec642c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons\debug\console.h">
@@ -178,6 +181,9 @@
     <ClInclude Include="..\include\blons\graphics\light.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\deferred.h">
+      <Filter>src\graphics\pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -293,6 +299,9 @@
     </ClCompile>
     <ClCompile Include="graphics\light.cpp">
       <Filter>src\graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\deferred.cpp">
+      <Filter>src\graphics\pipeline</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

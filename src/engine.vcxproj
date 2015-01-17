@@ -208,6 +208,7 @@
     <ClInclude Include="..\include\blons\graphics\mesh.h" />
     <ClInclude Include="..\include\blons\graphics\meshimporter.h" />
     <ClInclude Include="..\include\blons\graphics\model.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\deferred.h" />
     <ClInclude Include="..\include\blons\graphics\render\drawbatcher.h" />
     <ClInclude Include="..\include\blons\graphics\render\render.h" />
     <ClInclude Include="..\include\blons\graphics\render\shader.h" />
@@ -255,6 +256,7 @@
     <ClCompile Include="graphics\mesh.cpp" />
     <ClCompile Include="graphics\meshimporter.cpp" />
     <ClCompile Include="graphics\model.cpp" />
+    <ClCompile Include="graphics\pipeline\deferred.cpp" />
     <ClCompile Include="graphics\render\drawbatcher.cpp" />
     <ClCompile Include="graphics\render\glfuncloader.cpp" />
     <ClCompile Include="graphics\render\renderd3d11.cpp" />

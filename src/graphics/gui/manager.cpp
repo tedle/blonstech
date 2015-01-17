@@ -45,7 +45,7 @@ void Manager::Init(units::pixel width, units::pixel height, std::unique_ptr<Shad
 {
     screen_dimensions_ = Box(0, 0, width, height);
     ortho_matrix_ = MatrixOrthographic(0, screen_dimensions_.w, screen_dimensions_.h, 0,
-                                       kScreenNear, kScreenDepth);
+                                       kScreenNear, kScreenFar);
 
     ui_shader_ = std::move(ui_shader);
 

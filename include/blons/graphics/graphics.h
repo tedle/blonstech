@@ -60,24 +60,17 @@ const bool kEnableVsync = false;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief **Temporary** config option for max render distance
 ////////////////////////////////////////////////////////////////////////////////
-const units::world kScreenDepth = 100.0f;
+const units::world kScreenFar = 100.0f;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief **Temporary** config option for nearest render distance
 ////////////////////////////////////////////////////////////////////////////////
 const units::world kScreenNear = 0.1f;
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for shadow map resolution
-////////////////////////////////////////////////////////////////////////////////
-const units::pixel kShadowMapResolution = 1024;
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for light map resolution
-////////////////////////////////////////////////////////////////////////////////
-const units::pixel kLightMapResolution = 256;
 
 // Forward declarations
 class Light;
 class Shader;
 namespace gui { class Manager; }
+namespace pipeline { class Deferred; }
 
 // TODO: Custom shader pipelines like
 //           graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, vector<string> shader_files, func shader_inputs_callback)
@@ -163,64 +156,15 @@ public:
 private:
     bool MakeContext(Client::Info screen);
 
-    // Should only be called once per map load
-    bool BuildLightMapLookups();
-    bool BuildProbeMaps();
-
-    bool RenderGeometry(Matrix view_matrix);
-    bool RenderShadowMaps(Matrix view_matrix, Matrix light_vp_matrix);
-    bool RenderLightMaps(Matrix light_vp_matrix);
-    bool SumCoefficients(); // RenderLightMaps helper
-    bool RenderLighting(Matrix view_matrix);
-    bool RenderComposite();
     bool RenderSprites();
 
     RenderContext context_;
     Client::Info screen_;
     std::unique_ptr<Camera> camera_;
+    std::unique_ptr<pipeline::Deferred> pipeline_;
     std::unique_ptr<gui::Manager> gui_;
-    // TODO: Document the pipeline
-    std::unique_ptr<Shader> geo_shader_;
-    std::unique_ptr<Shader> shadow_shader_;
-    std::unique_ptr<Shader> blur_shader_;
-    std::unique_ptr<Shader> direct_light_shader_;
-    std::unique_ptr<Shader> indirect_light_shader_;
-    std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Shader> sprite_shader_;
-    std::unique_ptr<Framebuffer> geometry_buffer_;
-    std::unique_ptr<Framebuffer> shadow_buffer_;
-    std::unique_ptr<Framebuffer> blur_buffer_;
-    std::unique_ptr<Framebuffer> direct_light_buffer_;
-    std::unique_ptr<Framebuffer> indirect_light_buffer_;
-    std::unique_ptr<Framebuffer> light_buffer_;
-
-    // Light map stuff
-    std::unique_ptr<Shader> light_map_lookup_shader_;
-    std::unique_ptr<Shader> direct_light_map_shader_;
-    std::unique_ptr<Shader> indirect_light_map_shader_;
-    std::unique_ptr<Framebuffer> light_map_lookup_buffer_;
-    std::unique_ptr<Framebuffer> direct_light_map_accumulation_buffer_;
-    std::unique_ptr<Framebuffer> indirect_light_map_accumulation_buffer_;
-    Matrix light_map_ortho_matrix_;
-    const int kLightBounces = 1;
-
-    // Light probe stuff
-    std::vector<Vector3> probes_;
-    std::unique_ptr<DrawBatcher> probe_meshes_;
-    std::unique_ptr<DrawBatcher> probe_quads_;
-    std::unique_ptr<Camera> probe_view_;
-    std::unique_ptr<Shader> probe_map_shader_;
-    std::unique_ptr<Shader> probe_map_clear_shader_;
-    std::unique_ptr<Shader> probe_shader_;
-    std::unique_ptr<Shader> probe_coefficients_shader_;
-    std::unique_ptr<Framebuffer> probe_map_buffer_;
-    std::unique_ptr<Framebuffer> probe_buffer_;
-    std::unique_ptr<Framebuffer> probe_coefficients_buffer_;
-    Matrix probe_proj_matrix_, probe_ortho_matrix_;
-    const int kProbeMapSize = 16;
-    const float kProbeDistance = 5.0f;
-
-    Matrix proj_matrix_, ortho_matrix_;
+    Matrix ortho_matrix_;
 
     // TODO: Make this user customizable
     std::unique_ptr<Light> sun_;
