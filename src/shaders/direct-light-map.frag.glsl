@@ -41,7 +41,7 @@ struct DirectionalLight
 };
 uniform DirectionalLight sun;
 
-float PercentageList(vec4 pos)
+float PercentageLit(vec4 pos)
 {
 	vec4 light_pos = light_vp_matrix * pos;
 
@@ -70,10 +70,10 @@ float PercentageList(vec4 pos)
 	// p_max is invalid if the measured depth is greater than the local depth
 	// Use a smoothstep function to blend to 1 as we approach this
 	// Increases light bleeding, but looks way less gritty
-	float p = smoothstep(light_pos.z - 0.01, light_pos.z - 0.005, moments.x);
+	float p = smoothstep(light_pos.z - 0.002, light_pos.z - 0.001, moments.x);
 	// Use a smoothstep on pmax to decrease lightbleeding, both mitigating the bleed
 	// incurred by the p smoothing as well as the natural bleed induced by VSM
-	p_max = smoothstep(0.2, 1.0, p_max);
+	p_max = smoothstep(0.4, 1.0, p_max);
 	// The actual percent amount that the fragment is affected by the light source
 	return max(p, p_max);
 }
@@ -83,7 +83,7 @@ void main(void)
 	vec3 pos = texture(pos_lookup, tex_coord).rgb;
 	vec3 normal = texture(norm_lookup, tex_coord).rgb * 2 - 1;
 
-	float lit = PercentageList(vec4(pos, 1.0));
+	float lit = PercentageLit(vec4(pos, 1.0));
 
 	float light_angle = clamp(dot(normal, -sun.dir), 0.0, 1.0);
 

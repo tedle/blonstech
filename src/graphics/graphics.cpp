@@ -152,7 +152,7 @@ bool Graphics::Render()
     Matrix light_vp_matrix = sun_->ViewFrustum(view_matrix * proj_matrix_, kScreenDepth);
 
     // Clear buffers
-    context_->BeginScene(Vector3(0, 0, 0));
+    context_->BeginScene(Vector4(0, 0, 0, 1));
 
     // Render all of the geometry and accompanying info (normal, depth, etc)
     if (!RenderGeometry(view_matrix))
@@ -213,7 +213,7 @@ bool Graphics::BuildLightMapLookups()
     // Since lightmap UVs have no regard for vertex winding
     context_->SetCullMode(DISABLE);
 
-    light_map_lookup_buffer_->Bind(Vector3(0, 0, 0), context_);
+    light_map_lookup_buffer_->Bind(Vector4(0, 0, 0, 1), context_);
     for (const auto& model : models_)
     {
         // Bind the vertex data
@@ -342,6 +342,19 @@ bool Graphics::BuildProbeMaps()
             v.norm = Vector3(probes_[i].x, probes_[i].y, probes_[i].z);
         }
         probe_meshes_->Append(probe_mesh, MatrixTranslation(probes_[i].x, probes_[i].y, probes_[i].z), context_);
+    }
+
+    probe_quads_.reset(new DrawBatcher(DrawBatcher::MESH_3D, context_));
+    for (int i = 0; i < probes_.size(); i++)
+    {
+        std::unique_ptr<Mesh> probe_quad(new Mesh("blons:quad~" + std::to_string(kLightMapResolution), context_));
+        MeshData probe_mesh = probe_quad->mesh();
+        for (auto& v : probe_mesh.vertices)
+        {
+            v.tex.x = static_cast<float>(i);
+            v.norm = Vector3(probes_[i].x, probes_[i].y, probes_[i].z);
+        }
+        probe_quads_->Append(probe_mesh, MatrixTranslation(probes_[i].x, probes_[i].y, probes_[i].z), context_);
     }
     return true;
 }
@@ -496,9 +509,9 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
     // Since lightmap UVs have no regard for vertex winding
     context_->SetCullMode(DISABLE);
 
-    light_map_accumulation_buffer_->Bind(Vector3(0, 0, 0), context_);
+    direct_light_map_accumulation_buffer_->Bind(Vector4(0, 0, 0, 1), context_);
     // Bind the vertex data
-    light_map_accumulation_buffer_->Render(context_);
+    direct_light_map_accumulation_buffer_->Render(context_);
 
     // Set the inputs
     if (!direct_light_map_shader_->SetInput("proj_matrix", light_map_ortho_matrix_, context_) ||
@@ -513,13 +526,57 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
     }
 
     // Make the draw call
-    if (!direct_light_map_shader_->Render(light_map_accumulation_buffer_->index_count(), context_))
+    if (!direct_light_map_shader_->Render(direct_light_map_accumulation_buffer_->index_count(), context_))
     {
         return false;
     }
     context_->SetBlendMode(ALPHA);
     context_->SetCullMode(ENABLE_CCW);
 
+    // Clear the bounce lightmap before calling probe shader
+    indirect_light_map_accumulation_buffer_->Bind(Vector4(0, 0, 0, 0), context_);
+
+    // Build up the SH coefficients
+    SumCoefficients();
+
+    // This is pretty expensive, 1 bounce adds a lot and works great
+    for (int i = 0; i < kLightBounces; i++)
+    {
+        context_->SetDepthTesting(false);
+        // Stores multiple bounces
+        context_->SetBlendMode(ADDITIVE);
+        indirect_light_map_accumulation_buffer_->Bind(false, context_);
+
+        // Render each probe as a quad covering the entire lightmap to have it apply globally
+        probe_quads_->Render(false, context_);
+
+        // Set the inputs
+        if (!indirect_light_map_shader_->SetInput("proj_matrix", light_map_ortho_matrix_, context_) ||
+            !indirect_light_map_shader_->SetInput("lightmap_resolution", static_cast<float>(kLightMapResolution), context_) ||
+            !indirect_light_map_shader_->SetInput("probe_count", static_cast<float>(probes_.size()), context_) ||
+            !indirect_light_map_shader_->SetInput("probe_distance", kProbeDistance, context_) ||
+            !indirect_light_map_shader_->SetInput("pos_lookup", light_map_lookup_buffer_->textures()[0], 0, context_) ||
+            !indirect_light_map_shader_->SetInput("norm_lookup", light_map_lookup_buffer_->textures()[1], 1, context_) ||
+            !indirect_light_map_shader_->SetInput("probe_coefficients", probe_coefficients_buffer_->textures()[0], 2, context_))
+        {
+            return false;
+        }
+
+        // Make the draw call
+        if (!indirect_light_map_shader_->Render(probe_quads_->index_count(), context_))
+        {
+            return false;
+        }
+        context_->SetBlendMode(ALPHA);
+
+        // Build up the SH coefficients
+        SumCoefficients();
+    }
+    return true;
+}
+
+bool Graphics::SumCoefficients()
+{
     // Render lightmap to our light probes
     probe_buffer_->Bind(context_);
     probe_buffer_->Render(context_);
@@ -527,7 +584,8 @@ bool Graphics::RenderLightMaps(Matrix light_vp_matrix)
     if (!probe_shader_->SetInput("proj_matrix", probe_ortho_matrix_, context_) ||
         !probe_shader_->SetInput("probe_albedo", probe_map_buffer_->textures()[0], 0, context_) ||
         !probe_shader_->SetInput("probe_texmap", probe_map_buffer_->textures()[1], 1, context_) ||
-        !probe_shader_->SetInput("lightmap", light_map_accumulation_buffer_->textures()[0], 2, context_) ||
+        !probe_shader_->SetInput("direct_lightmap", direct_light_map_accumulation_buffer_->textures()[0], 2, context_) ||
+        !probe_shader_->SetInput("indirect_lightmap", indirect_light_map_accumulation_buffer_->textures()[0], 3, context_) ||
         !probe_shader_->SetInput("sky_colour", sky_colour_, context_))
     {
         return false;
@@ -688,17 +746,20 @@ bool Graphics::RenderComposite()
         screen_texture = light_map_lookup_buffer_->textures()[1];
         break;
     case 11:
-        screen_texture = light_map_accumulation_buffer_->textures()[0];
+        screen_texture = direct_light_map_accumulation_buffer_->textures()[0];
         break;
     case 12:
+        screen_texture = indirect_light_map_accumulation_buffer_->textures()[0];
+        break;
+    case 13:
         screen_texture = probe_buffer_->textures()[0];
         target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
         break;
-    case 13:
+    case 14:
         screen_texture = probe_coefficients_buffer_->textures()[0];
         target_sprite->set_pos(200, 0, screen_.width / 8, screen_.height);
         break;
-    case 14:
+    case 15:
         screen_texture = indirect_light_buffer_->textures()[0];
         break;
     case 0:
@@ -791,7 +852,7 @@ bool Graphics::BuildLighting()
 {
     log::Debug("Building irradiance volumes... ");
     Timer timer;
-    context_->BeginScene(Vector3(0, 0, 0));
+    context_->BeginScene(Vector4(0, 0, 0, 1));
     // Mark the position and normal of every vertex on the lightmap
     if (!BuildLightMapLookups())
     {
@@ -908,6 +969,12 @@ bool Graphics::MakeContext(Client::Info screen)
     indirect_light_inputs.push_back(ShaderAttribute(NORMAL, "input_norm")); // Stores probe position
     indirect_light_shader_.reset(new Shader("shaders/indirect-light.vert.glsl", "shaders/indirect-light.frag.glsl", indirect_light_inputs, context_));
 
+    ShaderAttributeList indirect_light_map_inputs;
+    indirect_light_map_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    indirect_light_map_inputs.push_back(ShaderAttribute(TEX, "input_uv")); // Stores probe id
+    indirect_light_map_inputs.push_back(ShaderAttribute(NORMAL, "input_norm")); // Stores probe position
+    indirect_light_map_shader_.reset(new Shader("shaders/indirect-light-map.vert.glsl", "shaders/indirect-light-map.frag.glsl", indirect_light_map_inputs, context_));
+
     ShaderAttributeList light_map_lookup_inputs;
     light_map_lookup_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     light_map_lookup_inputs.push_back(ShaderAttribute(LIGHT_TEX, "input_light_uv"));
@@ -954,6 +1021,7 @@ bool Graphics::MakeContext(Client::Info screen)
         direct_light_shader_ == nullptr ||
         indirect_light_shader_ == nullptr ||
         direct_light_map_shader_ == nullptr ||
+        indirect_light_map_shader_ == nullptr ||
         light_map_lookup_shader_ == nullptr ||
         light_shader_ == nullptr ||
         sprite_shader_ == nullptr ||
@@ -973,7 +1041,8 @@ bool Graphics::MakeContext(Client::Info screen)
     direct_light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
     indirect_light_buffer_.reset(new Framebuffer(screen.width, screen.height, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context_));
     light_map_lookup_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32, TextureHint::NEAREST }, { TextureHint::R8G8B8, TextureHint::NEAREST } }, false, context_));
-    light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context_));
+    direct_light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context_));
+    indirect_light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context_));
     light_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
     // TODO: Should tex map buffer be linearly sampled or nearest? (Currently linear)
     //     Linear would make smoother lightmaps

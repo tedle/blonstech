@@ -106,7 +106,7 @@ void Framebuffer::Render(RenderContext& context)
     context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 }
 
-void Framebuffer::Bind(Vector3 clear_colour, RenderContext& context)
+void Framebuffer::Bind(Vector4 clear_colour, RenderContext& context)
 {
     context->BindFramebuffer(fbo_.get());
     context->BeginScene(clear_colour);
@@ -114,7 +114,19 @@ void Framebuffer::Bind(Vector3 clear_colour, RenderContext& context)
 
 void Framebuffer::Bind(RenderContext& context)
 {
-    Bind(Vector3(0, 0, 0), context);
+    Bind(Vector4(0, 0, 0, 1), context);
+}
+
+void Framebuffer::Bind(bool clear_buffer, RenderContext& context)
+{
+    if (!clear_buffer)
+    {
+        context->BindFramebuffer(fbo_.get());
+    }
+    else
+    {
+        Bind(context);
+    }
 }
 
 void Framebuffer::Unbind(RenderContext& context)

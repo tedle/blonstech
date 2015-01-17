@@ -30,12 +30,11 @@ in float probe_id;
 out vec4 frag_colour;
 
 // Globals
-uniform mat4 inv_vp_matrix;
-uniform vec2 screen;
 uniform float probe_count;
 uniform float probe_distance;
-uniform sampler2D normal;
-uniform sampler2D view_depth;
+uniform float lightmap_resolution;
+uniform sampler2D pos_lookup;
+uniform sampler2D norm_lookup;
 uniform sampler2D probe_coefficients;
 
 const float C0 = 1.0;
@@ -89,20 +88,11 @@ vec3 IrradianceFromSH(vec3 n)
 	return max(irradiance, vec3(0.0));
 }
 
-// TODO: This is really slow, find some way to clip probes more efficiently...
 void main(void)
 {
-	vec2 tex_coord = gl_FragCoord.xy / screen;
+	vec2 tex_coord = gl_FragCoord.xy / lightmap_resolution;
 
-	float depth = texture(view_depth, tex_coord).r;
-
-	// World coordinates of the pixel we're rendering over
-	vec4 surface_pos = vec4(tex_coord.x,
-							tex_coord.y,
-							depth,
-							1.0);
-	surface_pos = inv_vp_matrix * (surface_pos * 2.0 - 1.0);
-	surface_pos /= surface_pos.w;
+	vec3 surface_pos = texture(pos_lookup, tex_coord).rgb;
 
 	vec3 light_dir = probe_pos - surface_pos.xyz;
 	float distance = length(light_dir);
@@ -112,7 +102,7 @@ void main(void)
 	}
 	light_dir = normalize(light_dir);
 
-	vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
+	vec3 surface_normal = texture(norm_lookup, tex_coord).rgb * 2 - 1;
 	float light_angle = dot(surface_normal, light_dir);
 
 	if (light_angle < 0.0)

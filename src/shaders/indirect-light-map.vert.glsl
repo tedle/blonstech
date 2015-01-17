@@ -24,36 +24,20 @@
 #version 400
 
 // Ins n outs
-in vec2 tex_coord;
+in vec3 input_pos;
+in vec2 input_uv; // Stores probe id
+in vec3 input_norm; // Stores probe position
 
-out vec4 frag_colour;
+out vec3 probe_pos;
+out float probe_id;
 
 // Globals
-uniform sampler2D probe_albedo;
-uniform sampler2D probe_texmap;
-uniform sampler2D direct_lightmap;
-uniform sampler2D indirect_lightmap;
-uniform vec3 sky_colour;
+uniform mat4 proj_matrix;
 
 void main(void)
 {
-	vec3 albedo = texture(probe_albedo, tex_coord).rgb;
-	vec3 light_coord = texture(probe_texmap, tex_coord).rgb;
+	gl_Position = proj_matrix * vec4(input_pos, 1.0);
 
-	// Should only ever be 1 or 0 but doesnt hurt to be safe
-	if (light_coord.b > 0.5)
-	{
-		// Sky should be about 1/5th as strong as sun, i think
-		const float sky_correction = 0.2;
-		frag_colour = vec4(pow(sky_colour, vec3(2.2)) * sky_correction, 1.0);
-		return;
-	}
-	vec4 direct_light_full = texture(direct_lightmap, light_coord.xy);
-	vec3 direct_light_colour = direct_light_full.rgb / direct_light_full.a;
-	vec4 indirect_light_full = texture(indirect_lightmap, light_coord.xy);
-	vec3 indirect_light_colour = indirect_light_full.rgb / indirect_light_full.a;
-
-	vec3 diffuse = albedo * (direct_light_colour + indirect_light_colour);
-
-    frag_colour = vec4(diffuse, 1.0);
+	probe_pos = input_norm;
+	probe_id = input_uv.x;
 }

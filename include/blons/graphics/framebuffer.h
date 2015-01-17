@@ -83,11 +83,17 @@ public:
     /// \param clear_colour Colour to fill the screen with
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Bind(Vector3 clear_colour, RenderContext& context);
+    void Bind(Vector4 clear_colour, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Bind(Vector3, RenderContext&) with a default colour black
+    /// \brief Calls Bind(Vector4, RenderContext&) with a default colour black
     ////////////////////////////////////////////////////////////////////////////////
     void Bind(RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief If clear_buffer is false, binds the framebuffer without clearing
+    /// the old texture. Otherwise calls Bind(Vector4, RenderContext&) with a
+    /// default colour of black
+    ////////////////////////////////////////////////////////////////////////////////
+    void Bind(bool clear_buffer, RenderContext& context);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Unbinds the framebuffer causing all subsequent draw calls to be drawn

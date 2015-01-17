@@ -222,7 +222,7 @@ public:
     ///
     /// \param clear_colour The colour to fill empty space with
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void BeginScene(Vector3 clear_colour)=0;
+    virtual void BeginScene(Vector4 clear_colour)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Called at the end of each frame, allows for any necessary teardown
     /// and framebuffer swapping

@@ -38,6 +38,39 @@ namespace
 std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_mesh_generators =
 {
     {
+        "blons:quad", [](const std::string& args)
+        {
+            MeshData quad;
+
+            const float width = static_cast<float>(atof(args.c_str()));
+            const float height = static_cast<float>(atof(args.c_str()));
+
+            Vertex v;
+            v.pos = Vector3(0.0, 0.0, 0.0);
+            v.tex = Vector2(0.0, 0.0);
+            v.norm = Vector3(0.0, 0.0, 1.0);
+            v.tan = Vector3(1.0, 0.0, 0.0);
+            v.bitan = Vector3(0.0, 1.0, 0.0);
+            quad.vertices.push_back(v);
+
+            v.pos = Vector3(width, 0.0, 0.0);
+            v.tex = Vector2(width, 0.0);
+            quad.vertices.push_back(v);
+
+            v.pos = Vector3(0.0, height, 0.0);
+            v.tex = Vector2(0.0, height);
+            quad.vertices.push_back(v);
+
+            v.pos = Vector3(width, height, 0.0);
+            v.tex = Vector2(width, height);
+            quad.vertices.push_back(v);
+
+            quad.indices = { 2, 1, 0, 3, 1, 2 };
+
+            return quad;
+        }
+    },
+    {
         "blons:sphere", [](const std::string& args)
         {
             MeshData sphere;

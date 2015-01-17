@@ -72,7 +72,7 @@ const units::pixel kShadowMapResolution = 1024;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief **Temporary** config option for light map resolution
 ////////////////////////////////////////////////////////////////////////////////
-const units::pixel kLightMapResolution = 512;
+const units::pixel kLightMapResolution = 256;
 
 // Forward declarations
 class Light;
@@ -170,6 +170,7 @@ private:
     bool RenderGeometry(Matrix view_matrix);
     bool RenderShadowMaps(Matrix view_matrix, Matrix light_vp_matrix);
     bool RenderLightMaps(Matrix light_vp_matrix);
+    bool SumCoefficients(); // RenderLightMaps helper
     bool RenderLighting(Matrix view_matrix);
     bool RenderComposite();
     bool RenderSprites();
@@ -194,15 +195,19 @@ private:
     std::unique_ptr<Framebuffer> light_buffer_;
 
     // Light map stuff
-    std::unique_ptr<Shader> direct_light_map_shader_;
     std::unique_ptr<Shader> light_map_lookup_shader_;
+    std::unique_ptr<Shader> direct_light_map_shader_;
+    std::unique_ptr<Shader> indirect_light_map_shader_;
     std::unique_ptr<Framebuffer> light_map_lookup_buffer_;
-    std::unique_ptr<Framebuffer> light_map_accumulation_buffer_;
+    std::unique_ptr<Framebuffer> direct_light_map_accumulation_buffer_;
+    std::unique_ptr<Framebuffer> indirect_light_map_accumulation_buffer_;
     Matrix light_map_ortho_matrix_;
+    const int kLightBounces = 1;
 
     // Light probe stuff
     std::vector<Vector3> probes_;
     std::unique_ptr<DrawBatcher> probe_meshes_;
+    std::unique_ptr<DrawBatcher> probe_quads_;
     std::unique_ptr<Camera> probe_view_;
     std::unique_ptr<Shader> probe_map_shader_;
     std::unique_ptr<Shader> probe_map_clear_shader_;
