@@ -49,9 +49,9 @@ void main(void)
 		return;
 	}
 	vec4 direct_light_full = texture(direct_lightmap, light_coord.xy);
-	vec3 direct_light_colour = direct_light_full.rgb / direct_light_full.a;
+	vec3 direct_light_colour = clamp(direct_light_full.rgb / direct_light_full.a, vec3(0), vec3(1));
 	vec4 indirect_light_full = texture(indirect_lightmap, light_coord.xy);
-	vec3 indirect_light_colour = indirect_light_full.rgb / indirect_light_full.a;
+	vec3 indirect_light_colour = clamp(indirect_light_full.rgb / indirect_light_full.a, vec3(0), vec3(1));
 
 	vec3 diffuse = albedo * (direct_light_colour + indirect_light_colour);
 
