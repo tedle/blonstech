@@ -45,30 +45,34 @@ namespace stage { class Lightprobe; }
 namespace stage { class Lighting; }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Class for an easy to use deferred rendering pipeline
+/// \brief Provides an easy to use deferred rendering pipeline
 ////////////////////////////////////////////////////////////////////////////////
 class Deferred
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to specify which stage of the pipeline should be rendered to
+    /// the screen
+    ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        FINAL,
-        ALBEDO,
-        NORMAL,
-        DEBUG,
-        G_DEPTH,
-        LIGHT_DEPTH,
-        DIRECT_LIGHT,
-        PROBE_ALBEDO,
-        PROBE_UV,
-        LIGHT_MAP_LOOKUP_POS,
-        LIGHT_MAP_LOOKUP_NORMAL,
-        DIRECT_LIGHT_MAP,
-        INDIRECT_LIGHT_MAP,
-        PROBE,
-        PROBE_COEFFICIENTS,
-        INDIRECT_LIGHT,
-        NONE
+        FINAL,                   ///< The final composited image
+        ALBEDO,                  ///< Fullbright geometry
+        NORMAL,                  ///< Worldspace normals of the geometry
+        DEBUG,                   ///< Various debug information
+        G_DEPTH,                 ///< Depth buffer of the geometry
+        LIGHT_DEPTH,             ///< Depth buffer from the light's point of view
+        DIRECT_LIGHT,            ///< Direct lighting pass
+        PROBE_ALBEDO,            ///< Probe diffuse information
+        PROBE_UV,                ///< Probe UV information
+        LIGHT_MAP_LOOKUP_POS,    ///< Lightmap position lookup
+        LIGHT_MAP_LOOKUP_NORMAL, ///< Lightmap worldspace normal lookup
+        DIRECT_LIGHT_MAP,        ///< Direct lighting map
+        INDIRECT_LIGHT_MAP,      ///< Bounce lighting map
+        PROBE,                   ///< Shaded probe view
+        PROBE_COEFFICIENTS,      ///< Spherical harmonics per probe
+        INDIRECT_LIGHT,          ///< Bounce lighting pass
+        NONE                     ///< Results in nullptr
     };
 
 public:
@@ -111,6 +115,7 @@ public:
     /// \brief Used to build global illumination for the scene. Should be called
     /// **once** after all static geometry has been loaded.
     ///
+    /// \param scene Contains scene information for rendering
     /// \param context Handle to the current rendering context
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
@@ -153,6 +158,32 @@ private:
 /// 
 /// ### Example:
 /// \code
+/// #include <blons/graphics/pipeline/pipeline.h>
+///
+/// // Using the deferred pipeline
+/// auto pipeline = std::make_unique<blons::pipeline::Deferred>(screen, blons::kPi / 2.0f, screen_near, screen_far, context)
+///
+/// // Rendering loop
+/// while (true)
+/// {
+///     pipeline::Scene scene;
+///     scene.lights = lights;
+///     scene.models = models;
+///     scene.sky_colour = sky_colour;
+///     scene.view = camera;
+///
+///     context->BeginScene(Vector4(0, 0, 0, 1));
+///
+///     if (!pipeline->Render(scene, context))
+///     {
+///         // Uh oh!
+///     }
+///
+///     // Can keep doing other rendering stuff here, UI, etc...
+///
+///     // Then swap buffers
+///     context->EndScene();
+/// }
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

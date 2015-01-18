@@ -42,30 +42,71 @@ namespace stage
 class Geometry;
 class Shadow;
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Calculates global illumination by use of spherical harmonics and
+/// applys it to the scene
+////////////////////////////////////////////////////////////////////////////////
 class Lightprobe
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to specify which output of the stage to retrieve
+    ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        COEFFICIENTS,
-        LIGHT_MAP_LOOKUP_POS,
-        LIGHT_MAP_LOOKUP_NORMAL,
-        DIRECT_LIGHT_MAP,
-        INDIRECT_LIGHT_MAP,
-        INDIRECT_LIGHT,
-        PROBE_ALBEDO,
-        PROBE_UV,
-        PROBE
+        COEFFICIENTS,            ///< Spherical harmonic coefficients for each light probe
+        LIGHT_MAP_LOOKUP_POS,    ///< World position used to apply lighting to the lightmaps
+        LIGHT_MAP_LOOKUP_NORMAL, ///< World normals Used to apply lighting to the lightmaps
+        DIRECT_LIGHT_MAP,        ///< Light map containing direct light information
+        INDIRECT_LIGHT_MAP,      ///< Light map containing indirect light information
+        INDIRECT_LIGHT,          ///< Scene with indirect lighting applied
+        PROBE_ALBEDO,            ///< Albedo lookup texture for probe rendering
+        PROBE_UV,                ///< Light map UV lookup texture for probe rendering
+        PROBE                    ///< Lighting applied to probe view of scene, for building coefficients
     };
 
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes a new Lightprobe stage
+    ///
+    /// \param perspective Screen dimensions and perspective information
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     Lightprobe(Perspective perspective, RenderContext& context);
     ~Lightprobe() {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Renders out the indirect lighting targets
+    ///
+    /// \param scene Contains scene information for rendering
+    /// \param geometry Handle to the geometry buffer pass performed earlier in the
+    /// frame
+    /// \param shadow Handle to the shadow buffer pass performed earlier in the
+    /// frame
+    /// \param perspective Screen dimensions and perspective information
+    /// \param view_matrix View matrix of the camera rendering the scene
+    /// \param proj_matrix Perspective matrix for rendering the scene
+    /// \param light_vp_matrix View projetion matrix of the directional light
+    /// providing shadow
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, Perspective perspective,
                 Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Builds light probe caching information. Should be called once after
+    /// map load
+    ///
+    /// \param scene Contains scene information for rendering
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     bool BuildLighting(const Scene& scene, RenderContext& context);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the rendering output from the pipeline stage
+    ///
+    /// \param buffer Lightprobe::Output target to retrieve
+    /// \return Handle to the output target texture
+    ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
 
 private:

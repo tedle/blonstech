@@ -40,21 +40,52 @@ namespace stage
 // Forward declarations
 class Geometry;
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Calculates cascading shadow maps and applys them to a scene
+////////////////////////////////////////////////////////////////////////////////
 class Shadow
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to specify which output of the stage to retrieve
+    ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        LIGHT_DEPTH,
-        DIRECT_LIGHT
+        LIGHT_DEPTH, ///< 16-bit depth in the red channel and 16-bit depth squared in the green channel
+        DIRECT_LIGHT ///< R8G8B8 direct lighting. Only provides luminance
     };
 
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes a new Shadow stage
+    ///
+    /// \param perspective Screen dimensions and perspective information
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     Shadow(Perspective perspective, RenderContext& context);
     ~Shadow() {}
 
-    bool Render(const Scene& scene, const Geometry& g_buffer, Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, Matrix ortho_matrix, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Renders out the shadow map targets
+    ///
+    /// \param scene Contains scene information for rendering
+    /// \param geometry Handle to the geometry buffer pass performed earlier in the
+    /// frame
+    /// \param view_matrix View matrix of the camera rendering the scene
+    /// \param proj_matrix Perspective matrix for rendering the scene
+    /// \param light_vp_matrix View projetion matrix of the directional light
+    /// providing shadow
+    /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
+    bool Render(const Scene& scene, const Geometry& geometry, Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, Matrix ortho_matrix, RenderContext& context);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the rendering output from the pipeline stage
+    ///
+    /// \param buffer Shadow::Output target to retrieve
+    /// \return Handle to the output target texture
+    ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
 
 private:
@@ -76,8 +107,7 @@ private:
 /// \ingroup pipeline
 /// 
 /// ### Example:
-/// \code
-/// \endcode
+/// See the pipeline module page for an example use on pipeline stages
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_SHADOW_H_

@@ -33,6 +33,9 @@ namespace blons
 {
 namespace pipeline
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Data object containing a scene to be rendered by pipelines
+////////////////////////////////////////////////////////////////////////////////
 struct Scene
 {
     Camera view;                ///< Camera the scene is viewed from
@@ -41,12 +44,18 @@ struct Scene
     Vector3 sky_colour;         ///< Colour of the sky
 };
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Data object containing information about how a scene is viewed
+////////////////////////////////////////////////////////////////////////////////
 struct Perspective
 {
-    units::pixel width, height;
-    units::world screen_near, screen_far;
-    float fov;
+    units::pixel width;       ///< Screen width in pixels
+    units::pixel height;      ///< Screen height in pixels
+    units::world screen_near; ///< Near clipping range in world units
+    units::world screen_far;  ///< Far clipping range in world units
+    float fov;                ///< Vertical field of view in radians
 };
+
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief **Temporary** config option for shadow map resolution
 ////////////////////////////////////////////////////////////////////////////////

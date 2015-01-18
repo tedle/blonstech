@@ -42,21 +42,55 @@ class Geometry;
 class Shadow;
 class Lightprobe;
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Composites lighting information from previous passes and adds
+/// specular
+////////////////////////////////////////////////////////////////////////////////
 class Lighting
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to specify which output of the stage to retrieve
+    ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        LIGHT
+        LIGHT ///< Composited lighting information applied to the scene
     };
 
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes a new Lighting stage
+    ///
+    /// \param perspective Screen dimensions and perspective information
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     Lighting(Perspective perspective, RenderContext& context);
     ~Lighting() {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Renders out the composited lighting targets
+    ///
+    /// \param scene Contains scene information for rendering
+    /// \param geometry Handle to the geometry buffer pass performed earlier in the
+    /// frame
+    /// \param shadow Handle to the shadow buffer pass performed earlier in the
+    /// frame
+    /// \param lightprobe Handle to the lightprobe buffer pass performed earlier in
+    /// the frame
+    /// \param view_matrix View matrix of the camera rendering the scene
+    /// \param proj_matrix Perspective matrix for rendering the scene
+    /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const Lightprobe& lightprobe,
                 Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix, RenderContext& context);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the rendering output from the pipeline stage
+    ///
+    /// \param buffer Lighting::Output target to retrieve
+    /// \return Handle to the output target texture
+    ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
 
 private:

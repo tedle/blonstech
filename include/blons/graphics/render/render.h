@@ -35,36 +35,52 @@
 
 namespace blons
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Contains formatting information for creating new textures
+////////////////////////////////////////////////////////////////////////////////
 struct TextureHint
 {
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Determines the bit format of the texture
+    ////////////////////////////////////////////////////////////////////////////////
     enum Format
     {
-        NONE,
-        A8,
-        R8G8B8,
-        R32G32B32,
-        R16G16,
-        R8G8B8A8,
-        R32G32B32A32
-    } format;
+        NONE,        ///< Error
+        A8,          ///< 1-channel, 8-bit per channel
+        R8G8B8,      ///< 3-channel, 8-bit per channel
+        R32G32B32,   ///< 3-channel, 32-bit per channel
+        R16G16,      ///< 2-channel, 16-bit per channel
+        R8G8B8A8,    ///< 3-channel, 8-bit per channel
+        R32G32B32A32 ///< 4-channel, 32-bit per channel
+    } format; ///< Determines the bit format of the texture
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Determines the filtering for texture access
+    ////////////////////////////////////////////////////////////////////////////////
     enum Filter
     {
-        NEAREST,
-        LINEAR
-    } filter;
+        NEAREST, ///< Nearest neighbour filtering
+        LINEAR   ///< Linear filtering
+    } filter; ///< Determines the filtering for texture access
 };
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Used to set the blending mode for future render passes
+////////////////////////////////////////////////////////////////////////////////
 enum BlendMode
 {
-    ADDITIVE,
-    ALPHA
+    ADDITIVE, ///< Pixel shader value is added to old value
+    ALPHA     ///< Pixel shader value is mixed with old value based on alpha
 };
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Used to set the culling mode for future render passes
+////////////////////////////////////////////////////////////////////////////////
 enum CullMode
 {
-    ENABLE_CCW,
-    ENABLE_CW,
-    DISABLE
+    ENABLE_CCW, ///< Only show triangles with counter-clockwise winding
+    ENABLE_CW,  ///< Only show triangle with clockwise winding
+    DISABLE     ///< Disable culling of triangles based on winding
 };
 
 ////////////////////////////////////////////////////////////////////////////////

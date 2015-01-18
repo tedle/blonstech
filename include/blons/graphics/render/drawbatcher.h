@@ -36,10 +36,13 @@ namespace blons
 class DrawBatcher
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Determines how the batch mesh is stored internally
+    ////////////////////////////////////////////////////////////////////////////////
     enum Type
     {
-        MESH_2D,
-        MESH_3D
+        MESH_2D, ///< Mesh only contains 2D position and UV information
+        MESH_3D  ///< Mesh stores full vertex information
     };
 
 public:

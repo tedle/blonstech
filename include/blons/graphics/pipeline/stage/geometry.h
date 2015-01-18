@@ -37,23 +37,50 @@ namespace pipeline
 {
 namespace stage
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Renders out the g-buffer including albedo, normal, and depth
+/// information to be consumed by later parts of the pipeline
+////////////////////////////////////////////////////////////////////////////////
 class Geometry
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to specify which output of the stage to retrieve
+    ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        ALBEDO,
-        NORMAL,
-        DEPTH,
-        DEBUG
+        ALBEDO, ///< Albedo colour
+        NORMAL, ///< World space normals
+        DEPTH,  ///< 24-bit depth in the red channel
+        DEBUG   ///< Various debug information
     };
 
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes a new Geometry stage
+    ///
+    /// \param perspective Screen dimensions and perspective information
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     Geometry(Perspective perspective, RenderContext& context);
     ~Geometry() {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Renders out the g-buffer
+    ///
+    /// \param scene Contains scene information for rendering
+    /// \param view_matrix View matrix of the camera rendering the scene
+    /// \param proj_matrix Perspective matrix for rendering the scene
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
     bool Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix, RenderContext& context);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the rendering output from the pipeline stage
+    ///
+    /// \param buffer Geometry::Output target to retrieve
+    /// \return Handle to the output target texture
+    ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
 
 private:
