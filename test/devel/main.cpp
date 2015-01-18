@@ -26,6 +26,7 @@
 
 void InitTestUI(blons::gui::Manager* gui);
 void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info);
+void SetRenderingOutput(blons::Graphics* graphics);
 
 int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, int cmd_show)
 {
@@ -78,6 +79,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
         {
             blons::temp::noclip(client->input(), graphics->camera());
         }
+        SetRenderingOutput(graphics.get());
         graphics->Render();
     }
 
@@ -144,6 +146,8 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
     auto v_c = blons::console::var<std::string>("sv:greeting");
 
     blons::console::RegisterFunction("gfx:reload", [=](){ graphics->Reload(info); });
+    blons::console::RegisterVariable("gfx:target", 0);
+    blons::console::RegisterVariable("gfx:alt-target", 1);
 
     blons::console::RegisterFunction("dbg:test-ui", std::bind(InitTestUI, graphics->gui()));
 
@@ -154,4 +158,66 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
             blons::console::out("%s\n", line.c_str());
         }
     });
+}
+
+void SetRenderingOutput(blons::Graphics* graphics)
+{
+    static const blons::console::Variable* target = blons::console::var("gfx:target");
+    static const blons::console::Variable* alt_target = blons::console::var("gfx:alt-target");
+    auto get_target = [](int target)
+    {
+        switch (target)
+        {
+        case 1:
+            return blons::pipeline::Deferred::ALBEDO;
+            break;
+        case 2:
+            return blons::pipeline::Deferred::NORMAL;
+            break;
+        case 3:
+            return blons::pipeline::Deferred::DEBUG;
+            break;
+        case 4:
+            return blons::pipeline::Deferred::G_DEPTH;
+            break;
+        case 5:
+            return blons::pipeline::Deferred::LIGHT_DEPTH;
+            break;
+        case 6:
+            return blons::pipeline::Deferred::DIRECT_LIGHT;
+            break;
+        case 7:
+            return blons::pipeline::Deferred::PROBE_ALBEDO;
+            break;
+        case 8:
+            return blons::pipeline::Deferred::PROBE_UV;
+            break;
+        case 9:
+            return blons::pipeline::Deferred::LIGHT_MAP_LOOKUP_POS;
+            break;
+        case 10:
+            return blons::pipeline::Deferred::LIGHT_MAP_LOOKUP_NORMAL;
+            break;
+        case 11:
+            return blons::pipeline::Deferred::DIRECT_LIGHT_MAP;
+            break;
+        case 12:
+            return blons::pipeline::Deferred::INDIRECT_LIGHT_MAP;
+            break;
+        case 13:
+            return blons::pipeline::Deferred::PROBE;
+            break;
+        case 14:
+            return blons::pipeline::Deferred::PROBE_COEFFICIENTS;
+            break;
+        case 15:
+            return blons::pipeline::Deferred::INDIRECT_LIGHT;
+            break;
+        case 0:
+        default:
+            return blons::pipeline::Deferred::FINAL;
+            break;
+        }
+    };
+    graphics->set_output(get_target(target->to<int>()), get_target(alt_target->to<int>()));
 }

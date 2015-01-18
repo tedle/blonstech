@@ -246,6 +246,11 @@ gui::Manager* Graphics::gui() const
     return gui_.get();
 }
 
+void Graphics::set_output(pipeline::Deferred::Output output, pipeline::Deferred::Output alt_output)
+{
+    pipeline_->set_output(output, alt_output);
+}
+
 bool Graphics::MakeContext(Client::Info screen)
 {
     screen_ = screen;

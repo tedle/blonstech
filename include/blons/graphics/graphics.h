@@ -35,6 +35,7 @@
 #include <blons/graphics/sprite.h>
 #include <blons/graphics/render/render.h>
 #include <blons/graphics/render/drawbatcher.h>
+#include <blons/graphics/pipeline/deferred.h>
 #include <blons/system/client.h>
 
 namespace blons
@@ -70,7 +71,6 @@ const units::world kScreenNear = 0.1f;
 class Light;
 class Shader;
 namespace gui { class Manager; }
-namespace pipeline { class Deferred; }
 
 // TODO: Custom shader pipelines like
 //           graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, vector<string> shader_files, func shader_inputs_callback)
@@ -152,6 +152,15 @@ public:
     /// \return Pointer to the GUI manager
     ////////////////////////////////////////////////////////////////////////////////
     gui::Manager* gui() const;
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Determines which stage of the rendering pipeline is displayed to the
+    /// screen
+    ///
+    /// \param output Rendering stage to display
+    /// \param alt_output Rendering stage to display in the bottom right corner
+    ////////////////////////////////////////////////////////////////////////////////
+    void set_output(pipeline::Deferred::Output output, pipeline::Deferred::Output alt_output);
 
 private:
     bool MakeContext(Client::Info screen);

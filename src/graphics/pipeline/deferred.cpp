@@ -31,7 +31,6 @@
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
-// TODO: Remove this include when we get smarter debug render targets
 #include <blons/graphics/sprite.h>
 
 namespace blons
@@ -40,6 +39,8 @@ namespace pipeline
 {
 Deferred::Deferred(Client::Info screen, float fov, float screen_near, float screen_far, RenderContext& context)
 {
+    output_ = FINAL;
+    alt_output_ = ALBEDO;
     Reload(screen, fov, screen_near, screen_far, context);
 }
 
@@ -71,6 +72,9 @@ bool Deferred::Init(RenderContext& context)
     {
         return false;
     }
+
+    output_sprite_.reset(new Sprite("blons:none", context));
+    alt_output_sprite_.reset(new Sprite("blons:none", context));
 
     return true;
 }
@@ -138,114 +142,121 @@ bool Deferred::BuildLighting(const Scene& scene, RenderContext& context)
     return lightprobe_->BuildLighting(scene, context);
 }
 
+void Deferred::set_output(Output output, Output alt_output)
+{
+    output_ = output;
+    alt_output_ = alt_output;
+}
+
 bool Deferred::RenderComposite(const Scene& scene, RenderContext& context)
 {
-    // TODO: TEMP DEBUG CODE. CLEAN THIS UP!!!
-    static bool init = true;
-    static const console::Variable* target = nullptr;
-    static std::unique_ptr<Sprite> target_sprite(new Sprite("blons:none", context));
-    static std::unique_ptr<Sprite> alt_target(new Sprite("blons:none", context));
-    if (init)
-    {
-        console::RegisterVariable("gfx:target", 0);
-        target = console::var("gfx:target");
-        init = false;
-        alt_target->set_pos(1380, 660, 200, 200);
-        alt_target->set_subtexture(0, 0, 16, -16);
-    }
-    target_sprite->set_pos(0, 0, perspective_.width, perspective_.height);
-    target_sprite->set_subtexture(0, 0, 16, -16);
-    const TextureResource* screen_texture;
-    const TextureResource* alt_screen_texture;
-    switch (target->to<int>())
-    {
-    case 1:
-        screen_texture = geometry_->output(stage::Geometry::ALBEDO);
-        break;
-    case 2:
-        screen_texture = geometry_->output(stage::Geometry::NORMAL);
-        break;
-    case 3:
-        screen_texture = geometry_->output(stage::Geometry::DEBUG);
-        break;
-    case 4:
-        screen_texture = geometry_->output(stage::Geometry::DEPTH);
-        break;
-    case 5:
-        screen_texture = shadow_->output(stage::Shadow::LIGHT_DEPTH);
-        break;
-    case 6:
-        screen_texture = shadow_->output(stage::Shadow::DIRECT_LIGHT);
-        break;
-    case 7:
-        screen_texture = lightprobe_->output(stage::Lightprobe::PROBE_ALBEDO);
-        target_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
-        break;
-    case 8:
-        screen_texture = lightprobe_->output(stage::Lightprobe::PROBE_UV);
-        target_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
-        break;
-    case 9:
-        screen_texture = lightprobe_->output(stage::Lightprobe::LIGHT_MAP_LOOKUP_POS);
-        break;
-    case 10:
-        screen_texture = lightprobe_->output(stage::Lightprobe::LIGHT_MAP_LOOKUP_NORMAL);
-        break;
-    case 11:
-        screen_texture = lightprobe_->output(stage::Lightprobe::DIRECT_LIGHT_MAP);
-        break;
-    case 12:
-        screen_texture = lightprobe_->output(stage::Lightprobe::INDIRECT_LIGHT_MAP);
-        break;
-    case 13:
-        screen_texture = lightprobe_->output(stage::Lightprobe::PROBE);
-        target_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
-        break;
-    case 14:
-        screen_texture = lightprobe_->output(stage::Lightprobe::COEFFICIENTS);
-        target_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
-        break;
-    case 15:
-        screen_texture = lightprobe_->output(stage::Lightprobe::INDIRECT_LIGHT);
-        break;
-    case 0:
-    default:
-        screen_texture = lighting_->output(stage::Lighting::LIGHT);
-        break;
-    }
-    alt_screen_texture = geometry_->output(stage::Geometry::ALBEDO);
+    output_sprite_->set_pos(0, 0, perspective_.width, perspective_.height);
+    output_sprite_->set_subtexture(0, 0, 16, -16);
+    alt_output_sprite_->set_pos(1380, 660, 200, 200);
+    alt_output_sprite_->set_subtexture(0, 0, 16, -16);
 
+    auto output_texture = [&](Output output, Sprite* output_sprite) -> const TextureResource*
+    {
+        switch (output)
+        {
+        case ALBEDO:
+            return geometry_->output(stage::Geometry::ALBEDO);
+            break;
+        case NORMAL:
+            return geometry_->output(stage::Geometry::NORMAL);
+            break;
+        case DEBUG:
+            return geometry_->output(stage::Geometry::DEBUG);
+            break;
+        case G_DEPTH:
+            return geometry_->output(stage::Geometry::DEPTH);
+            break;
+        case LIGHT_DEPTH:
+            return shadow_->output(stage::Shadow::LIGHT_DEPTH);
+            break;
+        case DIRECT_LIGHT:
+            return shadow_->output(stage::Shadow::DIRECT_LIGHT);
+            break;
+        case PROBE_ALBEDO:
+            output_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
+            return lightprobe_->output(stage::Lightprobe::PROBE_ALBEDO);
+            break;
+        case PROBE_UV:
+            output_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
+            return lightprobe_->output(stage::Lightprobe::PROBE_UV);
+            break;
+        case LIGHT_MAP_LOOKUP_POS:
+            return lightprobe_->output(stage::Lightprobe::LIGHT_MAP_LOOKUP_POS);
+            break;
+        case LIGHT_MAP_LOOKUP_NORMAL:
+            return lightprobe_->output(stage::Lightprobe::LIGHT_MAP_LOOKUP_NORMAL);
+            break;
+        case DIRECT_LIGHT_MAP:
+            return lightprobe_->output(stage::Lightprobe::DIRECT_LIGHT_MAP);
+            break;
+        case INDIRECT_LIGHT_MAP:
+            return lightprobe_->output(stage::Lightprobe::INDIRECT_LIGHT_MAP);
+            break;
+        case PROBE:
+            output_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
+            return lightprobe_->output(stage::Lightprobe::PROBE);
+            break;
+        case PROBE_COEFFICIENTS:
+            output_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
+            return lightprobe_->output(stage::Lightprobe::COEFFICIENTS);
+            break;
+        case INDIRECT_LIGHT:
+            return lightprobe_->output(stage::Lightprobe::INDIRECT_LIGHT);
+            break;
+        case NONE:
+            return nullptr;
+            break;
+        case FINAL:
+        default:
+            return lighting_->output(stage::Lighting::LIGHT);
+            break;
+        }
+    };
     // Needed so sprites can render over themselves
     context->SetDepthTesting(false);
 
-    // Push the full screen quad used to render FBO
-    target_sprite->Render(context);
-
-    // Set the inputs
-    if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_, context) ||
-        !composite_shader_->SetInput("sprite", screen_texture, context))
+    const TextureResource* texture;
+    texture = output_texture(output_, output_sprite_.get());
+    if (texture != nullptr)
     {
-        return false;
+        // Push the full screen quad used to render FBO
+        output_sprite_->Render(context);
+
+        // Set the inputs
+        if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_, context) ||
+            !composite_shader_->SetInput("sprite", texture, context))
+        {
+            return false;
+        }
+
+        if (!composite_shader_->Render(output_sprite_->index_count(), context))
+        {
+            return false;
+        }
     }
 
-    if (!composite_shader_->Render(target_sprite->index_count(), context))
+    texture = output_texture(alt_output_, alt_output_sprite_.get());
+    if (texture != nullptr)
     {
-        return false;
-    }
+        // Push the mini screen quad used to render alt FBO
+        alt_output_sprite_->Render(context);
 
-    // Push the mini screen quad used to render alt FBO
-    alt_target->Render(context);
+        // Set the inputs
+        if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_, context) ||
+            !composite_shader_->SetInput("sprite", texture, context))
+        {
+            return false;
+        }
 
-    // Set the inputs
-    if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_, context) ||
-        !composite_shader_->SetInput("sprite", alt_screen_texture, context))
-    {
-        return false;
-    }
-
-    if (!composite_shader_->Render(alt_target->index_count(), context))
-    {
-        return false;
+        if (!composite_shader_->Render(alt_output_sprite_->index_count(), context))
+        {
+            return false;
+        }
     }
     return true;
 }

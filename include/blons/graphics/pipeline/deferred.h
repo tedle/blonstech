@@ -34,6 +34,7 @@ namespace blons
 class DrawBatcher;
 class Framebuffer;
 class Shader;
+class Sprite;
 
 namespace pipeline
 {
@@ -48,6 +49,28 @@ namespace stage { class Lighting; }
 ////////////////////////////////////////////////////////////////////////////////
 class Deferred
 {
+public:
+    enum Output
+    {
+        FINAL,
+        ALBEDO,
+        NORMAL,
+        DEBUG,
+        G_DEPTH,
+        LIGHT_DEPTH,
+        DIRECT_LIGHT,
+        PROBE_ALBEDO,
+        PROBE_UV,
+        LIGHT_MAP_LOOKUP_POS,
+        LIGHT_MAP_LOOKUP_NORMAL,
+        DIRECT_LIGHT_MAP,
+        INDIRECT_LIGHT_MAP,
+        PROBE,
+        PROBE_COEFFICIENTS,
+        INDIRECT_LIGHT,
+        NONE
+    };
+
 public:
     ////////////////////////////////////////////////////////////////////////////////
     /// Initializes a new deferred rendering pipeline using the supplied width and height
@@ -93,10 +116,22 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     bool BuildLighting(const Scene& scene, RenderContext& context);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets which stage of the deferred rendering pipeline will be displayed
+    /// to the screen after rendering
+    ///
+    /// \param output Rendering stage to display
+    /// \param alt_output Rendering stage to display in bottom right corner
+    ////////////////////////////////////////////////////////////////////////////////
+    void set_output(Output output, Output alt_output);
+
 private:
     bool Init(RenderContext& context);
 
     bool RenderComposite(const Scene& scene, RenderContext& context);
+
+    Output output_, alt_output_;
+    std::unique_ptr<Sprite> output_sprite_, alt_output_sprite_;
 
     Matrix proj_matrix_, ortho_matrix_;
     Perspective perspective_;
