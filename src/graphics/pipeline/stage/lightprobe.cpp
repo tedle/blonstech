@@ -182,6 +182,131 @@ bool Lightprobe::Render(const Scene& scene, const Geometry& geometry, const Shad
     return true;
 }
 
+bool Lightprobe::RenderLightmaps(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix, RenderContext& context)
+{
+    // Can be removed when we support more lights
+    assert(scene.lights.size() == 1);
+    Light* sun = scene.lights[0];
+
+    // Rendering to a 2D map so whatever!!!
+    context->SetDepthTesting(false);
+    // Incase lightmap UVs are imperfect, allow them to overwrite themselves
+    context->SetBlendMode(ADDITIVE);
+    // Since lightmap UVs have no regard for vertex winding
+    context->SetCullMode(DISABLE);
+
+    direct_light_map_accumulation_buffer_->Bind(Vector4(0, 0, 0, 1), context);
+    // Bind the vertex data
+    direct_light_map_accumulation_buffer_->Render(context);
+
+    // Set the inputs
+    if (!direct_light_map_shader_->SetInput("proj_matrix", light_map_ortho_matrix_, context) ||
+        !direct_light_map_shader_->SetInput("light_vp_matrix", light_vp_matrix, context) ||
+        !direct_light_map_shader_->SetInput("pos_lookup", light_map_lookup_buffer_->textures()[0], 0, context) ||
+        !direct_light_map_shader_->SetInput("norm_lookup", light_map_lookup_buffer_->textures()[1], 1, context) ||
+        !direct_light_map_shader_->SetInput("light_depth", shadow.output(stage::Shadow::LIGHT_DEPTH), 2, context) ||
+        !direct_light_map_shader_->SetInput("sun.colour", sun->colour(), context) ||
+        !direct_light_map_shader_->SetInput("sun.dir", sun->direction(), context))
+    {
+        return false;
+    }
+
+    // Make the draw call
+    if (!direct_light_map_shader_->Render(direct_light_map_accumulation_buffer_->index_count(), context))
+    {
+        return false;
+    }
+    context->SetBlendMode(ALPHA);
+    context->SetCullMode(ENABLE_CCW);
+
+    // Clear the bounce lightmap before calling probe shader
+    indirect_light_map_accumulation_buffer_->Bind(Vector4(0, 0, 0, 0), context);
+
+    // Build up the SH coefficients
+    SumCoefficients(scene, context);
+
+    // This is pretty expensive, 1 bounce adds a lot and works great
+    for (int i = 0; i < kLightBounces; i++)
+    {
+        context->SetDepthTesting(false);
+        // Stores multiple bounces
+        context->SetBlendMode(ADDITIVE);
+        indirect_light_map_accumulation_buffer_->Bind(false, context);
+
+        // Render each probe as a quad covering the entire lightmap to have it apply globally
+        probe_quads_->Render(false, context);
+
+        // Set the inputs
+        if (!indirect_light_map_shader_->SetInput("proj_matrix", light_map_ortho_matrix_, context) ||
+            !indirect_light_map_shader_->SetInput("lightmap_resolution", static_cast<float>(kLightMapResolution), context) ||
+            !indirect_light_map_shader_->SetInput("probe_count", static_cast<float>(probes_.size()), context) ||
+            !indirect_light_map_shader_->SetInput("probe_distance", kProbeDistance, context) ||
+            !indirect_light_map_shader_->SetInput("pos_lookup", light_map_lookup_buffer_->textures()[0], 0, context) ||
+            !indirect_light_map_shader_->SetInput("norm_lookup", light_map_lookup_buffer_->textures()[1], 1, context) ||
+            !indirect_light_map_shader_->SetInput("probe_coefficients", probe_coefficients_buffer_->textures()[0], 2, context))
+        {
+            return false;
+        }
+
+        // Make the draw call
+        if (!indirect_light_map_shader_->Render(probe_quads_->index_count(), context))
+        {
+            return false;
+        }
+        context->SetBlendMode(ALPHA);
+
+        // Build up the SH coefficients
+        SumCoefficients(scene, context);
+    }
+    return true;
+}
+
+bool Lightprobe::SumCoefficients(const Scene& scene, RenderContext& context)
+{
+    // Render lightmap to our light probes
+    probe_buffer_->Bind(context);
+    probe_buffer_->Render(context);
+    // Set the inputs
+    if (!probe_shader_->SetInput("proj_matrix", probe_ortho_matrix_, context) ||
+        !probe_shader_->SetInput("probe_albedo", probe_map_buffer_->textures()[0], 0, context) ||
+        !probe_shader_->SetInput("probe_texmap", probe_map_buffer_->textures()[1], 1, context) ||
+        !probe_shader_->SetInput("direct_lightmap", direct_light_map_accumulation_buffer_->textures()[0], 2, context) ||
+        !probe_shader_->SetInput("indirect_lightmap", indirect_light_map_accumulation_buffer_->textures()[0], 3, context) ||
+        !probe_shader_->SetInput("sky_colour", scene.sky_colour, context))
+    {
+        return false;
+    }
+
+    // Make the draw call
+    if (!probe_shader_->Render(probe_buffer_->index_count(), context))
+    {
+        return false;
+    }
+
+    // Render lightmap to our light probes
+    probe_coefficients_buffer_->Bind(context);
+    probe_coefficients_buffer_->Render(context);
+
+    Matrix coef_ortho_matrix = MatrixOrthographic(0,
+                                                  static_cast<units::world>(9),
+                                                  static_cast<units::world>(probes_.size()),
+                                                  0, 0, 1);
+    // Set the inputs
+    if (!probe_coefficients_shader_->SetInput("proj_matrix", coef_ortho_matrix, context) ||
+        !probe_coefficients_shader_->SetInput("probe_irradiance", probe_buffer_->textures()[0], 0, context) ||
+        !probe_coefficients_shader_->SetInput("probe_count", static_cast<int>(probes_.size()), context) ||
+        !probe_coefficients_shader_->SetInput("probe_map_size", kProbeMapSize, context))
+    {
+        return false;
+    }
+    // Make the draw call
+    if (!probe_coefficients_shader_->Render(probe_coefficients_buffer_->index_count(), context))
+    {
+        return false;
+    }
+    return true;
+}
+
 bool Lightprobe::BuildLighting(const Scene& scene, RenderContext& context)
 {
     context->BeginScene(Vector4(0, 0, 0, 1));
@@ -410,131 +535,6 @@ bool Lightprobe::BuildProbeMaps(const Scene& scene, RenderContext& context)
             v.norm = Vector3(probes_[i].x, probes_[i].y, probes_[i].z);
         }
         probe_quads_->Append(probe_mesh, MatrixTranslation(probes_[i].x, probes_[i].y, probes_[i].z), context);
-    }
-    return true;
-}
-
-bool Lightprobe::RenderLightmaps(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix, RenderContext& context)
-{
-    // Can be removed when we support more lights
-    assert(scene.lights.size() == 1);
-    Light* sun = scene.lights[0];
-
-    // Rendering to a 2D map so whatever!!!
-    context->SetDepthTesting(false);
-    // Incase lightmap UVs are imperfect, allow them to overwrite themselves
-    context->SetBlendMode(ADDITIVE);
-    // Since lightmap UVs have no regard for vertex winding
-    context->SetCullMode(DISABLE);
-
-    direct_light_map_accumulation_buffer_->Bind(Vector4(0, 0, 0, 1), context);
-    // Bind the vertex data
-    direct_light_map_accumulation_buffer_->Render(context);
-
-    // Set the inputs
-    if (!direct_light_map_shader_->SetInput("proj_matrix", light_map_ortho_matrix_, context) ||
-        !direct_light_map_shader_->SetInput("light_vp_matrix", light_vp_matrix, context) ||
-        !direct_light_map_shader_->SetInput("pos_lookup", light_map_lookup_buffer_->textures()[0], 0, context) ||
-        !direct_light_map_shader_->SetInput("norm_lookup", light_map_lookup_buffer_->textures()[1], 1, context) ||
-        !direct_light_map_shader_->SetInput("light_depth", shadow.output(stage::Shadow::LIGHT_DEPTH), 2, context) ||
-        !direct_light_map_shader_->SetInput("sun.colour", sun->colour(), context) ||
-        !direct_light_map_shader_->SetInput("sun.dir", sun->direction(), context))
-    {
-        return false;
-    }
-
-    // Make the draw call
-    if (!direct_light_map_shader_->Render(direct_light_map_accumulation_buffer_->index_count(), context))
-    {
-        return false;
-    }
-    context->SetBlendMode(ALPHA);
-    context->SetCullMode(ENABLE_CCW);
-
-    // Clear the bounce lightmap before calling probe shader
-    indirect_light_map_accumulation_buffer_->Bind(Vector4(0, 0, 0, 0), context);
-
-    // Build up the SH coefficients
-    SumCoefficients(scene, context);
-
-    // This is pretty expensive, 1 bounce adds a lot and works great
-    for (int i = 0; i < kLightBounces; i++)
-    {
-        context->SetDepthTesting(false);
-        // Stores multiple bounces
-        context->SetBlendMode(ADDITIVE);
-        indirect_light_map_accumulation_buffer_->Bind(false, context);
-
-        // Render each probe as a quad covering the entire lightmap to have it apply globally
-        probe_quads_->Render(false, context);
-
-        // Set the inputs
-        if (!indirect_light_map_shader_->SetInput("proj_matrix", light_map_ortho_matrix_, context) ||
-            !indirect_light_map_shader_->SetInput("lightmap_resolution", static_cast<float>(kLightMapResolution), context) ||
-            !indirect_light_map_shader_->SetInput("probe_count", static_cast<float>(probes_.size()), context) ||
-            !indirect_light_map_shader_->SetInput("probe_distance", kProbeDistance, context) ||
-            !indirect_light_map_shader_->SetInput("pos_lookup", light_map_lookup_buffer_->textures()[0], 0, context) ||
-            !indirect_light_map_shader_->SetInput("norm_lookup", light_map_lookup_buffer_->textures()[1], 1, context) ||
-            !indirect_light_map_shader_->SetInput("probe_coefficients", probe_coefficients_buffer_->textures()[0], 2, context))
-        {
-            return false;
-        }
-
-        // Make the draw call
-        if (!indirect_light_map_shader_->Render(probe_quads_->index_count(), context))
-        {
-            return false;
-        }
-        context->SetBlendMode(ALPHA);
-
-        // Build up the SH coefficients
-        SumCoefficients(scene, context);
-    }
-    return true;
-}
-
-bool Lightprobe::SumCoefficients(const Scene& scene, RenderContext& context)
-{
-    // Render lightmap to our light probes
-    probe_buffer_->Bind(context);
-    probe_buffer_->Render(context);
-    // Set the inputs
-    if (!probe_shader_->SetInput("proj_matrix", probe_ortho_matrix_, context) ||
-        !probe_shader_->SetInput("probe_albedo", probe_map_buffer_->textures()[0], 0, context) ||
-        !probe_shader_->SetInput("probe_texmap", probe_map_buffer_->textures()[1], 1, context) ||
-        !probe_shader_->SetInput("direct_lightmap", direct_light_map_accumulation_buffer_->textures()[0], 2, context) ||
-        !probe_shader_->SetInput("indirect_lightmap", indirect_light_map_accumulation_buffer_->textures()[0], 3, context) ||
-        !probe_shader_->SetInput("sky_colour", scene.sky_colour, context))
-    {
-        return false;
-    }
-
-    // Make the draw call
-    if (!probe_shader_->Render(probe_buffer_->index_count(), context))
-    {
-        return false;
-    }
-
-    // Render lightmap to our light probes
-    probe_coefficients_buffer_->Bind(context);
-    probe_coefficients_buffer_->Render(context);
-
-    Matrix coef_ortho_matrix = MatrixOrthographic(0,
-                                                  static_cast<units::world>(9),
-                                                  static_cast<units::world>(probes_.size()),
-                                                  0, 0, 1);
-    // Set the inputs
-    if (!probe_coefficients_shader_->SetInput("proj_matrix", coef_ortho_matrix, context) ||
-        !probe_coefficients_shader_->SetInput("probe_irradiance", probe_buffer_->textures()[0], 0, context) ||
-        !probe_coefficients_shader_->SetInput("probe_count", static_cast<int>(probes_.size()), context) ||
-        !probe_coefficients_shader_->SetInput("probe_map_size", kProbeMapSize, context))
-    {
-        return false;
-    }
-    // Make the draw call
-    if (!probe_coefficients_shader_->Render(probe_coefficients_buffer_->index_count(), context))
-    {
-        return false;
     }
     return true;
 }

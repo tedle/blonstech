@@ -211,7 +211,6 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\deferred.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\pipeline.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\scene.h" />
-    <ClInclude Include="..\include\blons\graphics\pipeline\stage\composite.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightprobe.h" />
@@ -264,7 +263,6 @@
     <ClCompile Include="graphics\meshimporter.cpp" />
     <ClCompile Include="graphics\model.cpp" />
     <ClCompile Include="graphics\pipeline\deferred.cpp" />
-    <ClCompile Include="graphics\pipeline\stage\composite.cpp" />
     <ClCompile Include="graphics\pipeline\stage\geometry.cpp" />
     <ClCompile Include="graphics\pipeline\stage\lighting.cpp" />
     <ClCompile Include="graphics\pipeline\stage\lightprobe.cpp" />

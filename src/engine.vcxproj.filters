@@ -190,9 +190,6 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightprobe.h">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\graphics\pipeline\stage\composite.h">
-      <Filter>src\graphics\pipeline\stage</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClInclude>
@@ -326,9 +323,6 @@
     </ClCompile>
     <ClCompile Include="graphics\pipeline\deferred.cpp">
       <Filter>src\graphics\pipeline</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics\pipeline\stage\composite.cpp">
-      <Filter>src\graphics\pipeline\stage</Filter>
     </ClCompile>
     <ClCompile Include="graphics\pipeline\stage\geometry.cpp">
       <Filter>src\graphics\pipeline\stage</Filter>

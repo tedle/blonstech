@@ -30,7 +30,6 @@
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/lightprobe.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
-#include <blons/graphics/pipeline/stage/composite.h>
 #include <blons/graphics/pipeline/deferred.h>
 
 ////////////////////////////////////////////////////////////////////////////////

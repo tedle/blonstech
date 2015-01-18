@@ -27,6 +27,7 @@
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/lightprobe.h>
+#include <blons/graphics/pipeline/stage/lighting.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
@@ -58,26 +59,18 @@ bool Deferred::Init(RenderContext& context)
     geometry_.reset(new stage::Geometry(perspective_, context));
     shadow_.reset(new stage::Shadow(perspective_, context));
     lightprobe_.reset(new stage::Lightprobe(perspective_, context));
+    lighting_.reset(new stage::Lighting(perspective_, context));
 
     // Shaders
-    ShaderAttributeList light_inputs;
-    light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    light_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/light.frag.glsl", light_inputs, context));
-
     ShaderAttributeList composite_inputs;
     composite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     composite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", composite_inputs, context));
 
-    if (light_shader_ == nullptr ||
-        composite_shader_ == nullptr)
+    if (composite_shader_ == nullptr)
     {
         return false;
     }
-
-    // Framebuffers
-    light_buffer_.reset(new Framebuffer(perspective_.width, perspective_.height, 1, false, context));
 
     return true;
 }
@@ -123,7 +116,7 @@ bool Deferred::Render(const Scene& scene, RenderContext& context)
         return false;
     }
 
-    if (!RenderLighting(scene, view_matrix, context))
+    if (!lighting_->Render(scene, *geometry_, *shadow_, *lightprobe_, view_matrix, proj_matrix_, ortho_matrix_, context))
     {
         return false;
     }
@@ -143,43 +136,6 @@ bool Deferred::Render(const Scene& scene, RenderContext& context)
 bool Deferred::BuildLighting(const Scene& scene, RenderContext& context)
 {
     return lightprobe_->BuildLighting(scene, context);
-}
-
-bool Deferred::RenderLighting(const Scene& scene, Matrix view_matrix, RenderContext& context)
-{
-    // Can be removed when we support more lights
-    assert(scene.lights.size() == 1);
-    Light* sun = scene.lights[0];
-
-    // Used to turn pixel fragments into world coordinates
-    Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix_);
-
-    // Bind the buffer to do all lighting calculations on
-    light_buffer_->Bind(context);
-
-    light_buffer_->Render(context);
-
-    // Set the inputs
-    if (!light_shader_->SetInput("proj_matrix", ortho_matrix_, context) ||
-        !light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context) ||
-        !light_shader_->SetInput("albedo", geometry_->output(stage::Geometry::ALBEDO), 0, context) ||
-        !light_shader_->SetInput("normal", geometry_->output(stage::Geometry::NORMAL), 1, context) ||
-        !light_shader_->SetInput("depth", geometry_->output(stage::Geometry::DEPTH), 2, context) ||
-        !light_shader_->SetInput("direct_light", shadow_->output(stage::Shadow::DIRECT_LIGHT), 3, context) ||
-        !light_shader_->SetInput("indirect_light", lightprobe_->output(stage::Lightprobe::INDIRECT_LIGHT), 4, context) ||
-        !light_shader_->SetInput("sun.dir", sun->direction(), context) ||
-        !light_shader_->SetInput("sun.colour", sun->colour(), context) ||
-        !light_shader_->SetInput("sky_colour", scene.sky_colour, context))
-    {
-        return false;
-    }
-
-    // Finally do the render
-    if (!light_shader_->Render(light_buffer_->index_count(), context))
-    {
-        return false;
-    }
-    return true;
 }
 
 bool Deferred::RenderComposite(const Scene& scene, RenderContext& context)
@@ -254,7 +210,7 @@ bool Deferred::RenderComposite(const Scene& scene, RenderContext& context)
         break;
     case 0:
     default:
-        screen_texture = light_buffer_->textures()[0];
+        screen_texture = lighting_->output(stage::Lighting::LIGHT);
         break;
     }
     alt_screen_texture = geometry_->output(stage::Geometry::ALBEDO);

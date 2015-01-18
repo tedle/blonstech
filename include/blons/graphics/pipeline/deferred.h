@@ -41,6 +41,7 @@ namespace pipeline
 namespace stage { class Geometry; }
 namespace stage { class Shadow; }
 namespace stage { class Lightprobe; }
+namespace stage { class Lighting; }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Class for an easy to use deferred rendering pipeline
@@ -95,7 +96,6 @@ public:
 private:
     bool Init(RenderContext& context);
 
-    bool RenderLighting(const Scene& scene, Matrix view_matrix, RenderContext& context);
     bool RenderComposite(const Scene& scene, RenderContext& context);
 
     Matrix proj_matrix_, ortho_matrix_;
@@ -105,10 +105,9 @@ private:
     std::unique_ptr<stage::Geometry> geometry_;
     std::unique_ptr<stage::Shadow> shadow_;
     std::unique_ptr<stage::Lightprobe> lightprobe_;
+    std::unique_ptr<stage::Lighting> lighting_;
 
-    std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Shader> composite_shader_;
-    std::unique_ptr<Framebuffer> light_buffer_;
 };
 } // namespace pipeline
 } // namespace blons
