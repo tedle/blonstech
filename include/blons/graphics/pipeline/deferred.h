@@ -25,9 +25,7 @@
 #define BLONSTECH_GRAPHICS_PIPELINE_DEFERRED_H_
 
 // Public Includes
-#include <blons/graphics/camera.h>
-#include <blons/graphics/light.h>
-#include <blons/graphics/model.h>
+#include <blons/graphics/pipeline/scene.h>
 #include <blons/system/client.h>
 
 namespace blons
@@ -39,33 +37,10 @@ class Shader;
 
 namespace pipeline
 {
-struct Scene
-{
-    Camera view;                ///< Camera the scene is viewed from
-    std::vector<Model*> models; ///< List of models to be rendered on screen
-    std::vector<Light*> lights; ///< List of lights to be used in the scene
-    Vector3 sky_colour;         ///< Colour of the sky
-};
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for shadow map resolution
-////////////////////////////////////////////////////////////////////////////////
-const units::pixel kShadowMapResolution = 1024;
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for light map resolution
-////////////////////////////////////////////////////////////////////////////////
-const units::pixel kLightMapResolution = 256;
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for number of lighting bounces
-////////////////////////////////////////////////////////////////////////////////
-const int kLightBounces = 1;
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for probemap resolution
-////////////////////////////////////////////////////////////////////////////////
-const int kProbeMapSize = 16;
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for probemap area of effect
-////////////////////////////////////////////////////////////////////////////////
-const float kProbeDistance = 5.0f;
+// Forward declarations
+namespace stage { class Geometry; }
+namespace stage { class Shadow; }
+namespace stage { class Lightprobe; }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Class for an easy to use deferred rendering pipeline
@@ -84,7 +59,7 @@ public:
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     Deferred(Client::Info screen, float fov, float screen_near, float screen_far, RenderContext& context);
-    ~Deferred() {}
+    ~Deferred();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders the supplied models and lights to the screen
@@ -116,73 +91,31 @@ public:
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     bool BuildLighting(const Scene& scene, RenderContext& context);
+
 private:
     bool Init(RenderContext& context);
 
-    // Should only be called once per map load
-    bool BuildLightMapLookups(const Scene& scene, RenderContext& context);
-    bool BuildProbeMaps(const Scene& scene, RenderContext& context);
-
-    bool RenderGeometry(const Scene& scene, Matrix view_matrix, RenderContext& context);
-    bool RenderShadowMaps(const Scene& scene, Matrix view_matrix, Matrix light_vp_matrix, RenderContext& context);
-    bool RenderLightMaps(const Scene& scene, Matrix light_vp_matrix, RenderContext& context);
-    bool SumCoefficients(const Scene& scene, RenderContext& context); // RenderLightMaps helper
     bool RenderLighting(const Scene& scene, Matrix view_matrix, RenderContext& context);
     bool RenderComposite(const Scene& scene, RenderContext& context);
 
     Matrix proj_matrix_, ortho_matrix_;
-
-    struct Perspective
-    {
-        units::pixel width, height;
-        units::world screen_near, screen_far;
-        float fov;
-    } perspective_;
+    Perspective perspective_;
 
     // TODO: Document the pipeline
-    std::unique_ptr<Shader> geo_shader_;
-    std::unique_ptr<Shader> shadow_shader_;
-    std::unique_ptr<Shader> blur_shader_;
-    std::unique_ptr<Shader> direct_light_shader_;
-    std::unique_ptr<Shader> indirect_light_shader_;
+    std::unique_ptr<stage::Geometry> geometry_;
+    std::unique_ptr<stage::Shadow> shadow_;
+    std::unique_ptr<stage::Lightprobe> lightprobe_;
+
     std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Shader> composite_shader_;
-    std::unique_ptr<Framebuffer> geometry_buffer_;
-    std::unique_ptr<Framebuffer> shadow_buffer_;
-    std::unique_ptr<Framebuffer> blur_buffer_;
-    std::unique_ptr<Framebuffer> direct_light_buffer_;
-    std::unique_ptr<Framebuffer> indirect_light_buffer_;
     std::unique_ptr<Framebuffer> light_buffer_;
-
-    // Light map stuff
-    std::unique_ptr<Shader> light_map_lookup_shader_;
-    std::unique_ptr<Shader> direct_light_map_shader_;
-    std::unique_ptr<Shader> indirect_light_map_shader_;
-    std::unique_ptr<Framebuffer> light_map_lookup_buffer_;
-    std::unique_ptr<Framebuffer> direct_light_map_accumulation_buffer_;
-    std::unique_ptr<Framebuffer> indirect_light_map_accumulation_buffer_;
-    Matrix light_map_ortho_matrix_;
-
-    // Light probe stuff
-    std::vector<Vector3> probes_;
-    std::unique_ptr<DrawBatcher> probe_meshes_;
-    std::unique_ptr<DrawBatcher> probe_quads_;
-    std::unique_ptr<Camera> probe_view_;
-    std::unique_ptr<Shader> probe_map_shader_;
-    std::unique_ptr<Shader> probe_map_clear_shader_;
-    std::unique_ptr<Shader> probe_shader_;
-    std::unique_ptr<Shader> probe_coefficients_shader_;
-    std::unique_ptr<Framebuffer> probe_map_buffer_;
-    std::unique_ptr<Framebuffer> probe_buffer_;
-    std::unique_ptr<Framebuffer> probe_coefficients_buffer_;
-    Matrix probe_proj_matrix_, probe_ortho_matrix_;
 };
 } // namespace pipeline
 } // namespace blons
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::DeferredPipeline
-/// \ingroup graphics
+/// \class blons::pipeline::Deferred
+/// \ingroup pipeline
 /// 
 /// ### Example:
 /// \code

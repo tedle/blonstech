@@ -209,6 +209,13 @@
     <ClInclude Include="..\include\blons\graphics\meshimporter.h" />
     <ClInclude Include="..\include\blons\graphics\model.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\deferred.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\pipeline.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\scene.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\composite.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightprobe.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\shadow.h" />
     <ClInclude Include="..\include\blons\graphics\render\drawbatcher.h" />
     <ClInclude Include="..\include\blons\graphics\render\render.h" />
     <ClInclude Include="..\include\blons\graphics\render\shader.h" />
@@ -257,6 +264,11 @@
     <ClCompile Include="graphics\meshimporter.cpp" />
     <ClCompile Include="graphics\model.cpp" />
     <ClCompile Include="graphics\pipeline\deferred.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\composite.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\geometry.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\lighting.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\lightprobe.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\shadow.cpp" />
     <ClCompile Include="graphics\render\drawbatcher.cpp" />
     <ClCompile Include="graphics\render\glfuncloader.cpp" />
     <ClCompile Include="graphics\render\renderd3d11.cpp" />

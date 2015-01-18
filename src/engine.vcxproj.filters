@@ -32,6 +32,9 @@
     <Filter Include="src\graphics\pipeline">
       <UniqueIdentifier>{0a8df85e-ec87-433f-8327-680f6ec642c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\graphics\pipeline\stage">
+      <UniqueIdentifier>{c1b31eba-cbc9-4b75-803d-29614bc2e4d6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons\debug\console.h">
@@ -184,6 +187,27 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\deferred.h">
       <Filter>src\graphics\pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightprobe.h">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\composite.h">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\shadow.h">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\pipeline.h">
+      <Filter>src\graphics\pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\scene.h">
+      <Filter>src\graphics\pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -302,6 +326,21 @@
     </ClCompile>
     <ClCompile Include="graphics\pipeline\deferred.cpp">
       <Filter>src\graphics\pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\composite.cpp">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\geometry.cpp">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\lightprobe.cpp">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\shadow.cpp">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\lighting.cpp">
+      <Filter>src\graphics\pipeline\stage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

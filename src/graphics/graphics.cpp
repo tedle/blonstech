@@ -26,8 +26,7 @@
 // Public Includes
 #include <blons/graphics/gui/gui.h>
 #include <blons/graphics/light.h>
-#include <blons/graphics/pipeline/deferred.h>
-#include <blons/graphics/render/drawbatcher.h>
+#include <blons/graphics/pipeline/pipeline.h>
 #include <blons/graphics/render/shader.h>
 #include <blons/math/math.h>
 #include <blons/temphelpers.h>
