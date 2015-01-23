@@ -118,7 +118,7 @@ Lightprobe::Lightprobe(Perspective perspective, RenderContext& context)
     }
 
     // Framebuffers
-    indirect_light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context));
+    indirect_light_buffer_.reset(new Framebuffer(perspective.width / kLightInverseScale, perspective.height / kLightInverseScale, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context));
     light_map_lookup_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32, TextureHint::NEAREST }, { TextureHint::R8G8B8, TextureHint::NEAREST } }, false, context));
     direct_light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context));
     indirect_light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context));
@@ -160,8 +160,8 @@ bool Lightprobe::Render(const Scene& scene, const Geometry& geometry, const Shad
     // Do the indirect lighting from the SH coefficients
     if (!indirect_light_shader_->SetInput("mvp_matrix", view_matrix * proj_matrix, context) ||
         !indirect_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context) ||
-        !indirect_light_shader_->SetInput("screen", Vector2(units::pixel_to_subpixel(perspective.width),
-                                                            units::pixel_to_subpixel(perspective.height)), context) ||
+        !indirect_light_shader_->SetInput("screen", Vector2(units::pixel_to_subpixel(perspective.width / kLightInverseScale),
+                                                            units::pixel_to_subpixel(perspective.height / kLightInverseScale)), context) ||
         !indirect_light_shader_->SetInput("probe_count", static_cast<float>(probes_.size()), context) ||
         !indirect_light_shader_->SetInput("probe_distance", kProbeDistance, context) ||
         !indirect_light_shader_->SetInput("normal", geometry.output(stage::Geometry::NORMAL), 0, context) ||
