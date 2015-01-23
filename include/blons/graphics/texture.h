@@ -46,7 +46,8 @@ public:
         ALBEDO, ///< Used for colouring 3D models
         NORMAL, ///< Used for bump mapping 3D models
         LIGHT,  ///< Used for lighting 3D models
-        SPRITE  ///< Used for 2D rendering, ensures PixelData::RAW texture format
+        SPRITE, ///< Used for 2D rendering, ensures PixelData::RAW texture format
+        CUSTOM  ///< Uses custom render settings determined by initializer
     };
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -56,6 +57,7 @@ public:
     {
         units::pixel width;  ///< Width of the texture in pixels
         units::pixel height; ///< Height of the texture in pixels
+        units::pixel depth;  ///< Depth of the texture in pixels
         Type type;           ///< Usage of the texture
     };
 
@@ -72,10 +74,10 @@ public:
     /// \brief Initializes a new texture from raw pixel data. Will throw on failure
     ///
     /// \param pixels Pixel buffer and format info
-    /// \param type Usage of the texture
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Texture(const PixelData& pixels, Type type, RenderContext& context);
+    Texture(const PixelData& pixels, RenderContext& context);
+    Texture(const PixelData3D& pixels, RenderContext& context);
     ~Texture() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -101,12 +103,15 @@ public:
 
 private:
     bool Init(std::string filename, Type type, RenderContext& context);
-    bool Init(const PixelData& pixels, Type type, RenderContext& context);
+    bool Init(const PixelData& pixels, RenderContext& context);
+    bool Init(const PixelData3D& pixels, RenderContext& context);
 
-    // Empty if initialized from PixelData
+    // Empty if initialized from PixelData or voxel data
     std::string filename_;
-    // nullptr if initialized from filename
+    // nullptr if initialized from filename or voxel data
     std::unique_ptr<PixelData> pixel_data_;
+    // nullptr if initialized from filename or pixel data
+    std::unique_ptr<PixelData3D> pixel_data_3d_;
 
     std::shared_ptr<TextureResource> texture_;
     Info info_;

@@ -40,6 +40,7 @@ bool Texture::Init(std::string filename, Type type, RenderContext& context)
 {
     filename_ = filename;
     pixel_data_ = nullptr;
+    pixel_data_3d_ = nullptr;
 
     auto tex = resource::LoadTexture(filename, type, context);
     texture_ = std::move(tex.texture);
@@ -51,41 +52,25 @@ bool Texture::Init(std::string filename, Type type, RenderContext& context)
     return true;
 }
 
-Texture::Texture(const PixelData& pixels, Type type, RenderContext& context)
+Texture::Texture(const PixelData& pixels, RenderContext& context)
 {
-    if (!Init(pixels, type, context))
+    if (!Init(pixels, context))
     {
         throw "Failed to load texture";
     }
 }
 
-bool Texture::Init(const PixelData& pixels, Type type, RenderContext& context)
+bool Texture::Init(const PixelData& pixels, RenderContext& context)
 {
     filename_ = "";
     pixel_data_.reset(new PixelData(pixels));
+    pixel_data_3d_ = nullptr;
 
     // Make the actual texture
     texture_.reset(context->MakeTextureResource());
     if (texture_ == nullptr)
     {
         return false;
-    }
-
-    if (type == Type::SPRITE)
-    {
-        // No DDS compression or mipmaps + nearest neighbour filtering
-        pixel_data_->compression = PixelData::RAW;
-        pixel_data_->hint.filter = TextureHint::NEAREST;
-    }
-    else
-    {
-        pixel_data_->hint.filter = TextureHint::LINEAR;
-    }
-
-    // Get the most out of our lightmaps...
-    if (type == Type::LIGHT)
-    {
-        pixel_data_->compression = PixelData::RAW;
     }
 
     if (!context->RegisterTexture(texture_.get(), pixel_data_.get()))
@@ -95,7 +80,42 @@ bool Texture::Init(const PixelData& pixels, Type type, RenderContext& context)
 
     info_.width = pixel_data_->width;
     info_.height = pixel_data_->height;
-    info_.type = type;
+    info_.depth = 1;
+    info_.type = CUSTOM;
+
+    return true;
+}
+
+Texture::Texture(const PixelData3D& pixels, RenderContext& context)
+{
+    if (!Init(pixels, context))
+    {
+        throw "Failed to load texture";
+    }
+}
+
+bool Texture::Init(const PixelData3D& pixels, RenderContext& context)
+{
+    filename_ = "";
+    pixel_data_ = nullptr;
+    pixel_data_3d_.reset(new PixelData3D(pixels));
+
+    // Make the actual texture
+    texture_.reset(context->MakeTextureResource());
+    if (texture_ == nullptr)
+    {
+        return false;
+    }
+
+    if (!context->RegisterTexture(texture_.get(), pixel_data_3d_.get()))
+    {
+        return false;
+    }
+
+    info_.width = pixel_data_3d_->width;
+    info_.height = pixel_data_3d_->height;
+    info_.depth = pixel_data_3d_->depth;
+    info_.type = CUSTOM;
 
     return true;
 }
@@ -109,7 +129,7 @@ bool Texture::Reload(RenderContext& context)
 
     else if (pixel_data_ != nullptr)
     {
-        return Init(*pixel_data_, info_.type, context);
+        return Init(*pixel_data_, context);
     }
 
     return false;

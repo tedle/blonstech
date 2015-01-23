@@ -91,6 +91,7 @@ public:
     GLuint texture_;
     RenderGL40* context_;
     unsigned int context_id_;
+    GLint type_; ///< GL_TEXTURE_2D or GL_TEXTURE_3D
 };
 
 class FramebufferResourceGL40 : public FramebufferResource
@@ -559,63 +560,20 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
 
     // Creates empty render targets
-    auto make_texture = [&](TextureHint hint, bool is_depth)
+    auto make_texture = [&](TextureHint hint)
     {
         TextureResourceGL40 tex(this);
 
         // Generate an ID for the texture.
         glGenTextures(1, &tex.texture_);
 
-        // Bind the texture as a 2D texture.
-        glBindTexture(GL_TEXTURE_2D, tex.texture_);
-
-        // Set the parameters and fill it with empty image data
-        if (!is_depth)
-        {
-            GLint internalformat;
-            switch (hint.format)
-            {
-            case TextureHint::A8:
-                internalformat = GL_R8;
-                break;
-            case TextureHint::R8G8B8A8:
-                internalformat = GL_RGBA8;
-                break;
-            case TextureHint::R16G16:
-                internalformat = GL_RG16;
-                break;
-            case TextureHint::R32G32B32:
-                internalformat = GL_RGB32F;
-                break;
-            case TextureHint::R32G32B32A32:
-                internalformat = GL_RGBA32F;
-                break;
-            case TextureHint::NONE:
-            case TextureHint::R8G8B8:
-            default:
-                internalformat = GL_RGB;
-                break;
-            }
-            glTexImage2D(GL_TEXTURE_2D, 0, internalformat, width, height, 0, GL_RGB, GL_FLOAT, nullptr);
-        }
-        else
-        {
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
-        }
-         
-        // Always rendered as unstretched 2D for now...
-        switch (hint.filter)
-        {
-        case TextureHint::NEAREST:
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-            break;
-        case TextureHint::LINEAR:
-        default:
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            break;
-        }
+        PixelData pixels;
+        pixels.hint = hint;
+        pixels.compression = PixelData::RAW;
+        pixels.width = width;
+        pixels.height = height;
+        pixels.pixels = nullptr;
+        SetTextureData(&tex, &pixels);
 
         return tex;
     };
@@ -626,7 +584,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     {
         if (formats[i].format != TextureHint::NONE)
         {
-            fbo->targets_.push_back(make_texture(formats[i], false));
+            fbo->targets_.push_back(make_texture(formats[i]));
             auto attachment = GL_COLOR_ATTACHMENT0 + i;
             glFramebufferTexture(GL_FRAMEBUFFER, attachment, fbo->targets_.back().texture_, 0);
             drawbuffers[i] = attachment;
@@ -643,7 +601,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo->depth_render_);
 
         // Create and bind the depth target
-        fbo->depth_ = make_texture({ TextureHint::NONE, TextureHint::LINEAR }, true);
+        fbo->depth_ = make_texture({ TextureHint::DEPTH, TextureHint::LINEAR });
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_.texture_, 0);
     }
 
@@ -653,84 +611,32 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
 bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
 {
     TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
+    tex->type_ = GL_TEXTURE_2D;
 
     // Generate an ID for the texture.
     glGenTextures(1, &tex->texture_);
 
     // Bind the texture as a 2D texture.
-    glBindTexture(GL_TEXTURE_2D, tex->texture_);
+    glBindTexture(tex->type_, tex->texture_);
 
-    // Load the texture onto GPU
-    unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
-    if (pixel_data->compression == PixelData::DDS)
-    {
-        soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
-    }
-    else if (pixel_data->compression == PixelData::AUTO)
-    {
-        soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_GL_MIPMAPS;
-    }
-    int channels = 0;
-    switch (pixel_data->hint.format)
-    {
-    case TextureHint::A8:
-        channels = 1;
-        break;
-    case TextureHint::R8G8B8:
-        channels = 3;
-        break;
-    case TextureHint::R8G8B8A8:
-        channels = 4;
-        break;
-    default:
-        assert(false);
-        return false;
-    }
-    tex->texture_ = SOIL_create_OGL_texture(pixel_data->pixels.get(), &pixel_data->width, &pixel_data->height,
-                                            channels, tex->texture_, soil_flags);
-    if (tex->texture_ == 0)
-    {
-        return false;
-    }
+    // Upload image data to the GPU
+    SetTextureData(tex, pixel_data);
+    return true;
+}
 
-    // Apply our texture settings (we do this after to override SOIL settings)
-    // Set the texture to repeat when sampled outside UV range
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)
+{
+    TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
+    tex->type_ = GL_TEXTURE_3D;
 
-    // Raw textures use nearest neighbour filtering
-    if (pixel_data->hint.filter == TextureHint::NEAREST)
-    {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        if (pixel_data->compression == PixelData::AUTO)
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
-        }
-        else
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-        }
-    }
-    else
-    {
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        if (pixel_data->compression == PixelData::AUTO)
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-        }
-        else
-        {
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        }
-    }
+    // Generate an ID for the texture.
+    glGenTextures(1, &tex->texture_);
 
-    // TODO: attach this to a setting + safety check for max
-    // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &float);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
+    // Bind the texture as a 2D texture.
+    glBindTexture(tex->type_, tex->texture_);
 
-    // TODO: Re enable this for non-dds textures
-    // glGenerateMipmap(GL_TEXTURE_2D);
-
+    // Upload image data to the GPU
+    SetTextureData(tex, pixel_data);
     return true;
 }
 
@@ -929,6 +835,237 @@ void RenderGL40::MapMeshData(BufferResource* vertex_buffer, BufferResource* inde
     mapped_buffers_.index_data = *index_data;
 }
 
+void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
+{
+    auto tex = static_cast<TextureResourceGL40*>(texture);
+    tex->type_ = GL_TEXTURE_2D;
+
+    glBindTexture(tex->type_, tex->texture_);
+
+    // Upload uncompressed textures manually because it allows us way more format options
+    if (pixels->compression == PixelData::RAW)
+    {
+        GLint internal_format;
+        GLint input_format;
+        GLenum input_type;
+        switch (pixels->hint.format)
+        {
+        case TextureHint::A8:
+            internal_format = GL_R8;
+            input_format = GL_RED;
+            input_type = GL_UNSIGNED_BYTE;
+            break;
+        case TextureHint::R8G8_UINT:
+            internal_format = GL_RG8UI;
+            input_format = GL_RG_INTEGER;
+            input_type = GL_UNSIGNED_BYTE;
+            break;
+        case TextureHint::R8G8B8_UINT:
+            internal_format = GL_RGB8UI;
+            input_format = GL_RGB_INTEGER;
+            input_type = GL_UNSIGNED_BYTE;
+            break;
+        case TextureHint::R8G8B8A8_UINT:
+            internal_format = GL_RGBA8UI;
+            input_format = GL_RGBA_INTEGER;
+            input_type = GL_UNSIGNED_BYTE;
+            break;
+        case TextureHint::R8G8B8A8:
+            internal_format = GL_RGBA8;
+            input_format = GL_RGBA;
+            input_type = GL_UNSIGNED_BYTE;
+            break;
+        case TextureHint::R16G16:
+            internal_format = GL_RG16;
+            input_format = GL_RG;
+            input_type = GL_FLOAT;
+            break;
+        case TextureHint::R32G32B32:
+            internal_format = GL_RGB32F;
+            input_format = GL_RGB;
+            input_type = GL_FLOAT;
+            break;
+        case TextureHint::R32G32B32A32:
+            internal_format = GL_RGBA32F;
+            input_format = GL_RGBA;
+            input_type = GL_FLOAT;
+            break;
+        case TextureHint::DEPTH:
+            internal_format = GL_DEPTH_COMPONENT24;
+            input_format = GL_DEPTH_COMPONENT;
+            input_type = GL_FLOAT;
+            break;
+        case TextureHint::NONE:
+        case TextureHint::R8G8B8:
+        default:
+            internal_format = GL_RGB8;
+            input_format = GL_RGB;
+            input_type = GL_UNSIGNED_BYTE;
+            break;
+        }
+        glTexImage2D(tex->type_, 0, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels.get());
+    }
+    // Upload compressed textures thru SOIL because its way easier
+    else
+    {
+        unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
+        if (pixels->compression == PixelData::DDS)
+        {
+            soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
+        }
+        else if (pixels->compression == PixelData::AUTO)
+        {
+            soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_GL_MIPMAPS;
+        }
+        int channels = 0;
+        switch (pixels->hint.format)
+        {
+        case TextureHint::A8:
+            channels = 1;
+            break;
+        case TextureHint::R8G8B8:
+            channels = 3;
+            break;
+        case TextureHint::R8G8B8A8:
+            channels = 4;
+            break;
+        default:
+            throw "Compressed texture using wrong format";
+            break;
+        }
+        tex->texture_ = SOIL_create_OGL_texture(pixels->pixels.get(), &pixels->width, &pixels->height,
+            channels, tex->texture_, soil_flags);
+        if (tex->texture_ == 0)
+        {
+            throw "Failed to update compressed texture";
+        }
+    }
+
+    // Apply our texture settings (we do this after to override SOIL settings)
+    // Set the texture to repeat when sampled outside UV range
+    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    // Raw textures use nearest neighbour filtering
+    if (pixels->hint.filter == TextureHint::NEAREST)
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if (pixels->compression == PixelData::AUTO)
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        }
+        else
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        }
+    }
+    else
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if (pixels->compression == PixelData::AUTO)
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        }
+    }
+
+    // TODO: attach this to a setting + safety check for max
+    // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &float);
+    glTexParameteri(tex->type_, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
+
+    // TODO: Re enable this for non-dds textures
+    // glGenerateMipmap(tex->type_);
+}
+
+void RenderGL40::SetTextureData(TextureResource* texture, PixelData3D* pixels)
+{
+    auto tex = static_cast<TextureResourceGL40*>(texture);
+    tex->type_ = GL_TEXTURE_3D;
+
+    glBindTexture(tex->type_, tex->texture_);
+
+    GLint internal_format;
+    GLint input_format;
+    GLenum input_type;
+    switch (pixels->hint.format)
+    {
+    case TextureHint::A8:
+        internal_format = GL_R8;
+        input_format = GL_RED;
+        input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureHint::R8G8_UINT:
+        internal_format = GL_RG8UI;
+        input_format = GL_RG_INTEGER;
+        input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureHint::R8G8B8_UINT:
+        internal_format = GL_RGB8UI;
+        input_format = GL_RGB_INTEGER;
+        input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureHint::R8G8B8A8_UINT:
+        internal_format = GL_RGBA8UI;
+        input_format = GL_RGBA_INTEGER;
+        input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureHint::R8G8B8A8:
+        internal_format = GL_RGBA8;
+        input_format = GL_RGBA;
+        input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureHint::R16G16:
+        internal_format = GL_RG16;
+        input_format = GL_RG;
+        input_type = GL_FLOAT;
+        break;
+    case TextureHint::R32G32B32:
+        internal_format = GL_RGB32F;
+        input_format = GL_RGB;
+        input_type = GL_FLOAT;
+        break;
+    case TextureHint::R32G32B32A32:
+        internal_format = GL_RGBA32F;
+        input_format = GL_RGBA;
+        input_type = GL_FLOAT;
+        break;
+    case TextureHint::DEPTH:
+        internal_format = GL_DEPTH_COMPONENT24;
+        input_format = GL_DEPTH_COMPONENT;
+        input_type = GL_FLOAT;
+        break;
+    case TextureHint::NONE:
+    case TextureHint::R8G8B8:
+    default:
+        internal_format = GL_RGB8;
+        input_format = GL_RGB;
+        input_type = GL_UNSIGNED_BYTE;
+        break;
+    }
+    glTexImage3D(tex->type_, 0, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.get());
+    log::Debug("YOOOOO %i\n", glGetError());
+
+    // Set the texture to repeat when sampled outside UV range
+    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_R, GL_REPEAT);
+
+    // Raw textures use nearest neighbour filtering
+    if (pixels->hint.filter == TextureHint::NEAREST)
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    }
+    else
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+}
+
 bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const float value)
 {
     auto prog = static_cast<ShaderResourceGL40*>(program);
@@ -969,7 +1106,7 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const
 {
     const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(value);
     glActiveTexture(GL_TEXTURE0 + texture_index);
-    glBindTexture(GL_TEXTURE_2D, tex->texture_);
+    glBindTexture(tex->type_, tex->texture_);
     return SetShaderInput(program, name, static_cast<int>(texture_index));
 }
 

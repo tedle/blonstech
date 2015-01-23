@@ -320,6 +320,13 @@ units::world VectorDot(Vector3 a, Vector3 b)
     return product;
 }
 
+units::world VectorLength(Vector3 v)
+{
+    units::world length;
+    length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+    return length;
+}
+
 Vector3 VectorNormalize(Vector3 n)
 {
     float dist = sqrt(n.x * n.x + n.y * n.y + n.z * n.z);

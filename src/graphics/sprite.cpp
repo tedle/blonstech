@@ -36,7 +36,7 @@ Sprite::Sprite(std::string texture_filename, RenderContext& context)
 
 Sprite::Sprite(const PixelData& texture_data, RenderContext& context)
 {
-    texture_.reset(new Texture(texture_data, Texture::Type::SPRITE, context));
+    texture_.reset(new Texture(texture_data, context));
     if (!Init(context))
     {
         throw "Failed to register sprite";

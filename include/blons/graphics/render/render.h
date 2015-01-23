@@ -45,13 +45,17 @@ struct TextureHint
     ////////////////////////////////////////////////////////////////////////////////
     enum Format
     {
-        NONE,        ///< Error
-        A8,          ///< 1-channel, 8-bit per channel
-        R8G8B8,      ///< 3-channel, 8-bit per channel
-        R32G32B32,   ///< 3-channel, 32-bit per channel
-        R16G16,      ///< 2-channel, 16-bit per channel
-        R8G8B8A8,    ///< 3-channel, 8-bit per channel
-        R32G32B32A32 ///< 4-channel, 32-bit per channel
+        NONE,         ///< Error
+        A8,           ///< 1-channel, 8-bit per channel
+        R8G8_UINT,    ///< 2-channel, 8-bit per channel
+        R8G8B8_UINT,  ///< 3-channel, 8-bit per channel
+        R8G8B8A8_UINT,///< 4-channel, 8-bit per channel
+        R8G8B8,       ///< 3-channel, 8-bit per channel
+        R32G32B32,    ///< 3-channel, 32-bit per channel
+        R16G16,       ///< 2-channel, 16-bit per channel
+        R8G8B8A8,     ///< 3-channel, 8-bit per channel
+        R32G32B32A32, ///< 4-channel, 32-bit per channel
+        DEPTH         ///< Depth information
     } format; ///< Determines the bit format of the texture
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -104,8 +108,7 @@ struct MeshData
 struct PixelData
 {
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Raw pixel data in bytes, one value per byte corresponding to
-    /// PixelData::BitDepth
+    /// \brief Raw pixel data
     ////////////////////////////////////////////////////////////////////////////////
     std::unique_ptr<unsigned char> pixels;
     ////////////////////////////////////////////////////////////////////////////////
@@ -148,6 +151,9 @@ struct PixelData
         case TextureHint::A8:
             bits = 8;
             break;
+        case TextureHint::R8G8_UINT:
+            bits = 16;
+            break;
         case TextureHint::R8G8B8:
             bits = 24;
             break;
@@ -155,12 +161,84 @@ struct PixelData
         case TextureHint::R8G8B8A8:
             bits = 32;
             break;
+        case TextureHint::R32G32B32:
+            bits = 96;
+            break;
         case TextureHint::NONE:
         default:
             assert(false);
             break;
         }
         std::size_t texture_size = p.width * p.height * (bits / 8);
+        this->pixels.reset(new unsigned char[texture_size]);
+        memcpy(this->pixels.get(), p.pixels.get(), texture_size);
+    }
+};
+
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Holds raw pixel data and format info of a 3D texture
+////////////////////////////////////////////////////////////////////////////////
+struct PixelData3D
+{
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Raw pixel data
+    ////////////////////////////////////////////////////////////////////////////////
+    std::unique_ptr<unsigned char> pixels;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Width of the texture in pixels
+    ////////////////////////////////////////////////////////////////////////////////
+    units::pixel width;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Height of the texture in pixels
+    ////////////////////////////////////////////////////////////////////////////////
+    units::pixel height;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Depth of the texture in pixels
+    ////////////////////////////////////////////////////////////////////////////////
+    units::pixel depth;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Determines the pixel format and filtering of a texture
+    ////////////////////////////////////////////////////////////////////////////////
+    TextureHint hint;
+
+    PixelData3D() {}
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Performs a full copy of the given PixelData, including a byte for
+    /// byte copy of the pixel buffer
+    ////////////////////////////////////////////////////////////////////////////////
+    PixelData3D(const PixelData3D& p)
+    {
+        this->width = p.width;
+        this->height = p.height;
+        this->depth = p.depth;
+        this->hint = p.hint;
+        int bits;
+        switch (this->hint.format)
+        {
+        case TextureHint::A8:
+            bits = 8;
+            break;
+        case TextureHint::R8G8_UINT:
+            bits = 16;
+            break;
+        case TextureHint::R8G8B8:
+        case TextureHint::R8G8B8_UINT:
+            bits = 24;
+            break;
+        case TextureHint::R16G16:
+        case TextureHint::R8G8B8A8:
+        case TextureHint::R8G8B8A8_UINT:
+            bits = 32;
+            break;
+        case TextureHint::R32G32B32:
+            bits = 96;
+            break;
+        case TextureHint::NONE:
+        default:
+            assert(false);
+            break;
+        }
+        std::size_t texture_size = p.width * p.height * p.depth * (bits / 8);
         this->pixels.reset(new unsigned char[texture_size]);
         memcpy(this->pixels.get(), p.pixels.get(), texture_size);
     }
@@ -338,6 +416,7 @@ public:
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterTexture(TextureResource* texture, PixelData* pixel_data)=0;
+    virtual bool RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a ShaderResource, shader source files, and list of attributes,
     /// compiling them all into a single shader program to be used for rendering
@@ -444,6 +523,16 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     virtual void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                              Vertex** vertex_data, unsigned int** index_data)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets the pixel data and formatting of the supplied texture resource.
+    /// Overwrites old texture data completely, including width/height, format
+    /// settings, and compression
+    ///
+    /// \param texture Texture to be set
+    /// \param pixels Pixel data to update texture with
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void SetTextureData(TextureResource* texture, PixelData* pixels)=0;
+    virtual void SetTextureData(TextureResource* texture, PixelData3D* pixels)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets a shader's global variable to be that of the given value

@@ -59,6 +59,7 @@ public:
                              units::pixel width, units::pixel height,
                              std::vector<TextureHint> formats, bool store_depth) override;
     bool RegisterTexture(TextureResource* texture, PixelData* pixel_data) override;
+    bool RegisterTexture(TextureResource* texture, PixelData3D* pixel_data) override;
     bool RegisterShader(ShaderResource* program,
                         std::string vertex_filename, std::string pixel_filename,
                         ShaderAttributeList inputs) override;
@@ -77,6 +78,9 @@ public:
                         const unsigned int* indices, unsigned int index_offset, unsigned int index_count) override;
     void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                      Vertex** vertex_data, unsigned int** index_data) override;
+    void SetTextureData(TextureResource* texture, PixelData* pixels) override;
+    void SetTextureData(TextureResource* texture, PixelData3D* pixels) override;
+
     bool SetShaderInput(ShaderResource* program, const char* name, const float value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const int value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const Matrix value) override;
