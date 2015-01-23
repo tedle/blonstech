@@ -37,9 +37,13 @@ uniform sampler2D direct_light;
 uniform sampler2D indirect_light;
 
 // Used to give stronger specular when light bounces at shallower angles
-const float refraction_index = 0.5;
+// refraction_index of 1.0 gives a fresnel of about 0.058~ and 0.1 gives a coef of about 0.72
+// Dielectrics are usually 0.02-0.05 fresnel, so a refraction index of 1 is about good for that
+const float refraction_index = 1.0;
 const float extinction_coef = 0.5;
 const float fresnel_coef = (pow(refraction_index - 1, 2) + pow(extinction_coef, 2)) / (pow(refraction_index + 1, 2) + pow(extinction_coef, 2));
+// Pop this somewhere between 1-10,000 idk
+const float gloss = 20.0;
 
 struct DirectionalLight
 {
@@ -74,25 +78,26 @@ void main(void)
 	vec3 half = normalize(-sun.dir + view_dir);
 
 	// Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
-	float specular = pow(clamp(dot(half, surface_normal), 0.0, 1.0), 20.0);
+	float specular = pow(clamp(dot(half, surface_normal), 0.0, 1.0), gloss);
 
 	float light_angle = dot(surface_normal, -sun.dir);
 	// Black out surfaces not facing a light
-	if (light_angle < 0.1)
+	if (light_angle < 0.0)
 	{
-		specular *= light_angle * 10;
-		if (light_angle < 0.0)
-		{
-			specular = 0;
-		}
+		specular = 0;
 	}
 
 	// Get the direct lighting value
 	vec3 direct = texture(direct_light, tex_coord).rgb;
 
+	// Helps ensure outgoing light is never greater than incoming (real!)
+	float specular_normalization = ((gloss + 2) / 8);
+
 	// Linear blend specular with camera angle, based on fresnel coefficient
 	float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, half), 5.0);
 	specular *= fresnel;
+	specular *= specular_normalization;
+	// This has the N.L pre-applied
 	specular *= direct;
 
 	// Diffuse lighting (temporary)
@@ -106,6 +111,10 @@ void main(void)
 	// Uncomment to see GI only
 	//surface_colour *= 0.000001;
 	//surface_colour += indirect_full.rgb / indirect_full.a;
+
+	// Uncomment to see specular only
+	//surface_colour *= 0.000001;
+	//surface_colour += vec3(specular);
 
 	// Final composite
 	surface_colour = pow(surface_colour, vec3(1/2.2));
