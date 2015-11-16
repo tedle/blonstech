@@ -23,15 +23,6 @@
 
 namespace internal
 {
-// Builds a list of indices during compilation
-/// @cond Doxygen_Suppress
-// ^^^ Why am I even getting doxygen warnings?? These are excluded symbols, go away
-template<unsigned... i> struct Indices { typedef Indices type; };
-template<unsigned size, unsigned... i> struct MakeIndices : MakeIndices<size - 1, size - 1, i...> {};
-template<unsigned... i> struct MakeIndices<0, i...> : Indices<i...> {};
-template<unsigned size> using MakeIndicesType = typename MakeIndices<size>::type;
-/// @endcond
-
 // Base class used to store functions in the console
 class Function
 {
@@ -73,7 +64,7 @@ public:
 
     bool Run(const std::vector<Variable>& runtime_args)
     {
-        return PackArgsAndCall(MakeIndicesType<sizeof...(Args)>{}, runtime_args);
+        return PackArgsAndCall(std::index_sequence_for<Args...>{}, runtime_args);
     }
 
     std::vector<Variable::Type> ArgList()
@@ -100,8 +91,8 @@ private:
     template<>
     Variable::Type ArgType<const char*>() { return Variable::STRING; }
 
-    template<unsigned... i>
-    bool PackArgsAndCall(Indices<i...>, const std::vector<Variable>& runtime_args)
+    template<std::size_t... i>
+    bool PackArgsAndCall(std::index_sequence<i...>, const std::vector<Variable>& runtime_args)
     {
         // Check we were passed the right amount of arguments
         if (runtime_args.size() != sizeof...(i))
@@ -110,10 +101,9 @@ private:
         }
         try
         {
-            // This will throw if there's a type mismatch in supplied arguments
-            auto arg_tuple = std::make_tuple(runtime_args[i].to<Args>()...);
             // Calls the stored function with real arguments
-            func_(std::get<i>(arg_tuple)...);
+            // Will throw if there's a type mismatch in supplied arguments
+            func_(runtime_args[i].to<Args>()...);
         }
         catch (const char*)
         {
