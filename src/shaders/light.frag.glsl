@@ -78,13 +78,13 @@ void main(void)
 	vec3 half = normalize(-sun.dir + view_dir);
 
 	// Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
-	float specular = pow(clamp(dot(half, surface_normal), 0.0, 1.0), gloss);
+	vec3 specular = vec3(pow(clamp(dot(half, surface_normal), 0.0, 1.0), gloss));
 
 	float light_angle = dot(surface_normal, -sun.dir);
 	// Black out surfaces not facing a light
 	if (light_angle < 0.0)
 	{
-		specular = 0;
+		specular = vec3(0.0);
 	}
 
 	// Get the direct lighting value
