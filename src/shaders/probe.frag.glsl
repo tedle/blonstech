@@ -37,23 +37,23 @@ uniform vec3 sky_colour;
 
 void main(void)
 {
-	vec3 albedo = texture(probe_albedo, tex_coord).rgb;
-	vec3 light_coord = texture(probe_texmap, tex_coord).rgb;
+    vec3 albedo = texture(probe_albedo, tex_coord).rgb;
+    vec3 light_coord = texture(probe_texmap, tex_coord).rgb;
 
-	// Should only ever be 1 or 0 but doesnt hurt to be safe
-	if (light_coord.b > 0.5)
-	{
-		// Sky should be about 1/5th as strong as sun, i think
-		const float sky_correction = 0.2;
-		frag_colour = vec4(pow(sky_colour, vec3(2.2)) * sky_correction, 1.0);
-		return;
-	}
-	vec4 direct_light_full = texture(direct_lightmap, light_coord.xy);
-	vec3 direct_light_colour = clamp(direct_light_full.rgb / direct_light_full.a, vec3(0), vec3(1));
-	vec4 indirect_light_full = texture(indirect_lightmap, light_coord.xy);
-	vec3 indirect_light_colour = clamp(indirect_light_full.rgb / indirect_light_full.a, vec3(0), vec3(1));
+    // Should only ever be 1 or 0 but doesnt hurt to be safe
+    if (light_coord.b > 0.5)
+    {
+        // Sky should be about 1/5th as strong as sun, i think
+        const float sky_correction = 0.2;
+        frag_colour = vec4(pow(sky_colour, vec3(2.2)) * sky_correction, 1.0);
+        return;
+    }
+    vec4 direct_light_full = texture(direct_lightmap, light_coord.xy);
+    vec3 direct_light_colour = clamp(direct_light_full.rgb / direct_light_full.a, vec3(0), vec3(1));
+    vec4 indirect_light_full = texture(indirect_lightmap, light_coord.xy);
+    vec3 indirect_light_colour = clamp(indirect_light_full.rgb / indirect_light_full.a, vec3(0), vec3(1));
 
-	vec3 diffuse = albedo * (direct_light_colour + indirect_light_colour);
+    vec3 diffuse = albedo * (direct_light_colour + indirect_light_colour);
 
     frag_colour = vec4(diffuse, 1.0);
 }

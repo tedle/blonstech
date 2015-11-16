@@ -33,9 +33,9 @@ out vec3 norm;
 
 void main(void)
 {
-	vec2 texture_pos = (input_light_uv * 2) - 1;
+    vec2 texture_pos = (input_light_uv * 2) - 1;
     gl_Position = vec4(texture_pos, 0.0, 1.0);
 
-	pos = input_pos;
-	norm = input_norm;
+    pos = input_pos;
+    norm = input_norm;
 }

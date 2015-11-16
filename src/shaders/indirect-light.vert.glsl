@@ -38,6 +38,6 @@ void main(void)
 {
     gl_Position = mvp_matrix * vec4(input_pos, 1.0);
 
-	probe_pos = input_norm;
-	probe_id = input_uv.x;
+    probe_pos = input_norm;
+    probe_id = input_uv.x;
 }

@@ -32,6 +32,6 @@ uniform mat4 mvp_matrix;
 
 void main(void)
 {
-	gl_Position = mvp_matrix * vec4(input_pos, 1.0);
-	depth = gl_Position.z / gl_Position.w;
+    gl_Position = mvp_matrix * vec4(input_pos, 1.0);
+    depth = gl_Position.z / gl_Position.w;
 }

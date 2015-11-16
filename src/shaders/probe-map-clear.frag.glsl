@@ -36,5 +36,5 @@ uniform vec3 sky_colour;
 void main(void)
 {
     albedo_colour = vec4(sky_colour, 1.0);
-	tex_colour = vec4(clear_colour, 1.0);
+    tex_colour = vec4(clear_colour, 1.0);
 }

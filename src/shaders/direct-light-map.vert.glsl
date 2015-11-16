@@ -34,6 +34,6 @@ uniform mat4 proj_matrix;
 
 void main(void)
 {
-	gl_Position = proj_matrix * vec4(input_pos, 1.0);
-	tex_coord = input_uv;
+    gl_Position = proj_matrix * vec4(input_pos, 1.0);
+    tex_coord = input_uv;
 }

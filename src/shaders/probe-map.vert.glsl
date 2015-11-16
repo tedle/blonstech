@@ -38,5 +38,5 @@ void main(void)
 {
     gl_Position = mvp_matrix * vec4(input_pos, 1.0);
     tex_coord = input_uv;
-	lightmap_coord = input_light_uv;
+    lightmap_coord = input_light_uv;
 }

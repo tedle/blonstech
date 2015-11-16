@@ -47,76 +47,76 @@ const float gloss = 20.0;
 
 struct DirectionalLight
 {
-	vec3 dir;
-	vec3 colour;
+    vec3 dir;
+    vec3 colour;
 };
 uniform DirectionalLight sun;
 uniform vec3 sky_colour;
 
 void main(void)
 {
-	float depth_sample = texture(depth, tex_coord).r;
-	if (depth_sample == 1.0)
-	{
-		frag_colour = vec4(sky_colour, 1.0);
-		return;
-	}
-	// World coordinates of the pixel we're rendering
-	vec4 pos = vec4(tex_coord.x,
-					tex_coord.y + 1, // Invert and shift Y because FBOs are top-left origin
-					depth_sample,
-					1.0);
-	pos = inv_vp_matrix * (pos * 2.0 - 1.0);
-	pos /= pos.w;
+    float depth_sample = texture(depth, tex_coord).r;
+    if (depth_sample == 1.0)
+    {
+        frag_colour = vec4(sky_colour, 1.0);
+        return;
+    }
+    // World coordinates of the pixel we're rendering
+    vec4 pos = vec4(tex_coord.x,
+                    tex_coord.y + 1, // Invert and shift Y because FBOs are top-left origin
+                    depth_sample,
+                    1.0);
+    pos = inv_vp_matrix * (pos * 2.0 - 1.0);
+    pos /= pos.w;
 
-	// For directional lights
-	vec4 eye_pos = inv_vp_matrix * vec4(0.0, 0.0, 0.0, 1.0);
-	eye_pos /= eye_pos.w;
-	vec3 view_dir = normalize(eye_pos.xyz - pos.xyz);
+    // For directional lights
+    vec4 eye_pos = inv_vp_matrix * vec4(0.0, 0.0, 0.0, 1.0);
+    eye_pos /= eye_pos.w;
+    vec3 view_dir = normalize(eye_pos.xyz - pos.xyz);
 
-	vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
-	vec3 half = normalize(-sun.dir + view_dir);
+    vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
+    vec3 half = normalize(-sun.dir + view_dir);
 
-	// Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
-	vec3 specular = vec3(pow(clamp(dot(half, surface_normal), 0.0, 1.0), gloss));
+    // Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
+    vec3 specular = vec3(pow(clamp(dot(half, surface_normal), 0.0, 1.0), gloss));
 
-	float light_angle = dot(surface_normal, -sun.dir);
-	// Black out surfaces not facing a light
-	if (light_angle < 0.0)
-	{
-		specular = vec3(0.0);
-	}
+    float light_angle = dot(surface_normal, -sun.dir);
+    // Black out surfaces not facing a light
+    if (light_angle < 0.0)
+    {
+        specular = vec3(0.0);
+    }
 
-	// Get the direct lighting value
-	vec3 direct = texture(direct_light, tex_coord).rgb;
+    // Get the direct lighting value
+    vec3 direct = texture(direct_light, tex_coord).rgb;
 
-	// Helps ensure outgoing light is never greater than incoming (real!)
-	float specular_normalization = ((gloss + 2) / 8);
+    // Helps ensure outgoing light is never greater than incoming (real!)
+    float specular_normalization = ((gloss + 2) / 8);
 
-	// Linear blend specular with camera angle, based on fresnel coefficient
-	float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, half), 5.0);
-	specular *= fresnel;
-	specular *= specular_normalization;
-	// This has the N.L pre-applied
-	specular *= direct;
+    // Linear blend specular with camera angle, based on fresnel coefficient
+    float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, half), 5.0);
+    specular *= fresnel;
+    specular *= specular_normalization;
+    // This has the N.L pre-applied
+    specular *= direct;
 
-	// Diffuse lighting (temporary)
-	vec4 indirect_full = texture(indirect_light, tex_coord);
-	vec3 diffuse = (direct * sun.colour) + (indirect_full.rgb / indirect_full.a);
+    // Diffuse lighting (temporary)
+    vec4 indirect_full = texture(indirect_light, tex_coord);
+    vec3 diffuse = (direct * sun.colour) + (indirect_full.rgb / indirect_full.a);
 
-	vec3 surface_colour = texture(albedo, tex_coord).rgb;
-	surface_colour *= diffuse;
-	surface_colour += specular;
+    vec3 surface_colour = texture(albedo, tex_coord).rgb;
+    surface_colour *= diffuse;
+    surface_colour += specular;
 
-	// Uncomment to see GI only
-	//surface_colour *= 0.000001;
-	//surface_colour += indirect_full.rgb / indirect_full.a;
+    // Uncomment to see GI only
+    //surface_colour *= 0.000001;
+    //surface_colour += indirect_full.rgb / indirect_full.a;
 
-	// Uncomment to see specular only
-	//surface_colour *= 0.000001;
-	//surface_colour += vec3(specular);
+    // Uncomment to see specular only
+    //surface_colour *= 0.000001;
+    //surface_colour += vec3(specular);
 
-	// Final composite
-	surface_colour = pow(surface_colour, vec3(1/2.2));
-	frag_colour = vec4(surface_colour, 1.0);
+    // Final composite
+    surface_colour = pow(surface_colour, vec3(1/2.2));
+    frag_colour = vec4(surface_colour, 1.0);
 }

@@ -69,50 +69,50 @@ const float coef_count = 9;
 
 vec3 SampleSH(float coef_index)
 {
-	return texture(probe_coefficients, vec2((coef_index + 0.5) / coef_count, (probe_id + 0.5) / probe_count)).rgb;
+    return texture(probe_coefficients, vec2((coef_index + 0.5) / coef_count, (probe_id + 0.5) / probe_count)).rgb;
 }
 
 vec3 IrradianceFromSH(vec3 n)
 {
-	vec3 irradiance = vec3(0);
-	irradiance += kL0m0 * SampleSH(0);
-	irradiance += kL1m_1 * n.y * SampleSH(1);
-	irradiance += kL1m0 * n.z * SampleSH(2);
-	irradiance += kL1m1 * n.x * SampleSH(3);
-	irradiance += kL2m_2 * n.y * n.x * SampleSH(4);
-	irradiance += kL2m_1 * n.y * n.z * SampleSH(5);
-	irradiance += kL2m0 * (3.0 * (n.z * n.z) - 1.0) * SampleSH(6);
-	irradiance += kL2m1 * n.x * n.z * SampleSH(7);
-	irradiance += kL2m2 * (n.x * n.x - n.y * n.y) * SampleSH(8);
+    vec3 irradiance = vec3(0);
+    irradiance += kL0m0 * SampleSH(0);
+    irradiance += kL1m_1 * n.y * SampleSH(1);
+    irradiance += kL1m0 * n.z * SampleSH(2);
+    irradiance += kL1m1 * n.x * SampleSH(3);
+    irradiance += kL2m_2 * n.y * n.x * SampleSH(4);
+    irradiance += kL2m_1 * n.y * n.z * SampleSH(5);
+    irradiance += kL2m0 * (3.0 * (n.z * n.z) - 1.0) * SampleSH(6);
+    irradiance += kL2m1 * n.x * n.z * SampleSH(7);
+    irradiance += kL2m2 * (n.x * n.x - n.y * n.y) * SampleSH(8);
 
-	return max(irradiance, vec3(0.0));
+    return max(irradiance, vec3(0.0));
 }
 
 void main(void)
 {
-	vec2 tex_coord = gl_FragCoord.xy / lightmap_resolution;
+    vec2 tex_coord = gl_FragCoord.xy / lightmap_resolution;
 
-	vec3 surface_pos = texture(pos_lookup, tex_coord).rgb;
+    vec3 surface_pos = texture(pos_lookup, tex_coord).rgb;
 
-	vec3 light_dir = probe_pos - surface_pos.xyz;
-	float distance = length(light_dir);
-	if (distance > probe_distance)
-	{
-		discard;
-	}
-	light_dir = normalize(light_dir);
+    vec3 light_dir = probe_pos - surface_pos.xyz;
+    float distance = length(light_dir);
+    if (distance > probe_distance)
+    {
+        discard;
+    }
+    light_dir = normalize(light_dir);
 
-	vec3 surface_normal = texture(norm_lookup, tex_coord).rgb * 2 - 1;
-	float light_angle = dot(surface_normal, light_dir);
+    vec3 surface_normal = texture(norm_lookup, tex_coord).rgb * 2 - 1;
+    float light_angle = dot(surface_normal, light_dir);
 
-	if (light_angle < 0.0)
-	{
-		discard;
-	}
+    if (light_angle < 0.0)
+    {
+        discard;
+    }
 
-	// Quadratic falloff makes a smoother transition between light probes
-	float dist_coef = pow((probe_distance - distance) / probe_distance, 1.3);
-	float intensity = dist_coef * light_angle;
-	const float correction_factor = 0.1f;
-	frag_colour = vec4(IrradianceFromSH(surface_normal) * correction_factor * intensity, intensity);
+    // Quadratic falloff makes a smoother transition between light probes
+    float dist_coef = pow((probe_distance - distance) / probe_distance, 1.3);
+    float intensity = dist_coef * light_angle;
+    const float correction_factor = 0.1f;
+    frag_colour = vec4(IrradianceFromSH(surface_normal) * correction_factor * intensity, intensity);
 }

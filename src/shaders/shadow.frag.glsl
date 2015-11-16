@@ -29,16 +29,16 @@ out vec4 frag_colour;
 
 void main(void)
 {
-	// Doesn't need to be [0,1], but makes debugging via
-	// looking at textures easier... but makes for lost
-	// precision as well
-	float out_depth = (depth + 1.0) / 2.0;
-	frag_colour.r = out_depth;
-	// Used to compute the mean when texel discrepencies pop up
-	frag_colour.g = out_depth * out_depth;
-	frag_colour.a = 1.0f;
+    // Doesn't need to be [0,1], but makes debugging via
+    // looking at textures easier... but makes for lost
+    // precision as well
+    float out_depth = (depth + 1.0) / 2.0;
+    frag_colour.r = out_depth;
+    // Used to compute the mean when texel discrepencies pop up
+    frag_colour.g = out_depth * out_depth;
+    frag_colour.a = 1.0f;
 
-	// Should help reduce biasing on sharp angles...?
-	vec2 d = vec2(dFdx(out_depth), dFdy(out_depth));
-	frag_colour.g += 0.25 * (d.x * d.x + d.y * d.y);
+    // Should help reduce biasing on sharp angles...?
+    vec2 d = vec2(dFdx(out_depth), dFdy(out_depth));
+    frag_colour.g += 0.25 * (d.x * d.x + d.y * d.y);
 }

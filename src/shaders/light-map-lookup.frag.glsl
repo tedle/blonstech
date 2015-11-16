@@ -32,6 +32,6 @@ out vec4 norm_colour;
 
 void main(void)
 {
-	pos_colour = vec4(pos, 1.0);
-	norm_colour = vec4((norm + 1) / 2, 1.0);
+    pos_colour = vec4(pos, 1.0);
+    norm_colour = vec4((norm + 1) / 2, 1.0);
 }

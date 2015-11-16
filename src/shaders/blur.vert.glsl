@@ -31,6 +31,6 @@ out vec2 tex_coord;
 
 void main(void)
 {
-	gl_Position = vec4(input_pos, 1.0);
-	tex_coord = input_uv;
+    gl_Position = vec4(input_pos, 1.0);
+    tex_coord = input_uv;
 }

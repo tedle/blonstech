@@ -37,13 +37,13 @@ uniform sampler2D normal;
 
 void main(void)
 {
-	// Albedo
-	frag_colour = vec4(pow(texture(albedo, tex_coord).rgb, vec3(2.2)), 1.0);
+    // Albedo
+    frag_colour = vec4(pow(texture(albedo, tex_coord).rgb, vec3(2.2)), 1.0);
 
-	// Normal
-	vec3 norm_map = texture(normal, tex_coord).rgb * 2 - 1;
-	norm_colour = vec4((norm_map * norm + 1) / 2, 1.0);
+    // Normal
+    vec3 norm_map = texture(normal, tex_coord).rgb * 2 - 1;
+    norm_colour = vec4((norm_map * norm + 1) / 2, 1.0);
 
-	// Debug out (UV coords)
-	debug_colour = vec4(tex_coord.xy, 0.0, 1.0);
+    // Debug out (UV coords)
+    debug_colour = vec4(tex_coord.xy, 0.0, 1.0);
 }
