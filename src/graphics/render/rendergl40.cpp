@@ -126,8 +126,8 @@ public:
     bool SetUniform(const char* name, T value);
 
 private:
-    struct HashFunc { unsigned int operator()(const char* s){ return FastHash(s); } };
-    struct CompFunc { bool operator()(const char* a, const char* b) { return strcmp(a, b) == 0; } };
+    struct HashFunc { unsigned int operator()(const char* s) const { return FastHash(s); } };
+    struct CompFunc { bool operator()(const char* a, const char* b) const { return strcmp(a, b) == 0; } };
     std::unordered_map<const char*, GLint, HashFunc, CompFunc> uniform_location_cache_;
     // slow, but clean. possible memory leak with const char* key anyway, iduno
     // std::unordered_map<std::string, GLint> uniform_location_cache_;
