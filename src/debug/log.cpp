@@ -56,7 +56,7 @@ std::string FormatPrintString(const std::string& fmt, va_list args)
 }
 } // namespace
 
-void Debug(const std::string& fmt, ...)
+void Debug(const std::string fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -66,7 +66,7 @@ void Debug(const std::string& fmt, ...)
     OutputLogMessage(message, Level::DEBUG);
 }
 
-void Info(const std::string& fmt, ...)
+void Info(const std::string fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -76,7 +76,7 @@ void Info(const std::string& fmt, ...)
     OutputLogMessage(message, Level::INFO);
 }
 
-void Warn(const std::string& fmt, ...)
+void Warn(const std::string fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
@@ -86,7 +86,7 @@ void Warn(const std::string& fmt, ...)
     OutputLogMessage(message, Level::WARN);
 }
 
-void Fatal(const std::string& fmt, ...)
+void Fatal(const std::string fmt, ...)
 {
     va_list args;
     va_start(args, fmt);

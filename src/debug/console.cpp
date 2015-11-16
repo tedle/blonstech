@@ -251,7 +251,7 @@ void in(const std::string& command)
     PrintUsage(func_name, func_list->second);
 }
 
-void out(const std::string& fmt, ...)
+void out(const std::string fmt, ...)
 {
     // Generate printf string
     va_list args;

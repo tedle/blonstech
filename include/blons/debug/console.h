@@ -73,7 +73,7 @@ void in(const std::string& command);
 /// \param fmt Format string
 /// \param ... Format values
 ////////////////////////////////////////////////////////////////////////////////
-void out(const std::string& fmt, ...);
+void out(const std::string fmt, ...);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Retrieves a global console variable by name. See blons::console for
