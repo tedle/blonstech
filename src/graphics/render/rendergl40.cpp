@@ -389,6 +389,9 @@ RenderGL40::RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen)
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // Set the row padding on textures to be 1 (default 4)
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
     // Configure vsync (please be false)
     vsync_ = vsync;
     if (!wglSwapIntervalEXT(vsync))
