@@ -329,7 +329,7 @@ units::world VectorLength(Vector3 v)
 
 Vector3 VectorNormalize(Vector3 n)
 {
-    float dist = sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
+    float dist = sqrtf(n.x * n.x + n.y * n.y + n.z * n.z);
     n.x /= dist;
     n.y /= dist;
     n.z /= dist;
@@ -342,10 +342,10 @@ Vector3 VectorPitchYawRoll(Matrix view_matrix)
 
     XMFLOAT4X4 xm;
     memcpy(xm.m, view_matrix.m, sizeof(float)*4*4);
-    float pitch = atan2(xm._23,
-                        sqrt(xm._13 * xm._13 +
-                             xm._33 * xm._33));
-    float yaw = atan2(xm._31, -xm._11);
+    float pitch = atan2f(xm._23,
+                         sqrtf(xm._13 * xm._13 +
+                               xm._33 * xm._33));
+    float yaw = atan2f(xm._31, -xm._11);
 
     rot.x = pitch;
     rot.y = yaw;

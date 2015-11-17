@@ -82,9 +82,9 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, units::pixel texture
     x_offset = font_face->glyph->metrics.horiBearingX / 64;
     y_offset = font_face->glyph->metrics.horiBearingY / 64 - height;
 
-    for (units::pixel y = 0; y < bitmap.rows; y++)
+    for (units::pixel y = 0; y < height; y++)
     {
-        for (units::pixel x = 0; x < bitmap.width; x++)
+        for (units::pixel x = 0; x < width; x++)
         {
             pixels.push_back(*(bitmap.buffer++));
         }

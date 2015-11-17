@@ -153,8 +153,8 @@ void Client::InitWindow(units::pixel* screen_width, units::pixel* screen_height)
         // Init screen settings
         memset(&screen_settings, 0, sizeof(screen_settings));
         screen_settings.dmSize       = sizeof(screen_settings);
-        screen_settings.dmPelsWidth  = (unsigned long)screen_width;
-        screen_settings.dmPelsHeight = (unsigned long)screen_height;
+        screen_settings.dmPelsWidth  = static_cast<unsigned long>(*screen_width);
+        screen_settings.dmPelsHeight = static_cast<unsigned long>(*screen_height);
         screen_settings.dmBitsPerPel = 32;
         screen_settings.dmFields     = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
 
