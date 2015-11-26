@@ -26,7 +26,6 @@
 // Public Includes
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
-#include <blons/graphics/pipeline/stage/lightprobe.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
@@ -59,7 +58,6 @@ bool Deferred::Init()
     // Pipeline setup
     geometry_.reset(new stage::Geometry(perspective_));
     shadow_.reset(new stage::Shadow(perspective_));
-    lightprobe_.reset(new stage::Lightprobe(perspective_));
     lighting_.reset(new stage::Lighting(perspective_));
 
     // Shaders
@@ -118,14 +116,7 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    // Builds a direct light map and then bounce lighting
-    if (!lightprobe_->Render(scene, *geometry_, *shadow_, perspective_,
-                             view_matrix, proj_matrix_, light_vp_matrix))
-    {
-        return false;
-    }
-
-    if (!lighting_->Render(scene, *geometry_, *shadow_, *lightprobe_, view_matrix, proj_matrix_, ortho_matrix_))
+    if (!lighting_->Render(scene, *geometry_, *shadow_, view_matrix, proj_matrix_, ortho_matrix_))
     {
         return false;
     }
@@ -147,11 +138,6 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
     }
 
     return true;
-}
-
-bool Deferred::BuildLighting(const Scene& scene)
-{
-    return lightprobe_->BuildLighting(scene);
 }
 
 void Deferred::set_output(Output output, Output alt_output)
@@ -188,37 +174,6 @@ bool Deferred::RenderComposite(const Scene& scene)
             break;
         case DIRECT_LIGHT:
             return shadow_->output(stage::Shadow::DIRECT_LIGHT);
-            break;
-        case PROBE_ALBEDO:
-            output_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
-            return lightprobe_->output(stage::Lightprobe::PROBE_ALBEDO);
-            break;
-        case PROBE_UV:
-            output_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
-            return lightprobe_->output(stage::Lightprobe::PROBE_UV);
-            break;
-        case LIGHT_MAP_LOOKUP_POS:
-            return lightprobe_->output(stage::Lightprobe::LIGHT_MAP_LOOKUP_POS);
-            break;
-        case LIGHT_MAP_LOOKUP_NORMAL:
-            return lightprobe_->output(stage::Lightprobe::LIGHT_MAP_LOOKUP_NORMAL);
-            break;
-        case DIRECT_LIGHT_MAP:
-            return lightprobe_->output(stage::Lightprobe::DIRECT_LIGHT_MAP);
-            break;
-        case INDIRECT_LIGHT_MAP:
-            return lightprobe_->output(stage::Lightprobe::INDIRECT_LIGHT_MAP);
-            break;
-        case PROBE:
-            output_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
-            return lightprobe_->output(stage::Lightprobe::PROBE);
-            break;
-        case PROBE_COEFFICIENTS:
-            output_sprite->set_pos(200, 0, perspective_.width / 8, perspective_.height);
-            return lightprobe_->output(stage::Lightprobe::COEFFICIENTS);
-            break;
-        case INDIRECT_LIGHT:
-            return lightprobe_->output(stage::Lightprobe::INDIRECT_LIGHT);
             break;
         case NONE:
             return nullptr;

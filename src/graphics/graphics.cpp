@@ -254,26 +254,6 @@ void Graphics::Reload(Client::Info screen)
         s->Reload();
     }
     log::Debug("%ims!\n", timer.ms());
-    BuildLighting();
-}
-
-bool Graphics::BuildLighting()
-{
-    pipeline::Scene scene;
-    scene.lights = { sun_.get() };
-    scene.models.assign(models_.begin(), models_.end());
-    scene.sky_colour = sky_colour_;
-    scene.view = *camera_;
-
-    log::Debug("Building irradiance volumes... ");
-    Timer timer;
-    if (!pipeline_->BuildLighting(scene))
-    {
-        log::Debug("failed!\n");
-        return false;
-    }
-    log::Debug("%ims!\n", timer.ms());
-    return true;
 }
 
 Camera* Graphics::camera() const

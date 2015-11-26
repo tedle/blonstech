@@ -178,9 +178,6 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\deferred.h">
       <Filter>src\graphics\pipeline</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightprobe.h">
-      <Filter>src\graphics\pipeline\stage</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClInclude>
@@ -342,9 +339,6 @@
     <ClCompile Include="graphics\pipeline\stage\geometry.cpp">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\pipeline\stage\lightprobe.cpp">
-      <Filter>src\graphics\pipeline\stage</Filter>
-    </ClCompile>
     <ClCompile Include="graphics\pipeline\stage\shadow.cpp">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClCompile>
@@ -398,8 +392,6 @@
     <None Include="shaders\ui.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\test.frag.fx" />
-    <None Include="shaders\test.vert.fx" />
     <None Include="shaders\light.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
@@ -416,48 +408,6 @@
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\blur.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\probe-map.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\probe-map.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\probe-map-clear.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\direct-light-map.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\direct-light-map.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\probe.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\sh-coefficients.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\sh-coefficients.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\light-map-lookup.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\light-map-lookup.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\indirect-light.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\indirect-light.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\indirect-light-map.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\indirect-light-map.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\ui-composite.frag.glsl">

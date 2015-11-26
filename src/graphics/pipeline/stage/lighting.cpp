@@ -26,7 +26,6 @@
 // Public Includes
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
-#include <blons/graphics/pipeline/stage/lightprobe.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
@@ -54,7 +53,7 @@ Lighting::Lighting(Perspective perspective)
     light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false));
 }
 
-bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const Lightprobe& lightprobe,
+bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
                       Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
     auto context = render::context();
@@ -77,7 +76,6 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
         !light_shader_->SetInput("normal", geometry.output(stage::Geometry::NORMAL), 1) ||
         !light_shader_->SetInput("depth", geometry.output(stage::Geometry::DEPTH), 2) ||
         !light_shader_->SetInput("direct_light", shadow.output(stage::Shadow::DIRECT_LIGHT), 3) ||
-        !light_shader_->SetInput("indirect_light", lightprobe.output(stage::Lightprobe::INDIRECT_LIGHT), 4) ||
         !light_shader_->SetInput("sun.dir", sun->direction()) ||
         !light_shader_->SetInput("sun.colour", sun->colour()) ||
         !light_shader_->SetInput("sky_colour", scene.sky_colour))

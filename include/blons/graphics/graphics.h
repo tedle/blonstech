@@ -130,14 +130,6 @@ public:
     void Reload(Client::Info screen);
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Used to build global illumination for the scene. Should be called
-    /// **once** after all static geometry has been loaded.
-    ///
-    /// \return True on success
-    ////////////////////////////////////////////////////////////////////////////////
-    bool BuildLighting();
-
-    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Returns a pointer to the camera owned by the blons::Graphics manager
     /// that is used each frame to view renderable models
     ///

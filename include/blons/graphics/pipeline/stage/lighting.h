@@ -40,7 +40,6 @@ namespace stage
 // Forward declarations
 class Geometry;
 class Shadow;
-class Lightprobe;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Composites lighting information from previous passes and adds
@@ -74,13 +73,11 @@ public:
     /// frame
     /// \param shadow Handle to the shadow buffer pass performed earlier in the
     /// frame
-    /// \param lightprobe Handle to the lightprobe buffer pass performed earlier in
-    /// the frame
     /// \param view_matrix View matrix of the camera rendering the scene
     /// \param proj_matrix Perspective matrix for rendering the scene
     /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const Lightprobe& lightprobe,
+    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
                 Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////

@@ -40,9 +40,6 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     // Big scene
     models = blons::temp::load_codmap("bms_test2uv", std::move(models), graphics.get());
 
-    // The extra models don't have unique lightmap UVs yet, so we build without them
-    graphics->BuildLighting();
-
     // Model 1
     models.push_back(graphics->MakeModel("teapot_highpoly.bms"));
     models.back()->set_pos(0.0, 0.0, 20.0);
@@ -185,33 +182,6 @@ void SetRenderingOutput(blons::Graphics* graphics)
             break;
         case 6:
             return blons::pipeline::Deferred::DIRECT_LIGHT;
-            break;
-        case 7:
-            return blons::pipeline::Deferred::PROBE_ALBEDO;
-            break;
-        case 8:
-            return blons::pipeline::Deferred::PROBE_UV;
-            break;
-        case 9:
-            return blons::pipeline::Deferred::LIGHT_MAP_LOOKUP_POS;
-            break;
-        case 10:
-            return blons::pipeline::Deferred::LIGHT_MAP_LOOKUP_NORMAL;
-            break;
-        case 11:
-            return blons::pipeline::Deferred::DIRECT_LIGHT_MAP;
-            break;
-        case 12:
-            return blons::pipeline::Deferred::INDIRECT_LIGHT_MAP;
-            break;
-        case 13:
-            return blons::pipeline::Deferred::PROBE;
-            break;
-        case 14:
-            return blons::pipeline::Deferred::PROBE_COEFFICIENTS;
-            break;
-        case 15:
-            return blons::pipeline::Deferred::INDIRECT_LIGHT;
             break;
         case 0:
         default:

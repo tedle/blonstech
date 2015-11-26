@@ -37,7 +37,7 @@ uniform sampler2D albedo;
 uniform sampler2D normal;
 uniform sampler2D depth;
 uniform sampler2D direct_light;
-uniform sampler2D indirect_light;
+//uniform sampler2D indirect_light;
 
 // Used to give stronger specular when light bounces at shallower angles
 // refraction_index of 1.0 gives a fresnel of about 0.058~ and 0.1 gives a coef of about 0.72
@@ -104,8 +104,9 @@ void main(void)
     specular *= direct;
 
     // Diffuse lighting (temporary)
-    vec4 indirect_full = texture(indirect_light, tex_coord);
-    vec3 diffuse = (direct * sun.colour) + (indirect_full.rgb / indirect_full.a);
+    //vec4 indirect_full = texture(indirect_light, tex_coord);
+    //vec3 diffuse = (direct * sun.colour) + (indirect_full.rgb / indirect_full.a);
+    vec3 diffuse = (direct * sun.colour);
 
     vec3 surface_colour = texture(albedo, tex_coord).rgb;
     surface_colour *= diffuse;

@@ -28,7 +28,6 @@
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
-#include <blons/graphics/pipeline/stage/lightprobe.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
 #include <blons/graphics/pipeline/deferred.h>
 

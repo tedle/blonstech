@@ -41,7 +41,6 @@ namespace pipeline
 // Forward declarations
 namespace stage { class Geometry; }
 namespace stage { class Shadow; }
-namespace stage { class Lightprobe; }
 namespace stage { class Lighting; }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -63,15 +62,6 @@ public:
         G_DEPTH,                 ///< Depth buffer of the geometry
         LIGHT_DEPTH,             ///< Depth buffer from the light's point of view
         DIRECT_LIGHT,            ///< Direct lighting pass
-        PROBE_ALBEDO,            ///< Probe diffuse information
-        PROBE_UV,                ///< Probe UV information
-        LIGHT_MAP_LOOKUP_POS,    ///< Lightmap position lookup
-        LIGHT_MAP_LOOKUP_NORMAL, ///< Lightmap worldspace normal lookup
-        DIRECT_LIGHT_MAP,        ///< Direct lighting map
-        INDIRECT_LIGHT_MAP,      ///< Bounce lighting map
-        PROBE,                   ///< Shaded probe view
-        PROBE_COEFFICIENTS,      ///< Spherical harmonics per probe
-        INDIRECT_LIGHT,          ///< Bounce lighting pass
         NONE                     ///< Results in nullptr
     };
 
@@ -119,15 +109,6 @@ public:
     void Reload(Client::Info screen, float fov, float screen_near, float screen_far);
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Used to build global illumination for the scene. Should be called
-    /// **once** after all static geometry has been loaded.
-    ///
-    /// \param scene Contains scene information for rendering
-    /// \return True on success
-    ////////////////////////////////////////////////////////////////////////////////
-    bool BuildLighting(const Scene& scene);
-
-    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets which stage of the deferred rendering pipeline will be displayed
     /// to the screen after rendering
     ///
@@ -149,7 +130,6 @@ private:
     // TODO: Document the pipeline
     std::unique_ptr<stage::Geometry> geometry_;
     std::unique_ptr<stage::Shadow> shadow_;
-    std::unique_ptr<stage::Lightprobe> lightprobe_;
     std::unique_ptr<stage::Lighting> lighting_;
 
     std::unique_ptr<Shader> composite_shader_;

@@ -216,7 +216,6 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\scene.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h" />
-    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightprobe.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\shadow.h" />
     <ClInclude Include="..\include\blons\graphics\render\commonshader.h" />
     <ClInclude Include="..\include\blons\graphics\render\computeshader.h" />
@@ -277,7 +276,6 @@
     <ClCompile Include="graphics\pipeline\deferred.cpp" />
     <ClCompile Include="graphics\pipeline\stage\geometry.cpp" />
     <ClCompile Include="graphics\pipeline\stage\lighting.cpp" />
-    <ClCompile Include="graphics\pipeline\stage\lightprobe.cpp" />
     <ClCompile Include="graphics\pipeline\stage\shadow.cpp" />
     <ClCompile Include="graphics\render\commonshader.cpp" />
     <ClCompile Include="graphics\render\computeshader.cpp" />
@@ -302,24 +300,10 @@
   <ItemGroup>
     <None Include="shaders\blur.frag.glsl" />
     <None Include="shaders\blur.vert.glsl" />
-    <None Include="shaders\direct-light-map.frag.glsl" />
-    <None Include="shaders\direct-light-map.vert.glsl" />
     <None Include="shaders\gamma.lib.glsl" />
-    <None Include="shaders\indirect-light-map.frag.glsl" />
-    <None Include="shaders\indirect-light-map.vert.glsl" />
-    <None Include="shaders\indirect-light.frag.glsl" />
-    <None Include="shaders\indirect-light.vert.glsl" />
-    <None Include="shaders\light-map-lookup.frag.glsl" />
-    <None Include="shaders\light-map-lookup.vert.glsl" />
     <None Include="shaders\light.frag.glsl" />
     <None Include="shaders\mesh.frag.glsl" />
     <None Include="shaders\mesh.vert.glsl" />
-    <None Include="shaders\probe-map-clear.frag.glsl" />
-    <None Include="shaders\probe-map.frag.glsl" />
-    <None Include="shaders\probe-map.vert.glsl" />
-    <None Include="shaders\probe.frag.glsl" />
-    <None Include="shaders\sh-coefficients.frag.glsl" />
-    <None Include="shaders\sh-coefficients.vert.glsl" />
     <None Include="shaders\shadow.frag.glsl" />
     <None Include="shaders\shadow.vert.glsl" />
     <None Include="shaders\direct-light.frag.glsl" />
@@ -328,14 +312,6 @@
     <None Include="shaders\ui-blur.frag.glsl" />
     <None Include="shaders\ui-composite.frag.glsl" />
     <None Include="shaders\ui.frag.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="shaders\test.frag.fx">
-      <FileType>Document</FileType>
-    </None>
-    <None Include="shaders\test.vert.fx">
-      <FileType>Document</FileType>
-    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
