@@ -127,7 +127,7 @@
       <AdditionalDependencies>FreeType2/lib/freetype253.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Lib>
-      <AdditionalDependencies>FreeType2\lib\freetype261_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeType2\lib\freetype28_D.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <ProjectReference />
   </ItemDefinitionGroup>
@@ -170,7 +170,7 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <Lib>
-      <AdditionalDependencies>FreeType2\lib\freetype261.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>FreeType2\lib\freetype28.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <ProjectReference />
   </ItemDefinitionGroup>
