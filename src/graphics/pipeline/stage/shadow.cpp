@@ -78,6 +78,7 @@ bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_ma
     // Bind the shadow depth framebuffer to render all models onto
     shadow_buffer_->Bind(context);
 
+    // TODO: Separate into shadow.cpp and shadowmap.cpp for more modularity
     // TODO: 3D pass ->
     //      Render everything as a batch as this is untextured
     for (const auto& model : scene.models)

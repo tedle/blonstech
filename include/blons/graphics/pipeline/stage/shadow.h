@@ -73,7 +73,7 @@ public:
     /// frame
     /// \param view_matrix View matrix of the camera rendering the scene
     /// \param proj_matrix Perspective matrix for rendering the scene
-    /// \param light_vp_matrix View projetion matrix of the directional light
+    /// \param light_vp_matrix View projection matrix of the directional light
     /// providing shadow
     /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
     /// \param context Handle to the current rendering context
