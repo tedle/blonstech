@@ -50,7 +50,9 @@ Geometry::Geometry(Perspective perspective, RenderContext& context)
     }
 
     // Framebuffers
-    geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 4, context));
+    // 3 outputs -> diffuse, normal, debug
+    // TODO: Remove debug when no longer needed
+    geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 3, context));
 }
 
 bool Geometry::Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix, RenderContext& context)
