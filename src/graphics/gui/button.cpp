@@ -38,17 +38,17 @@ Button::Button(Box pos, std::string label, Manager* parent_manager, Window* pare
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](){};
 
+    Vector2 caption_pos(0, 0);
+    // Center the button caption
     if (label.length() > 0)
     {
         const auto& font = gui_->skin()->font(Skin::FontStyle::LABEL);
         units::pixel caption_width = font->string_width(label);
         units::pixel letter_height = font->letter_height();
-        // Vertically center the button caption
-        Vector2 caption_pos;
         caption_pos.x = pos.x + floor((pos.w - caption_width) / 2 - font->cursor_offset(label[0]));
         caption_pos.y = pos.y + floor((pos.h + letter_height) / 2);
-        label_.reset(new Label(caption_pos, label, parent_manager, parent_window));
     }
+    label_.reset(new Label(caption_pos, label, parent_manager, parent_window));
 }
 
 void Button::Render(RenderContext& context)
@@ -222,4 +222,3 @@ void Button::set_callback(std::function<void()> callback)
 }
 } // namespace gui
 } // namespace blons
-
