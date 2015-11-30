@@ -174,11 +174,13 @@ private:
     // despite widgets needing access to them. Kind of hacky to friend it up, but oh well
     friend Control;
     friend Button;
+    friend DebugSliderButton;
     friend Label;
     friend Textarea;
     friend ConsoleTextarea;
     friend Textbox;
     friend ConsoleTextbox;
+    friend DebugSliderTextbox;
     friend Window;
     friend ConsoleWindow;
     void Init(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context);

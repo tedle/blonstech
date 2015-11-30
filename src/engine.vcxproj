@@ -198,6 +198,7 @@
     <ClInclude Include="..\include\blons\graphics\gui\consoletextbox.h" />
     <ClInclude Include="..\include\blons\graphics\gui\consolewindow.h" />
     <ClInclude Include="..\include\blons\graphics\gui\control.h" />
+    <ClInclude Include="..\include\blons\graphics\gui\debugslider.h" />
     <ClInclude Include="..\include\blons\graphics\gui\font.h" />
     <ClInclude Include="..\include\blons\graphics\gui\gui.h" />
     <ClInclude Include="..\include\blons\graphics\gui\label.h" />
@@ -233,6 +234,8 @@
     <ClInclude Include="..\include\blons\system\timer.h" />
     <ClInclude Include="..\include\blons\temphelpers.h" />
     <ClInclude Include="debug\consoleparser.h" />
+    <ClInclude Include="graphics\gui\debugsliderbutton.h" />
+    <ClInclude Include="graphics\gui\debugslidertextbox.h" />
     <ClInclude Include="graphics\internalresource.h" />
     <ClInclude Include="graphics\render\glfuncloader.h" />
     <ClInclude Include="graphics\render\renderd3d11.h" />
@@ -252,6 +255,9 @@
     <ClCompile Include="graphics\gui\consoletextbox.cpp" />
     <ClCompile Include="graphics\gui\consolewindow.cpp" />
     <ClCompile Include="graphics\gui\control.cpp" />
+    <ClCompile Include="graphics\gui\debugslider.cpp" />
+    <ClCompile Include="graphics\gui\debugsliderbutton.cpp" />
+    <ClCompile Include="graphics\gui\debugslidertextbox.cpp" />
     <ClCompile Include="graphics\gui\font.cpp" />
     <ClCompile Include="graphics\gui\label.cpp" />
     <ClCompile Include="graphics\gui\manager.cpp" />

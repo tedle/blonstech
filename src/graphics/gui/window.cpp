@@ -268,6 +268,14 @@ Button* Window::MakeButton(units::pixel x, units::pixel y, units::pixel width, u
     return static_cast<Button*>(controls_.back().get());
 }
 
+DebugSlider* Window::MakeDebugSlider(units::pixel x, units::pixel y, units::pixel width, units::pixel height, float min, float max, float step)
+{
+    Box pos(x, y, width, height);
+    std::unique_ptr<DebugSlider> slider(new DebugSlider(pos, min, max, step, gui_, this));
+    controls_.push_back(std::move(slider));
+    return static_cast<DebugSlider*>(controls_.back().get());
+}
+
 Label* Window::MakeLabel(units::pixel x, units::pixel y, std::string text)
 {
     Vector2 pos(units::pixel_to_subpixel(x),

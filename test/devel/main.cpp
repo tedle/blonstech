@@ -122,6 +122,8 @@ void InitTestUI(blons::gui::Manager* gui)
     gui->window("test")->MakeButton(10, 105, 380, 40, "Clear!")->set_callback(textareaclear);
 
     gui->window("yoyo")->MakeButton(10, 250, 280, 40, "New stuff maybe!");
+
+    gui->window("test")->MakeDebugSlider(10, 40, 380, 40, -5, 20, 0.01f);
 }
 
 void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)

@@ -205,6 +205,15 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\debugslider.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\gui\debugsliderbutton.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\gui\debugslidertextbox.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -335,6 +344,15 @@
     </ClCompile>
     <ClCompile Include="graphics\pipeline\stage\lighting.cpp">
       <Filter>src\graphics\pipeline\stage</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\debugslider.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\debugsliderbutton.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\debugslidertextbox.cpp">
+      <Filter>src\graphics\gui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

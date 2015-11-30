@@ -239,6 +239,23 @@ public:
             /// to fit with font specifications
             ////////////////////////////////////////////////////////////////////////////////
             Box cursor = Box(14, 42, 1, 1);
+            ////////////////////////////////////////////////////////////////////////////////
+            /// \brief Displays on progress based textboxes like gui::DebugSlider
+            ////////////////////////////////////////////////////////////////////////////////
+            Textbox progress = Textbox
+            {
+                Box(14, 44, 5, 5), // top_left
+                Box(20, 44, 1, 5), // top
+                Box(22, 44, 5, 5), // top_right
+                Box(14, 50, 5, 1), // left
+                Box(20, 50, 1, 1), // body
+                Box(22, 50, 5, 1), // right
+                Box(14, 52, 5, 5), // bottom_left
+                Box(20, 52, 1, 5), // bottom
+                Box(22, 52, 5, 5), // bottom_right
+                // TODO: Implement overlaid text colour
+                Vector4(1.0, 0.0, 0.0, 1.0) // text colour
+            };
         } textbox; ///< Layouts for various textbox states
 
         ////////////////////////////////////////////////////////////////////////////////

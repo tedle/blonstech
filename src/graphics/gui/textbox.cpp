@@ -222,14 +222,24 @@ bool Textbox::Update(const Input& input)
     return active_;
 }
 
-void Textbox::set_callback(std::function<void(Textbox*)> callback)
+bool Textbox::focus() const
 {
-    callback_ = callback;
+    return active_;
 }
 
 std::string Textbox::text() const
 {
     return text_;
+}
+
+void Textbox::set_callback(std::function<void(Textbox*)> callback)
+{
+    callback_ = callback;
+}
+
+void Textbox::set_focus(bool focus)
+{
+    active_ = focus;
 }
 
 void Textbox::set_text(std::string text)
@@ -351,6 +361,11 @@ void Textbox::OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modif
     {
         key_repeat_.timer.start();
     }
+}
+
+std::function<void(Textbox*)> Textbox::callback() const
+{
+    return callback_;
 }
 
 Skin::FontStyle Textbox::font_style() const

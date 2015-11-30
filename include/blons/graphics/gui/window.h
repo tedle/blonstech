@@ -27,6 +27,7 @@
 // Public Includes
 #include <blons/graphics/gui/control.h>
 #include <blons/graphics/gui/button.h>
+#include <blons/graphics/gui/debugslider.h>
 #include <blons/graphics/gui/label.h>
 #include <blons/graphics/gui/textarea.h>
 #include <blons/graphics/gui/textbox.h>
@@ -106,6 +107,22 @@ public:
     /// gui::Window and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
     Button* MakeButton(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string label);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates a new blons::gui::DebugSlider inside the window
+    ///
+    /// \param x Where to place the button horizontally in pixels
+    /// \param y Where to place the button vertically in pixels
+    /// \param width How wide the button should be in pixels
+    /// \param height How tall the button should be in pixels
+    /// \param min Minimum value that can be held by debug slider
+    /// \param max Maximum value that can be held by debug slider
+    /// \param step Minimum interval that value may be changed by
+    /// \return Pointer to the created debug slider. This memory is owned by the
+    /// gui::Window and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
+    DebugSlider* MakeDebugSlider(units::pixel x, units::pixel y, units::pixel width, units::pixel height, float min, float max, float step);
+
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new blons::gui::Label inside the window
     ///
