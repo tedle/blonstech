@@ -184,8 +184,7 @@ bool Button::Update(const Input& input)
     for (const auto& e : input.event_queue())
     {
         // Clicked inside button
-        if (mx >= x && mx < x + pos_.w &&
-            my >= y && my < y + pos_.h)
+        if (hover_)
         {
             if (e.type == Input::Event::MOUSE_DOWN)
             {
@@ -195,7 +194,7 @@ bool Button::Update(const Input& input)
             else if (e.type == Input::Event::MOUSE_UP)
             {
                 // Only do callback if cursor is inside button's region when mouse is released
-                if (active_ && hover_)
+                if (active_)
                 {
                     callback_();
                 }
