@@ -42,7 +42,7 @@ uniform sampler2D indirect_light;
 const float refraction_index = 1.0;
 const float extinction_coef = 0.5;
 const float fresnel_coef = (pow(refraction_index - 1, 2) + pow(extinction_coef, 2)) / (pow(refraction_index + 1, 2) + pow(extinction_coef, 2));
-// Pop this somewhere between 1-10,000 idk
+// Pop this somewhere between 0.1-100,000 idk
 const float gloss = 20.0;
 
 struct DirectionalLight
