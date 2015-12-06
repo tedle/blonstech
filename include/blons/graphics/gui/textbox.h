@@ -75,19 +75,6 @@ public:
     bool Update(const Input& input) override;
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief True if the textbox is currently focused and accepting keyboard input
-    ///
-    /// \return Focus state
-    ////////////////////////////////////////////////////////////////////////////////
-    bool focus() const;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves the text that has been typed into the textbox
-    ///
-    /// \return Text currently inside textbox
-    ////////////////////////////////////////////////////////////////////////////////
-    std::string text() const;
-
-    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets a callback to be invoked when the Return key is pressed while
     /// the textbox is active. The callback takes a single argument containing a
     /// pointer to the calling textbox and returns void.
@@ -97,11 +84,45 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     void set_callback(std::function<void(Textbox*)> callback);
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief True if the textbox is currently focused and accepting keyboard input
+    ///
+    /// \return Focus state
+    ////////////////////////////////////////////////////////////////////////////////
+    bool focus() const;
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets whether the textbox is focused and can accept keyboard input
     ///
     /// \param focus Focus state
     ////////////////////////////////////////////////////////////////////////////////
     void set_focus(bool focus);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Returns the starting and ending index of the highlighted region
+    /// within the text of the box. First value will always be the location of the
+    /// text cursor and as such may be greater, equal or less than the ending index.
+    ///
+    /// \return Start and end index
+    ////////////////////////////////////////////////////////////////////////////////
+    std::pair<std::size_t, std::size_t> highlight() const;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets the highlighted region of text within the textbox. Accepts 2
+    /// indices to determine the highlighted region. Numbers greater than the length
+    /// of the string will be placed at the end. Negative values will wrap around
+    /// from the back of the string. For example a call of `set_highlight(0, -1);`
+    /// would highlight the entire string. The indices can be provided in either
+    /// order, with the cursor argument placing the location of the actual text
+    /// cursor within the box. Supplying 2 identical values will simply place the
+    /// text cursor where specified.
+    ///
+    /// \param cursor Index of text cursor
+    /// \param end Index of opposing end of highlight region
+    ////////////////////////////////////////////////////////////////////////////////
+    void set_highlight(int cursor, int end);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the text that has been typed into the textbox
+    ///
+    /// \return Text currently inside textbox
+    ////////////////////////////////////////////////////////////////////////////////
+    std::string text() const;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the text inside of the current textbox. Does not parse colour
     /// formatting
@@ -148,6 +169,18 @@ protected:
     ////////////////////////////////////////////////////////////////////////////////
     void OnMouseDown(const Input& input);
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Handles textbox input logic for dealing with mouse release
+    ///
+    /// \param input Handle to the current input events
+    ////////////////////////////////////////////////////////////////////////////////
+    void OnMouseUp(const Input& input);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Handles textbox input logic for dealing with mouse movement
+    ///
+    /// \param input Handle to the current input events
+    ////////////////////////////////////////////////////////////////////////////////
+    void OnMouseMove(const Input& input);
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Handles textbox input logic for dealing with key presses
     ///
     /// \param input Handle to the current input events
@@ -165,6 +198,13 @@ protected:
     /// active
     ////////////////////////////////////////////////////////////////////////////////
     void OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modifiers mods);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Handles scrolling text side to side when highlight dragging out of
+    /// textbox boundaries. Should be called once per Textbox::Update.
+    ///
+    /// \param input Handle to the current input events
+    ////////////////////////////////////////////////////////////////////////////////
+    void UpdateHighlightScroll(const Input& input);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the callback used for this textbox
@@ -194,13 +234,14 @@ protected:
 
 private:
     // Helper functions
+    std::string::iterator NearestCursorPos(units::pixel mouse_x);
     void SetCursorPos(std::string::iterator cursor);
     units::subpixel CursorOffset();
 
     std::string text_;
     Skin::FontStyle font_style_;
-    std::string::iterator cursor_;
-    Timer cursor_blink_;
+    std::string::iterator cursor_, highlight_;
+    Timer cursor_blink_, drag_highlight_scrolling_;
     struct
     {
         Timer timer;
@@ -208,7 +249,7 @@ private:
     } key_repeat_;
     std::unique_ptr<Label> text_label_;
     std::function<void(Textbox*)> callback_;
-    bool active_;
+    bool active_, drag_highlighting_;
     // Padding between edge of textbox and text
     units::pixel padding_;
 };

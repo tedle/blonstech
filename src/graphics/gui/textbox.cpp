@@ -34,9 +34,9 @@ Textbox::Textbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window
     : Control(pos, parent_manager, parent_window)
 {
     active_ = false;
+    drag_highlighting_ = false;
     text_ = "";
     font_style_ = style;
-    cursor_ = text_.end();
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](Textbox* t){};
 
@@ -49,6 +49,9 @@ Textbox::Textbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window
     text_pos.y = pos.y + floor((pos.h + letter_height) / 2);
     text_label_.reset(new Label(text_pos, text_, style, gui_, parent_));
     text_label_->set_colour_parsing(false);
+    // Must be called after label is initialized
+    SetCursorPos(text_.end());
+    highlight_ = cursor_;
 }
 
 void Textbox::Render(RenderContext& context)
@@ -160,14 +163,34 @@ void Textbox::RenderBody(const Skin::Layout::Textbox& t, RenderContext& context)
 
 void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
 {
-    auto sprite = gui_->skin()->sprite();
-    auto batch = gui_->control_batch(crop_, feather_, context);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
+    auto crop = Box(x + padding_ / 2, 0.0f, pos_.w - padding_, 0.0f);
+    auto feather = 0;
+    auto sprite = gui_->skin()->sprite();
+    auto batch = gui_->control_batch(crop, feather, context);
 
-    // Transition blink state every 500ms
-    if (cursor_blink_.ms() % 1000 < 500)
+    if (cursor_ != highlight_)
+    {
+        auto x_offset = LabelOffset(cursor_);
+        auto highlight_offset = LabelOffset(highlight_);
+        // TODO: Make negative width sprites display reverse instead of getting culled?
+        if (x_offset > highlight_offset)
+        {
+            std::swap(x_offset, highlight_offset);
+        }
+        auto cursor_width = highlight_offset - x_offset;
+        auto cursor_height = gui_->skin()->font(font_style_)->letter_height() + 6.0f;
+        auto y_offset = floor((pos_.h - cursor_height) / 2);
+        sprite->set_pos(x + x_offset,
+                        y + y_offset,
+                        cursor_width,
+                        cursor_height);
+        sprite->set_subtexture(cursor);
+        batch->Append(sprite->mesh(), context);
+    }
+    else if (cursor_blink_.ms() % 1000 < 500)
     {
         auto cursor_width = 1.0f;
         auto cursor_height = gui_->skin()->font(font_style_)->letter_height() + 6.0f;
@@ -196,12 +219,24 @@ bool Textbox::Update(const Input& input)
     auto mods = input.modifiers();
     auto events = GetEventsWithRepeats(input);
 
+    UpdateHighlightScroll(input);
+
     for (const auto& e : events)
     {
         if (e.type == Input::Event::MOUSE_DOWN)
         {
             OnMouseDown(input);
         }
+        else if (e.type == Input::Event::MOUSE_UP)
+        {
+            OnMouseUp(input);
+        }
+        else if (e.type == Input::Event::MOUSE_MOVE_X ||
+                 e.type == Input::Event::MOUSE_MOVE_Y)
+        {
+            OnMouseMove(input);
+        }
+
         if (active_)
         {
             auto key = static_cast<Input::KeyCode>(e.value);
@@ -222,9 +257,76 @@ bool Textbox::Update(const Input& input)
     return active_;
 }
 
+void Textbox::set_callback(std::function<void(Textbox*)> callback)
+{
+    callback_ = callback;
+}
+
 bool Textbox::focus() const
 {
     return active_;
+}
+
+void Textbox::set_focus(bool focus)
+{
+    if (focus)
+    {
+        active_ = true;
+        cursor_blink_.start();
+    }
+    else
+    {
+        active_ = false;
+        cursor_blink_.stop();
+        key_repeat_.timer.stop();
+        key_repeat_.code = Input::BAD;
+    }
+}
+
+std::pair<std::size_t, std::size_t> Textbox::highlight() const
+{
+    return std::make_pair(std::distance<std::string::const_iterator>(text_.begin(), cursor_),
+                          std::distance<std::string::const_iterator>(text_.begin(), highlight_));
+}
+
+// TODO: Add an overload that accepts iterators to avoid fix the whole size mismatch issue here
+// Careful work to avoid underflows and such here since we're mixing ints and size_ts (sorry)
+void Textbox::set_highlight(int cursor, int end)
+{
+    std::size_t cursor_index, end_index;
+    if (cursor < 0)
+    {
+        if (abs(cursor) >= text_.length())
+        {
+            cursor_index = 0;
+        }
+        else
+        {
+            cursor_index = std::min(text_.length(), text_.length() + cursor + 1);
+        }
+    }
+    else
+    {
+        cursor_index = std::min(text_.length(), static_cast<std::size_t>(cursor));
+    }
+    if (end < 0)
+    {
+        if (abs(cursor) >= text_.length())
+        {
+            end_index = 0;
+        }
+        else
+        {
+            end_index = std::min(text_.length(), text_.length() + end + 1);
+        }
+    }
+    else
+    {
+        end_index = std::min(text_.length(), static_cast<std::size_t>(end));
+    }
+
+    SetCursorPos(text_.begin() + cursor_index);
+    highlight_ = text_.begin() + end_index;
 }
 
 std::string Textbox::text() const
@@ -232,21 +334,13 @@ std::string Textbox::text() const
     return text_;
 }
 
-void Textbox::set_callback(std::function<void(Textbox*)> callback)
-{
-    callback_ = callback;
-}
-
-void Textbox::set_focus(bool focus)
-{
-    active_ = focus;
-}
-
 void Textbox::set_text(std::string text)
 {
     text_ = text;
     text_label_->set_text(text_);
     SetCursorPos(text_.end());
+    highlight_ = cursor_;
+    drag_highlighting_ = false;
 }
 
 std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input)
@@ -286,16 +380,34 @@ void Textbox::OnMouseDown(const Input& input)
     if (mx >= x && mx < x + pos_.w &&
         my >= y && my < y + pos_.h)
     {
-        active_ = true;
-        cursor_blink_.start();
-        cursor_ = text_.end();
+        set_focus(true);
+        drag_highlighting_ = true;
+
+        SetCursorPos(NearestCursorPos(mx));
+        highlight_ = cursor_;
     }
     else
     {
-        active_ = false;
-        cursor_blink_.stop();
-        key_repeat_.timer.stop();
-        key_repeat_.code = Input::BAD;
+        set_focus(false);
+    }
+}
+
+void Textbox::OnMouseUp(const Input& input)
+{
+    drag_highlighting_ = false;
+}
+
+void Textbox::OnMouseMove(const Input& input)
+{
+    auto parent_pos = parent_->pos();
+    auto x = pos_.x + parent_pos.x;
+    units::pixel mx = input.mouse_x();
+
+    // Update highlight when dragging inside textbox
+    if (mx >= x + padding_ && mx < x + pos_.w - padding_ &&
+        drag_highlighting_)
+    {
+        SetCursorPos(NearestCursorPos(mx));
     }
 }
 
@@ -312,21 +424,51 @@ void Textbox::OnKeyDown(const Input& input, const Input::KeyCode key, Input::Mod
 
     if (input.IsPrintable(key) && !mods.ctrl && !mods.alt)
     {
+        if (cursor_ != highlight_)
+        {
+            // std::string::erase cannot erase backwards for some reason
+            if (cursor_ > highlight_)
+            {
+                std::swap(cursor_, highlight_);
+            }
+            SetCursorPos(text_.erase(cursor_, highlight_));
+        }
         SetCursorPos(text_.insert(cursor_, input.ToAscii(key, mods.shift)) + 1);
+        highlight_ = cursor_;
     }
     else if (key == Input::BACKSPACE)
     {
-        if (cursor_ > text_.begin())
+        if (cursor_ != highlight_)
+        {
+            // std::string::erase cannot erase backwards for some reason
+            if (cursor_ > highlight_)
+            {
+                std::swap(cursor_, highlight_);
+            }
+            SetCursorPos(text_.erase(cursor_, highlight_));
+        }
+        else if (cursor_ > text_.begin())
         {
             SetCursorPos(text_.erase(cursor_ - 1));
         }
+        highlight_ = cursor_;
     }
     else if (key == Input::DEL)
     {
-        if (cursor_ < text_.end())
+        if (cursor_ != highlight_)
+        {
+            // std::string::erase cannot erase backwards for some reason
+            if (cursor_ > highlight_)
+            {
+                std::swap(cursor_, highlight_);
+            }
+            SetCursorPos(text_.erase(cursor_, highlight_));
+        }
+        else if (cursor_ < text_.end())
         {
             SetCursorPos(text_.erase(cursor_));
         }
+        highlight_ = cursor_;
     }
     else if (key == Input::LEFT)
     {
@@ -334,12 +476,20 @@ void Textbox::OnKeyDown(const Input& input, const Input::KeyCode key, Input::Mod
         {
             SetCursorPos(cursor_ - 1);
         }
+        if (!mods.shift)
+        {
+            highlight_ = cursor_;
+        }
     }
     else if (key == Input::RIGHT)
     {
         if (cursor_ < text_.end())
         {
             SetCursorPos(cursor_ + 1);
+        }
+        if (!mods.shift)
+        {
+            highlight_ = cursor_;
         }
     }
     else if (key == Input::RETURN)
@@ -383,6 +533,38 @@ units::pixel Textbox::padding() const
     return padding_;
 }
 
+std::string::iterator Textbox::NearestCursorPos(units::pixel mouse_x)
+{
+    auto parent_pos = parent_->pos();
+    auto x = pos_.x + parent_pos.x;
+
+    auto cursor_pos = text_.end();
+    units::pixel str_width = 0;
+    const auto font = gui_->skin()->font(font_style_);
+    const auto label_offset = text_label_->pos().x - pos_.x;
+
+    // Loop thru text by each letter, accumulating pixel width until it exceeds mouse pos
+    for (auto it = text_.begin(); it != text_.end(); it++)
+    {
+        auto cur_width = font->string_width(std::string(1, *it), false);
+        str_width += cur_width;
+        // Clicked on left half of char?
+        if (str_width - cur_width / 2 > mouse_x - x - label_offset)
+        {
+            cursor_pos = it;
+            break;
+        }
+        // Clicked on right half of char?
+        else if (str_width > mouse_x - x - label_offset)
+        {
+            cursor_pos = it + 1;
+            break;
+        }
+    }
+    // Return pos of one we found or default to end of line
+    return cursor_pos;
+}
+
 void Textbox::SetCursorPos(std::string::iterator cursor)
 {
     cursor_ = cursor;
@@ -400,6 +582,13 @@ void Textbox::SetCursorPos(std::string::iterator cursor)
         auto label_diff = cursor_offset - padding_;
         text_label_->set_pos(label_pos.x - label_diff, label_pos.y);
     }
+    // Label is offscreen left && whitespace exists on the right
+    else if (label_pos.x - (pos_.x + padding_) < 0 && end_of_text_offset < pos_.w - padding_)
+    {
+        auto label_diff = end_of_text_offset - (pos_.w - padding_) + 1;
+        // std::min prevents whitespace appearing on the left side of the text
+        text_label_->set_pos(std::min(label_pos.x - label_diff, pos_.x + padding_), label_pos.y);
+    }
 }
 
 units::subpixel Textbox::CursorOffset()
@@ -409,6 +598,33 @@ units::subpixel Textbox::CursorOffset()
     const auto label_offset = text_label_->pos().x - (pos_.x + padding_);
     const auto cursor_offset = font->string_width(std::string(text_.begin(), cursor_), false) + label_offset + padding_;
     return cursor_offset;
+}
+
+void Textbox::UpdateHighlightScroll(const Input& input)
+{
+    auto parent_pos = parent_->pos();
+    auto x = pos_.x + parent_pos.x;
+    units::pixel mx = input.mouse_x();
+
+    units::subpixel distance_to_border = std::max((x + padding_) - mx, mx - (x + pos_.w - padding_));
+    // Scroll faster when farther away from border of textbox
+    units::time::ms scroll_wait_time = static_cast<units::time::ms>(200.0f / std::max(pow(distance_to_border, 0.7f), 1.0f));
+
+    // Update highlight when dragging outside textbox
+    if (drag_highlighting_ &&
+        distance_to_border > 0 &&
+        drag_highlight_scrolling_.ms() > scroll_wait_time)
+    {
+        if (mx < x + padding_ && cursor_ > text_.begin())
+        {
+            SetCursorPos(cursor_ - 1);
+        }
+        else if (mx >= x + pos_.w - padding_ && cursor_ < text_.end())
+        {
+            SetCursorPos(cursor_ + 1);
+        }
+        drag_highlight_scrolling_.start();
+    }
 }
 } // namespace gui
 } // namespace blons

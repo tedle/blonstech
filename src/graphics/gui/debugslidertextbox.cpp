@@ -191,12 +191,17 @@ bool DebugSliderTextbox::Update(const Input& input)
     // Allows debug slider to sanitize text input when focus is lost
     if (active)
     {
+        if (!queue_callback_)
+        {
+            set_highlight(0, -1);
+        }
         queue_callback_ = true;
     }
     else if (queue_callback_)
     {
         queue_callback_ = false;
         callback()(this);
+        set_highlight(0, 0);
     }
     return active;
 }

@@ -73,10 +73,26 @@ bool ConsoleTextbox::Update(const Input& input)
     auto mods = input.modifiers();
     auto events = Textbox::GetEventsWithRepeats(input);
 
+    UpdateHighlightScroll(input);
+
     for (const auto& e : events)
     {
         auto key = static_cast<Input::KeyCode>(e.value);
         mods.Update(e);
+
+        if (e.type == Input::Event::MOUSE_DOWN)
+        {
+            OnMouseDown(input);
+        }
+        else if (e.type == Input::Event::MOUSE_UP)
+        {
+            OnMouseUp(input);
+        }
+        else if (e.type == Input::Event::MOUSE_MOVE_X ||
+                 e.type == Input::Event::MOUSE_MOVE_Y)
+        {
+            OnMouseMove(input);
+        }
 
         if (e.type == Input::Event::KEY_DOWN)
         {
@@ -89,7 +105,14 @@ bool ConsoleTextbox::Update(const Input& input)
             Textbox::OnKeyUp(input, key, mods);
         }
     }
+
     // Consume input while shown
+    // Ideally we would ignore mouse input to prevent focus ever being lost,
+    // but then we lose out on draggable highlighting
+    if (!focus())
+    {
+        set_focus(true);
+    }
     return true;
 }
 
