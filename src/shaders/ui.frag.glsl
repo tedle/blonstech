@@ -48,33 +48,46 @@ void main(void)
         frag_colour = texture(skin, tex_coord);
     }
     // Cropping!
-    if (feather > 0)
-    {
-        if (crop.z != 0)
-        {
-            if (gl_FragCoord.x < crop.x + feather)
-            {
-                float alpha = max(0, (gl_FragCoord.x - crop.x) / feather);
-                frag_colour.a *= alpha;
-            }
-            else if (gl_FragCoord.x > crop.x + crop.z - feather)
-            {
-                float alpha = max(0, (crop.x + crop.z - gl_FragCoord.x) / feather);
-                frag_colour.a *= alpha;
-            }
-        }
-        if (crop.w != 0)
-        {
-            if (gl_FragCoord.y < crop.y + feather)
-            {
-                float alpha = max(0, (gl_FragCoord.y - crop.y) / feather);
-                frag_colour.a *= alpha;
-            }
-            else if (gl_FragCoord.y > crop.y + crop.w - feather)
-            {
-                float alpha = max(0, (crop.y + crop.w - gl_FragCoord.y) / feather);
-                frag_colour.a *= alpha;
-            }
-        }
-    }
+	if (crop.z != 0)
+	{
+		if (gl_FragCoord.x < crop.x + feather)
+		{
+			float alpha = 0;
+			if (feather > 0)
+			{
+				alpha = max(0, (gl_FragCoord.x - crop.x) / feather);
+			}
+			frag_colour.a *= alpha;
+		}
+		else if (gl_FragCoord.x > crop.x + crop.z - feather)
+		{
+			float alpha = 0;
+			if (feather > 0)
+			{
+				alpha = max(0, (crop.x + crop.z - gl_FragCoord.x) / feather);
+			}
+			frag_colour.a *= alpha;
+		}
+	}
+	if (crop.w != 0)
+	{
+		if (gl_FragCoord.y < crop.y + feather)
+		{
+			float alpha = 0;
+			if (feather > 0)
+			{
+				alpha = max(0, (gl_FragCoord.y - crop.y) / feather);
+			}
+			frag_colour.a *= alpha;
+		}
+		else if (gl_FragCoord.y > crop.y + crop.w - feather)
+		{
+			float alpha = 0;
+			if (feather > 0)
+			{
+				alpha = max(0, (crop.y + crop.w - gl_FragCoord.y) / feather);
+			}
+			frag_colour.a *= alpha;
+		}
+	}
 }
