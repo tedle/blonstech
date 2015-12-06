@@ -236,7 +236,7 @@ private:
     // Helper functions
     std::string::iterator NearestCursorPos(units::pixel mouse_x);
     void SetCursorPos(std::string::iterator cursor);
-    units::subpixel CursorOffset();
+    units::subpixel LabelOffset(std::string::iterator cursor);
 
     std::string text_;
     Skin::FontStyle font_style_;

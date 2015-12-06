@@ -23,6 +23,8 @@
 
 #include <blons/graphics/gui/textbox.h>
 
+// Includes
+#include <algorithm>
 // Public Includes
 #include <blons/graphics/gui/gui.h>
 
@@ -194,7 +196,7 @@ void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
     {
         auto cursor_width = 1.0f;
         auto cursor_height = gui_->skin()->font(font_style_)->letter_height() + 6.0f;
-        auto x_offset = CursorOffset();
+        auto x_offset = LabelOffset(cursor_);
         auto y_offset = floor((pos_.h - cursor_height) / 2);
         sprite->set_pos(x + x_offset,
                         y + y_offset,
@@ -569,7 +571,8 @@ void Textbox::SetCursorPos(std::string::iterator cursor)
 {
     cursor_ = cursor;
     const auto label_pos = text_label_->pos();
-    const auto cursor_offset = CursorOffset();
+    const auto cursor_offset = LabelOffset(cursor_);
+    const auto end_of_text_offset = LabelOffset(text_.end());
     // Cursor out of bounds right side
     if (cursor_offset >= pos_.w - padding_)
     {
@@ -591,12 +594,12 @@ void Textbox::SetCursorPos(std::string::iterator cursor)
     }
 }
 
-units::subpixel Textbox::CursorOffset()
+units::subpixel Textbox::LabelOffset(std::string::iterator cursor)
 {
     const auto font = gui_->skin()->font(font_style_);
     const auto layout = gui_->skin()->layout();
     const auto label_offset = text_label_->pos().x - (pos_.x + padding_);
-    const auto cursor_offset = font->string_width(std::string(text_.begin(), cursor_), false) + label_offset + padding_;
+    const auto cursor_offset = font->string_width(std::string(text_.begin(), cursor), false) + label_offset + padding_;
     return cursor_offset;
 }
 
