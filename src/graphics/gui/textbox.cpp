@@ -360,10 +360,16 @@ std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input)
             code == Input::LEFT ||
             code == Input::RIGHT)
         {
-            Input::Event repeat(Input::Event::KEY_DOWN, code);
-            events.push_back(repeat);
-            // How long before next repeated key press
-            key_repeat_.timer.rewind(40);
+            // Make sure we don't tack on a simulated key press after the key is released
+            // That would start an infinite loop of keyspam and be bad
+            Input::Event search(Input::Event::KEY_UP, code);
+            if (std::find(events.begin(), events.end(), search) == events.end())
+            {
+                Input::Event repeat(Input::Event::KEY_DOWN, code);
+                events.push_back(repeat);
+                // How long before next repeated key press
+                key_repeat_.timer.rewind(40);
+            }
         }
     }
     return std::move(events);
