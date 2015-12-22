@@ -98,8 +98,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     bool LoadFont(std::string filename, units::pixel pixel_size, Skin::FontStyle style, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls LoadFont(std::string, units::pixel, FontStyle, RenderContext&)
-    /// with a style of `FontStyle::DEFAULT`.
+    /// \brief Calls LoadFont(std::string, units::pixel, Skin::FontStyle, RenderContext&)
+    /// with a style of `Skin::FontStyle::DEFAULT`.
     ////////////////////////////////////////////////////////////////////////////////
     bool LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context);
 
@@ -114,21 +114,21 @@ public:
     /// \param width How wide the window should be in pixels
     /// \param height How tall the window should be in pixels
     /// \param caption Text to display on the titlebar. Only applicable if type is
-    /// `WindowType::DRAGGABLE`
-    /// \param type Determines how the window will behave. See gui::WindowType
+    /// `Window::Type::DRAGGABLE`
+    /// \param type Determines how the window will behave. See gui::Window::Type
     /// \return Pointer to the created window. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
     Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
-    /// MakeWindow(std::string, units::pixel, units::pixel, units::pixel, units::pixel, std::string, WindowType)
-    /// with a type of `WindowType::DRAGGABLE`
+    /// MakeWindow(std::string, units::pixel, units::pixel, units::pixel, units::pixel, std::string, Window::Type)
+    /// with a type of `Window::Type::DRAGGABLE`
     ////////////////////////////////////////////////////////////////////////////////
     Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
-    /// MakeWindow(std::string, units::pixel, units::pixel, units::pixel, units::pixel, std::string, WindowType)
+    /// MakeWindow(std::string, units::pixel, units::pixel, units::pixel, units::pixel, std::string, Window::Type)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
     Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type);
@@ -199,7 +199,7 @@ private:
     /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
     /// towards font rendering.
     ///
-    /// \param style gui::FontStyle to be drawn
+    /// \param style gui::Skin::FontStyle to be drawn
     /// \param colour Colour of the text with values ranging from 0.0 to 1.0
     /// \param context Handle to the current rendering context
     /// \return The Drawbatcher for rendering

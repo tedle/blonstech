@@ -42,12 +42,12 @@ class ConsoleTextbox : public Textbox
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc Textbox(Box, FontStyle, Manager*, Window*)
+    /// \copydoc Textbox(Box, Skin::FontStyle, Manager*, Window*)
     ////////////////////////////////////////////////////////////////////////////////
     ConsoleTextbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls ConsoleTextbox(Box, FontStyle, Manager*, Window*) with a
-    /// style of FontStyle::CONSOLE
+    /// \brief Calls ConsoleTextbox(Box, Skin::FontStyle, Manager*, Window*) with a
+    /// style of Skin::FontStyle::CONSOLE
     ////////////////////////////////////////////////////////////////////////////////
     ConsoleTextbox(Box pos, Manager* parent_manager, Window* parent_window)
         : ConsoleTextbox(pos, Skin::FontStyle::CONSOLE, parent_manager, parent_window) {}

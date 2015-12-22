@@ -53,8 +53,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Textarea(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Textarea(Box, FontStyle, Manager*, Window*) with a default
-    /// style of `FontStyle::LABEL`
+    /// \brief Calls Textarea(Box, Skin::FontStyle, Manager*, Window*) with a
+    /// default style of `Skin::FontStyle::LABEL`
     ////////////////////////////////////////////////////////////////////////////////
     Textarea(Box pos, Manager* parent_manager, Window* parent_window)
         : Textarea(pos, Skin::FontStyle::LABEL, parent_manager, parent_window) {}

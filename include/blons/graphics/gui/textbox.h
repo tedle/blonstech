@@ -52,8 +52,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Textbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Textbox(Box, FontStyle, Manager*, Window*) with a default
-    /// style of `FontStyle::LABEL`
+    /// \brief Calls Textbox(Box, Skin::FontStyle, Manager*, Window*) with a default
+    /// style of `Skin::FontStyle::LABEL`
     ////////////////////////////////////////////////////////////////////////////////
     Textbox(Box pos, Manager* parent_manager, Window* parent_window)
         : Textbox(pos, Skin::FontStyle::LABEL, parent_manager, parent_window) {}

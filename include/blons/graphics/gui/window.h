@@ -60,20 +60,20 @@ public:
     /// \param id Unique string to identify and retrieve window by
     /// \param pos Position and dimensions of the window
     /// \param caption String to be displayed in titlebar, only used if type is
-    /// `WindowType::DRAGGABLE`
-    /// \param type How the window should behave. See gui::WindowType
+    /// `Window::Type::DRAGGABLE`
+    /// \param type How the window should behave. See gui::Window::Type
     /// \param parent_manager gui::Manager containing this window
     ////////////////////////////////////////////////////////////////////////////////
     Window(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Window(std::string, Box, std::string, WindowType, Manager*)
+    /// \brief Calls Window(std::string, Box, std::string, Window::Type, Manager*)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
     Window(std::string id, Box pos, Type type, Manager* parent_manager)
         : Window(id, pos, "", type, parent_manager) {}
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Window(std::string, Box, std::string, WindowType, Manager*)
-    /// with a type of `WindowType::DRAGGABLE`
+    /// \brief Calls Window(std::string, Box, std::string, Window::Type, Manager*)
+    /// with a type of `Window::Type::DRAGGABLE`
     ////////////////////////////////////////////////////////////////////////////////
     Window(std::string id, Box pos, std::string caption, Manager* parent_manager)
         : Window(id, pos, caption, Type::DRAGGABLE, parent_manager) {}

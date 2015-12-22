@@ -40,13 +40,13 @@ class ConsoleTextarea : public Textarea
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc Textarea(Box, FontStyle, Manager*, Window*)
+    /// \copydoc Textarea(Box, Skin::FontStyle, Manager*, Window*)
     ////////////////////////////////////////////////////////////////////////////////
     ConsoleTextarea(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window)
         : Textarea(pos, style, parent_manager, parent_window) {}
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls ConsoleTextarea(Box, FontStyle, Manager*, Window*) with a
-    /// style of FontStyle::CONSOLE
+    /// \brief Calls ConsoleTextarea(Box, Skin::FontStyle, Manager*, Window*) with a
+    /// style of Skin::FontStyle::CONSOLE
     ////////////////////////////////////////////////////////////////////////////////
     ConsoleTextarea(Box pos, Manager* parent_manager, Window* parent_window)
         : ConsoleTextarea(pos, Skin::FontStyle::CONSOLE, parent_manager, parent_window) {}

@@ -359,16 +359,16 @@ public:
     /// \param filename Filename of the font to open
     /// \param pixel_size How large the font should be
     /// \param style Determines which parts of the UI will use the font. See
-    /// gui::FontStyle
+    /// gui::Skin::FontStyle
     /// \param context Handle to the current rendering context
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     bool LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves a handle to the font used for the specified FontStyle
+    /// \brief Retrieves a handle to the font used for the specified Skin::FontStyle
     ///
     /// \return Font attached to the specified style. If none has been loaded for
-    /// that style then the Font attached to `FontStyle::DEFAULT` is returned
+    /// that style then the Font attached to `Skin::FontStyle::DEFAULT` is returned
     ////////////////////////////////////////////////////////////////////////////////
     Font* font(FontStyle style);
     ////////////////////////////////////////////////////////////////////////////////

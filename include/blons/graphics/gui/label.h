@@ -53,8 +53,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Label(Vector2 pos, ColourString text, Skin::FontStyle style, Manager* parent_manager, Window* parent_window);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Label(Vector2, ColourString, FontStyle, Manager*, Window*)
-    /// with a default style of `FontStyle::LABEL`
+    /// \brief Calls Label(Vector2, ColourString, Skin::FontStyle, Manager*, Window*)
+    /// with a default style of `Skin::FontStyle::LABEL`
     ////////////////////////////////////////////////////////////////////////////////
     Label(Vector2 pos, ColourString text, Manager* parent_manager, Window* parent_window)
         : Label(pos, text, Skin::FontStyle::LABEL, parent_manager, parent_window) {}

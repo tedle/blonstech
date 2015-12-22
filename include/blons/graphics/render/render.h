@@ -41,7 +41,7 @@ namespace blons
 struct TextureHint
 {
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Determines the bit format of the texture
+    /// \brief Determines the bit format of a texture
     ////////////////////////////////////////////////////////////////////////////////
     enum Format
     {
@@ -56,7 +56,7 @@ struct TextureHint
         R8G8B8A8,     ///< 3-channel, 8-bit per channel
         R32G32B32A32, ///< 4-channel, 32-bit per channel
         DEPTH         ///< Depth information
-    } format; ///< Determines the bit format of the texture
+    } format; ///< \copybrief Format
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Determines the filtering for texture access
@@ -65,7 +65,7 @@ struct TextureHint
     {
         NEAREST, ///< Nearest neighbour filtering
         LINEAR   ///< Linear filtering
-    } filter; ///< Determines the filtering for texture access
+    } filter; ///< \copybrief Filter
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +132,7 @@ struct PixelData
         AUTO,      ///< Compresses to DXT5 & generates mipmaps
         DDS,       ///< Uses mipmaps & compression from image file
         RAW        ///< Will not generate mipmaps, will not compress on GPU
-    } compression; ///< \copybrief Format
+    } compression; ///< \copybrief Compression
 
     PixelData() {}
     ////////////////////////////////////////////////////////////////////////////////
@@ -416,6 +416,9 @@ public:
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterTexture(TextureResource* texture, PixelData* pixel_data)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc RegisterTexture(TextureResource*, PixelData*)
+    ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a ShaderResource, shader source files, and list of attributes,
@@ -532,6 +535,9 @@ public:
     /// \param pixels Pixel data to update texture with
     ////////////////////////////////////////////////////////////////////////////////
     virtual void SetTextureData(TextureResource* texture, PixelData* pixels)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetTextureData(TextureResource*, PixelData*)
+    ////////////////////////////////////////////////////////////////////////////////
     virtual void SetTextureData(TextureResource* texture, PixelData3D* pixels)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
