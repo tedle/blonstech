@@ -87,7 +87,7 @@ void out(const std::string fmt, ...);
 /// \return Value of the variable
 ////////////////////////////////////////////////////////////////////////////////
 template <typename T>
-T var(const std::string& name)
+inline T var(const std::string& name)
 {
     return internal::__var(name)->to<T>();
 }
@@ -105,7 +105,7 @@ inline const Variable* var(const std::string& name)
 /// \param value New value of the variable
 ////////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void set_var(const std::string& name, T value)
+inline void set_var(const std::string& name, T value)
 {
     Variable v(value);
     internal::__set_var(name, v);
@@ -138,6 +138,10 @@ const std::vector<std::string>& history();
 /// If you register a function with the same name as an existing variable it
 /// will throw.
 ///
+/// If the type signature of a supplied function cannot be deduced but is still
+/// compatible with `std::function` it can be specified like
+/// `blons::console::RegisterFunction<int, float>("func", [](int x, float y){});`
+///
 /// \param name The name the function will be called by
 /// \param func Function that will be called whenever invoked by the console
 ////////////////////////////////////////////////////////////////////////////////
@@ -158,6 +162,15 @@ inline void RegisterFunction(const std::string& name, std::function<void()> func
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+/// \copydoc console::RegisterFunction
+////////////////////////////////////////////////////////////////////////////////
+template <typename Lambda, std::enable_if_t<!std::is_bind_expression<Lambda>::value>* = nullptr>
+inline void RegisterFunction(const std::string& name, Lambda func)
+{
+    RegisterFunction(name, internal::LambdaToFunction<Lambda>::Type(func));
+}
+
+////////////////////////////////////////////////////////////////////////////////
 /// \brief Register a global console variable to be used for configuration.
 ///
 /// The variable is statically typed and only supports certain native C++ types.
@@ -170,7 +183,7 @@ inline void RegisterFunction(const std::string& name, std::function<void()> func
 /// \param value Value of the variable
 ////////////////////////////////////////////////////////////////////////////////
 template <typename T>
-void RegisterVariable(const std::string& name, T value)
+inline void RegisterVariable(const std::string& name, T value)
 {
     Variable v(value);
     internal::__registervariable(name, v);
@@ -217,11 +230,10 @@ void RegisterPrintCallback(PrintCallback callback);
 /// blons::console::out("Printing to stdout!\n");
 ///
 /// // Registering a console function
-/// std::function<void(int, int)> add = [](int x, int y)
+/// blons::console::RegisterFunction("add", [](int x, int y)
 /// {
 ///     blons::console::out("Sum is %i\n", x + y);
-/// }
-/// blons::console::RegisterFunction("add", add);
+/// });
 /// blons::console::in("add 10 20"); // Prints "Sum is 30"
 ///
 /// // Registering a console variable

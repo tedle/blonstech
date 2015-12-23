@@ -23,6 +23,22 @@
 
 namespace internal
 {
+// Generates a std::function type to match a given lambda type
+// Usage LambdaToFunction<decltype(lambda)>::Type func(lambda);
+template <typename T>
+struct LambdaToFunction { using Type = typename LambdaToFunction<decltype(&T::operator())>::Type; };
+
+template <typename T, typename U, typename... Args>
+struct LambdaToFunction<T(U::*)(Args...) const>
+{
+    using Type = std::function<void(Args...)>;
+};
+// TODO: Implement this if we can think of a concise way to do it...?
+// template <typename T>
+// struct BindToFunction { using Type = typename BindToFunction<T>::Type; };
+// template <typename T, typename Func, typename... Args>
+// struct BindToFunction<std::_Binder<T, Func, Args...>> {};
+
 // Base class used to store functions in the console
 class Function
 {

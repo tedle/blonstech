@@ -130,12 +130,9 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
 {
     blons::console::out("Welcome, gamer -- to the blonstech universe!\n");
 
-    std::function<void(int)> test_func = [](int i){ blons::console::out("%i gamers in the house!\n", i); };
-    std::function<void(const char*)> test_func_s = [](const char* i){ blons::console::out("%s stringers in the house!\n", i); };
-    std::function<void(int, int)> test_func_ii = [](int i, int j){ blons::console::out("%i, %i double inters in the house!\n", i, j); };
-    blons::console::RegisterFunction("dbg:testo", test_func);
-    blons::console::RegisterFunction("dbg:testo", test_func_s);
-    blons::console::RegisterFunction("dbg:testo", test_func_ii);
+    blons::console::RegisterFunction("dbg:testo", [](int i){ blons::console::out("%i gamers in the house!\n", i); });
+    blons::console::RegisterFunction("dbg:testo", [](const char* i){ blons::console::out("%s stringers in the house!\n", i); });
+    blons::console::RegisterFunction("dbg:testo", [](int i, int j){ blons::console::out("%i, %i double inters in the house!\n", i, j); });
 
     blons::console::RegisterVariable("sv:cool", 5);
     blons::console::RegisterVariable("math:pi", 3.14f);

@@ -124,22 +124,19 @@ void internal::__registervariable(const std::string& name, const Variable& varia
     case Variable::INT:
     {
         RegisterFunction(name, [=](){ out("%i\n", var<int>(name)); });
-        std::function<void(int)> setter = [=](int v){ set_var(name, v); };
-        RegisterFunction(name, setter);
+        RegisterFunction(name, [=](int v){ set_var(name, v); });
         break;
     }
     case Variable::FLOAT:
     {
         RegisterFunction(name, [=](){ out("%f\n", var<float>(name)); });
-        std::function<void(float)> setter = [=](float v){ set_var(name, v); };
-        RegisterFunction(name, setter);
+        RegisterFunction(name, [=](float v){ set_var(name, v); });
         break;
     }
     case Variable::STRING:
     {
         RegisterFunction(name, [=](){ out("\"%s\"\n", var<const char*>(name)); });
-        std::function<void(const char*)> setter = [=](const char* v){ set_var(name, v); };
-        RegisterFunction(name, setter);
+        RegisterFunction(name, [=](const char* v){ set_var(name, v); });
         break;
     }
     default:
