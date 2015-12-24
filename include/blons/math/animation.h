@@ -58,7 +58,7 @@ public:
     /// \brief Function prototype for animation callbacks, receives a number from
     /// [0.0, 1.0] indicating the completion progress of the animation
     ////////////////////////////////////////////////////////////////////////////////
-    typedef std::function<void(float)> Callback;
+    using Callback = std::function<void(float)>;
 
 public:
     ////////////////////////////////////////////////////////////////////////////////

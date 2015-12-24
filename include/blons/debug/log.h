@@ -40,7 +40,7 @@ namespace log
 ///
 /// The input string contains text that is outputted by the logger.
 ////////////////////////////////////////////////////////////////////////////////
-typedef std::function<void(const std::string&)> PrintCallback;
+using PrintCallback = std::function<void(const std::string&)>;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Debug logging levels

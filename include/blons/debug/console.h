@@ -50,7 +50,7 @@ namespace console
 ///
 /// The input string contains text that is being printed by the console.
 ////////////////////////////////////////////////////////////////////////////////
-typedef std::function<void(const std::string&)> PrintCallback;
+using PrintCallback = std::function<void(const std::string&)>;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Send a text command into the console

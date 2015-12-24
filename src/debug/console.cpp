@@ -37,7 +37,7 @@ using internal::Function;
 
 namespace
 {
-typedef std::vector<std::unique_ptr<Function>> FunctionList;
+using FunctionList = std::vector<std::unique_ptr<Function>>;
 
 struct ConsoleState
 {
