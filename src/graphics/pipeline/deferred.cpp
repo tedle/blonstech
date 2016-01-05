@@ -92,6 +92,11 @@ void Deferred::Reload(Client::Info screen, float fov, float screen_near, float s
 
 bool Deferred::Render(const Scene& scene, RenderContext& context)
 {
+    return Render(scene, nullptr, context);
+}
+
+bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer, RenderContext& context)
+{
     // TODO: Support more scene lights
     assert(scene.lights.size() == 1);
     Light* sun = scene.lights[0];
@@ -125,8 +130,15 @@ bool Deferred::Render(const Scene& scene, RenderContext& context)
         return false;
     }
 
-    // Bind the back buffer
-    context->BindFramebuffer(nullptr);
+    // Bind the output buffer
+    if (output_buffer != nullptr)
+    {
+        output_buffer->Bind(context);
+    }
+    else
+    {
+        context->BindFramebuffer(nullptr);
+    }
 
     // Render the final composite of the geometry and lighting passes
     if (!RenderComposite(scene, context))

@@ -100,6 +100,17 @@ public:
     bool Render(const Scene& scene, RenderContext& context);
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Renders the supplied models and lights to the supplied framebuffer
+    ///
+    /// \param scene Struct containing all of the models and information needed to
+    /// render a scene
+    /// \param output_buffer Borrowed pointer to a framebuffer for rendering
+    /// \param context Handle to the current rendering context
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    bool Render(const Scene& scene, Framebuffer* output_buffer, RenderContext& context);
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Reloads graphics API. Used for applying new video settings. **Never**
     /// call this in the middle of rendering a frame (callbacks beware!).
     ///
@@ -132,7 +143,6 @@ public:
 
 private:
     bool Init(RenderContext& context);
-
     bool RenderComposite(const Scene& scene, RenderContext& context);
 
     Output output_, alt_output_;

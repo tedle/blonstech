@@ -152,10 +152,12 @@ bool Graphics::Render()
     context_->BeginScene(Vector4(0, 0, 0, 1));
 
     // Render the scene
-    if (!pipeline_->Render(scene, context_))
+    if (!pipeline_->Render(scene, output_buffer_.get(), context_))
     {
         return false;
     }
+
+    output_buffer_->Bind(false, context_);
 
     // Render all 2D sprites
     if (!RenderSprites())
@@ -164,7 +166,23 @@ bool Graphics::Render()
     }
 
     // Render the GUI
-    gui_->Render(context_);
+    gui_->Render(output_buffer_.get(), context_);
+
+    // Output the main FBO to the backbuffer
+    context_->BindFramebuffer(nullptr);
+    output_buffer_->Render(context_);
+
+    // Set the inputs
+    if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
+        !sprite_shader_->SetInput("sprite", output_buffer_->textures()[0], context_))
+    {
+        return false;
+    }
+
+    if (!sprite_shader_->Render(output_buffer_->index_count(), context_))
+    {
+        return false;
+    }
 
     // Swap buffers
     context_->EndScene();
@@ -266,6 +284,7 @@ bool Graphics::MakeContext(Client::Info screen)
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height), 0,
                                        kScreenNear, kScreenFar);
+
     // Shaders
     ShaderAttributeList sprite_inputs;
     sprite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
@@ -292,6 +311,8 @@ bool Graphics::MakeContext(Client::Info screen)
     {
         gui_->Reload(screen.width, screen.height, std::move(ui_shader), context_);
     }
+
+    output_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
 
     return true;
 }

@@ -36,6 +36,7 @@
 namespace blons
 {
 // Forward declarations
+class Framebuffer;
 class Shader;
 
 namespace gui
@@ -133,6 +134,14 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Renders all Window%s and Control%s to the supplied framebuffer.
+    /// Generally issue by Graphics class and not by user.
+    ///
+    /// \param output_buffer Handle to the framebuffer to render to
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
+    void Render(Framebuffer* output_buffer, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the screen. Generally issued
     /// by Graphics class and not by user.

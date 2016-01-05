@@ -173,6 +173,7 @@ private:
     std::unique_ptr<pipeline::Deferred> pipeline_;
     std::unique_ptr<gui::Manager> gui_;
     std::unique_ptr<Shader> sprite_shader_;
+    std::unique_ptr<Framebuffer> output_buffer_;
     Matrix ortho_matrix_;
 
     // TODO: Make this user customizable

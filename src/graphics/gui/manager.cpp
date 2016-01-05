@@ -111,8 +111,17 @@ Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, unit
     return MakeWindow(id, x, y, width, height, "", type);
 }
 
-void Manager::Render(RenderContext& context)
+void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
 {
+    if (output_buffer != nullptr)
+    {
+        output_buffer->Bind(false, context);
+    }
+    else
+    {
+        context->BindFramebuffer(nullptr);
+    }
+    // TODO: Remove concept of a main window. That's dumb!
     // Main window always renders at the bottom
     main_window_->Render(context);
     // User made windows
@@ -128,7 +137,6 @@ void Manager::Render(RenderContext& context)
     {
         console_window_->Render(context);
     }
-
     // Draw pass
     ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
     for (int i = 0; i < batch_index_; i++)
@@ -154,6 +162,11 @@ void Manager::Render(RenderContext& context)
     }
 
     batch_index_ = 0;
+}
+
+void Manager::Render(RenderContext& context)
+{
+    Render(nullptr, context);
 }
 
 void Manager::Reload(units::pixel screen_width, units::pixel screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
@@ -198,7 +211,7 @@ bool Manager::Update(const Input& input)
 
 Window* Manager::window(std::string id)
 {
-    for (auto& w : windows_)
+    for (const auto& w : windows_)
     {
         if (w->id() == id)
         {
