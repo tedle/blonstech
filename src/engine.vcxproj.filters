@@ -433,5 +433,11 @@
     <None Include="shaders\indirect-light-map.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\ui-composite.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\ui-blur.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

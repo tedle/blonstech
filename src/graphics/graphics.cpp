@@ -291,13 +291,7 @@ bool Graphics::MakeContext(Client::Info screen)
     sprite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
     sprite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", sprite_inputs, context_));
 
-    ShaderAttributeList ui_inputs;
-    ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    auto ui_shader = std::unique_ptr<Shader>(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", ui_inputs, context_));
-
-    if (sprite_shader_ == nullptr ||
-        ui_shader == nullptr)
+    if (sprite_shader_ == nullptr)
     {
         return false;
     }
@@ -305,11 +299,11 @@ bool Graphics::MakeContext(Client::Info screen)
     // GUI
     if (gui_ == nullptr)
     {
-        gui_.reset(new gui::Manager(screen.width, screen.height, std::move(ui_shader), context_));
+        gui_.reset(new gui::Manager(screen.width, screen.height, context_));
     }
     else
     {
-        gui_->Reload(screen.width, screen.height, std::move(ui_shader), context_);
+        gui_->Reload(screen.width, screen.height, context_);
     }
 
     output_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));

@@ -88,10 +88,9 @@ public:
     ///
     /// \param screen_width Maximum width of the view screen in pixels
     /// \param screen_height Maximum height of the view screen in pixels
-    /// \param ui_shader Shader to be used for rendering Control%s and text
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Manager(units::pixel screen_width, units::pixel screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
+    Manager(units::pixel screen_width, units::pixel screen_height, RenderContext& context);
     ~Manager();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -136,7 +135,9 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the supplied framebuffer.
-    /// Generally issue by Graphics class and not by user.
+    /// Generally issue by Graphics class and not by user. If no framebuffer is
+    /// supplied the backbuffer is used instead. Drop shadows and blurs can only
+    /// be applied when a framebuffer is given.
     ///
     /// \param output_buffer Handle to the framebuffer to render to
     /// \param context Handle to the current rendering context
@@ -144,7 +145,8 @@ public:
     void Render(Framebuffer* output_buffer, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the screen. Generally issued
-    /// by Graphics class and not by user.
+    /// by Graphics class and not by user. Draws to the backbuffer with no blur or
+    /// shadows applied.
     ///
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
@@ -155,10 +157,9 @@ public:
     ///
     /// \param screen_width Maximum width of the view screen in pixels
     /// \param screen_height Maximum height of the view screen in pixels
-    /// \param ui_shader Shader to be used for rendering Control%s and text
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Reload(units::pixel screen_width, units::pixel screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
+    void Reload(units::pixel screen_width, units::pixel screen_height, RenderContext& context);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs input logic for all Window%s and Control%s. Generally issued
@@ -192,7 +193,7 @@ private:
     friend DebugSliderTextbox;
     friend Window;
     friend ConsoleWindow;
-    void Init(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context);
+    void Init(units::pixel width, units::pixel height, RenderContext& context);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves an unnused Drawbatcher with the specific shader inputs
@@ -234,8 +235,14 @@ private:
 
     Box screen_dimensions_;
     Matrix ortho_matrix_;
+    Matrix blur_ortho_matrix_;
 
     std::unique_ptr<Shader> ui_shader_;
+    std::unique_ptr<Framebuffer> ui_buffer_;
+    std::unique_ptr<Shader> blur_shader_;
+    std::unique_ptr<Framebuffer> blur_buffer_a_;
+    std::unique_ptr<Framebuffer> blur_buffer_b_;
+    std::unique_ptr<Shader> composite_shader_;
 
     std::unique_ptr<Skin> skin_;
     std::vector<std::unique_ptr<Window>> windows_;

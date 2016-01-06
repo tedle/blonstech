@@ -33,21 +33,41 @@ namespace blons
 {
 namespace gui
 {
-Manager::Manager(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
+namespace
 {
-    Init(width, height, std::move(ui_shader), context);
+    // Blur is rendered at screen_res / kBlurFactor
+    // Saves cycles & strengthens blur
+    static const float kBlurFactor = 2.0f;
+    static const int kBlurFactori = static_cast<int>(kBlurFactor);
+    static const int kBlurIterations = 5;
+}
+
+Manager::Manager(units::pixel width, units::pixel height, RenderContext& context)
+{
+    Init(width, height, context);
     // TODO: Make the windows resize on reload
     main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
     console_window_.reset(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
 }
 
-void Manager::Init(units::pixel width, units::pixel height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
+void Manager::Init(units::pixel width, units::pixel height, RenderContext& context)
 {
     screen_dimensions_ = Box(0, 0, width, height);
     ortho_matrix_ = MatrixOrthographic(0, screen_dimensions_.w, screen_dimensions_.h, 0,
                                        kScreenNear, kScreenFar);
+    blur_ortho_matrix_ = MatrixOrthographic(0, screen_dimensions_.w / kBlurFactori, screen_dimensions_.h / kBlurFactori, 0,
+                                            kScreenNear, kScreenFar);
 
-    ui_shader_ = std::move(ui_shader);
+    ShaderAttributeList ui_inputs;
+    ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    ui_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", ui_inputs, context));
+    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-blur.frag.glsl", ui_inputs, context));
+    composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-composite.frag.glsl", ui_inputs, context));
+
+    ui_buffer_.reset(new Framebuffer(width, height, { { TextureHint::R8G8B8A8, TextureHint::LINEAR } }, false, context));
+    blur_buffer_a_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureHint::R8G8B8A8, TextureHint::LINEAR } }, false, context));
+    blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureHint::R8G8B8A8, TextureHint::LINEAR } }, false, context));
 
     skin_.reset(new Skin(context));
 
@@ -113,9 +133,11 @@ Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, unit
 
 void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
 {
+    // Rendering UI to a separate buffer is needed for styles
+    // Styles are only possible when output_buffer is supplied
     if (output_buffer != nullptr)
     {
-        output_buffer->Bind(false, context);
+        ui_buffer_->Bind(Vector4(0.0, 0.0, 0.0, 0.0), context);
     }
     else
     {
@@ -160,8 +182,48 @@ void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
         batch.second->Render(context);
         ui_shader_->Render(batch.second->index_count(), context);
     }
-
     batch_index_ = 0;
+    // Cannot apply UI styles when rendering to backbuffer
+    if (output_buffer == nullptr)
+    {
+        return;
+    }
+    // Achieve a fast, strong blur by rendering at a low resolution and skipping over pixels
+    // Artifacting is resolved by iterating multiple times, which also further strengthens blur
+    blur_shader_->SetInput("proj_matrix", blur_ortho_matrix_, context);
+    blur_shader_->SetInput("ui", ui_buffer_->textures()[0], 1, context);
+    for (int i = 0; i < kBlurIterations; i++)
+    {
+        // It is safe to never clear buffers since it's based off a clean input texture
+        blur_buffer_a_->Bind(false, context);
+        blur_buffer_a_->Render(context);
+        if (i == 0)
+        {
+            blur_shader_->SetInput("composite", output_buffer->textures()[0], 0, context);
+        }
+        else
+        {
+            blur_shader_->SetInput("composite", blur_buffer_b_->textures()[0], 0, context);
+        }
+        // Uniform inputs are faster than alternating 2 separate shaders
+        blur_shader_->SetInput("horizontal", 1.0f, context);
+        blur_shader_->SetInput("screen_length", screen_dimensions_.w / kBlurFactor, context);
+        blur_shader_->Render(blur_buffer_a_->index_count(), context);
+
+        blur_buffer_b_->Bind(false, context);
+        blur_buffer_b_->Render(context);
+        blur_shader_->SetInput("composite", blur_buffer_a_->textures()[0], 0, context);
+        blur_shader_->SetInput("horizontal", 0.0f, context);
+        blur_shader_->SetInput("screen_length", screen_dimensions_.h / kBlurFactor, context);
+        blur_shader_->Render(blur_buffer_b_->index_count(), context);
+    }
+
+    output_buffer->Bind(false, context);
+    output_buffer->Render(context);
+    composite_shader_->SetInput("proj_matrix", ortho_matrix_, context);
+    composite_shader_->SetInput("blurred_composite", blur_buffer_b_->textures()[0], 0, context);
+    composite_shader_->SetInput("ui", ui_buffer_->textures()[0], 1, context);
+    composite_shader_->Render(output_buffer->index_count(), context);
 }
 
 void Manager::Render(RenderContext& context)
@@ -169,9 +231,9 @@ void Manager::Render(RenderContext& context)
     Render(nullptr, context);
 }
 
-void Manager::Reload(units::pixel screen_width, units::pixel screen_height, std::unique_ptr<Shader> ui_shader, RenderContext& context)
+void Manager::Reload(units::pixel screen_width, units::pixel screen_height, RenderContext& context)
 {
-    Init(screen_width, screen_height, std::move(ui_shader), context);
+    Init(screen_width, screen_height, context);
 }
 
 bool Manager::Update(const Input& input)

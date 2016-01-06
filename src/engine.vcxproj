@@ -315,6 +315,8 @@
     <None Include="shaders\direct-light.frag.glsl" />
     <None Include="shaders\sprite.frag.glsl" />
     <None Include="shaders\sprite.vert.glsl" />
+    <None Include="shaders\ui-blur.frag.glsl" />
+    <None Include="shaders\ui-composite.frag.glsl" />
     <None Include="shaders\ui.frag.glsl" />
   </ItemGroup>
   <ItemGroup>
