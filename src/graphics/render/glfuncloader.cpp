@@ -77,6 +77,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glBindVertexArray");
     }
 
+    glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)glGetProcAddress("glBlendFuncSeparate");
+    if (glBlendFuncSeparate == nullptr)
+    {
+        failed.push_back("glBlendFuncSeparate");
+    }
+
     glBufferData = (PFNGLBUFFERDATAPROC)glGetProcAddress("glBufferData");
     if (glBufferData == nullptr)
     {
@@ -382,6 +388,7 @@ PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;
 PFNGLBUFFERDATAPROC glBufferData;
 PFNGLBUFFERSUBDATAPROC glBufferSubData;
 PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;

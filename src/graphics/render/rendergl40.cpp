@@ -1115,20 +1115,29 @@ bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const
 
 bool RenderGL40::SetBlendMode(BlendMode mode)
 {
-    GLint sfunc, dfunc;
+    GLint scfunc, dcfunc, safunc, dafunc;
     switch (mode)
     {
     case ADDITIVE:
-        sfunc = GL_ONE;
-        dfunc = GL_ONE;
+        scfunc = GL_ONE;
+        dcfunc = GL_ONE;
+        safunc = GL_ONE;
+        dafunc = GL_ONE;
         break;
     default:
     case ALPHA:
-        sfunc = GL_SRC_ALPHA;
-        dfunc = GL_ONE_MINUS_SRC_ALPHA;
+        scfunc = GL_SRC_ALPHA;
+        dcfunc = GL_ONE_MINUS_SRC_ALPHA;
+        safunc = GL_ONE;
+        dafunc = GL_ONE_MINUS_SRC_ALPHA;
         break;
+    case OVERWRITE:
+        scfunc = GL_ONE;
+        dcfunc = GL_ZERO;
+        safunc = GL_ONE;
+        dafunc = GL_ZERO;
     }
-    glBlendFunc(sfunc, dfunc);
+    glBlendFuncSeparate(scfunc, dcfunc, safunc, dafunc);
 
     return true;
 }

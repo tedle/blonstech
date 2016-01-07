@@ -74,7 +74,8 @@ struct TextureHint
 enum BlendMode
 {
     ADDITIVE, ///< Pixel shader value is added to old value
-    ALPHA     ///< Pixel shader value is mixed with old value based on alpha
+    ALPHA,    ///< Pixel shader value is mixed with old value based on alpha
+    OVERWRITE ///< Pixel shader value replaces value on buffer
 };
 
 ////////////////////////////////////////////////////////////////////////////////
