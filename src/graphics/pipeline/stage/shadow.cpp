@@ -61,7 +61,7 @@ Shadow::Shadow(Perspective perspective, RenderContext& context)
         throw "Failed to initialize Shadow shaders";
     }
 
-    blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context));
+    blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR, TextureHint::CLAMP } }, context));
     direct_light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false, context));
     shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureHint::R16G16, TextureHint::LINEAR } }, context));
 }

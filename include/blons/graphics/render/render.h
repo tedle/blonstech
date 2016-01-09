@@ -66,6 +66,17 @@ struct TextureHint
         NEAREST, ///< Nearest neighbour filtering
         LINEAR   ///< Linear filtering
     } filter; ///< \copybrief Filter
+
+    enum Wrap
+    {
+        CLAMP,
+        REPEAT
+    } wrap;
+
+    TextureHint(Format format, Filter filter, Wrap wrap) : format(format), filter(filter), wrap(wrap) {}
+    TextureHint(Format format, Filter filter) : TextureHint(format, filter, REPEAT) {}
+    TextureHint(Format format) : TextureHint(format, NEAREST, REPEAT) {}
+    TextureHint() : TextureHint(NONE, NEAREST, REPEAT) {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -40,7 +40,7 @@ Framebuffer::Framebuffer(units::pixel width, units::pixel height, unsigned int t
     std::vector<TextureHint> formats;
     for (unsigned int i = 0; i < texture_count; i++)
     {
-        formats.push_back({ TextureHint::R8G8B8, TextureHint::LINEAR });
+        formats.push_back({ TextureHint::R8G8B8, TextureHint::LINEAR, TextureHint::CLAMP });
     }
     Init(width, height, formats, store_depth, context);
 }
@@ -50,7 +50,7 @@ Framebuffer::Framebuffer(units::pixel width, units::pixel height, unsigned int t
     std::vector<TextureHint> formats;
     for (unsigned int i = 0; i < texture_count; i++)
     {
-        formats.push_back({ TextureHint::R8G8B8, TextureHint::LINEAR });
+        formats.push_back({ TextureHint::R8G8B8, TextureHint::LINEAR, TextureHint::CLAMP });
     }
     Init(width, height, formats, true, context);
 }

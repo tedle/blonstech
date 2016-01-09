@@ -604,7 +604,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo->depth_render_);
 
         // Create and bind the depth target
-        fbo->depth_ = make_texture({ TextureHint::DEPTH, TextureHint::LINEAR });
+        fbo->depth_ = make_texture({ TextureHint::DEPTH, TextureHint::LINEAR, TextureHint::CLAMP });
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_.texture_, 0);
     }
 
@@ -945,11 +945,16 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
     }
 
     // Apply our texture settings (we do this after to override SOIL settings)
-    // Set the texture to repeat when sampled outside UV range
-    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
-
-    // Raw textures use nearest neighbour filtering
+    if (pixels->hint.wrap == TextureHint::CLAMP)
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    else
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    }
     if (pixels->hint.filter == TextureHint::NEAREST)
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -1049,14 +1054,20 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData3D* pixels)
         break;
     }
     glTexImage3D(tex->type_, 0, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.get());
-    log::Debug("YOOOOO %i\n", glGetError());
 
-    // Set the texture to repeat when sampled outside UV range
-    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(tex->type_, GL_TEXTURE_WRAP_R, GL_REPEAT);
-
-    // Raw textures use nearest neighbour filtering
+    // Apply our texture settings (we do this after to override SOIL settings)
+    if (pixels->hint.wrap == TextureHint::CLAMP)
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    }
+    else
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_R, GL_REPEAT);
+    }
     if (pixels->hint.filter == TextureHint::NEAREST)
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

@@ -53,12 +53,12 @@ public:
     Framebuffer(units::pixel width, units::pixel height, std::vector<TextureHint> texture_formats, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureHint>, bool, RenderContext&)
-    /// with a default texture list of {R8B8G8, LINEAR}
+    /// with a default texture list of {R8B8G8, LINEAR, CLAMP}
     ////////////////////////////////////////////////////////////////////////////////
     Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, bool store_depth, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureHint>, bool, RenderContext&)
-    /// with a default texture list of {R8B8G8, LINEAR} and a store_depth of true
+    /// with a default texture list of {R8B8G8, LINEAR, CLAMP} and a store_depth of true
     ////////////////////////////////////////////////////////////////////////////////
     Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, RenderContext& context);
     ~Framebuffer() {}

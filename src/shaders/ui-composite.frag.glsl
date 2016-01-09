@@ -36,7 +36,7 @@ void main(void)
 {
     //blur_colour.rgb *= 1.0 - ui_colour.a;
     //blur_colour.rgb += ui_colour.rgb * ui_colour.a;
-    if (texture(ui, tex_coord).a > 0 || true)
+    if (texture(ui, tex_coord).a > 0)
     {
         frag_colour = vec4(0);
         frag_colour += texture(ui, tex_coord) * 0.001;

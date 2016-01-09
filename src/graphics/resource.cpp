@@ -156,6 +156,7 @@ TextureBuffer LoadTexture(const std::string& filename, Texture::Type type, Rende
             // No DDS compression or mipmaps + nearest neighbour filtering
             tex.pixels->compression = PixelData::RAW;
             tex.pixels->hint.filter = TextureHint::NEAREST;
+            tex.pixels->hint.wrap = TextureHint::REPEAT;
         }
         else if (type == Texture::LIGHT)
         {
