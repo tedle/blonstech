@@ -124,7 +124,7 @@ public:
     ///
     /// \return List of render targets
     ////////////////////////////////////////////////////////////////////////////////
-    std::vector<const TextureResource*> textures();
+    const std::vector<const TextureResource*>& textures() const;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the depth texture of the framebuffer as a TextureResource.
     /// May return nullptr if no depth buffer is used for rendering

@@ -148,7 +148,7 @@ unsigned int Framebuffer::index_count() const
     return static_cast<unsigned int>(index_count);
 }
 
-std::vector<const TextureResource*> Framebuffer::textures()
+const std::vector<const TextureResource*>& Framebuffer::textures() const
 {
     return textures_;
 }
