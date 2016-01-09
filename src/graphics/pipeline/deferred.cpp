@@ -151,9 +151,9 @@ void Deferred::set_output(Output output, Output alt_output)
 bool Deferred::RenderComposite(const Scene& scene, RenderContext& context)
 {
     output_sprite_->set_pos(0, 0, perspective_.width, perspective_.height);
-    output_sprite_->set_subtexture(0, 0, 16, -16);
+    output_sprite_->set_subtexture(0, 16, 16, -16);
     alt_output_sprite_->set_pos(1380, 660, 200, 200);
-    alt_output_sprite_->set_subtexture(0, 0, 16, -16);
+    alt_output_sprite_->set_subtexture(0, 16, 16, -16);
 
     auto output_texture = [&](Output output, Sprite* output_sprite) -> const TextureResource*
     {

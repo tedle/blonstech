@@ -85,11 +85,12 @@ void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<Text
     vs[3].pos.x = units::pixel_to_subpixel(width); vs[3].pos.y = 0.0f;
 
     // Invert texture coordinates cus opengl saves them bottom-left
-    // TODO: Find a render API independant solution for this
-    vs[0].tex.x = 0; vs[0].tex.y =  0;
-    vs[1].tex.x = 0; vs[1].tex.y = -1;
-    vs[2].tex.x = 1; vs[2].tex.y = -1;
-    vs[3].tex.x = 1; vs[3].tex.y =  0;
+    // It's absolutely insane that this is not configurable
+    // TODO: Find a render API independent solution for this
+    vs[0].tex.x = 0; vs[0].tex.y = 1;
+    vs[1].tex.x = 0; vs[1].tex.y = 0;
+    vs[2].tex.x = 1; vs[2].tex.y = 0;
+    vs[3].tex.x = 1; vs[3].tex.y = 1;
 
     render_quad_.indices = { 0, 1, 2, 0, 2, 3 };
 

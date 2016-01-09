@@ -63,7 +63,7 @@ void main(void)
     }
     // World coordinates of the pixel we're rendering
     vec4 pos = vec4(tex_coord.x,
-                    tex_coord.y + 1, // Invert and shift Y because FBOs are top-left origin
+                    tex_coord.y,
                     depth_sample,
                     1.0);
     pos = inv_vp_matrix * (pos * 2.0 - 1.0);
