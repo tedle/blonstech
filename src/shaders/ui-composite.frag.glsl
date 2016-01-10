@@ -34,16 +34,20 @@ uniform sampler2D ui;
 
 void main(void)
 {
-    //blur_colour.rgb *= 1.0 - ui_colour.a;
-    //blur_colour.rgb += ui_colour.rgb * ui_colour.a;
-    if (texture(ui, tex_coord).a > 0)
+    vec4 blurred_composite_frag = texture(blurred_composite, tex_coord);
+    vec4 ui_frag = texture(ui, tex_coord);
+    // Pseduo stencil test for blur effect
+    if (ui_frag.a > 0)
     {
-        frag_colour = vec4(0);
-        frag_colour += texture(ui, tex_coord) * 0.001;
-        frag_colour += texture(blurred_composite, tex_coord);// * 0.001;
+        frag_colour.a = 1.0;
+        frag_colour.rgb = mix(blurred_composite_frag.rgb, ui_frag.rgb, ui_frag.a);
     }
+    // Apply drop shadow. We should theoretically do this in both paths,
+    // however this requires weakening the shadows effect to make it look nice
+    // behind windows, causing the actual surrounding drop shadow to be barely visible.
+    // Clamping also results in ugly problems
     else
     {
-        discard;
+        frag_colour = vec4(0.0, 0.0, 0.0, blurred_composite_frag.a);
     }
 }

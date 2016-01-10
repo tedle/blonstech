@@ -40,11 +40,17 @@ void main(void)
     float step = (1.0 / screen_length);
     vec3 blur_colour = vec3(0);
     float shadow = 0;
+    // Glass blur
     blur_colour.rgb += texture(composite, tex_coord - step * 5.230769230769231 * dir).rgb * 0.07027027027027027;
     blur_colour.rgb += texture(composite, tex_coord - step * 2.3846153846153848 * dir).rgb * 0.3162162162162162;
     blur_colour.rgb += texture(composite, tex_coord).rgb * 0.22702702702702704;
     blur_colour.rgb += texture(composite, tex_coord + step * 2.3846153846153848 * dir).rgb * 0.3162162162162162;
     blur_colour.rgb += texture(composite, tex_coord + step * 5.230769230769231 * dir).rgb * 0.07027027027027027;
-    shadow = 1.0 + texture(ui, vec2(tex_coord.x + step, tex_coord.y)).a;
+    // Drop shadow
+    shadow += texture(ui, tex_coord - step * 5.230769230769231 * dir).a * 0.07027027027027027;
+    shadow += texture(ui, tex_coord - step * 2.3846153846153848 * dir).a * 0.3162162162162162;
+    shadow += texture(ui, tex_coord).a * 0.22702702702702704;
+    shadow += texture(ui, tex_coord + step * 2.3846153846153848 * dir).a * 0.3162162162162162;
+    shadow += texture(ui, tex_coord + step * 5.230769230769231 * dir).a * 0.07027027027027027;
     frag_colour = vec4(blur_colour, shadow);
 }

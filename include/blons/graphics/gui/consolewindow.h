@@ -65,13 +65,6 @@ public:
     ~ConsoleWindow() {}
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Submits a drawbatch with mesh data & shader inputs to the parent
-    /// gui::Manager
-    ///
-    /// \param context Handle to the current rendering context
-    ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context) override;
-    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs no input logic of its own, simply forwards input to child
     /// Control%s.
     ///

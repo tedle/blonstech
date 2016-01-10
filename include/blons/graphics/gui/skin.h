@@ -330,17 +330,6 @@ public:
             Vector4 completion_colour = Vector4(0.9f, 0.9f, 1.0f, 0.6f); ///< Colour for tab completion hinting text
             Box cursor = Box(56, 48, 1, 1); ///< Texture coordinates for the text cursor region
         } console; ///< Layout for console controls
-
-        ////////////////////////////////////////////////////////////////////////////////
-        /// \brief Struct with Box%es detailing where to find a pre-rendered drop shadow
-        /// for use by other UI elements
-        ////////////////////////////////////////////////////////////////////////////////
-        struct Dropshadow
-        {
-            Box bottom_left = Box(82, 0, 10, 40);  ///< Texture coordinates for the bottom left region
-            Box bottom = Box(93, 0, 1, 40);        ///< Texture coordinates for the bottom center region
-            Box bottom_right = Box(95, 0, 10, 40); ///< Texture coordinates for the bottom right region
-        } dropshadow; ///< Generic drop shadow layout for controls
     };
 
 public:

@@ -64,25 +64,6 @@ ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, Type 
     hidden_ = true;
 }
 
-void ConsoleWindow::Render(RenderContext& context)
-{
-    auto skin = gui_->skin();
-    auto layout = skin->layout();
-    auto sprite = skin->sprite();
-    auto batch = gui_->control_batch(crop_, feather_, context);
-
-    // Render a drop shadow
-    auto& shadow = layout->dropshadow.bottom;
-    sprite->set_pos(pos_.x,
-                    pos_.y + pos_.h,
-                    pos_.w,
-                    shadow.h);
-    sprite->set_subtexture(shadow);
-    batch->Append(sprite->mesh(), context);
-
-    Window::Render(context);
-}
-
 bool ConsoleWindow::Update(const Input& input)
 {
     slide_.Update();
@@ -103,10 +84,9 @@ void ConsoleWindow::hide()
         show();
         return;
     }
-    auto shadow_height = gui_->skin()->layout()->dropshadow.bottom.h;
-    Animation::Callback cb = [this, shadow_height](float d)
+    Animation::Callback cb = [this](float d)
     {
-        pos_.y = -(pos_.h + shadow_height) * d;
+        pos_.y = -pos_.h * d;
         // Animation has finished
         if (d == 1.0)
         {
@@ -120,10 +100,9 @@ void ConsoleWindow::hide()
 
 void ConsoleWindow::show()
 {
-    auto shadow_height = gui_->skin()->layout()->dropshadow.bottom.h;
-    Animation::Callback cb = [this, shadow_height](float d)
+    Animation::Callback cb = [this](float d)
     {
-        pos_.y = -(pos_.h + shadow_height) * (1.0f - d);
+        pos_.y = -pos_.h * (1.0f - d);
     };
     slide_ = Animation(300, cb, Animation::CUBIC_OUT);
     slide_.Update();

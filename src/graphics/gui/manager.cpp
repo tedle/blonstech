@@ -191,8 +191,8 @@ void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
     }
     // Achieve a fast, strong blur by rendering at a low resolution and skipping over pixels
     // Artifacting is resolved by iterating multiple times, which also further strengthens blur
+    context->SetBlendMode(OVERWRITE);
     blur_shader_->SetInput("proj_matrix", blur_ortho_matrix_, context);
-    blur_shader_->SetInput("ui", ui_buffer_->textures()[0], 1, context);
     for (int i = 0; i < kBlurIterations; i++)
     {
         // It is safe to never clear buffers since it's based off a clean input texture
@@ -201,10 +201,12 @@ void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
         if (i == 0)
         {
             blur_shader_->SetInput("composite", output_buffer->textures()[0], 0, context);
+            blur_shader_->SetInput("ui", ui_buffer_->textures()[0], 1, context);
         }
         else
         {
             blur_shader_->SetInput("composite", blur_buffer_b_->textures()[0], 0, context);
+            blur_shader_->SetInput("ui", blur_buffer_b_->textures()[0], 1, context);
         }
         // Uniform inputs are faster than alternating 2 separate shaders
         blur_shader_->SetInput("horizontal", 1.0f, context);
@@ -214,11 +216,12 @@ void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
         blur_buffer_b_->Bind(false, context);
         blur_buffer_b_->Render(context);
         blur_shader_->SetInput("composite", blur_buffer_a_->textures()[0], 0, context);
+        blur_shader_->SetInput("ui", blur_buffer_a_->textures()[0], 1, context);
         blur_shader_->SetInput("horizontal", 0.0f, context);
         blur_shader_->SetInput("screen_length", screen_dimensions_.h / kBlurFactor, context);
         blur_shader_->Render(blur_buffer_b_->index_count(), context);
     }
-
+    context->SetBlendMode(ALPHA);
     output_buffer->Bind(false, context);
     output_buffer->Render(context);
     composite_shader_->SetInput("proj_matrix", ortho_matrix_, context);
