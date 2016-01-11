@@ -25,13 +25,18 @@
 
 namespace blons
 {
-Sprite::Sprite(std::string texture_filename, RenderContext& context)
+Sprite::Sprite(std::string texture_filename, TextureType::Options options, RenderContext& context)
 {
-    texture_.reset(new Texture(texture_filename, { TextureType::RAW, TextureType::NEAREST, TextureType::REPEAT }, context));
+    texture_.reset(new Texture(texture_filename, options, context));
     if (!Init(context))
     {
         throw "Failed to register sprite";
     }
+}
+
+Sprite::Sprite(std::string texture_filename, RenderContext& context)
+    : Sprite::Sprite(texture_filename, { TextureType::RAW, TextureType::NEAREST, TextureType::REPEAT }, context)
+{
 }
 
 Sprite::Sprite(const PixelData& texture_data, RenderContext& context)

@@ -42,6 +42,16 @@ public:
     /// \brief Initializes a new sprite from an image file. Will throw on failure
     ///
     /// \param texture_filename Image file on disk
+    /// \param options Compression, filter, and wrapping options
+    /// \param context Handle to the current rendering context
+    ////////////////////////////////////////////////////////////////////////////////
+    Sprite(std::string texture_filename, TextureType::Options options, RenderContext& context);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes a new sprite from an image file. Uses default texture
+    /// options of TextureType::RAW, TextureType::NEAREST, and TextureType::REPEAT.
+    /// Will throw on failure
+    ///
+    /// \param texture_filename Image file on disk
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     Sprite(std::string texture_filename, RenderContext& context);
