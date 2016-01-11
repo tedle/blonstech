@@ -33,7 +33,7 @@ namespace gui
 Skin::Skin(RenderContext& context)
 {
     // TODO: Load from user supplied image
-    skin_.reset(new Sprite("skin.png", context));
+    skin_.reset(new Sprite("skin.png", { TextureType::RAW, TextureType::LINEAR, TextureType::CLAMP }, context));
 
     // TODO: Ensure DEFAULT font is somehow not nullptr before being handed over to user
     font_list_[DEFAULT] = nullptr;

@@ -95,15 +95,15 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             Button normal = Button
             {
-                Box(0, 45, 5, 5), // top_left
-                Box(6, 45, 1, 5), // top
-                Box(8, 45, 5, 5), // top_right
-                Box(0, 51, 5, 1), // left
-                Box(6, 51, 1, 1), // body
-                Box(8, 51, 5, 1), // right
-                Box(0, 53, 5, 5), // bottom_left
-                Box(6, 53, 1, 5), // bottom
-                Box(8, 53, 5, 5), // bottom_right
+                Box(1,  53, 5, 5), // top_left
+                Box(9,  53, 1, 5), // top
+                Box(13, 53, 5, 5), // top_right
+                Box(1,  61, 5, 1), // left
+                Box(9,  61, 1, 1), // body
+                Box(13, 61, 5, 1), // right
+                Box(1,  65, 5, 5), // bottom_left
+                Box(9,  65, 1, 5), // bottom
+                Box(13, 65, 5, 5), // bottom_right
                 Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
             ////////////////////////////////////////////////////////////////////////////////
@@ -111,15 +111,15 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             Button hover = Button
             {
-                Box(0, 59, 5, 5), // top_left
-                Box(6, 59, 1, 5), // top
-                Box(8, 59, 5, 5), // top_right
-                Box(0, 65, 5, 1), // left
-                Box(6, 65, 1, 1), // body
-                Box(8, 65, 5, 1), // right
-                Box(0, 67, 5, 5), // bottom_left
-                Box(6, 67, 1, 5), // bottom
-                Box(8, 67, 5, 5), // bottom_right
+                Box(1,  73, 5, 5), // top_left
+                Box(9,  73, 1, 5), // top
+                Box(13, 73, 5, 5), // top_right
+                Box(1,  81, 5, 1), // left
+                Box(9,  81, 1, 1), // body
+                Box(13, 81, 5, 1), // right
+                Box(1,  85, 5, 5), // bottom_left
+                Box(9,  85, 1, 5), // bottom
+                Box(13, 85, 5, 5), // bottom_right
                 Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
             ////////////////////////////////////////////////////////////////////////////////
@@ -127,15 +127,15 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             Button active = Button
             {
-                Box(0, 73, 5, 5), // top_left
-                Box(6, 73, 1, 5), // top
-                Box(8, 73, 5, 5), // top_right
-                Box(0, 79, 5, 1), // left
-                Box(6, 79, 1, 1), // body
-                Box(8, 79, 5, 1), // right
-                Box(0, 81, 5, 5), // bottom_left
-                Box(6, 81, 1, 5), // bottom
-                Box(8, 81, 5, 5), // bottom_right
+                Box(1,  93,  5, 5), // top_left
+                Box(9,  93,  1, 5), // top
+                Box(13, 93,  5, 5), // top_right
+                Box(1,  101, 5, 1), // left
+                Box(9,  101, 1, 1), // body
+                Box(13, 101, 5, 1), // right
+                Box(1,  105, 5, 5), // bottom_left
+                Box(9,  105, 1, 5), // bottom
+                Box(13, 105, 5, 5), // bottom_right
                 Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
         } button; ///< Layouts for various button states
@@ -164,15 +164,15 @@ public:
         ////////////////////////////////////////////////////////////////////////////////
         Textarea textarea = Textarea
         {
-            Box(14, 28, 5, 5), // top_left
-            Box(20, 28, 1, 5), // top
-            Box(22, 28, 5, 5), // top_right
-            Box(14, 34, 5, 1), // left
-            Box(20, 34, 1, 1), // body
-            Box(22, 34, 5, 1), // right
-            Box(14, 36, 5, 5), // bottom_left
-            Box(20, 36, 1, 5), // bottom
-            Box(22, 36, 5, 5), // bottom_right
+            Box(21, 41, 5, 5), // top_left
+            Box(29, 41, 1, 5), // top
+            Box(33, 41, 5, 5), // top_right
+            Box(21, 49, 5, 1), // left
+            Box(29, 49, 1, 1), // body
+            Box(33, 49, 5, 1), // right
+            Box(21, 53, 5, 5), // bottom_left
+            Box(29, 53, 1, 5), // bottom
+            Box(33, 53, 5, 5), // bottom_right
             Vector4(1.0, 1.0, 1.0, 1.0) // text colour
         };
 
@@ -206,15 +206,15 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             Textbox normal = Textbox
             {
-                Box(14, 0, 5, 5), // top_left
-                Box(20, 0, 1, 5), // top
-                Box(22, 0, 5, 5), // top_right
-                Box(14, 6, 5, 1), // left
-                Box(20, 6, 1, 1), // body
-                Box(22, 6, 5, 1), // right
-                Box(14, 8, 5, 5), // bottom_left
-                Box(20, 8, 1, 5), // bottom
-                Box(22, 8, 5, 5), // bottom_right
+                Box(21, 1,  5, 5), // top_left
+                Box(29, 1,  1, 5), // top
+                Box(33, 1,  5, 5), // top_right
+                Box(21, 9,  5, 1), // left
+                Box(29, 9,  1, 1), // body
+                Box(33, 9,  5, 1), // right
+                Box(21, 13, 5, 5), // bottom_left
+                Box(29, 13, 1, 5), // bottom
+                Box(33, 13, 5, 5), // bottom_right
                 Vector4(0.8f, 0.8f, 0.8f, 1.0) // text colour
             };
             ////////////////////////////////////////////////////////////////////////////////
@@ -223,36 +223,36 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             Textbox active = Textbox
             {
-                Box(14, 14, 5, 5), // top_left
-                Box(20, 14, 1, 5), // top
-                Box(22, 14, 5, 5), // top_right
-                Box(14, 20, 5, 1), // left
-                Box(20, 20, 1, 1), // body
-                Box(22, 20, 5, 1), // right
-                Box(14, 22, 5, 5), // bottom_left
-                Box(20, 22, 1, 5), // bottom
-                Box(22, 22, 5, 5), // bottom_right
+                Box(21, 21, 5, 5), // top_left
+                Box(29, 21, 1, 5), // top
+                Box(33, 21, 5, 5), // top_right
+                Box(21, 29, 5, 1), // left
+                Box(29, 29, 1, 1), // body
+                Box(33, 29, 5, 1), // right
+                Box(21, 33, 5, 5), // bottom_left
+                Box(29, 33, 1, 5), // bottom
+                Box(33, 33, 5, 5), // bottom_right
                 Vector4(1.0, 1.0, 1.0, 1.0) // text colour
             };
             ////////////////////////////////////////////////////////////////////////////////
             /// \brief Drawn where text insertion takes place. Stretched in all directions
             /// to fit with font specifications
             ////////////////////////////////////////////////////////////////////////////////
-            Box cursor = Box(14, 42, 1, 1);
+            Box cursor = Box(21, 81, 1, 1);
             ////////////////////////////////////////////////////////////////////////////////
             /// \brief Displays on progress based textboxes like gui::DebugSlider
             ////////////////////////////////////////////////////////////////////////////////
             Textbox progress = Textbox
             {
-                Box(14, 44, 5, 5), // top_left
-                Box(20, 44, 1, 5), // top
-                Box(22, 44, 5, 5), // top_right
-                Box(14, 50, 5, 1), // left
-                Box(20, 50, 1, 1), // body
-                Box(22, 50, 5, 1), // right
-                Box(14, 52, 5, 5), // bottom_left
-                Box(20, 52, 1, 5), // bottom
-                Box(22, 52, 5, 5), // bottom_right
+                Box(21, 61, 5, 5), // top_left
+                Box(29, 61, 1, 5), // top
+                Box(33, 61, 5, 5), // top_right
+                Box(21, 69, 5, 1), // left
+                Box(29, 69, 1, 1), // body
+                Box(33, 69, 5, 1), // right
+                Box(21, 73, 5, 5), // bottom_left
+                Box(29, 73, 1, 5), // bottom
+                Box(33, 73, 5, 5), // bottom_right
                 // TODO: Implement overlaid text colour
                 Vector4(1.0, 0.0, 0.0, 1.0) // text colour
             };
@@ -272,20 +272,20 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             struct Titlebar
             {
-                Box left = Box(0, 0, 5, 30);   ///< Texture coordinates for the left edge region
-                Box center = Box(6, 0, 1, 30); ///< Texture coordinates for the center body region
-                Box right = Box(8, 0, 5, 30);  ///< Texture coordinates for the right edge region
+                Box left = Box(1, 0, 5, 30);   ///< Texture coordinates for the left edge region
+                Box center = Box(9, 0, 1, 30); ///< Texture coordinates for the center body region
+                Box right = Box(13, 0, 5, 30); ///< Texture coordinates for the right edge region
                 Vector4 colour = Vector4(0.25f, 0.25f, 0.25f, 1.0); ///< Colour of the window caption
             } title; ///< Layout for the window's titlebar
-            Box top_left = Box(0, 31, 5, 5);     ///< Texture coordinates for the top left region
-            Box top = Box(6, 31, 1, 5);          ///< Texture coordinates for the top edge region
-            Box top_right = Box(8, 31, 5, 5);    ///< Texture coordinates for the top right region
-            Box left = Box(0, 37, 5, 1);         ///< Texture coordinates for the left edge region
-            Box body = Box(6, 37, 1, 1);         ///< Texture coordinates for the body region
-            Box right = Box(8, 37, 5, 1);        ///< Texture coordinates for the right edge region
-            Box bottom_left = Box(0, 39, 5, 5);  ///< Texture coordinates for the bottom left region
-            Box bottom = Box(6, 39, 1, 5);       ///< Texture coordinates for the bottom edge region
-            Box bottom_right = Box(8, 39, 5, 5); ///< Texture coordinates for the bottom right region
+            Box top_left = Box(1, 33, 5, 5);      ///< Texture coordinates for the top left region
+            Box top = Box(9, 33, 1, 5);           ///< Texture coordinates for the top edge region
+            Box top_right = Box(13, 33, 5, 5);    ///< Texture coordinates for the top right region
+            Box left = Box(1, 41, 5, 1);          ///< Texture coordinates for the left edge region
+            Box body = Box(9, 41, 1, 1);          ///< Texture coordinates for the body region
+            Box right = Box(13, 41, 5, 1);        ///< Texture coordinates for the right edge region
+            Box bottom_left = Box(1, 45, 5, 5);   ///< Texture coordinates for the bottom left region
+            Box bottom = Box(9, 45, 1, 5);        ///< Texture coordinates for the bottom edge region
+            Box bottom_right = Box(13, 45, 5, 5); ///< Texture coordinates for the bottom right region
             Vector4 colour = Vector4(1.0, 1.0, 1.0, 1.0); ///< Default colour of labels
         } window; ///< Layout for windows
 
@@ -300,15 +300,15 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             Textarea textarea = Textarea
             {
-                Box(56, 0, 10, 10),  // top_left
-                Box(67, 0, 1, 10),   // top
-                Box(69, 0, 10, 10),  // top_right
-                Box(56, 11, 10, 23), // left
-                Box(67, 11, 1, 23),  // body
-                Box(69, 11, 10, 23), // right
-                Box(56, 35, 10, 10), // bottom_left
-                Box(67, 35, 1, 10),  // bottom
-                Box(69, 35, 10, 10), // bottom_right
+                Box(75, 1, 10, 10),  // top_left
+                Box(88, 1, 1, 10),   // top
+                Box(92, 1, 10, 10),  // top_right
+                Box(75, 14, 10, 23), // left
+                Box(88, 14, 1, 23),  // body
+                Box(92, 14, 10, 23), // right
+                Box(75, 40, 10, 10), // bottom_left
+                Box(88, 40, 1, 10),  // bottom
+                Box(92, 40, 10, 10), // bottom_right
                 Vector4(0.9f, 0.9f, 0.9f, 1.0) // text colour
             };
             ////////////////////////////////////////////////////////////////////////////////
@@ -316,19 +316,19 @@ public:
             ////////////////////////////////////////////////////////////////////////////////
             Textbox textbox = Textbox
             {
-                Box(30, 0, 10, 10),  // top_left
-                Box(41, 0, 1, 10),   // top
-                Box(43, 0, 10, 10),  // top_right
-                Box(30, 11, 10, 1),  // left
-                Box(41, 11, 1, 1),   // body
-                Box(43, 11, 10, 1),  // right
-                Box(30, 13, 10, 10), // bottom_left
-                Box(41, 13, 1, 10),  // bottom
-                Box(43, 13, 10, 10), // bottom_right
+                Box(43, 1, 10, 10),  // top_left
+                Box(56, 1, 1, 10),   // top
+                Box(60, 1, 10, 10),  // top_right
+                Box(43, 14, 10, 1),  // left
+                Box(56, 14, 1, 1),   // body
+                Box(60, 14, 10, 1),  // right
+                Box(43, 18, 10, 10), // bottom_left
+                Box(56, 18, 1, 10),  // bottom
+                Box(60, 18, 10, 10), // bottom_right
                 Vector4(0.9f, 0.9f, 0.9f, 1.0f) // text colour
             };
             Vector4 completion_colour = Vector4(0.9f, 0.9f, 1.0f, 0.6f); ///< Colour for tab completion hinting text
-            Box cursor = Box(56, 48, 1, 1); ///< Texture coordinates for the text cursor region
+            Box cursor = Box(75, 55, 1, 1); ///< Texture coordinates for the text cursor region
         } console; ///< Layout for console controls
     };
 
