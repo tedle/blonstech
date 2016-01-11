@@ -118,16 +118,16 @@ Lightprobe::Lightprobe(Perspective perspective, RenderContext& context)
     }
 
     // Framebuffers
-    indirect_light_buffer_.reset(new Framebuffer(perspective.width / kLightInverseScale, perspective.height / kLightInverseScale, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context));
-    light_map_lookup_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32, TextureHint::NEAREST }, { TextureHint::R8G8B8, TextureHint::NEAREST } }, false, context));
-    direct_light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context));
-    indirect_light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureHint::R32G32B32A32, TextureHint::LINEAR } }, false, context));
+    indirect_light_buffer_.reset(new Framebuffer(perspective.width / kLightInverseScale, perspective.height / kLightInverseScale, { { TextureType::R32G32B32A32, TextureType::LINEAR } }, false, context));
+    light_map_lookup_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureType::R32G32B32, TextureType::NEAREST }, { TextureType::R8G8B8, TextureType::NEAREST } }, false, context));
+    direct_light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureType::R32G32B32A32, TextureType::LINEAR } }, false, context));
+    indirect_light_map_accumulation_buffer_.reset(new Framebuffer(kLightMapResolution, kLightMapResolution, { { TextureType::R32G32B32A32, TextureType::LINEAR } }, false, context));
     // TODO: Should tex map buffer be linearly sampled or nearest? (Currently linear)
     //     Linear would make smoother lightmaps
     //     Nearest would prevent bleeding between geometry edges
     probe_map_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), 2, context));
-    probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context));
-    probe_coefficients_buffer_.reset(new Framebuffer(9, static_cast<int>(probes_.size()), { { TextureHint::R8G8B8, TextureHint::NEAREST } }, context));
+    probe_buffer_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<int>(probes_.size()), { { TextureType::R8G8B8, TextureType::NEAREST } }, context));
+    probe_coefficients_buffer_.reset(new Framebuffer(9, static_cast<int>(probes_.size()), { { TextureType::R8G8B8, TextureType::NEAREST } }, context));
 }
 
 // Renders the scene geometry to a lightmap by using the light-depth buffer

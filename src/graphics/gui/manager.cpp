@@ -65,10 +65,10 @@ void Manager::Init(units::pixel width, units::pixel height, RenderContext& conte
     blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-blur.frag.glsl", ui_inputs, context));
     composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-composite.frag.glsl", ui_inputs, context));
 
-    ui_buffer_.reset(new Framebuffer(width, height, { { TextureHint::R8G8B8A8, TextureHint::LINEAR, TextureHint::CLAMP } }, false, context));
-    blur_buffer_a_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureHint::R8G8B8A8, TextureHint::LINEAR, TextureHint::CLAMP } }, false, context));
-    blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureHint::R8G8B8A8, TextureHint::LINEAR, TextureHint::CLAMP } }, false, context));
-    //blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureHint::R8G8B8A8, TextureHint::LINEAR } }, false, context));
+    ui_buffer_.reset(new Framebuffer(width, height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false, context));
+    blur_buffer_a_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false, context));
+    blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false, context));
+    //blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR } }, false, context));
 
     skin_.reset(new Skin(context));
 

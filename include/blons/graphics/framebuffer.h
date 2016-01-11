@@ -45,19 +45,19 @@ public:
     /// \param store_depth If true will store the depth buffer as a texture
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureHint> texture_formats, bool store_depth, RenderContext& context);
+    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureHint>, bool, RenderContext&)
+    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool, RenderContext&)
     /// with a default store_depth of true
     ////////////////////////////////////////////////////////////////////////////////
-    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureHint> texture_formats, RenderContext& context);
+    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureHint>, bool, RenderContext&)
+    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool, RenderContext&)
     /// with a default texture list of {R8B8G8, LINEAR, CLAMP}
     ////////////////////////////////////////////////////////////////////////////////
     Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, bool store_depth, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureHint>, bool, RenderContext&)
+    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool, RenderContext&)
     /// with a default texture list of {R8B8G8, LINEAR, CLAMP} and a store_depth of true
     ////////////////////////////////////////////////////////////////////////////////
     Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, RenderContext& context);
@@ -134,7 +134,7 @@ public:
     const TextureResource* depth();
 
 private:
-    void Init(units::pixel width, units::pixel height, std::vector<TextureHint> texture_formats, bool store_depth, RenderContext& context);
+    void Init(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth, RenderContext& context);
 
     std::unique_ptr<FramebufferResource> fbo_;
 

@@ -118,7 +118,7 @@ MeshBuffer LoadMesh(const std::string& filename, RenderContext& context)
     return buffer;
 }
 
-TextureBuffer LoadTexture(const std::string& filename, Texture::Type type, RenderContext& context)
+TextureBuffer LoadTexture(const std::string& filename, TextureType::Options options, RenderContext& context)
 {
     // Get texture data for file, or create fresh texture data if new
     auto& tex = g_texture_cache[filename];
@@ -151,18 +151,12 @@ TextureBuffer LoadTexture(const std::string& filename, Texture::Type type, Rende
             return TextureBuffer();
         }
 
-        if (type == Texture::SPRITE)
+        if (options.compression != TextureType::AUTO)
         {
-            // No DDS compression or mipmaps + nearest neighbour filtering
-            tex.pixels->compression = PixelData::RAW;
-            tex.pixels->hint.filter = TextureHint::NEAREST;
-            tex.pixels->hint.wrap = TextureHint::REPEAT;
+            tex.pixels->type.compression = options.compression;
         }
-        else if (type == Texture::LIGHT)
-        {
-            // Get the most out of our lightmaps...
-            tex.pixels->compression = PixelData::RAW;
-        }
+        tex.pixels->type.filter = options.filter;
+        tex.pixels->type.wrap = options.wrap;
 
         if (!context->RegisterTexture(texture.get(), tex.pixels.get()))
         {
@@ -178,7 +172,7 @@ TextureBuffer LoadTexture(const std::string& filename, Texture::Type type, Rende
     buffer.texture = tex.texture;
     buffer.info.width = tex.pixels->width;
     buffer.info.height = tex.pixels->height;
-    buffer.info.type = type;
+    buffer.info.type = tex.pixels->type;
 
     return buffer;
 }

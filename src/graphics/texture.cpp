@@ -28,21 +28,21 @@
 
 namespace blons
 {
-Texture::Texture(std::string filename, Type type, RenderContext& context)
+Texture::Texture(std::string filename, TextureType::Options options, RenderContext& context)
 {
-    if (!Init(filename, type, context))
+    if (!Init(filename, options, context))
     {
         throw "Failed to load texture";
     }
 }
 
-bool Texture::Init(std::string filename, Type type, RenderContext& context)
+bool Texture::Init(std::string filename, TextureType::Options options, RenderContext& context)
 {
     filename_ = filename;
     pixel_data_ = nullptr;
     pixel_data_3d_ = nullptr;
 
-    auto tex = resource::LoadTexture(filename, type, context);
+    auto tex = resource::LoadTexture(filename, options, context);
     texture_ = std::move(tex.texture);
     info_ = tex.info;
     if (texture_ == nullptr)
@@ -81,7 +81,7 @@ bool Texture::Init(const PixelData& pixels, RenderContext& context)
     info_.width = pixel_data_->width;
     info_.height = pixel_data_->height;
     info_.depth = 1;
-    info_.type = CUSTOM;
+    info_.type = pixel_data_->type;
 
     return true;
 }
@@ -115,7 +115,7 @@ bool Texture::Init(const PixelData3D& pixels, RenderContext& context)
     info_.width = pixel_data_3d_->width;
     info_.height = pixel_data_3d_->height;
     info_.depth = pixel_data_3d_->depth;
-    info_.type = CUSTOM;
+    info_.type = pixel_data_3d_->type;
 
     return true;
 }
@@ -124,7 +124,7 @@ bool Texture::Reload(RenderContext& context)
 {
     if (filename_.length() > 0)
     {
-        return Init(filename_, info_.type, context);
+        return Init(filename_, { info_.type.compression, info_.type.filter, info_.type.wrap }, context);
     }
 
     else if (pixel_data_ != nullptr)

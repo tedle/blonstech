@@ -549,7 +549,7 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
 
 bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
                                      units::pixel width, units::pixel height,
-                                     std::vector<TextureHint> formats, bool store_depth)
+                                     std::vector<TextureType> formats, bool store_depth)
 {
     FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
 
@@ -563,7 +563,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
 
     // Creates empty render targets
-    auto make_texture = [&](TextureHint hint)
+    auto make_texture = [&](TextureType type)
     {
         TextureResourceGL40 tex(this);
 
@@ -571,8 +571,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         glGenTextures(1, &tex.texture_);
 
         PixelData pixels;
-        pixels.hint = hint;
-        pixels.compression = PixelData::RAW;
+        pixels.type = type;
         pixels.width = width;
         pixels.height = height;
         pixels.pixels = nullptr;
@@ -585,7 +584,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     std::unique_ptr<GLenum[]> drawbuffers(new GLenum[formats.size()]);
     for (unsigned int i = 0; i < formats.size(); i++)
     {
-        if (formats[i].format != TextureHint::NONE)
+        if (formats[i].format != TextureType::NONE)
         {
             fbo->targets_.push_back(make_texture(formats[i]));
             auto attachment = GL_COLOR_ATTACHMENT0 + i;
@@ -604,7 +603,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo->depth_render_);
 
         // Create and bind the depth target
-        fbo->depth_ = make_texture({ TextureHint::DEPTH, TextureHint::LINEAR, TextureHint::CLAMP });
+        fbo->depth_ = make_texture({ TextureType::DEPTH, TextureType::LINEAR, TextureType::CLAMP });
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_.texture_, 0);
     }
 
@@ -846,60 +845,60 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
     glBindTexture(tex->type_, tex->texture_);
 
     // Upload uncompressed textures manually because it allows us way more format options
-    if (pixels->compression == PixelData::RAW)
+    if (pixels->type.compression == TextureType::RAW)
     {
         GLint internal_format;
         GLint input_format;
         GLenum input_type;
-        switch (pixels->hint.format)
+        switch (pixels->type.format)
         {
-        case TextureHint::A8:
+        case TextureType::A8:
             internal_format = GL_R8;
             input_format = GL_RED;
             input_type = GL_UNSIGNED_BYTE;
             break;
-        case TextureHint::R8G8_UINT:
+        case TextureType::R8G8_UINT:
             internal_format = GL_RG8UI;
             input_format = GL_RG_INTEGER;
             input_type = GL_UNSIGNED_BYTE;
             break;
-        case TextureHint::R8G8B8_UINT:
+        case TextureType::R8G8B8_UINT:
             internal_format = GL_RGB8UI;
             input_format = GL_RGB_INTEGER;
             input_type = GL_UNSIGNED_BYTE;
             break;
-        case TextureHint::R8G8B8A8_UINT:
+        case TextureType::R8G8B8A8_UINT:
             internal_format = GL_RGBA8UI;
             input_format = GL_RGBA_INTEGER;
             input_type = GL_UNSIGNED_BYTE;
             break;
-        case TextureHint::R8G8B8A8:
+        case TextureType::R8G8B8A8:
             internal_format = GL_RGBA8;
             input_format = GL_RGBA;
             input_type = GL_UNSIGNED_BYTE;
             break;
-        case TextureHint::R16G16:
+        case TextureType::R16G16:
             internal_format = GL_RG16;
             input_format = GL_RG;
             input_type = GL_FLOAT;
             break;
-        case TextureHint::R32G32B32:
+        case TextureType::R32G32B32:
             internal_format = GL_RGB32F;
             input_format = GL_RGB;
             input_type = GL_FLOAT;
             break;
-        case TextureHint::R32G32B32A32:
+        case TextureType::R32G32B32A32:
             internal_format = GL_RGBA32F;
             input_format = GL_RGBA;
             input_type = GL_FLOAT;
             break;
-        case TextureHint::DEPTH:
+        case TextureType::DEPTH:
             internal_format = GL_DEPTH_COMPONENT24;
             input_format = GL_DEPTH_COMPONENT;
             input_type = GL_FLOAT;
             break;
-        case TextureHint::NONE:
-        case TextureHint::R8G8B8:
+        case TextureType::NONE:
+        case TextureType::R8G8B8:
         default:
             internal_format = GL_RGB8;
             input_format = GL_RGB;
@@ -912,24 +911,24 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
     else
     {
         unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
-        if (pixels->compression == PixelData::DDS)
+        if (pixels->type.compression == TextureType::DDS)
         {
             soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
         }
-        else if (pixels->compression == PixelData::AUTO)
+        else if (pixels->type.compression == TextureType::AUTO)
         {
             soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_GL_MIPMAPS;
         }
         int channels = 0;
-        switch (pixels->hint.format)
+        switch (pixels->type.format)
         {
-        case TextureHint::A8:
+        case TextureType::A8:
             channels = 1;
             break;
-        case TextureHint::R8G8B8:
+        case TextureType::R8G8B8:
             channels = 3;
             break;
-        case TextureHint::R8G8B8A8:
+        case TextureType::R8G8B8A8:
             channels = 4;
             break;
         default:
@@ -945,7 +944,7 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
     }
 
     // Apply our texture settings (we do this after to override SOIL settings)
-    if (pixels->hint.wrap == TextureHint::CLAMP)
+    if (pixels->type.wrap == TextureType::CLAMP)
     {
         glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -955,10 +954,10 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
         glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
     }
-    if (pixels->hint.filter == TextureHint::NEAREST)
+    if (pixels->type.filter == TextureType::NEAREST)
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        if (pixels->compression == PixelData::AUTO)
+        if (pixels->type.compression == TextureType::AUTO)
         {
             glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
         }
@@ -970,7 +969,7 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
     else
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        if (pixels->compression == PixelData::AUTO)
+        if (pixels->type.compression == TextureType::AUTO)
         {
             glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         }
@@ -998,55 +997,55 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData3D* pixels)
     GLint internal_format;
     GLint input_format;
     GLenum input_type;
-    switch (pixels->hint.format)
+    switch (pixels->type.format)
     {
-    case TextureHint::A8:
+    case TextureType::A8:
         internal_format = GL_R8;
         input_format = GL_RED;
         input_type = GL_UNSIGNED_BYTE;
         break;
-    case TextureHint::R8G8_UINT:
+    case TextureType::R8G8_UINT:
         internal_format = GL_RG8UI;
         input_format = GL_RG_INTEGER;
         input_type = GL_UNSIGNED_BYTE;
         break;
-    case TextureHint::R8G8B8_UINT:
+    case TextureType::R8G8B8_UINT:
         internal_format = GL_RGB8UI;
         input_format = GL_RGB_INTEGER;
         input_type = GL_UNSIGNED_BYTE;
         break;
-    case TextureHint::R8G8B8A8_UINT:
+    case TextureType::R8G8B8A8_UINT:
         internal_format = GL_RGBA8UI;
         input_format = GL_RGBA_INTEGER;
         input_type = GL_UNSIGNED_BYTE;
         break;
-    case TextureHint::R8G8B8A8:
+    case TextureType::R8G8B8A8:
         internal_format = GL_RGBA8;
         input_format = GL_RGBA;
         input_type = GL_UNSIGNED_BYTE;
         break;
-    case TextureHint::R16G16:
+    case TextureType::R16G16:
         internal_format = GL_RG16;
         input_format = GL_RG;
         input_type = GL_FLOAT;
         break;
-    case TextureHint::R32G32B32:
+    case TextureType::R32G32B32:
         internal_format = GL_RGB32F;
         input_format = GL_RGB;
         input_type = GL_FLOAT;
         break;
-    case TextureHint::R32G32B32A32:
+    case TextureType::R32G32B32A32:
         internal_format = GL_RGBA32F;
         input_format = GL_RGBA;
         input_type = GL_FLOAT;
         break;
-    case TextureHint::DEPTH:
+    case TextureType::DEPTH:
         internal_format = GL_DEPTH_COMPONENT24;
         input_format = GL_DEPTH_COMPONENT;
         input_type = GL_FLOAT;
         break;
-    case TextureHint::NONE:
-    case TextureHint::R8G8B8:
+    case TextureType::NONE:
+    case TextureType::R8G8B8:
     default:
         internal_format = GL_RGB8;
         input_format = GL_RGB;
@@ -1056,7 +1055,7 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData3D* pixels)
     glTexImage3D(tex->type_, 0, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.get());
 
     // Apply our texture settings (we do this after to override SOIL settings)
-    if (pixels->hint.wrap == TextureHint::CLAMP)
+    if (pixels->type.wrap == TextureType::CLAMP)
     {
         glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -1068,7 +1067,7 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData3D* pixels)
         glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(tex->type_, GL_TEXTURE_WRAP_R, GL_REPEAT);
     }
-    if (pixels->hint.filter == TextureHint::NEAREST)
+    if (pixels->type.filter == TextureType::NEAREST)
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -1227,26 +1226,26 @@ bool RenderGL40::LoadPixelData(std::string filename, PixelData* data)
 
     if (filetype == ".dds")
     {
-        data->compression = PixelData::DDS;
+        data->type.compression = TextureType::DDS;
     }
     else
     {
-        data->compression = PixelData::AUTO;
+        data->type.compression = TextureType::AUTO;
     }
 
     switch (channels)
     {
     case 1:
-        data->hint.format = TextureHint::A8;
+        data->type.format = TextureType::A8;
         break;
     case 3:
-        data->hint.format = TextureHint::R8G8B8;
+        data->type.format = TextureType::R8G8B8;
         break;
     case 4:
-        data->hint.format = TextureHint::R8G8B8A8;
+        data->type.format = TextureType::R8G8B8A8;
         break;
     default:
-        data->hint.format = TextureHint::R8G8B8A8;
+        data->type.format = TextureType::R8G8B8A8;
         break;
     }
     return true;

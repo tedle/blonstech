@@ -39,18 +39,6 @@ class Texture
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Used to determine texture usage
-    ////////////////////////////////////////////////////////////////////////////////
-    enum Type
-    {
-        ALBEDO, ///< Used for colouring 3D models
-        NORMAL, ///< Used for bump mapping 3D models
-        LIGHT,  ///< Used for lighting 3D models
-        SPRITE, ///< Used for 2D rendering, ensures PixelData::RAW texture format
-        CUSTOM  ///< Uses custom render settings determined by initializer
-    };
-
-    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Contains texture info such as size and type
     ////////////////////////////////////////////////////////////////////////////////
     struct Info
@@ -58,7 +46,7 @@ public:
         units::pixel width;  ///< Width of the texture in pixels
         units::pixel height; ///< Height of the texture in pixels
         units::pixel depth;  ///< Depth of the texture in pixels
-        Type type;           ///< Usage of the texture
+        TextureType type;    ///< Texture format and behaviour info
     };
 
 public:
@@ -66,10 +54,10 @@ public:
     /// \brief Initializes a new texture from an image file. Will throw on failure
     ///
     /// \param filename Image file on disk
-    /// \param type Usage of the texture
+    /// \param options Texture filtering and wrapping options
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Texture(std::string filename, Type type, RenderContext& context);
+    Texture(std::string filename, TextureType::Options options, RenderContext& context);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Initializes a new texture from raw pixel data. Will throw on failure
     ///
@@ -105,7 +93,7 @@ public:
     const TextureResource* texture() const;
 
 private:
-    bool Init(std::string filename, Type type, RenderContext& context);
+    bool Init(std::string filename, TextureType::Options options, RenderContext& context);
     bool Init(const PixelData& pixels, RenderContext& context);
     bool Init(const PixelData3D& pixels, RenderContext& context);
 

@@ -38,7 +38,7 @@ namespace blons
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Contains formatting information for creating new textures
 ////////////////////////////////////////////////////////////////////////////////
-struct TextureHint
+struct TextureType
 {
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Determines the bit format of a texture
@@ -59,6 +59,16 @@ struct TextureHint
     } format; ///< \copybrief Format
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Determines the format and rendering options of a texture
+    ////////////////////////////////////////////////////////////////////////////////
+    enum Compression
+    {
+        AUTO,      ///< Compresses to DXT5 & generates mipmaps
+        DDS,       ///< Uses mipmaps & compression from image file
+        RAW        ///< Will not generate mipmaps, will not compress on GPU
+    } compression; ///< \copybrief Compression
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Determines the filtering for texture access
     ////////////////////////////////////////////////////////////////////////////////
     enum Filter
@@ -67,16 +77,28 @@ struct TextureHint
         LINEAR   ///< Linear filtering
     } filter; ///< \copybrief Filter
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Determines the UV wrapping behaviour for texture access
+    ////////////////////////////////////////////////////////////////////////////////
     enum Wrap
     {
-        CLAMP,
-        REPEAT
-    } wrap;
+        CLAMP, ///< Samples edge pixel when out of bounds
+        REPEAT ///< Tiled repetition
+    } wrap; ///< \copybrief Wrap
 
-    TextureHint(Format format, Filter filter, Wrap wrap) : format(format), filter(filter), wrap(wrap) {}
-    TextureHint(Format format, Filter filter) : TextureHint(format, filter, REPEAT) {}
-    TextureHint(Format format) : TextureHint(format, NEAREST, REPEAT) {}
-    TextureHint() : TextureHint(NONE, NEAREST, REPEAT) {}
+    struct Options { Compression compression; Filter filter; Wrap wrap; };
+
+    TextureType(Format format, Compression compression, Filter filter, Wrap wrap) : format(format), compression(compression), filter(filter), wrap(wrap) {}
+
+    TextureType(Format format, Compression compression, Filter filter) : TextureType(format, compression, filter, REPEAT) {}
+    TextureType(Format format, Filter filter, Wrap wrap) : TextureType(format, RAW, filter, wrap) {}
+
+    TextureType(Format format, Compression compression) : TextureType(format, compression, NEAREST, REPEAT) {}
+    TextureType(Format format, Filter filter) : TextureType(format, RAW, filter, REPEAT) {}
+
+    TextureType(Format format) : TextureType(format, RAW, NEAREST, REPEAT) {}
+
+    TextureType() : TextureType(NONE, RAW, NEAREST, REPEAT) {}
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -132,19 +154,9 @@ struct PixelData
     ////////////////////////////////////////////////////////////////////////////////
     units::pixel height;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Determines the pixel format and filtering of a texture
+    /// \brief Determines the texture storage and behaviour options
     ////////////////////////////////////////////////////////////////////////////////
-    TextureHint hint;
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Determines the format and rendering options of a texture
-    ////////////////////////////////////////////////////////////////////////////////
-    enum Compression
-    {
-        AUTO,      ///< Compresses to DXT5 & generates mipmaps
-        DDS,       ///< Uses mipmaps & compression from image file
-        RAW        ///< Will not generate mipmaps, will not compress on GPU
-    } compression; ///< \copybrief Compression
+    TextureType type;
 
     PixelData() {}
     ////////////////////////////////////////////////////////////////////////////////
@@ -155,28 +167,27 @@ struct PixelData
     {
         this->width = p.width;
         this->height = p.height;
-        this->hint = p.hint;
-        this->compression = p.compression;
+        this->type = p.type;
         int bits;
-        switch (this->hint.format)
+        switch (this->type.format)
         {
-        case TextureHint::A8:
+        case TextureType::A8:
             bits = 8;
             break;
-        case TextureHint::R8G8_UINT:
+        case TextureType::R8G8_UINT:
             bits = 16;
             break;
-        case TextureHint::R8G8B8:
+        case TextureType::R8G8B8:
             bits = 24;
             break;
-        case TextureHint::R16G16:
-        case TextureHint::R8G8B8A8:
+        case TextureType::R16G16:
+        case TextureType::R8G8B8A8:
             bits = 32;
             break;
-        case TextureHint::R32G32B32:
+        case TextureType::R32G32B32:
             bits = 96;
             break;
-        case TextureHint::NONE:
+        case TextureType::NONE:
         default:
             assert(false);
             break;
@@ -209,9 +220,9 @@ struct PixelData3D
     ////////////////////////////////////////////////////////////////////////////////
     units::pixel depth;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Determines the pixel format and filtering of a texture
+    /// \brief Determines the texture storage and behaviour options
     ////////////////////////////////////////////////////////////////////////////////
-    TextureHint hint;
+    TextureType type;
 
     PixelData3D() {}
     ////////////////////////////////////////////////////////////////////////////////
@@ -223,29 +234,29 @@ struct PixelData3D
         this->width = p.width;
         this->height = p.height;
         this->depth = p.depth;
-        this->hint = p.hint;
+        this->type = p.type;
         int bits;
-        switch (this->hint.format)
+        switch (this->type.format)
         {
-        case TextureHint::A8:
+        case TextureType::A8:
             bits = 8;
             break;
-        case TextureHint::R8G8_UINT:
+        case TextureType::R8G8_UINT:
             bits = 16;
             break;
-        case TextureHint::R8G8B8:
-        case TextureHint::R8G8B8_UINT:
+        case TextureType::R8G8B8:
+        case TextureType::R8G8B8_UINT:
             bits = 24;
             break;
-        case TextureHint::R16G16:
-        case TextureHint::R8G8B8A8:
-        case TextureHint::R8G8B8A8_UINT:
+        case TextureType::R16G16:
+        case TextureType::R8G8B8A8:
+        case TextureType::R8G8B8A8_UINT:
             bits = 32;
             break;
-        case TextureHint::R32G32B32:
+        case TextureType::R32G32B32:
             bits = 96;
             break;
-        case TextureHint::NONE:
+        case TextureType::NONE:
         default:
             assert(false);
             break;
@@ -418,7 +429,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterFramebuffer(FramebufferResource* frame_buffer,
                                      units::pixel width, units::pixel height,
-                                     std::vector<TextureHint> formats, bool store_depth)=0;
+                                     std::vector<TextureType> formats, bool store_depth)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a TextureResource and binds it, combined with the supplied
     /// PixelData, to the graphics API permitting their use for rendering calls.

@@ -133,10 +133,10 @@ std::unordered_map<std::string, std::function<PixelData(const std::string& args)
         "blons:none", [](const std::string& args)
         {
             PixelData none;
-            none.compression = PixelData::RAW;
-            none.hint.format = TextureHint::R8G8B8;
-            none.hint.filter = TextureHint::NEAREST;
-            none.hint.wrap = TextureHint::REPEAT;
+            none.type.format = TextureType::R8G8B8;
+            none.type.compression = TextureType::RAW;
+            none.type.filter = TextureType::NEAREST;
+            none.type.wrap = TextureType::REPEAT;
             none.width = 16;
             none.height = 16;
             none.pixels.reset(new unsigned char[none.width * none.height * 3]);
@@ -157,10 +157,10 @@ std::unordered_map<std::string, std::function<PixelData(const std::string& args)
         "blons:normal", [](const std::string& args)
         {
             PixelData normal;
-            normal.compression = PixelData::RAW;
-            normal.hint.format = TextureHint::R8G8B8;
-            normal.hint.filter = TextureHint::LINEAR;
-            normal.hint.wrap = TextureHint::REPEAT;
+            normal.type.format = TextureType::R8G8B8;
+            normal.type.compression = TextureType::RAW;
+            normal.type.filter = TextureType::LINEAR;
+            normal.type.wrap = TextureType::REPEAT;
             normal.width = 1;
             normal.height = 1;
             normal.pixels.reset(new unsigned char[normal.width * normal.height * 3]);

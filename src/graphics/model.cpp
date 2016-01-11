@@ -35,6 +35,13 @@
 
 namespace blons
 {
+namespace
+{
+TextureType::Options kAlbedoOptions = { TextureType::AUTO, TextureType::LINEAR, TextureType::REPEAT };
+TextureType::Options kNormalOptions = { TextureType::AUTO, TextureType::LINEAR, TextureType::REPEAT };
+TextureType::Options kLightOptions =  { TextureType::RAW,  TextureType::LINEAR, TextureType::REPEAT };
+}
+
 Model::Model(std::string mesh_filename, RenderContext& context)
 {
     mesh_ = nullptr;
@@ -72,7 +79,22 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     {
         std::string tex_file;
         tex_file = tex_folder + tex.filename;
-        auto texture = std::unique_ptr<Texture>(new Texture(tex_file.c_str(), tex.type, context));
+        TextureType::Options tex_options;
+        switch (tex.type)
+        {
+        case Mesh::TextureInfo::ALBEDO:
+            tex_options = kAlbedoOptions;
+            break;
+        case Mesh::TextureInfo::NORMAL:
+            tex_options = kNormalOptions;
+            break;
+        case Mesh::TextureInfo::LIGHT:
+            tex_options = kLightOptions;
+            break;
+        default:
+            throw "Unknown texture type in mesh file";
+        }
+        auto texture = std::unique_ptr<Texture>(new Texture(tex_file.c_str(), tex_options, context));
 
         if (texture == nullptr)
         {
@@ -80,30 +102,30 @@ Model::Model(std::string mesh_filename, RenderContext& context)
         }
 
         // Transfer new texture to aproppriate member
-        if (tex.type == Texture::ALBEDO)
+        if (tex.type == Mesh::TextureInfo::ALBEDO)
         {
             albedo_texture_ = std::move(texture);
         }
-        else if (tex.type == Texture::NORMAL)
+        else if (tex.type == Mesh::TextureInfo::NORMAL)
         {
             normal_texture_ = std::move(texture);
         }
-        else if (tex.type == Texture::LIGHT)
+        else if (tex.type == Mesh::TextureInfo::LIGHT)
         {
             light_texture_ = std::move(texture);
         }
     }
     if (albedo_texture_ == nullptr)
     {
-        albedo_texture_.reset(new Texture("blons:none", Texture::ALBEDO, context));
+        albedo_texture_.reset(new Texture("blons:none", kAlbedoOptions, context));
     }
     if (normal_texture_ == nullptr)
     {
-        normal_texture_.reset(new Texture("blons:normal", Texture::NORMAL, context));
+        normal_texture_.reset(new Texture("blons:normal", kNormalOptions, context));
     }
     if (light_texture_ == nullptr)
     {
-        light_texture_.reset(new Texture("blons:none", Texture::LIGHT, context));
+        light_texture_.reset(new Texture("blons:none", kLightOptions, context));
     }
     log::Debug("[%ims]\n", timer.ms());
 }

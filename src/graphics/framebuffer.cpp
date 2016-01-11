@@ -25,37 +25,37 @@
 
 namespace blons
 {
-Framebuffer::Framebuffer(units::pixel width, units::pixel height, std::vector<TextureHint> texture_formats, bool store_depth, RenderContext& context)
+Framebuffer::Framebuffer(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth, RenderContext& context)
 {
     Init(width, height, texture_formats, store_depth, context);
 }
 
-Framebuffer::Framebuffer(units::pixel width, units::pixel height, std::vector<TextureHint> texture_formats, RenderContext& context)
+Framebuffer::Framebuffer(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, RenderContext& context)
 {
     Init(width, height, texture_formats, true, context);
 }
 
 Framebuffer::Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, bool store_depth, RenderContext& context)
 {
-    std::vector<TextureHint> formats;
+    std::vector<TextureType> formats;
     for (unsigned int i = 0; i < texture_count; i++)
     {
-        formats.push_back({ TextureHint::R8G8B8, TextureHint::LINEAR, TextureHint::CLAMP });
+        formats.push_back({ TextureType::R8G8B8, TextureType::RAW, TextureType::LINEAR, TextureType::CLAMP });
     }
     Init(width, height, formats, store_depth, context);
 }
 
 Framebuffer::Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, RenderContext& context)
 {
-    std::vector<TextureHint> formats;
+    std::vector<TextureType> formats;
     for (unsigned int i = 0; i < texture_count; i++)
     {
-        formats.push_back({ TextureHint::R8G8B8, TextureHint::LINEAR, TextureHint::CLAMP });
+        formats.push_back({ TextureType::R8G8B8, TextureType::RAW, TextureType::LINEAR, TextureType::CLAMP });
     }
     Init(width, height, formats, true, context);
 }
 
-void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<TextureHint> texture_formats, bool store_depth, RenderContext& context)
+void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth, RenderContext& context)
 {
     fbo_.reset(context->MakeFramebufferResource());
     if (!context->RegisterFramebuffer(fbo_.get(), width, height, texture_formats, store_depth))

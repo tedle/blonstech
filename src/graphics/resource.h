@@ -86,7 +86,7 @@ MeshBuffer LoadMesh(const std::string& filename, RenderContext& context);
 /// \return TextureBuffer containing shared TextureResource pointer that will be
 /// nullptr on failure, as well as texture information
 ////////////////////////////////////////////////////////////////////////////////
-TextureBuffer LoadTexture(const std::string& filename, Texture::Type type, RenderContext& context);
+TextureBuffer LoadTexture(const std::string& filename, TextureType::Options options, RenderContext& context);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Clears all cached resource buffers, but not cached resource data
