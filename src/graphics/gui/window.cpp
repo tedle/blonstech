@@ -40,7 +40,7 @@ Window::Window(std::string id, Box pos, std::string caption, Type type, Manager*
     units::subpixel title_bar_height = gui_->skin()->layout()->window.title.center.h;
     units::subpixel letter_height = units::pixel_to_subpixel(gui_->skin()->font(Skin::FontStyle::HEADING)->letter_height());
     units::subpixel caption_offset = (title_bar_height + letter_height) / 2;
-    Vector2 caption_pos(20, caption_offset);
+    Vector2 caption_pos(gui_->skin()->layout()->window.title.left.w, caption_offset);
     for (auto& c : caption)
     {
         c = toupper(c);

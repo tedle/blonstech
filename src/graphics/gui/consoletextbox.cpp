@@ -35,6 +35,7 @@ namespace gui
 ConsoleTextbox::ConsoleTextbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window* parent_window)
     : Textbox(pos, style, parent_manager, parent_window)
 {
+    // TODO: Somehow make padding specifiable by children as it's currently using parent's skin layout
     command_history_index_ = kCommandHistoryIndexNone;
     tab_completion_index_ = 0;
 

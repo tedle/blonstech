@@ -42,7 +42,8 @@ Textbox::Textbox(Box pos, Skin::FontStyle style, Manager* parent_manager, Window
     // Empty lambda is easier than worrying about nullptrs
     callback_ = [](Textbox* t){};
 
-    padding_ = units::subpixel_to_pixel(gui_->skin()->layout()->textbox.normal.left.w * 2);
+    edge_width_ = units::subpixel_to_pixel(gui_->skin()->layout()->textbox.normal.left.w);
+    padding_ = gui_->skin()->layout()->textbox.padding + edge_width_;
     // For vertically centering the text
     const auto& font = gui_->skin()->font(font_style_);
     std::size_t letter_height = font->letter_height();
@@ -168,7 +169,7 @@ void Textbox::RenderCursor(const Box& cursor, RenderContext& context)
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
-    auto crop = Box(x + padding_ / 2, 0.0f, pos_.w - padding_, 0.0f);
+    auto crop = Box(x + edge_width_, 0.0f, pos_.w - edge_width_ * 2, 0.0f);
     auto feather = 0;
     auto sprite = gui_->skin()->sprite();
     auto batch = gui_->control_batch(crop, feather, context);
@@ -212,7 +213,7 @@ void Textbox::RenderText(RenderContext& context)
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
 
-    text_label_->set_crop(Box(x + padding_ / 2, 0.0f, pos_.w - padding_, 0.0f), padding_ / 2);
+    text_label_->set_crop(Box(x + edge_width_, 0.0f, pos_.w - edge_width_ * 2, 0.0f), padding_ - edge_width_);
     text_label_->Render(context);
 }
 

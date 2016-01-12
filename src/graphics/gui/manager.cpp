@@ -74,7 +74,7 @@ void Manager::Init(units::pixel width, units::pixel height, RenderContext& conte
 
     // TODO: move this out of constructor! font load included!
     LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::DEFAULT, context);
-    LoadFont("font stuff/test-heading.ttf", 14, Skin::FontStyle::HEADING, context);
+    LoadFont("font stuff/test-heading.ttf", 20, Skin::FontStyle::HEADING, context);
     LoadFont("font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL, context);
     LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE, context);
 

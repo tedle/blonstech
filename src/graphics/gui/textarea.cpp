@@ -40,7 +40,8 @@ Textarea::Textarea(Box pos, Skin::FontStyle style, Manager* parent_manager, Wind
     font_style_ = style;
 
     newest_top_ = false;
-    padding_ = units::subpixel_to_pixel(gui_->skin()->layout()->textarea.left.w * 2);
+    edge_width_ = units::subpixel_to_pixel(gui_->skin()->layout()->textarea.left.w);
+    padding_ = gui_->skin()->layout()->textarea.padding + edge_width_;
 
     scroll_offset_ = 0;
     scroll_destination_ = 0;
@@ -153,12 +154,12 @@ void Textarea::RenderText(const Skin::Layout::Textarea& t, RenderContext& contex
 
     for (auto i = line_offset; i < renderable_lines + line_offset; i++)
     {
-        const auto feather = padding_ / 2;
+        const auto feather = padding_ - edge_width_;
         auto& label = lines_[lines_.size() - i - 1];
-        Box crop(0.0f, y + padding_ / 2, 0.0f, pos_.h - padding_);
+        Box crop(0.0f, y + edge_width_, 0.0f, pos_.h - edge_width_ * 2);
         // Don't feather our g's and y's if we're at the bottom
         // Divide by line_height gives us a smoother transition
-        crop.h += std::max(0, feather - scroll_offset_ / line_height);
+        crop.h += std::max(0, feather - scroll_offset_);
         label->set_crop(crop, feather);
 
         if (newest_top_)
@@ -294,7 +295,7 @@ void Textarea::MoveScrollOffset(units::pixel delta, bool smooth)
     units::pixel max_offset = font->line_height() * static_cast<units::pixel>(lines_.size())
                             - units::subpixel_to_pixel(pos_.h)
                             + font->letter_height()
-                            - padding_ / 2;
+                            - edge_width_;
 
     scroll_destination_ = std::max(0, std::min(scroll_destination_ + delta, max_offset));
 

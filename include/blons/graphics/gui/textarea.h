@@ -121,7 +121,8 @@ private:
     std::string text_;
     std::vector<std::unique_ptr<Label>> lines_;
     units::pixel line_height_;
-    units::pixel padding_;
+    // Cached skin values
+    units::pixel padding_, edge_width_;
 
     // What is rendered
     units::pixel scroll_offset_;

@@ -250,8 +250,8 @@ private:
     std::unique_ptr<Label> text_label_;
     std::function<void(Textbox*)> callback_;
     bool active_, drag_highlighting_;
-    // Padding between edge of textbox and text
-    units::pixel padding_;
+    // Cached skin values
+    units::pixel padding_, edge_width_;
 };
 } // namespace gui
 } // namespace blons

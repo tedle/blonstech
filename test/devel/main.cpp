@@ -88,10 +88,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
 void InitTestUI(blons::gui::Manager* gui)
 {
-    gui->MakeWindow("yoyo", 450, 250, 300, 300, "Amicable window");
-    gui->MakeWindow("test", 20, 80, 400, 200, "Friendly window");
+    gui->MakeWindow("yoyo", 450, 250, 300, 370, "Amicable window");
+    gui->MakeWindow("test", 20, 80, 400, 270, "Friendly window");
 
-    auto textarea = gui->window("yoyo")->MakeTextarea(10, 40, 280, 205);
+    auto textarea = gui->window("yoyo")->MakeTextarea(10, 110, 280, 205);
     for (int i = 0; i < 5; i++)
     {
         textarea->AddLine("Simple test line that isn't too short,\nmaybe even a little long, thanks for the friendly test!");
@@ -99,7 +99,7 @@ void InitTestUI(blons::gui::Manager* gui)
 
     textarea->AddLine("HAello! blonsUI in action!");
 
-    auto textbox = gui->window("test")->MakeTextbox(135, 150, 255, 40);
+    auto textbox = gui->window("test")->MakeTextbox(135, 220, 255, 40);
     auto print = [textbox]()
     {
         blons::log::Debug("%s\n", textbox->text().c_str());
@@ -118,12 +118,12 @@ void InitTestUI(blons::gui::Manager* gui)
         textbox->set_text("");
     };
     textbox->set_callback(textareaprint);
-    gui->window("test")->MakeButton(10, 150, 120, 40, "Print!")->set_callback(print);
-    gui->window("test")->MakeButton(10, 105, 380, 40, "Clear!")->set_callback(textareaclear);
+    gui->window("test")->MakeButton(10, 220, 120, 40, "Print!")->set_callback(print);
+    gui->window("test")->MakeButton(10, 175, 380, 40, "Clear!")->set_callback(textareaclear);
 
-    gui->window("yoyo")->MakeButton(10, 250, 280, 40, "New stuff maybe!");
+    gui->window("yoyo")->MakeButton(10, 320, 280, 40, "New stuff maybe!");
 
-    gui->window("test")->MakeDebugSlider(10, 40, 380, 40, -5, 20, 0.01f);
+    gui->window("test")->MakeDebugSlider(10, 110, 380, 40, -5, 20, 0.01f);
 }
 
 void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
