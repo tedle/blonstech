@@ -52,10 +52,10 @@ public:
         /// \brief Usage of texture
         ////////////////////////////////////////////////////////////////////////////////
         enum Type {
-            ALBEDO,
-            NORMAL,
-            LIGHT
-        } type;
+            ALBEDO, ///< Used to store colour of a mesh
+            NORMAL, ///< Used to store normals of a mesh
+            LIGHT   ///< Used to store lightmap data of a mesh
+        } type; ///< \copybrief TextureInfo::Type
     };
 
 public:

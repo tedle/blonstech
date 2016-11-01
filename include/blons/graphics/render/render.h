@@ -59,7 +59,7 @@ struct TextureType
     } format; ///< \copybrief Format
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Determines the format and rendering options of a texture
+    /// \brief Determines the compression format of a texture
     ////////////////////////////////////////////////////////////////////////////////
     enum Compression
     {
@@ -86,18 +86,55 @@ struct TextureType
         REPEAT ///< Tiled repetition
     } wrap; ///< \copybrief Wrap
 
-    struct Options { Compression compression; Filter filter; Wrap wrap; };
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Contains texture storage and rendering options
+    ////////////////////////////////////////////////////////////////////////////////
+    struct Options
+    {
+        Compression compression; ///< \copybrief TextureType::Compression
+        Filter filter;           ///< \copybrief TextureType::Filter
+        Wrap wrap;               ///< \copybrief TextureType::Wrap
+    };
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes TextureType with all settings specified
+    ////////////////////////////////////////////////////////////////////////////////
     TextureType(Format format, Compression compression, Filter filter, Wrap wrap) : format(format), compression(compression), filter(filter), wrap(wrap) {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes TextureType with a default setting of
+    /// `TextureType::Wrap::REPEAT`
+    ////////////////////////////////////////////////////////////////////////////////
     TextureType(Format format, Compression compression, Filter filter) : TextureType(format, compression, filter, REPEAT) {}
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes TextureType with a default setting of
+    /// `TextureType::Compression::RAW`
+    ////////////////////////////////////////////////////////////////////////////////
     TextureType(Format format, Filter filter, Wrap wrap) : TextureType(format, RAW, filter, wrap) {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes TextureType with default settings of
+    /// `TextureType::Filter::NEAREST`, `TextureType::Wrap::REPEAT`
+    ////////////////////////////////////////////////////////////////////////////////
     TextureType(Format format, Compression compression) : TextureType(format, compression, NEAREST, REPEAT) {}
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes TextureType with default settings of
+    /// `TextureType::Compression::RAW`, `TextureType::Wrap::REPEAT`
+    ////////////////////////////////////////////////////////////////////////////////
     TextureType(Format format, Filter filter) : TextureType(format, RAW, filter, REPEAT) {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes TextureType with default settings of
+    /// `TextureType::Compression::RAW`, `TextureType::Filter::NEAREST`,
+    /// `TextureType::Wrap::REPEAT`
+    ////////////////////////////////////////////////////////////////////////////////
     TextureType(Format format) : TextureType(format, RAW, NEAREST, REPEAT) {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes TextureType with default settings of
+    /// `TextureType::Format::NONE`, `TextureType::Compression::RAW`,
+    /// `TextureType::Filter::NEAREST`, `TextureType::Wrap::REPEAT`
+    ////////////////////////////////////////////////////////////////////////////////
     TextureType() : TextureType(NONE, RAW, NEAREST, REPEAT) {}
 };
 
