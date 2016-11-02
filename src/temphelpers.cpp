@@ -56,11 +56,11 @@ void noclip(Input* input, Camera* camera)
 
     static Timer last_move;
     // Welcome to the hackiest no clip wasd movement u ever see
-    if (last_move.ms() > 10)
+    if (last_move.ms() > 2)
     {
-        last_move.rewind(10);
+        last_move.rewind(2);
 
-        float velocity = 0.2f;
+        float velocity = 0.04f;
         if (input->IsKeyDown(Input::SHIFT))
         {
             velocity *= 0.25f;
