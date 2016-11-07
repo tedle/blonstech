@@ -25,6 +25,8 @@
 
 // Includes
 #include <fstream>
+#include <sstream>
+#include <regex>
 
 namespace blons
 {
@@ -32,22 +34,8 @@ Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAt
 {
     program_.reset(context->MakeShaderResource());
 
-    // Load the shader files into memory
-    std::ifstream vertex_file(vertex_filename, std::ios::binary);
-    vertex_file.imbue(std::locale("C"));
-    std::string vertex_source((std::istreambuf_iterator<char>(vertex_file)),
-                               std::istreambuf_iterator<char>());
-    vertex_file.close();
-    std::ifstream pixel_file(pixel_filename, std::ios::binary);
-    pixel_file.imbue(std::locale("C"));
-    std::string pixel_source((std::istreambuf_iterator<char>(pixel_file)),
-                              std::istreambuf_iterator<char>());
-    pixel_file.close();
-    if (!vertex_source.size() || !pixel_source.size())
-    {
-        log::Fatal("Shader files could not be accessed\n");
-        throw "Shader files could not be accessed";
-    }
+    std::string vertex_source = ParseFile(vertex_filename);
+    std::string pixel_source = ParseFile(pixel_filename);
 
     if (!context->RegisterShader(program_.get(), vertex_source, pixel_source, inputs))
     {
@@ -105,5 +93,43 @@ bool Shader::SetInput(const char* field, const TextureResource* value, RenderCon
 bool Shader::SetInput(const char* field, const TextureResource* value, unsigned int texture_index, RenderContext& context)
 {
     return context->SetShaderInput(program_.get(), field, value, texture_index);
+}
+
+std::string Shader::ParseFile(std::string filename)
+{
+    // Load source file into memory
+    std::ifstream source_file(filename, std::ios::binary);
+    if (source_file.fail())
+    {
+        log::Fatal("Shader file could not be accessed");
+        throw "Shader file could not be accessed";
+    }
+    source_file.imbue(std::locale("C"));
+    std::string source((std::istreambuf_iterator<char>(source_file)),
+                        std::istreambuf_iterator<char>());
+    source_file.close();
+    if (source.size() == 0)
+    {
+        log::Fatal("Shader file was empty");
+        throw "Shader file was empty";
+    }
+
+    // Search for and process #include directives
+    std::regex re ("#include <(.*?)>");
+    std::smatch match;
+    while (std::regex_search(source, match, re))
+    {
+        std::string include_file = match[1].str();
+        std::string prefix = match.prefix().str();
+        std::string suffix = match.suffix().str();
+        auto prefix_lines = std::count(prefix.begin(), prefix.end(), '\n');
+        std::stringstream processed_source;
+        processed_source << prefix << std::endl << "#line 1 \"" << include_file << "\"" << std::endl
+                         << ParseFile(include_file) << std::endl << "#line " << prefix_lines + 1 << " \""
+                         << filename << "\"" << std::endl << suffix;
+        source = processed_source.str();
+    }
+
+    return source;
 }
 } // namespace blons

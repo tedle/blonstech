@@ -95,6 +95,15 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     bool SetInput(const char* field, const TextureResource* value, unsigned int texture_index, RenderContext& context);
 
+protected:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Loads source file into memory and applies preprocessor directives
+    ///
+    /// \param filename Source file on disk
+    /// \return String containing processed source code. Will throw on failure
+    ////////////////////////////////////////////////////////////////////////////////
+    std::string ParseFile(std::string filename);
+
 private:
     std::unique_ptr<ShaderResource> program_;
 };
@@ -103,6 +112,15 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::Shader
 /// \ingroup graphics
+///
+/// The Shader class manages compilation and resource management of shader files
+/// used in rendering pipelines. Applies a custom preprocessor before sending
+/// each shader to the API's compiler.
+///
+/// ### Preprocessor Directives
+/// Directive | Usage
+/// --------- | -----
+/// include   | <tt>\#include \<shaders/mesh.fx\></tt>
 ///
 /// ### Example:
 /// \code
