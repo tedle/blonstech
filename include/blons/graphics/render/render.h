@@ -486,14 +486,14 @@ public:
     /// meshes each frame.
     ///
     /// \param program ShaderResource for identifying shader code in future calls
-    /// \param vertex_filename Filename of the vertex shader source
-    /// \param pixel_filename Filename of the pixel (fragment) shader source
+    /// \param vertex_source Source code for the vertex shader
+    /// \param pixel_source Source code for the pixel (fragment) shader
     /// \param inputs List of attributes to be passed into the shader on each draw
     /// call. Allows for translation of vertex data to shader data
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterShader(ShaderResource* program,
-                                std::string vertex_filename, std::string pixel_filename,
+                                std::string vertex_source, std::string pixel_source,
                                 ShaderAttributeList inputs)=0;
 
     ////////////////////////////////////////////////////////////////////////////////

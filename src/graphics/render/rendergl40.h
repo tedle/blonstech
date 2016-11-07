@@ -61,7 +61,7 @@ public:
     bool RegisterTexture(TextureResource* texture, PixelData* pixel_data) override;
     bool RegisterTexture(TextureResource* texture, PixelData3D* pixel_data) override;
     bool RegisterShader(ShaderResource* program,
-                        std::string vertex_filename, std::string pixel_filename,
+                        std::string vertex_source, std::string pixel_source,
                         ShaderAttributeList inputs) override;
 
     void RenderShader(ShaderResource* program, unsigned int index_count) override;

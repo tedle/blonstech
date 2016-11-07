@@ -23,13 +23,33 @@
 
 #include <blons/graphics/render/shader.h>
 
+// Includes
+#include <fstream>
+
 namespace blons
 {
 Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs, RenderContext& context)
 {
     program_.reset(context->MakeShaderResource());
 
-    if (!context->RegisterShader(program_.get(), vertex_filename, pixel_filename, inputs))
+    // Load the shader files into memory
+    std::ifstream vertex_file(vertex_filename, std::ios::binary);
+    vertex_file.imbue(std::locale("C"));
+    std::string vertex_source((std::istreambuf_iterator<char>(vertex_file)),
+                               std::istreambuf_iterator<char>());
+    vertex_file.close();
+    std::ifstream pixel_file(pixel_filename, std::ios::binary);
+    pixel_file.imbue(std::locale("C"));
+    std::string pixel_source((std::istreambuf_iterator<char>(pixel_file)),
+                              std::istreambuf_iterator<char>());
+    pixel_file.close();
+    if (!vertex_source.size() || !pixel_source.size())
+    {
+        log::Fatal("Shader files could not be accessed\n");
+        throw "Shader files could not be accessed";
+    }
+
+    if (!context->RegisterShader(program_.get(), vertex_source, pixel_source, inputs))
     {
         log::Fatal("Shaders failed to compile\n");
         throw "Shaders failed to compile";

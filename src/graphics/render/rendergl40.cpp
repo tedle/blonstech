@@ -27,7 +27,6 @@
 // Includes
 #include <unordered_map>
 #include <memory>
-#include <fstream>
 // OpenGL image loader
 #include <SOIL2/SOIL2.h>
 // Public Includes
@@ -643,34 +642,18 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData3D* pixel_da
 }
 
 bool RenderGL40::RegisterShader(ShaderResource* program,
-                                std::string vertex_filename, std::string pixel_filename,
+                                std::string vertex_source, std::string pixel_source,
                                 ShaderAttributeList inputs)
 {
     ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
 
-    // Load the shader files into memory
-    std::ifstream vert_file(vertex_filename, std::ios::binary);
-    vert_file.imbue(std::locale("C"));
-    std::string vert_bytes((std::istreambuf_iterator<char>(vert_file)), 
-                            std::istreambuf_iterator<char>());
-    vert_file.close();
-    std::ifstream frag_file(pixel_filename, std::ios::binary);
-    frag_file.imbue(std::locale("C"));
-    std::string frag_bytes((std::istreambuf_iterator<char>(frag_file)), 
-                            std::istreambuf_iterator<char>());
-    frag_file.close();
-    if (!vert_bytes.size() || !frag_bytes.size())
-    {
-        return false;
-    }
-
     // Initialize and compile the shaders
     shader->vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
     shader->frag_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
-    const char* vb = vert_bytes.data();
-    const char* fb = frag_bytes.data();
-    glShaderSource(shader->vertex_shader_, 1, &vb, nullptr);
-    glShaderSource(shader->frag_shader_, 1, &fb, nullptr);
+    const char* vs = vertex_source.data();
+    const char* ps = pixel_source.data();
+    glShaderSource(shader->vertex_shader_, 1, &vs, nullptr);
+    glShaderSource(shader->frag_shader_, 1, &ps, nullptr);
     glCompileShader(shader->vertex_shader_);
     glCompileShader(shader->frag_shader_);
 
