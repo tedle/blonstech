@@ -117,19 +117,47 @@ std::string Shader::ParseFile(std::string filename)
     // Search for and process #include directives
     std::regex re ("#include <(.*?)>");
     std::smatch match;
-    while (std::regex_search(source, match, re))
+    // We split the source file into a vector of individual lines to preserve
+    // a reliable, unprocessed line count while including new files
+    std::vector<std::string> source_lines;
+    std::stringstream source_stream(source);
+    std::string line = "";
+    while (std::getline(source_stream, line))
     {
-        std::string include_file = match[1].str();
-        std::string prefix = match.prefix().str();
-        std::string suffix = match.suffix().str();
-        auto prefix_lines = std::count(prefix.begin(), prefix.end(), '\n');
-        std::stringstream processed_source;
-        processed_source << prefix << std::endl << "#line 1 \"" << include_file << "\"" << std::endl
-                         << ParseFile(include_file) << std::endl << "#line " << prefix_lines + 1 << " \""
-                         << filename << "\"" << std::endl << suffix;
-        source = processed_source.str();
+        source_lines.push_back(line);
     }
 
-    return source;
+    // Use the line count to insert #line directives into the GLSL preprocessor so compilation
+    // errors show appropriate files and lines
+    // TODO: Make sure this is DirectX compatible too somehow. Or implementation independent...
+    std::size_t line_count = 0;
+    for (auto& search_line : source_lines)
+    {
+        while (std::regex_search(search_line, match, re))
+        {
+            std::string include_file = match[1].str();
+            std::string prefix = match.prefix().str();
+            std::string suffix = match.suffix().str();
+            std::stringstream processed_line;
+            processed_line << prefix << std::endl << "#line 1 \"" << include_file << "\"" << std::endl
+                           << ParseFile(include_file) << std::endl << "#line " << line_count + 1
+                           << " \"" << filename << "\"" << std::endl << suffix;
+            search_line = processed_line.str();
+        }
+        line_count++;
+    }
+
+    // Stitch the individual lines back together
+    std::string stitched_source = "";
+    for (const auto& s : source_lines)
+    {
+        if (stitched_source != "")
+        {
+            stitched_source += '\n';
+        }
+        stitched_source += s;
+    }
+
+    return stitched_source;
 }
 } // namespace blons
