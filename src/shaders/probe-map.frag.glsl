@@ -23,6 +23,9 @@
 
 #version 400
 
+// Includes
+#include <shaders/gamma.lib.glsl>
+
 // Ins n outs
 in vec2 tex_coord;
 in vec2 lightmap_coord;
@@ -36,7 +39,7 @@ uniform sampler2D albedo;
 void main(void)
 {
     // Albedo
-    albedo_colour = vec4(pow(texture(albedo, tex_coord).rgb, vec3(2.2)), 1.0);
+    albedo_colour = vec4(GammaDecode(texture(albedo, tex_coord).rgb), 1.0);
 
     // Texture lookup
     tex_colour = vec4(lightmap_coord.xy, 0.0, 1.0);

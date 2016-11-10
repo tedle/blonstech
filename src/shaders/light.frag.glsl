@@ -23,6 +23,9 @@
 
 #version 400
 
+// Includes
+#include <shaders/gamma.lib.glsl>
+
 // Ins n outs
 in vec2 tex_coord;
 
@@ -117,6 +120,6 @@ void main(void)
     //surface_colour += vec3(specular);
 
     // Final composite
-    surface_colour = pow(surface_colour, vec3(1/2.2));
+    surface_colour = GammaEncode(surface_colour);
     frag_colour = vec4(surface_colour, 1.0);
 }

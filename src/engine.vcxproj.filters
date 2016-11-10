@@ -439,5 +439,8 @@
     <None Include="shaders\ui-blur.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\gamma.lib.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

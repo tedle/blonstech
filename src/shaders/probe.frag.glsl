@@ -23,6 +23,9 @@
 
 #version 400
 
+// Includes
+#include <shaders/gamma.lib.glsl>
+
 // Ins n outs
 in vec2 tex_coord;
 
@@ -45,7 +48,7 @@ void main(void)
     {
         // Sky should be about 1/5th as strong as sun, i think
         const float sky_correction = 0.2;
-        frag_colour = vec4(pow(sky_colour, vec3(2.2)) * sky_correction, 1.0);
+        frag_colour = vec4(GammaDecode(sky_colour) * sky_correction, 1.0);
         return;
     }
     vec4 direct_light_full = texture(direct_lightmap, light_coord.xy);

@@ -23,6 +23,9 @@
 
 #version 400
 
+// Includes
+#include <shaders/gamma.lib.glsl>
+
 // Ins n outs
 in vec2 tex_coord;
 in mat3 norm;
@@ -38,7 +41,7 @@ uniform sampler2D normal;
 void main(void)
 {
     // Albedo
-    frag_colour = vec4(pow(texture(albedo, tex_coord).rgb, vec3(2.2)), 1.0);
+    frag_colour = vec4(GammaDecode(texture(albedo, tex_coord).rgb), 1.0);
 
     // Normal
     vec3 norm_map = texture(normal, tex_coord).rgb * 2 - 1;
