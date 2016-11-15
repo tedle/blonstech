@@ -116,7 +116,7 @@ public:
 
     GLuint program_;
     GLuint vertex_shader_;
-    GLuint frag_shader_;
+    GLuint pixel_shader_;
     RenderGL40* context_;
     unsigned int context_id_;
 
@@ -187,10 +187,10 @@ ShaderResourceGL40::~ShaderResourceGL40()
     }
 
     glDetachShader(program_, vertex_shader_);
-    glDetachShader(program_, frag_shader_);
+    glDetachShader(program_, pixel_shader_);
 
     glDeleteShader(vertex_shader_);
-    glDeleteShader(frag_shader_);
+    glDeleteShader(pixel_shader_);
 
     glDeleteProgram(program_);
 
@@ -649,33 +649,33 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
 
     // Initialize and compile the shaders
     shader->vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
-    shader->frag_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
+    shader->pixel_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
     const char* vs = vertex_source.data();
     const char* ps = pixel_source.data();
     glShaderSource(shader->vertex_shader_, 1, &vs, nullptr);
-    glShaderSource(shader->frag_shader_, 1, &ps, nullptr);
+    glShaderSource(shader->pixel_shader_, 1, &ps, nullptr);
     glCompileShader(shader->vertex_shader_);
-    glCompileShader(shader->frag_shader_);
+    glCompileShader(shader->pixel_shader_);
 
     // Check that everything went OK
-    int vert_result, frag_result;
+    int vert_result, pixel_result;
     glGetShaderiv(shader->vertex_shader_, GL_COMPILE_STATUS, &vert_result);
     if (!vert_result)
     {
         LogCompileErrors(shader->vertex_shader_, true);
         return false;
     }
-    glGetShaderiv(shader->frag_shader_, GL_COMPILE_STATUS, &frag_result);
-    if (!frag_result)
+    glGetShaderiv(shader->pixel_shader_, GL_COMPILE_STATUS, &pixel_result);
+    if (!pixel_result)
     {
-        LogCompileErrors(shader->frag_shader_, true);
+        LogCompileErrors(shader->pixel_shader_, true);
         return false;
     }
 
     // Take our shaders and turn it into a render pipeline
     shader->program_ = glCreateProgram();
     glAttachShader(shader->program_, shader->vertex_shader_);
-    glAttachShader(shader->program_, shader->frag_shader_);
+    glAttachShader(shader->program_, shader->pixel_shader_);
     for (const auto& input : inputs)
     {
         glBindAttribLocation(shader->program_, input.first, input.second.c_str());
