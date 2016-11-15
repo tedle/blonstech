@@ -115,8 +115,7 @@ public:
     ~ShaderResourceGL40() override;
 
     GLuint program_;
-    GLuint vertex_shader_;
-    GLuint pixel_shader_;
+    std::vector<GLuint> shaders_;
     RenderGL40* context_;
     unsigned int context_id_;
 
@@ -186,11 +185,11 @@ ShaderResourceGL40::~ShaderResourceGL40()
         return;
     }
 
-    glDetachShader(program_, vertex_shader_);
-    glDetachShader(program_, pixel_shader_);
-
-    glDeleteShader(vertex_shader_);
-    glDeleteShader(pixel_shader_);
+    for (const auto& shader : shaders_)
+    {
+        glDetachShader(program_, shader);
+        glDeleteShader(shader);
+    }
 
     glDeleteProgram(program_);
 
@@ -648,34 +647,36 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
     ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
 
     // Initialize and compile the shaders
-    shader->vertex_shader_ = glCreateShader(GL_VERTEX_SHADER);
-    shader->pixel_shader_ = glCreateShader(GL_FRAGMENT_SHADER);
+    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
+    shader->shaders_.push_back(vertex_shader);
+    GLuint pixel_shader = glCreateShader(GL_FRAGMENT_SHADER);
+    shader->shaders_.push_back(pixel_shader);
     const char* vs = vertex_source.data();
     const char* ps = pixel_source.data();
-    glShaderSource(shader->vertex_shader_, 1, &vs, nullptr);
-    glShaderSource(shader->pixel_shader_, 1, &ps, nullptr);
-    glCompileShader(shader->vertex_shader_);
-    glCompileShader(shader->pixel_shader_);
+    glShaderSource(vertex_shader, 1, &vs, nullptr);
+    glShaderSource(pixel_shader, 1, &ps, nullptr);
+    glCompileShader(vertex_shader);
+    glCompileShader(pixel_shader);
 
     // Check that everything went OK
     int vert_result, pixel_result;
-    glGetShaderiv(shader->vertex_shader_, GL_COMPILE_STATUS, &vert_result);
+    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &vert_result);
     if (!vert_result)
     {
-        LogCompileErrors(shader->vertex_shader_, true);
+        LogCompileErrors(vertex_shader, true);
         return false;
     }
-    glGetShaderiv(shader->pixel_shader_, GL_COMPILE_STATUS, &pixel_result);
+    glGetShaderiv(pixel_shader, GL_COMPILE_STATUS, &pixel_result);
     if (!pixel_result)
     {
-        LogCompileErrors(shader->pixel_shader_, true);
+        LogCompileErrors(pixel_shader, true);
         return false;
     }
 
     // Take our shaders and turn it into a render pipeline
     shader->program_ = glCreateProgram();
-    glAttachShader(shader->program_, shader->vertex_shader_);
-    glAttachShader(shader->program_, shader->pixel_shader_);
+    glAttachShader(shader->program_, vertex_shader);
+    glAttachShader(shader->program_, pixel_shader);
     for (const auto& input : inputs)
     {
         glBindAttribLocation(shader->program_, input.first, input.second.c_str());
