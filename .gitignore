@@ -9,6 +9,7 @@ build/
 doc/
 
 # Visual Studio
+.vs/
 *.VC.db
 *.opendb
 *.opensdf
