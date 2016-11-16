@@ -39,8 +39,8 @@ namespace blons
 namespace
 {
 // Used to determine which context is currently active, if multiple exist
-static unsigned int g_active_context;
-static unsigned int g_context_count;
+static unsigned int g_active_context = 0;
+static unsigned int g_context_count = 0;
 
 // Overloaded glUniforms to keep things generic
 void Uniform(GLuint loc, float value)
@@ -72,7 +72,7 @@ void Uniform(GLuint loc, Vector4 value)
 class BufferResourceGL40 : public BufferResource
 {
 public:
-    BufferResourceGL40(RenderGL40* context) : context_(context) {}
+    BufferResourceGL40(RenderGL40* context) : context_(context), context_id_(g_active_context) {}
     ~BufferResourceGL40() override;
 
     GLuint buffer_, vertex_array_id_;
@@ -84,7 +84,7 @@ public:
 class TextureResourceGL40 : public TextureResource
 {
 public:
-    TextureResourceGL40(RenderGL40* context) : context_(context) {}
+    TextureResourceGL40(RenderGL40* context) : context_(context), context_id_(g_active_context) {}
     ~TextureResourceGL40() override;
 
     GLuint texture_;
@@ -96,13 +96,13 @@ public:
 class FramebufferResourceGL40 : public FramebufferResource
 {
 public:
-    FramebufferResourceGL40(RenderGL40* context) : context_(context), depth_(TextureResourceGL40(context)) {}
+    FramebufferResourceGL40(RenderGL40* context) : context_(context), context_id_(g_active_context) {}
     ~FramebufferResourceGL40() override;
 
     GLuint framebuffer_;
     units::pixel width, height;
-    std::vector<TextureResourceGL40> targets_;
-    TextureResourceGL40 depth_;
+    std::vector<std::unique_ptr<TextureResourceGL40>> targets_;
+    std::unique_ptr<TextureResourceGL40> depth_;
     GLuint depth_render_;
     RenderGL40* context_;
     unsigned int context_id_;
@@ -111,7 +111,7 @@ public:
 class ShaderResourceGL40 : public ShaderResource
 {
 public:
-    ShaderResourceGL40(RenderGL40* context) : context_(context) {}
+    ShaderResourceGL40(RenderGL40* context) : context_(context), context_id_(g_active_context) {}
     ~ShaderResourceGL40() override;
 
     GLuint program_;
@@ -133,11 +133,14 @@ private:
 
 BufferResourceGL40::~BufferResourceGL40()
 {
-    if (context_id_ != g_active_context)
+    // TODO: Something cleaner when multiple contexts are possible
+    if (g_active_context == 0)
     {
-        // TODO: Something cleaner in case owning context isnt actually deleted
         return;
     }
+    // TODO: Something cleaner in case owning context isnt actually deleted
+    // This shouldnt be possible yet
+    assert(context_id_ == g_active_context);
 
     context_->UnmapBuffers();
 
@@ -157,10 +160,12 @@ BufferResourceGL40::~BufferResourceGL40()
 
 FramebufferResourceGL40::~FramebufferResourceGL40()
 {
-    if (context_id_ != g_active_context)
+    if (g_active_context == 0)
     {
         return;
     }
+    // This shouldnt be possible yet
+    assert(context_id_ == g_active_context);
 
     glDeleteRenderbuffers(1, &depth_render_);
 
@@ -170,20 +175,24 @@ FramebufferResourceGL40::~FramebufferResourceGL40()
 
 TextureResourceGL40::~TextureResourceGL40()
 {
-    if (context_id_ != g_active_context)
+    if (g_active_context == 0)
     {
         return;
     }
+    // This shouldnt be possible yet
+    assert(context_id_ == g_active_context);
 
     glDeleteTextures(1, &texture_);
 }
 
 ShaderResourceGL40::~ShaderResourceGL40()
 {
-    if (context_id_ != g_active_context)
+    if (g_active_context == 0)
     {
         return;
     }
+    // This shouldnt be possible yet
+    assert(context_id_ == g_active_context);
 
     for (const auto& shader : shaders_)
     {
@@ -563,17 +572,17 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     // Creates empty render targets
     auto make_texture = [&](TextureType type)
     {
-        TextureResourceGL40 tex(this);
+        auto tex = std::make_unique<TextureResourceGL40>(this);
 
         // Generate an ID for the texture.
-        glGenTextures(1, &tex.texture_);
+        glGenTextures(1, &tex->texture_);
 
         PixelData pixels;
         pixels.type = type;
         pixels.width = width;
         pixels.height = height;
         pixels.pixels = nullptr;
-        SetTextureData(&tex, &pixels);
+        SetTextureData(tex.get(), &pixels);
 
         return tex;
     };
@@ -586,7 +595,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
         {
             fbo->targets_.push_back(make_texture(formats[i]));
             auto attachment = GL_COLOR_ATTACHMENT0 + i;
-            glFramebufferTexture(GL_FRAMEBUFFER, attachment, fbo->targets_.back().texture_, 0);
+            glFramebufferTexture(GL_FRAMEBUFFER, attachment, fbo->targets_.back()->texture_, 0);
             drawbuffers[i] = attachment;
         }
     }
@@ -602,7 +611,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
 
         // Create and bind the depth target
         fbo->depth_ = make_texture({ TextureType::DEPTH, TextureType::LINEAR, TextureType::CLAMP });
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_.texture_, 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_->texture_, 0);
     }
 
     return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
@@ -731,7 +740,7 @@ std::vector<const TextureResource*> RenderGL40::FramebufferTextures(FramebufferR
     std::vector<const TextureResource*> targets;
     for (const auto& tex : fbo->targets_)
     {
-        targets.push_back(&tex);
+        targets.push_back(tex.get());
     }
 
     return targets;
@@ -741,7 +750,7 @@ const TextureResource* RenderGL40::FramebufferDepthTexture(FramebufferResource* 
 {
     FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
 
-    return &fbo->depth_;
+    return fbo->depth_.get();
 }
 
 void RenderGL40::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
