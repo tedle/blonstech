@@ -136,9 +136,6 @@
     <ClInclude Include="graphics\render\renderd3d11.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\render\rendergl40.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
     <ClInclude Include="debug\consoleparser.h">
       <Filter>src\debug</Filter>
     </ClInclude>
@@ -214,6 +211,9 @@
     <ClInclude Include="graphics\gui\debugslidertextbox.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
+    <ClInclude Include="graphics\render\rendergl43.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -259,9 +259,6 @@
       <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="graphics\render\renderd3d11.cpp">
-      <Filter>src\graphics\render</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics\render\rendergl40.cpp">
       <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="graphics\render\shader.cpp">
@@ -353,6 +350,9 @@
     </ClCompile>
     <ClCompile Include="graphics\gui\debugslidertextbox.cpp">
       <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\rendergl43.cpp">
+      <Filter>src\graphics\render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#version 400
+#version 430
 
 // TODO: Change this into a compute shader, so we can sample the entire cubemap asynchronously
 // Ins n outs

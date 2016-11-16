@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include <Windows.h>
-#include "rendergl40.h"
+#include "rendergl43.h"
 
 // Includes
 #include <unordered_map>
@@ -69,54 +69,54 @@ void Uniform(GLuint loc, Vector4 value)
 }
 } // namespace
 
-class BufferResourceGL40 : public BufferResource
+class BufferResourceGL43 : public BufferResource
 {
 public:
-    BufferResourceGL40(RenderGL40* context) : context_(context), context_id_(g_active_context) {}
-    ~BufferResourceGL40() override;
+    BufferResourceGL43(RenderGL43* context) : context_(context), context_id_(g_active_context) {}
+    ~BufferResourceGL43() override;
 
     GLuint buffer_, vertex_array_id_;
     enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
-    RenderGL40* context_;
+    RenderGL43* context_;
     unsigned int context_id_;
 };
 
-class TextureResourceGL40 : public TextureResource
+class TextureResourceGL43 : public TextureResource
 {
 public:
-    TextureResourceGL40(RenderGL40* context) : context_(context), context_id_(g_active_context) {}
-    ~TextureResourceGL40() override;
+    TextureResourceGL43(RenderGL43* context) : context_(context), context_id_(g_active_context) {}
+    ~TextureResourceGL43() override;
 
     GLuint texture_;
-    RenderGL40* context_;
+    RenderGL43* context_;
     unsigned int context_id_;
     GLint type_; ///< GL_TEXTURE_2D or GL_TEXTURE_3D
 };
 
-class FramebufferResourceGL40 : public FramebufferResource
+class FramebufferResourceGL43 : public FramebufferResource
 {
 public:
-    FramebufferResourceGL40(RenderGL40* context) : context_(context), context_id_(g_active_context) {}
-    ~FramebufferResourceGL40() override;
+    FramebufferResourceGL43(RenderGL43* context) : context_(context), context_id_(g_active_context) {}
+    ~FramebufferResourceGL43() override;
 
     GLuint framebuffer_;
     units::pixel width, height;
-    std::vector<std::unique_ptr<TextureResourceGL40>> targets_;
-    std::unique_ptr<TextureResourceGL40> depth_;
+    std::vector<std::unique_ptr<TextureResourceGL43>> targets_;
+    std::unique_ptr<TextureResourceGL43> depth_;
     GLuint depth_render_;
-    RenderGL40* context_;
+    RenderGL43* context_;
     unsigned int context_id_;
 };
 
-class ShaderResourceGL40 : public ShaderResource
+class ShaderResourceGL43 : public ShaderResource
 {
 public:
-    ShaderResourceGL40(RenderGL40* context) : context_(context), context_id_(g_active_context) {}
-    ~ShaderResourceGL40() override;
+    ShaderResourceGL43(RenderGL43* context) : context_(context), context_id_(g_active_context) {}
+    ~ShaderResourceGL43() override;
 
     GLuint program_;
     std::vector<GLuint> shaders_;
-    RenderGL40* context_;
+    RenderGL43* context_;
     unsigned int context_id_;
 
     GLint UniformLocation(const char* name);
@@ -131,7 +131,7 @@ private:
     // std::unordered_map<std::string, GLint> uniform_location_cache_;
 };
 
-BufferResourceGL40::~BufferResourceGL40()
+BufferResourceGL43::~BufferResourceGL43()
 {
     // TODO: Something cleaner when multiple contexts are possible
     if (g_active_context == 0)
@@ -144,11 +144,11 @@ BufferResourceGL40::~BufferResourceGL40()
 
     context_->UnmapBuffers();
 
-    if (type_ == BufferResourceGL40::VERTEX_BUFFER)
+    if (type_ == BufferResourceGL43::VERTEX_BUFFER)
     {
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
-    else if (type_ == BufferResourceGL40::INDEX_BUFFER)
+    else if (type_ == BufferResourceGL43::INDEX_BUFFER)
     {
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
@@ -158,7 +158,7 @@ BufferResourceGL40::~BufferResourceGL40()
     glDeleteVertexArrays(1, &vertex_array_id_);
 }
 
-FramebufferResourceGL40::~FramebufferResourceGL40()
+FramebufferResourceGL43::~FramebufferResourceGL43()
 {
     if (g_active_context == 0)
     {
@@ -173,7 +173,7 @@ FramebufferResourceGL40::~FramebufferResourceGL40()
     glDeleteFramebuffers(1, &framebuffer_);
 }
 
-TextureResourceGL40::~TextureResourceGL40()
+TextureResourceGL43::~TextureResourceGL43()
 {
     if (g_active_context == 0)
     {
@@ -185,7 +185,7 @@ TextureResourceGL40::~TextureResourceGL40()
     glDeleteTextures(1, &texture_);
 }
 
-ShaderResourceGL40::~ShaderResourceGL40()
+ShaderResourceGL43::~ShaderResourceGL43()
 {
     if (g_active_context == 0)
     {
@@ -205,7 +205,7 @@ ShaderResourceGL40::~ShaderResourceGL40()
     context_->UnbindShader();
 }
 
-GLint ShaderResourceGL40::UniformLocation(const char* name)
+GLint ShaderResourceGL43::UniformLocation(const char* name)
 {
     auto it = uniform_location_cache_.find(name);
     if (it == uniform_location_cache_.end())
@@ -218,7 +218,7 @@ GLint ShaderResourceGL40::UniformLocation(const char* name)
 }
 
 template <typename T>
-bool ShaderResourceGL40::SetUniform(const char* name, T value)
+bool ShaderResourceGL43::SetUniform(const char* name, T value)
 {
     // Clear errors so we know problems are isolated to this function
     glGetError();
@@ -238,7 +238,7 @@ bool ShaderResourceGL40::SetUniform(const char* name, T value)
     return true;
 }
 
-RenderGL40::RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen)
+RenderGL43::RenderGL43(Client::Info screen_info, bool vsync, bool fullscreen)
 {
     g_context_count++;
     id_ = g_context_count;
@@ -351,7 +351,7 @@ RenderGL40::RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen)
     const int context_attributes[] =
     {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
         0
     };
     render_context_ = wglCreateContextAttribsARB(device_context_, 0, context_attributes);
@@ -407,7 +407,7 @@ RenderGL40::RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen)
     }
 }
 
-RenderGL40::~RenderGL40()
+RenderGL43::~RenderGL43()
 {
     // TODO: Somehow nullify all created resources in here
     // Reset the current context before deleting it
@@ -417,47 +417,47 @@ RenderGL40::~RenderGL40()
     g_active_context = 0;
 }
 
-void RenderGL40::BeginScene(Vector4 clear_colour)
+void RenderGL43::BeginScene(Vector4 clear_colour)
 {
     glClearColor(clear_colour.r, clear_colour.g, clear_colour.b, clear_colour.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void RenderGL40::EndScene()
+void RenderGL43::EndScene()
 {
     SwapBuffers(device_context_);
 }
 
-BufferResource* RenderGL40::MakeBufferResource()
+BufferResource* RenderGL43::MakeBufferResource()
 {
-    return new BufferResourceGL40(this);
+    return new BufferResourceGL43(this);
 }
 
-FramebufferResource* RenderGL40::MakeFramebufferResource()
+FramebufferResource* RenderGL43::MakeFramebufferResource()
 {
-    return new FramebufferResourceGL40(this);
+    return new FramebufferResourceGL43(this);
 }
 
-TextureResource* RenderGL40::MakeTextureResource()
+TextureResource* RenderGL43::MakeTextureResource()
 {
-    return new TextureResourceGL40(this);
+    return new TextureResourceGL43(this);
 }
 
-ShaderResource* RenderGL40::MakeShaderResource()
+ShaderResource* RenderGL43::MakeShaderResource()
 {
-    return new ShaderResourceGL40(this);
+    return new ShaderResourceGL43(this);
 }
 
-bool RenderGL40::Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+bool RenderGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count)
 {
-    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
-    BufferResourceGL40* index_buf = static_cast<BufferResourceGL40*>(index_buffer);
+    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
+    BufferResourceGL43* index_buf = static_cast<BufferResourceGL43*>(index_buffer);
 
     // Set the buffer types
-    vertex_buf->type_ = BufferResourceGL40::VERTEX_BUFFER;
-    index_buf->type_ = BufferResourceGL40::INDEX_BUFFER;
+    vertex_buf->type_ = BufferResourceGL43::VERTEX_BUFFER;
+    index_buf->type_ = BufferResourceGL43::INDEX_BUFFER;
 
     // Generate a vertex array and set it
     GLuint vertex_array_id;
@@ -509,16 +509,16 @@ bool RenderGL40::Register3DMesh(BufferResource* vertex_buffer, BufferResource* i
     return true;
 }
 
-bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+bool RenderGL43::Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count)
 {
-    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
-    BufferResourceGL40* index_buf = static_cast<BufferResourceGL40*>(index_buffer);
+    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
+    BufferResourceGL43* index_buf = static_cast<BufferResourceGL43*>(index_buffer);
 
     // Set the buffer types
-    vertex_buf->type_ = BufferResourceGL40::VERTEX_BUFFER;
-    index_buf->type_ = BufferResourceGL40::INDEX_BUFFER;
+    vertex_buf->type_ = BufferResourceGL43::VERTEX_BUFFER;
+    index_buf->type_ = BufferResourceGL43::INDEX_BUFFER;
 
     // Generate a vertex array and set it
     GLuint vertex_array_id;
@@ -554,11 +554,11 @@ bool RenderGL40::Register2DMesh(BufferResource* vertex_buffer, BufferResource* i
     return true;
 }
 
-bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
+bool RenderGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
                                      units::pixel width, units::pixel height,
                                      std::vector<TextureType> formats, bool store_depth)
 {
-    FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
+    FramebufferResourceGL43* fbo = static_cast<FramebufferResourceGL43*>(frame_buffer);
 
     fbo->width = width;
     fbo->height = height;
@@ -572,7 +572,7 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     // Creates empty render targets
     auto make_texture = [&](TextureType type)
     {
-        auto tex = std::make_unique<TextureResourceGL40>(this);
+        auto tex = std::make_unique<TextureResourceGL43>(this);
 
         // Generate an ID for the texture.
         glGenTextures(1, &tex->texture_);
@@ -617,9 +617,9 @@ bool RenderGL40::RegisterFramebuffer(FramebufferResource* frame_buffer,
     return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 }
 
-bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
+bool RenderGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
 {
-    TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
+    TextureResourceGL43* tex = static_cast<TextureResourceGL43*>(texture);
     tex->type_ = GL_TEXTURE_2D;
 
     // Generate an ID for the texture.
@@ -633,9 +633,9 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData* pixel_data
     return true;
 }
 
-bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)
+bool RenderGL43::RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)
 {
-    TextureResourceGL40* tex = static_cast<TextureResourceGL40*>(texture);
+    TextureResourceGL43* tex = static_cast<TextureResourceGL43*>(texture);
     tex->type_ = GL_TEXTURE_3D;
 
     // Generate an ID for the texture.
@@ -649,11 +649,11 @@ bool RenderGL40::RegisterTexture(TextureResource* texture, PixelData3D* pixel_da
     return true;
 }
 
-bool RenderGL40::RegisterShader(ShaderResource* program,
+bool RenderGL43::RegisterShader(ShaderResource* program,
                                 std::string vertex_source, std::string pixel_source,
                                 ShaderAttributeList inputs)
 {
-    ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
+    ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
 
     // Initialize and compile the shaders
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -704,11 +704,11 @@ bool RenderGL40::RegisterShader(ShaderResource* program,
     return true;
 }
 
-void RenderGL40::RenderShader(ShaderResource* program, unsigned int index_count)
+void RenderGL43::RenderShader(ShaderResource* program, unsigned int index_count)
 {
     UnmapBuffers();
 
-    ShaderResourceGL40* shader = static_cast<ShaderResourceGL40*>(program);
+    ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
 
     BindShader(shader->program_);
 
@@ -718,11 +718,11 @@ void RenderGL40::RenderShader(ShaderResource* program, unsigned int index_count)
     glBindVertexArray(0);
 }
 
-void RenderGL40::BindFramebuffer(FramebufferResource* frame_buffer)
+void RenderGL43::BindFramebuffer(FramebufferResource* frame_buffer)
 {
     if (frame_buffer != nullptr)
     {
-        FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
+        FramebufferResourceGL43* fbo = static_cast<FramebufferResourceGL43*>(frame_buffer);
         glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
         glViewport(0, 0, fbo->width, fbo->height);
     }
@@ -733,9 +733,9 @@ void RenderGL40::BindFramebuffer(FramebufferResource* frame_buffer)
     }
 }
 
-std::vector<const TextureResource*> RenderGL40::FramebufferTextures(FramebufferResource* frame_buffer)
+std::vector<const TextureResource*> RenderGL43::FramebufferTextures(FramebufferResource* frame_buffer)
 {
-    FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
+    FramebufferResourceGL43* fbo = static_cast<FramebufferResourceGL43*>(frame_buffer);
 
     std::vector<const TextureResource*> targets;
     for (const auto& tex : fbo->targets_)
@@ -746,27 +746,27 @@ std::vector<const TextureResource*> RenderGL40::FramebufferTextures(FramebufferR
     return targets;
 }
 
-const TextureResource* RenderGL40::FramebufferDepthTexture(FramebufferResource* frame_buffer)
+const TextureResource* RenderGL43::FramebufferDepthTexture(FramebufferResource* frame_buffer)
 {
-    FramebufferResourceGL40* fbo = static_cast<FramebufferResourceGL40*>(frame_buffer);
+    FramebufferResourceGL43* fbo = static_cast<FramebufferResourceGL43*>(frame_buffer);
 
     return fbo->depth_.get();
 }
 
-void RenderGL40::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
+void RenderGL43::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
     UnmapBuffers();
 
-    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
+    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
     glBindVertexArray(vertex_buf->vertex_array_id_);
 }
 
-void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+void RenderGL43::SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                              const Vertex* vertices, unsigned int vert_count,
                              const unsigned int* indices, unsigned int index_count)
 {
-    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
-    BufferResourceGL40* index_buf = static_cast<BufferResourceGL40*>(index_buffer);
+    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
+    BufferResourceGL43* index_buf = static_cast<BufferResourceGL43*>(index_buffer);
 
     glBindVertexArray(vertex_buf->vertex_array_id_);
     // Attach vertex buffer data to VAO
@@ -780,12 +780,12 @@ void RenderGL40::SetMeshData(BufferResource* vertex_buffer, BufferResource* inde
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
 }
 
-void RenderGL40::UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+void RenderGL43::UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
                                 const unsigned int* indices, unsigned int index_offset, unsigned int index_count)
 {
-    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
-    BufferResourceGL40* index_buf  = static_cast<BufferResourceGL40*>(index_buffer);
+    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
+    BufferResourceGL43* index_buf  = static_cast<BufferResourceGL43*>(index_buffer);
 
     glBindVertexArray(vertex_buf->vertex_array_id_);
     // Attach vertex buffer data to VAO
@@ -797,11 +797,11 @@ void RenderGL40::UpdateMeshData(BufferResource* vertex_buffer, BufferResource* i
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, index_offset * sizeof(unsigned int), index_count * sizeof(unsigned int), indices);
 }
 
-void RenderGL40::MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+void RenderGL43::MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                    Vertex** vertex_data, unsigned int** index_data)
 {
-    BufferResourceGL40* vertex_buf = static_cast<BufferResourceGL40*>(vertex_buffer);
-    BufferResourceGL40* index_buf  = static_cast<BufferResourceGL40*>(index_buffer);
+    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
+    BufferResourceGL43* index_buf  = static_cast<BufferResourceGL43*>(index_buffer);
 
     if (vertex_buf->buffer_ != mapped_buffers_.vertex || index_buf->buffer_ != mapped_buffers_.index)
     {
@@ -830,9 +830,9 @@ void RenderGL40::MapMeshData(BufferResource* vertex_buffer, BufferResource* inde
     mapped_buffers_.index_data = *index_data;
 }
 
-void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
+void RenderGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
 {
-    auto tex = static_cast<TextureResourceGL40*>(texture);
+    auto tex = static_cast<TextureResourceGL43*>(texture);
     tex->type_ = GL_TEXTURE_2D;
 
     glBindTexture(tex->type_, tex->texture_);
@@ -980,9 +980,9 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData* pixels)
     // glGenerateMipmap(tex->type_);
 }
 
-void RenderGL40::SetTextureData(TextureResource* texture, PixelData3D* pixels)
+void RenderGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
 {
-    auto tex = static_cast<TextureResourceGL40*>(texture);
+    auto tex = static_cast<TextureResourceGL43*>(texture);
     tex->type_ = GL_TEXTURE_3D;
 
     glBindTexture(tex->type_, tex->texture_);
@@ -1072,51 +1072,51 @@ void RenderGL40::SetTextureData(TextureResource* texture, PixelData3D* pixels)
     }
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const float value)
+bool RenderGL43::SetShaderInput(ShaderResource* program, const char* name, const float value)
 {
-    auto prog = static_cast<ShaderResourceGL40*>(program);
+    auto prog = static_cast<ShaderResourceGL43*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const int value)
+bool RenderGL43::SetShaderInput(ShaderResource* program, const char* name, const int value)
 {
-    auto prog = static_cast<ShaderResourceGL40*>(program);
+    auto prog = static_cast<ShaderResourceGL43*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Matrix value)
+bool RenderGL43::SetShaderInput(ShaderResource* program, const char* name, const Matrix value)
 {
-    auto prog = static_cast<ShaderResourceGL40*>(program);
+    auto prog = static_cast<ShaderResourceGL43*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Vector2 value)
+bool RenderGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector2 value)
 {
-    auto prog = static_cast<ShaderResourceGL40*>(program);
+    auto prog = static_cast<ShaderResourceGL43*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Vector3 value)
+bool RenderGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector3 value)
 {
-    auto prog = static_cast<ShaderResourceGL40*>(program);
+    auto prog = static_cast<ShaderResourceGL43*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const Vector4 value)
+bool RenderGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector4 value)
 {
-    auto prog = static_cast<ShaderResourceGL40*>(program);
+    auto prog = static_cast<ShaderResourceGL43*>(program);
     return prog->SetUniform(name, value);
 }
 
-bool RenderGL40::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)
+bool RenderGL43::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)
 {
-    const TextureResourceGL40* tex = static_cast<const TextureResourceGL40*>(value);
+    const TextureResourceGL43* tex = static_cast<const TextureResourceGL43*>(value);
     glActiveTexture(GL_TEXTURE0 + texture_index);
     glBindTexture(tex->type_, tex->texture_);
     return SetShaderInput(program, name, static_cast<int>(texture_index));
 }
 
-bool RenderGL40::SetBlendMode(BlendMode mode)
+bool RenderGL43::SetBlendMode(BlendMode mode)
 {
     GLint scfunc, dcfunc, safunc, dafunc;
     switch (mode)
@@ -1145,7 +1145,7 @@ bool RenderGL40::SetBlendMode(BlendMode mode)
     return true;
 }
 
-bool RenderGL40::SetCullMode(CullMode mode)
+bool RenderGL43::SetCullMode(CullMode mode)
 {
     switch (mode)
     {
@@ -1168,7 +1168,7 @@ bool RenderGL40::SetCullMode(CullMode mode)
     return true;
 }
 
-bool RenderGL40::SetDepthTesting(bool enable)
+bool RenderGL43::SetDepthTesting(bool enable)
 {
     if (enable == depth_testing_)
     {
@@ -1187,7 +1187,7 @@ bool RenderGL40::SetDepthTesting(bool enable)
     return true;
 }
 
-bool RenderGL40::SetViewport(Box viewport)
+bool RenderGL43::SetViewport(Box viewport)
 {
     glViewport(static_cast<GLint>(viewport.x),
                static_cast<GLint>(viewport.y),
@@ -1196,14 +1196,14 @@ bool RenderGL40::SetViewport(Box viewport)
     return true;
 }
 
-void RenderGL40::VideoCardInfo(char* name, int& memory)
+void RenderGL43::VideoCardInfo(char* name, int& memory)
 {
     strcpy_s(name, 128, video_card_desc_.c_str());
     memory = video_card_memory_;
     return;
 }
 
-bool RenderGL40::LoadPixelData(std::string filename, PixelData* data)
+bool RenderGL43::LoadPixelData(std::string filename, PixelData* data)
 {
     std::string filetype(filename);
     int channels = 0;
@@ -1244,7 +1244,7 @@ bool RenderGL40::LoadPixelData(std::string filename, PixelData* data)
     return true;
 }
 
-void RenderGL40::BindShader(GLuint shader)
+void RenderGL43::BindShader(GLuint shader)
 {
     // Avoid repeated calls to glUseProgram (perf boost)
     if (shader != active_shader_)
@@ -1254,12 +1254,12 @@ void RenderGL40::BindShader(GLuint shader)
     active_shader_ = shader;
 }
 
-void RenderGL40::UnbindShader()
+void RenderGL43::UnbindShader()
 {
     active_shader_ = 0;
 }
 
-void RenderGL40::UnmapBuffers()
+void RenderGL43::UnmapBuffers()
 {
     if (mapped_buffers_.vertex != 0)
     {
@@ -1275,7 +1275,7 @@ void RenderGL40::UnmapBuffers()
     mapped_buffers_.index = 0;
 }
 
-void RenderGL40::LogCompileErrors(GLuint resource, bool is_shader)
+void RenderGL43::LogCompileErrors(GLuint resource, bool is_shader)
 {
     int buffer_size;
     if (is_shader)

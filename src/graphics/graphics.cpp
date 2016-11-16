@@ -32,7 +32,7 @@
 #include <blons/temphelpers.h>
 // Local Includes
 #include "render/renderd3d11.h"
-#include "render/rendergl40.h"
+#include "render/rendergl43.h"
 #include "resource.h"
 
 namespace blons
@@ -275,7 +275,7 @@ bool Graphics::MakeContext(Client::Info screen)
 
     // OpenGL
     context_.reset();
-    context_ = RenderContext(new RenderGL40(screen, kEnableVsync, (kRenderMode == RenderMode::FULLSCREEN)));
+    context_ = RenderContext(new RenderGL43(screen, kEnableVsync, (kRenderMode == RenderMode::FULLSCREEN)));
     if (!context_)
     {
         return false;

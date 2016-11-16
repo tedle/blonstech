@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#version 400
+#version 430
 
 // Includes
 #include <shaders/gamma.lib.glsl>
@@ -78,10 +78,10 @@ void main(void)
     vec3 view_dir = normalize(eye_pos.xyz - pos.xyz);
 
     vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
-    vec3 half = normalize(-sun.dir + view_dir);
+    vec3 halfway = normalize(-sun.dir + view_dir);
 
     // Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
-    vec3 specular = vec3(pow(clamp(dot(half, surface_normal), 0.0, 1.0), gloss));
+    vec3 specular = vec3(pow(clamp(dot(halfway, surface_normal), 0.0, 1.0), gloss));
 
     float light_angle = dot(surface_normal, -sun.dir);
     // Black out surfaces not facing a light
@@ -97,7 +97,7 @@ void main(void)
     float specular_normalization = ((gloss + 2) / 8);
 
     // Linear blend specular with camera angle, based on fresnel coefficient
-    float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, half), 5.0);
+    float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, halfway), 5.0);
     specular *= fresnel;
     specular *= specular_normalization;
     // This has the N.L pre-applied

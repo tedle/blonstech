@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_RENDER_RENDERGL40_H_
-#define BLONSTECH_GRAPHICS_RENDER_RENDERGL40_H_
+#ifndef BLONSTECH_GRAPHICS_RENDER_RENDERGL43_H_
+#define BLONSTECH_GRAPHICS_RENDER_RENDERGL43_H_
 
 // Linking
 #pragma comment(lib, "opengl32.lib")
@@ -35,11 +35,11 @@
 
 namespace blons
 {
-class RenderGL40 : public Render
+class RenderGL43 : public Render
 {
 public:
-    RenderGL40(Client::Info screen_info, bool vsync, bool fullscreen);
-    ~RenderGL40() override;
+    RenderGL43(Client::Info screen_info, bool vsync, bool fullscreen);
+    ~RenderGL43() override;
 
     void BeginScene(Vector4 clear_colour) override;
     void EndScene() override;
@@ -128,4 +128,4 @@ private:
 };
 } // namespace blons
     
-#endif // BLONSTECH_GRAPHICS_RENDER_RENDERGL40_H_
+#endif // BLONSTECH_GRAPHICS_RENDER_RENDERGL43_H_
