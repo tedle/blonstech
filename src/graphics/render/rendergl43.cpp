@@ -111,13 +111,14 @@ public:
 class ShaderResourceGL43 : public ShaderResource
 {
 public:
-    ShaderResourceGL43(RenderGL43* context) : context_(context), context_id_(g_active_context) {}
+    ShaderResourceGL43(RenderGL43* context) : context_(context), context_id_(g_active_context), type_(NONE) {}
     ~ShaderResourceGL43() override;
 
     GLuint program_;
     std::vector<GLuint> shaders_;
     RenderGL43* context_;
     unsigned int context_id_;
+    enum ShaderType { NONE, PIPELINE, COMPUTE } type_;
 
     GLint UniformLocation(const char* name);
     template <typename T>
@@ -700,6 +701,45 @@ bool RenderGL43::RegisterShader(ShaderResource* program,
         LogCompileErrors(shader->program_, false);
         return false;
     }
+    shader->type_ = ShaderResourceGL43::PIPELINE;
+
+    return true;
+}
+
+bool RenderGL43::RegisterComputeShader(ShaderResource* program, std::string source)
+{
+    ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
+
+    // Initialize and compile the shaders
+    GLuint compute_shader = glCreateShader(GL_COMPUTE_SHADER);
+    shader->shaders_.push_back(compute_shader);
+    const char* cs = source.data();
+    glShaderSource(compute_shader, 1, &cs, nullptr);
+    glCompileShader(compute_shader);
+
+    // Check that everything went OK
+    int shader_result;
+    glGetShaderiv(compute_shader, GL_COMPILE_STATUS, &shader_result);
+    if (!shader_result)
+    {
+        LogCompileErrors(compute_shader, true);
+        return false;
+    }
+
+    // Take our shaders and turn it into a render pipeline
+    shader->program_ = glCreateProgram();
+    glAttachShader(shader->program_, compute_shader);
+    glLinkProgram(shader->program_);
+
+    // Check that everything went OK
+    int link_result;
+    glGetProgramiv(shader->program_, GL_LINK_STATUS, &link_result);
+    if (!link_result)
+    {
+        LogCompileErrors(shader->program_, false);
+        return false;
+    }
+    shader->type_ = ShaderResourceGL43::COMPUTE;
 
     return true;
 }
@@ -710,12 +750,31 @@ void RenderGL43::RenderShader(ShaderResource* program, unsigned int index_count)
 
     ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
 
+    if (shader->type_ != ShaderResourceGL43::PIPELINE)
+    {
+        throw "Bad shader type sent to rendering pipeline";
+    }
+
     BindShader(shader->program_);
 
     glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
     // TODO: make this only called once per shader somehow
     // nvogl32.dll loves it when i clean up my VAOs!
     glBindVertexArray(0);
+}
+
+void RenderGL43::RunComputeShader(ShaderResource* program, unsigned int groups_x,
+                                  unsigned int groups_y, unsigned int groups_z)
+{
+    ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
+
+    if (shader->type_ != ShaderResourceGL43::COMPUTE)
+    {
+        throw "Bad shader type sent to computing pipeline";
+    }
+
+    BindShader(shader->program_);
+    glDispatchCompute(groups_x, groups_y, groups_z);
 }
 
 void RenderGL43::BindFramebuffer(FramebufferResource* frame_buffer)

@@ -495,6 +495,15 @@ public:
     virtual bool RegisterShader(ShaderResource* program,
                                 std::string vertex_source, std::string pixel_source,
                                 ShaderAttributeList inputs)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a ShaderResource and source file, compiling them into a compute
+    /// shader that can be run at any time.
+    ///
+    /// \param program ShaderResource for identifying shader code in future calls
+    /// \param source Source code for the compute shader
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool RegisterComputeShader(ShaderResource* program, std::string source)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds the supplied ShaderResource and renders a number of vertices
@@ -505,6 +514,19 @@ public:
     /// \param index_count Number of vertices to render
     ////////////////////////////////////////////////////////////////////////////////
     virtual void RenderShader(ShaderResource* program, unsigned int index_count)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Binds and runs the supplied ShaderResource with the specified thread
+    /// group dimensions. Further granularity of threads can usually be described at
+    /// the shader level and in this case the total number of threads will be
+    /// `(groups_x * shader_x) * (groups_y * shader_y) * (groups_z * shader_z)`
+    ///
+    /// \param program %ComputeShader to render with
+    /// \param groups_x Number of thread groups running on the X axis
+    /// \param groups_y Number of thread groups running on the Y axis
+    /// \param groups_z Number of thread groups running on the Z axis
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void RunComputeShader(ShaderResource* program, unsigned int groups_x,
+                                  unsigned int groups_y, unsigned int groups_z)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a FramebufferResource and binds it to the graphics API,

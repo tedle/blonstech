@@ -63,8 +63,11 @@ public:
     bool RegisterShader(ShaderResource* program,
                         std::string vertex_source, std::string pixel_source,
                         ShaderAttributeList inputs) override;
+    bool RegisterComputeShader(ShaderResource* program, std::string source) override;
 
     void RenderShader(ShaderResource* program, unsigned int index_count) override;
+    void RunComputeShader(ShaderResource* program, unsigned int groups_x,
+                          unsigned int groups_y, unsigned int groups_z) override;
 
     void BindFramebuffer(FramebufferResource* frame_buffer) override;
     std::vector<const TextureResource*> FramebufferTextures(FramebufferResource* frame_buffer) override;
