@@ -214,6 +214,12 @@
     <ClInclude Include="graphics\render\rendergl43.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\computeshader.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\commonshader.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -352,6 +358,12 @@
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
     <ClCompile Include="graphics\render\rendergl43.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\computeshader.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\commonshader.cpp">
       <Filter>src\graphics\render</Filter>
     </ClCompile>
   </ItemGroup>

@@ -21,30 +21,30 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/render/shader.h>
+#include <blons/graphics/render/computeshader.h>
 
 namespace blons
 {
-Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs, RenderContext& context) :
+ComputeShader::ComputeShader(std::string source_filename, RenderContext& context) :
     CommonShader::CommonShader(context)
 {
-    std::string vertex_source = ParseFile(vertex_filename);
-    std::string pixel_source = ParseFile(pixel_filename);
+    std::string source = ParseFile(source_filename);
 
-    if (!context->RegisterShader(program_.get(), vertex_source, pixel_source, inputs))
+    if (!context->RegisterComputeShader(program_.get(), source))
     {
         log::Fatal("Shaders failed to compile\n");
         throw "Shaders failed to compile";
     }
 }
 
-Shader::~Shader()
+ComputeShader::~ComputeShader()
 {
 }
 
-bool Shader::Render(unsigned int index_count, RenderContext& context)
+bool ComputeShader::Run(unsigned int groups_x, unsigned int groups_y, unsigned int groups_z,
+                        RenderContext& context)
 {
-    context->RenderShader(program_.get(), index_count);
+    context->RunComputeShader(program_.get(), groups_x, groups_y, groups_z);
 
     return true;
 }

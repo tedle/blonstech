@@ -26,6 +26,7 @@
 
 // Includes
 #include <blons/graphics/render/render.h>
+#include <blons/graphics/render/commonshader.h>
 
 namespace blons
 {
@@ -33,7 +34,7 @@ namespace blons
 /// \brief Class for creating and interacting with a programmable rendering
 /// pipeline
 ////////////////////////////////////////////////////////////////////////////////
-class Shader
+class Shader : public CommonShader
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
@@ -55,72 +56,19 @@ public:
     /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     bool Render(unsigned int index_count, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Sets a shader's global variable to be that of the given value
-    ///
-    /// \param field Name of global variable to modify
-    /// \param value Value to set global variable to
-    /// \param context Handle to the current rendering context
-    /// \return True on success
-    ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const float value, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc SetInput
-    ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const int value, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc SetInput
-    ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const Matrix value, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc SetInput
-    ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const Vector2 value, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc SetInput
-    ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const Vector3 value, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc SetInput
-    ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const Vector4 value, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc SetInput
-    ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const TextureResource* value, RenderContext& context);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc SetInput
-    ///
-    /// \param texture_index The slot to bind the texture to. Defaults to 0
-    ////////////////////////////////////////////////////////////////////////////////
-    bool SetInput(const char* field, const TextureResource* value, unsigned int texture_index, RenderContext& context);
-
-protected:
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Loads source file into memory and applies preprocessor directives
-    ///
-    /// \param filename Source file on disk
-    /// \return String containing processed source code. Will throw on failure
-    ////////////////////////////////////////////////////////////////////////////////
-    std::string ParseFile(std::string filename);
-
-private:
-    std::unique_ptr<ShaderResource> program_;
 };
 } // namespace blons
 
+// TODO: When preprocessor is moved to standalone class from CommonShader, update docs
+// to reference new class both in Shader and ComputeShader
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::Shader
 /// \ingroup graphics
 ///
 /// The Shader class manages compilation and resource management of shader files
 /// used in rendering pipelines. Applies a custom preprocessor before sending
-/// each shader to the API's compiler.
-///
-/// ### Preprocessor Directives
-/// Directive | Usage
-/// --------- | -----
-/// include   | <tt>\#include \<shaders/mesh.fx\></tt>
+/// each shader to the API's compiler. For a list of preprocessor directives see
+/// the CommonShader class documentation.
 ///
 /// ### Example:
 /// \code
