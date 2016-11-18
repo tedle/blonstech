@@ -49,11 +49,23 @@ public:
     ~Shader();
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reloads the shader to be attached to the active rendering context
+    /// Will throw on failure
+    ////////////////////////////////////////////////////////////////////////////////
+    void Reload();
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Issues a draw call for the specified number of indices
     ///
     /// \param index_count Number of indices to render
     ////////////////////////////////////////////////////////////////////////////////
     bool Render(unsigned int index_count);
+
+private:
+    void Init();
+
+    std::string vertex_filename_;
+    std::string pixel_filename_;
+    ShaderAttributeList inputs_;
 };
 } // namespace blons
 

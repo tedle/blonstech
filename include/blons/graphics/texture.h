@@ -71,10 +71,9 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Reloads the texture to be attached to the active rendering context
-    ///
-    /// \return True if reinitialized successfully
+    /// Will throw on failure
     ////////////////////////////////////////////////////////////////////////////////
-    bool Reload();
+    void Reload();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves texture information like dimensions & usage type
@@ -90,9 +89,9 @@ public:
     const TextureResource* texture() const;
 
 private:
-    bool Init(std::string filename, TextureType::Options options);
-    bool Init(const PixelData& pixels);
-    bool Init(const PixelData3D& pixels);
+    void Init(std::string filename, TextureType::Options options);
+    void Init(const PixelData& pixels);
+    void Init(const PixelData3D& pixels);
 
     // Empty if initialized from PixelData or voxel data
     std::string filename_;

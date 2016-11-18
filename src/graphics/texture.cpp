@@ -30,13 +30,10 @@ namespace blons
 {
 Texture::Texture(std::string filename, TextureType::Options options)
 {
-    if (!Init(filename, options))
-    {
-        throw "Failed to load texture";
-    }
+    Init(filename, options);
 }
 
-bool Texture::Init(std::string filename, TextureType::Options options)
+void Texture::Init(std::string filename, TextureType::Options options)
 {
     filename_ = filename;
     pixel_data_ = nullptr;
@@ -47,20 +44,16 @@ bool Texture::Init(std::string filename, TextureType::Options options)
     info_ = tex.info;
     if (texture_ == nullptr)
     {
-        return false;
-    }
-    return true;
-}
-
-Texture::Texture(const PixelData& pixels)
-{
-    if (!Init(pixels))
-    {
         throw "Failed to load texture";
     }
 }
 
-bool Texture::Init(const PixelData& pixels)
+Texture::Texture(const PixelData& pixels)
+{
+    Init(pixels);
+}
+
+void Texture::Init(const PixelData& pixels)
 {
     auto context = render::context();
     filename_ = "";
@@ -71,31 +64,26 @@ bool Texture::Init(const PixelData& pixels)
     texture_.reset(context->MakeTextureResource());
     if (texture_ == nullptr)
     {
-        return false;
+        throw "Failed to allocate texture resource";
     }
 
     if (!context->RegisterTexture(texture_.get(), pixel_data_.get()))
     {
-        return false;
+        throw "Failed to register texture resource";
     }
 
     info_.width = pixel_data_->width;
     info_.height = pixel_data_->height;
     info_.depth = 1;
     info_.type = pixel_data_->type;
-
-    return true;
 }
 
 Texture::Texture(const PixelData3D& pixels)
 {
-    if (!Init(pixels))
-    {
-        throw "Failed to load texture";
-    }
+    Init(pixels);
 }
 
-bool Texture::Init(const PixelData3D& pixels)
+void Texture::Init(const PixelData3D& pixels)
 {
     auto context = render::context();
     filename_ = "";
@@ -106,35 +94,36 @@ bool Texture::Init(const PixelData3D& pixels)
     texture_.reset(context->MakeTextureResource());
     if (texture_ == nullptr)
     {
-        return false;
+        throw "Failed to allocate texture resource";
     }
 
     if (!context->RegisterTexture(texture_.get(), pixel_data_3d_.get()))
     {
-        return false;
+        throw "Failed to register texture resource";
     }
 
     info_.width = pixel_data_3d_->width;
     info_.height = pixel_data_3d_->height;
     info_.depth = pixel_data_3d_->depth;
     info_.type = pixel_data_3d_->type;
-
-    return true;
 }
 
-bool Texture::Reload()
+void Texture::Reload()
 {
     if (filename_.length() > 0)
     {
-        return Init(filename_, { info_.type.compression, info_.type.filter, info_.type.wrap });
+        Init(filename_, { info_.type.compression, info_.type.filter, info_.type.wrap });
     }
 
     else if (pixel_data_ != nullptr)
     {
-        return Init(*pixel_data_);
+        Init(*pixel_data_);
     }
 
-    return false;
+    else if (pixel_data_3d_ != nullptr)
+    {
+        Init(*pixel_data_3d_);
+    }
 }
 
 Texture::Info Texture::info() const

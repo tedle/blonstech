@@ -28,10 +28,7 @@ namespace blons
 Sprite::Sprite(std::string texture_filename, TextureType::Options options)
 {
     texture_.reset(new Texture(texture_filename, options));
-    if (!Init())
-    {
-        throw "Failed to register sprite";
-    }
+    Init();
 }
 
 Sprite::Sprite(std::string texture_filename)
@@ -42,13 +39,10 @@ Sprite::Sprite(std::string texture_filename)
 Sprite::Sprite(const PixelData& texture_data)
 {
     texture_.reset(new Texture(texture_data));
-    if (!Init())
-    {
-        throw "Failed to register sprite";
-    }
+    Init();
 }
 
-bool Sprite::Init()
+void Sprite::Init()
 {
     auto context = render::context();
     vertex_buffer_.reset(context->MakeBufferResource());
@@ -68,9 +62,8 @@ bool Sprite::Init()
                                  mesh_.vertices.data(), vertex_count(),
                                  mesh_.indices.data(), index_count()))
     {
-        return false;
+        throw "Failed to register sprite";
     }
-    return true;
 }
 
 void Sprite::Render()
@@ -83,17 +76,15 @@ void Sprite::Render()
     context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 }
 
-bool Sprite::Reload()
+void Sprite::Reload()
 {
     // Backup our sprite settings
     auto temp_pos = pos_;
     auto temp_tex = tex_map_;
 
     // Freshly initialize
-    if (!Init() || !texture_->Reload())
-    {
-        return false;
-    }
+    Init();
+    texture_->Reload();
 
     // Restore & push settings
     pos_ = temp_pos;
@@ -102,8 +93,6 @@ bool Sprite::Reload()
     render::context()->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
                                       mesh_.vertices.data(), 0, vertex_count(),
                                       mesh_.indices.data(), 0, index_count());
-
-    return true;
 }
 
 unsigned int Sprite::vertex_count() const

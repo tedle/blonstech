@@ -45,6 +45,11 @@ public:
     ~ComputeShader();
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Reloads the shader to be attached to the active rendering context
+    /// Will throw on failure
+    ////////////////////////////////////////////////////////////////////////////////
+    void Reload();
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds and runs the ComputeShader with the specified thread group
     /// dimensions. Further granularity of threads can usually be described at the
     /// shader level and in this case the total number of threads will be
@@ -55,6 +60,9 @@ public:
     /// \param groups_z Number of thread groups running on the Z axis
     ////////////////////////////////////////////////////////////////////////////////
     bool Run(unsigned int groups_x, unsigned int groups_y, unsigned int groups_z);
+
+private:
+    std::string source_filename_;
 };
 } // namespace blons
 

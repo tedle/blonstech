@@ -32,20 +32,17 @@ namespace blons
 {
 Mesh::Mesh(const std::string& mesh_filename)
 {
-    if (!Init(mesh_filename))
-    {
-        throw "Failed to initialize mesh";
-    }
+    filename_ = mesh_filename;
+    Reload();
 }
 
-bool Mesh::Init(const std::string& mesh_filename)
+void Mesh::Reload()
 {
-    filename_ = mesh_filename;
-    auto mesh = resource::LoadMesh(mesh_filename);
+    auto mesh = resource::LoadMesh(filename_);
 
     if (mesh.vertex == nullptr || mesh.index == nullptr)
     {
-        return false;
+        throw "Failed to initialize mesh";
     }
 
     vertex_buffer_ = std::move(mesh.vertex);
@@ -54,13 +51,6 @@ bool Mesh::Init(const std::string& mesh_filename)
     index_count_ = mesh.index_count;
     data_ = std::move(mesh.data);
     texture_list_ = mesh.texture_list;
-
-    return true;
-}
-
-bool Mesh::Reload()
-{
-    return Init(filename_);
 }
 
 BufferResource* Mesh::vertex_buffer() const

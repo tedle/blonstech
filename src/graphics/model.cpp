@@ -137,26 +137,12 @@ void Model::Render()
     render::context()->BindMeshBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
 }
 
-bool Model::Reload()
+void Model::Reload()
 {
-    if (!mesh_->Reload())
-    {
-        return false;
-    }
-    if (!albedo_texture_->Reload())
-    {
-        return false;
-    }
-    if (!normal_texture_->Reload())
-    {
-        return false;
-    }
-    if (!light_texture_->Reload())
-    {
-        return false;
-    }
-
-    return true;
+    mesh_->Reload();
+    albedo_texture_->Reload();
+    normal_texture_->Reload();
+    light_texture_->Reload();
 }
 
 int Model::index_count() const

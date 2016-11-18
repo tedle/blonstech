@@ -69,10 +69,9 @@ public:
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Reloads the mesh to be attached to the active rendering context
-    ///
-    /// \return True if reinitialized successfully
+    /// Will throw on failure
     ////////////////////////////////////////////////////////////////////////////////
-    bool Reload();
+    void Reload();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a handle to the mesh's vertex buffer resource
@@ -113,8 +112,6 @@ public:
     const std::vector<Mesh::TextureInfo>& textures() const;
 
 private:
-    bool Init(const std::string& mesh_filename);
-
     std::string filename_;
 
     std::shared_ptr<BufferResource> vertex_buffer_, index_buffer_;

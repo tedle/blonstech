@@ -28,18 +28,26 @@ namespace blons
 Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs) :
     CommonShader::CommonShader()
 {
-    std::string vertex_source = ParseFile(vertex_filename);
-    std::string pixel_source = ParseFile(pixel_filename);
-
-    if (!render::context()->RegisterShader(program_.get(), vertex_source, pixel_source, inputs))
-    {
-        log::Fatal("Shaders failed to compile\n");
-        throw "Shaders failed to compile";
-    }
+    vertex_filename_ = vertex_filename;
+    pixel_filename_ = pixel_filename;
+    inputs_ = inputs;
+    Reload();
 }
 
 Shader::~Shader()
 {
+}
+
+void Shader::Reload()
+{
+    std::string vertex_source = ParseFile(vertex_filename_);
+    std::string pixel_source = ParseFile(pixel_filename_);
+
+    if (!render::context()->RegisterShader(program_.get(), vertex_source, pixel_source, inputs_))
+    {
+        log::Fatal("Shaders failed to compile\n");
+        throw "Shaders failed to compile";
+    }
 }
 
 bool Shader::Render(unsigned int index_count)
