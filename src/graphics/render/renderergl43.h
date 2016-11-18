@@ -107,7 +107,6 @@ public:
     void UnmapBuffers();
 
 private:
-    unsigned int id_;
     Client::Info screen_;
     void LogCompileErrors(GLuint resource, bool is_shader);
     bool vsync_;

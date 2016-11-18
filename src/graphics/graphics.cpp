@@ -220,6 +220,7 @@ bool Graphics::RenderSprites()
 void Graphics::Reload(Client::Info screen)
 {
     log::Debug("Reloading ... ");
+    render::MakeContext(screen);
     Timer timer;
     resource::ClearBufferCache();
     Init(screen);

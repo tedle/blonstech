@@ -38,10 +38,6 @@ namespace blons
 {
 namespace
 {
-// Used to determine which context is currently active, if multiple exist
-static unsigned int g_active_context = 0;
-static unsigned int g_context_count = 0;
-
 // Overloaded glUniforms to keep things generic
 void Uniform(GLuint loc, float value)
 {
@@ -72,31 +68,29 @@ void Uniform(GLuint loc, Vector4 value)
 class BufferResourceGL43 : public BufferResource
 {
 public:
-    BufferResourceGL43(RendererGL43* context) : context_(context), context_id_(g_active_context) {}
+    BufferResourceGL43(Renderer::ContextID parent_id) : parent_id_(parent_id) {}
     ~BufferResourceGL43() override;
 
     GLuint buffer_, vertex_array_id_;
     enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
-    RendererGL43* context_;
-    unsigned int context_id_;
+    const Renderer::ContextID parent_id_;
 };
 
 class TextureResourceGL43 : public TextureResource
 {
 public:
-    TextureResourceGL43(RendererGL43* context) : context_(context), context_id_(g_active_context) {}
+    TextureResourceGL43(Renderer::ContextID parent_id) : parent_id_(parent_id) {}
     ~TextureResourceGL43() override;
 
     GLuint texture_;
-    RendererGL43* context_;
-    unsigned int context_id_;
+    const Renderer::ContextID parent_id_;
     GLint type_; ///< GL_TEXTURE_2D or GL_TEXTURE_3D
 };
 
 class FramebufferResourceGL43 : public FramebufferResource
 {
 public:
-    FramebufferResourceGL43(RendererGL43* context) : context_(context), context_id_(g_active_context) {}
+    FramebufferResourceGL43(Renderer::ContextID parent_id) : parent_id_(parent_id) {}
     ~FramebufferResourceGL43() override;
 
     GLuint framebuffer_;
@@ -104,20 +98,18 @@ public:
     std::vector<std::unique_ptr<TextureResourceGL43>> targets_;
     std::unique_ptr<TextureResourceGL43> depth_;
     GLuint depth_render_;
-    RendererGL43* context_;
-    unsigned int context_id_;
+    const Renderer::ContextID parent_id_;
 };
 
 class ShaderResourceGL43 : public ShaderResource
 {
 public:
-    ShaderResourceGL43(RendererGL43* context) : context_(context), context_id_(g_active_context), type_(NONE) {}
+    ShaderResourceGL43(Renderer::ContextID parent_id) : parent_id_(parent_id) {}
     ~ShaderResourceGL43() override;
 
     GLuint program_;
     std::vector<GLuint> shaders_;
-    RendererGL43* context_;
-    unsigned int context_id_;
+    const Renderer::ContextID parent_id_;
     enum ShaderType { NONE, PIPELINE, COMPUTE } type_;
 
     GLint UniformLocation(const char* name);
@@ -134,16 +126,16 @@ private:
 
 BufferResourceGL43::~BufferResourceGL43()
 {
-    // TODO: Something cleaner when multiple contexts are possible
-    if (g_active_context == 0)
+    auto active_context = render::context();
+    // TODO: Something cleaner in case owning context isnt actually deleted (inactive?)
+    // This is save when deleted since OpenGL contexts clean up after themselves
+    if (parent_id_ != active_context->id())
     {
         return;
     }
-    // TODO: Something cleaner in case owning context isnt actually deleted
-    // This shouldnt be possible yet
-    assert(context_id_ == g_active_context);
 
-    context_->UnmapBuffers();
+    auto context = static_cast<RendererGL43*>(active_context);
+    context->UnmapBuffers();
 
     if (type_ == BufferResourceGL43::VERTEX_BUFFER)
     {
@@ -161,12 +153,11 @@ BufferResourceGL43::~BufferResourceGL43()
 
 FramebufferResourceGL43::~FramebufferResourceGL43()
 {
-    if (g_active_context == 0)
+    auto active_context = render::context();
+    if (parent_id_ != active_context->id())
     {
         return;
     }
-    // This shouldnt be possible yet
-    assert(context_id_ == g_active_context);
 
     glDeleteRenderbuffers(1, &depth_render_);
 
@@ -176,24 +167,24 @@ FramebufferResourceGL43::~FramebufferResourceGL43()
 
 TextureResourceGL43::~TextureResourceGL43()
 {
-    if (g_active_context == 0)
+    auto active_context = render::context();
+    if (parent_id_ != active_context->id())
     {
         return;
     }
-    // This shouldnt be possible yet
-    assert(context_id_ == g_active_context);
 
     glDeleteTextures(1, &texture_);
 }
 
 ShaderResourceGL43::~ShaderResourceGL43()
 {
-    if (g_active_context == 0)
+    auto active_context = render::context();
+    if (parent_id_ != active_context->id())
     {
         return;
     }
-    // This shouldnt be possible yet
-    assert(context_id_ == g_active_context);
+
+    auto context = static_cast<RendererGL43*>(active_context);
 
     for (const auto& shader : shaders_)
     {
@@ -203,7 +194,7 @@ ShaderResourceGL43::~ShaderResourceGL43()
 
     glDeleteProgram(program_);
 
-    context_->UnbindShader();
+    context->UnbindShader();
 }
 
 GLint ShaderResourceGL43::UniformLocation(const char* name)
@@ -224,7 +215,8 @@ bool ShaderResourceGL43::SetUniform(const char* name, T value)
     // Clear errors so we know problems are isolated to this function
     glGetError();
 
-    context_->BindShader(program_);
+    auto context = static_cast<RendererGL43*>(render::context());
+    context->BindShader(program_);
 
     auto location = UniformLocation(name);
     if (location < 0)
@@ -241,10 +233,6 @@ bool ShaderResourceGL43::SetUniform(const char* name, T value)
 
 RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen)
 {
-    g_context_count++;
-    id_ = g_context_count;
-    g_active_context = id_;
-
     // Mitigates repeated calls to glUseProgram
     active_shader_ = 0;
 
@@ -414,8 +402,6 @@ RendererGL43::~RendererGL43()
     // Reset the current context before deleting it
     wglMakeCurrent(device_context_, nullptr);
     wglDeleteContext(render_context_);
-
-    g_active_context = 0;
 }
 
 void RendererGL43::BeginScene(Vector4 clear_colour)
@@ -431,22 +417,22 @@ void RendererGL43::EndScene()
 
 BufferResource* RendererGL43::MakeBufferResource()
 {
-    return new BufferResourceGL43(this);
+    return new BufferResourceGL43(id());
 }
 
 FramebufferResource* RendererGL43::MakeFramebufferResource()
 {
-    return new FramebufferResourceGL43(this);
+    return new FramebufferResourceGL43(id());
 }
 
 TextureResource* RendererGL43::MakeTextureResource()
 {
-    return new TextureResourceGL43(this);
+    return new TextureResourceGL43(id());
 }
 
 ShaderResource* RendererGL43::MakeShaderResource()
 {
-    return new ShaderResourceGL43(this);
+    return new ShaderResourceGL43(id());
 }
 
 bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
@@ -573,7 +559,7 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
     // Creates empty render targets
     auto make_texture = [&](TextureType type)
     {
-        auto tex = std::make_unique<TextureResourceGL43>(this);
+        auto tex = std::make_unique<TextureResourceGL43>(id());
 
         // Generate an ID for the texture.
         glGenTextures(1, &tex->texture_);

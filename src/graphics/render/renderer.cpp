@@ -26,6 +26,12 @@
 namespace blons
 {
     Renderer::ContextID Renderer::context_count = 1;
-    Renderer::Renderer() : id_(context_count) { context_count++; }
-    //Renderer::context_count = 1;
+    Renderer::Renderer() : id_(context_count)
+    {
+        context_count++;
+    }
+    Renderer::ContextID Renderer::id()
+    {
+        return id_;
+    }
 } // namespace blons

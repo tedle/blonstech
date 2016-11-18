@@ -371,8 +371,15 @@ public:
     using ContextID = std::size_t;
 
 public:
-    Renderer();// : id_(context_count) { context_count++; }
+    Renderer();
     virtual ~Renderer() {};
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves unique identifier for context
+    ///
+    /// \return Unique ContextID
+    ////////////////////////////////////////////////////////////////////////////////
+    ContextID id();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Called at the beginning of each frame, allows for any necessary setup
