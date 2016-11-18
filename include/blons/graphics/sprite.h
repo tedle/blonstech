@@ -27,7 +27,7 @@
 // Public Includes
 #include <blons/graphics/mesh.h>
 #include <blons/graphics/texture.h>
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 
 namespace blons
 {
@@ -43,41 +43,35 @@ public:
     ///
     /// \param texture_filename Image file on disk
     /// \param options Compression, filter, and wrapping options
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Sprite(std::string texture_filename, TextureType::Options options, RenderContext& context);
+    Sprite(std::string texture_filename, TextureType::Options options);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Initializes a new sprite from an image file. Uses default texture
     /// options of TextureType::RAW, TextureType::NEAREST, and TextureType::REPEAT.
     /// Will throw on failure
     ///
     /// \param texture_filename Image file on disk
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Sprite(std::string texture_filename, RenderContext& context);
+    Sprite(std::string texture_filename);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Initializes a new sprite from raw pixel data. Will throw on failure
     ///
     /// \param texture_data Pixel buffer and format info
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Sprite(const PixelData& texture_data, RenderContext& context);
+    Sprite(const PixelData& texture_data);
     virtual ~Sprite() {}
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Pushes quad to the graphics API preparing it for a draw call
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context);
+    void Render();
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Reloads the sprite to be active in the supplied rendering context
+    /// \brief Reloads the sprite to be attached to the active rendering context
     ///
-    /// \param context Handle to the current rendering context
     /// \return True if reinitialized successfully
     ////////////////////////////////////////////////////////////////////////////////
-    bool Reload(RenderContext& context);
+    bool Reload();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Number of vertices in the quad used for rendering. Should always be
@@ -190,10 +184,8 @@ public:
 protected:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Called by the constructor, completes all generic initialization
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    bool Init(RenderContext& context);
+    bool Init();
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Updates the internal mesh data to be based on the current position
     /// and texture region. Called by both Sprite::Render and Sprite::mesh
@@ -264,13 +256,13 @@ protected:
 ///     while (true)
 ///     {
 ///         // Push the sprites's vertices
-///         sprite->Render(context);
+///         sprite->Render();
 ///
 ///         // Set the shader's inputs
-///         shader->SetInput("sprite", sprite->texture(), context);
+///         shader->SetInput("sprite", sprite->texture());
 ///
 ///         // Make the draw call
-///         shader->Render(sprite->index_count(), context);
+///         shader->Render(sprite->index_count());
 ///     }
 /// }
 /// \endcode

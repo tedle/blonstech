@@ -29,7 +29,7 @@
 #include <memory>
 // Public Includes
 #include <blons/graphics/gui/font.h>
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 
 namespace blons
 {
@@ -342,10 +342,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Initializes nullptr for all Font%s (**temporary**) and a
     /// hard-coded skin texture (**temporary**)
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Skin(RenderContext& context);
+    Skin();
     ~Skin() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -355,10 +353,9 @@ public:
     /// \param pixel_size How large the font should be
     /// \param style Determines which parts of the UI will use the font. See
     /// gui::Skin::FontStyle
-    /// \param context Handle to the current rendering context
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    bool LoadFont(std::string filename, units::pixel pixel_size, FontStyle style, RenderContext& context);
+    bool LoadFont(std::string filename, units::pixel pixel_size, FontStyle style);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a handle to the font used for the specified Skin::FontStyle
     ///
@@ -406,7 +403,7 @@ protected:
 /// ### Example:
 /// \code
 /// // A UI element rendered using a skin
-/// void DerivesControl::Render(RenderContext& context)
+/// void DerivesControl::Render()
 /// {
 ///     // Find which part of the skin we're supposed to render
 ///     auto layout = gui_->skin()->layout();
@@ -416,7 +413,7 @@ protected:
 ///     auto sprite = gui_->skin()->sprite();
 ///
 ///     // Batch to send mesh data to
-///     auto batch = control_batch(crop_, feather_, context);
+///     auto batch = control_batch(crop_, feather_);
 ///
 ///     // Follow the containing Window's position as it's dragged around
 ///     auto parent_pos = parent_->pos();
@@ -426,7 +423,7 @@ protected:
 ///     // Render the center body of a button
 ///     sprite->set_pos(x, y, pos_.w, pos_.h);
 ///     sprite->set_subtexture(region.body);
-///     batch->Append(sprite->mesh(), context);
+///     batch->Append(sprite->mesh());
 /// }
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////

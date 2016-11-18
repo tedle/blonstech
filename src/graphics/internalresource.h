@@ -25,7 +25,7 @@
 #define BLONSTECH_GRAPHICS_INTERNALRESOURCE_H_
 
 // Public Includes
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 #include <blons/graphics/mesh.h>
 
 namespace blons

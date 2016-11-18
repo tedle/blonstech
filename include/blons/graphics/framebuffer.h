@@ -24,7 +24,7 @@
 #ifndef BLONSTECH_GRAPHICS_FRAMEBUFFER_H_
 #define BLONSTECH_GRAPHICS_FRAMEBUFFER_H_
 
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 #include <blons/graphics/mesh.h>
 
 namespace blons
@@ -43,24 +43,23 @@ public:
     /// \param height Height of the render target in pixels
     /// \param texture_formats The format of the output textures
     /// \param store_depth If true will store the depth buffer as a texture
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth, RenderContext& context);
+    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool, RenderContext&)
+    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool)
     /// with a default store_depth of true
     ////////////////////////////////////////////////////////////////////////////////
-    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, RenderContext& context);
+    Framebuffer(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool, RenderContext&)
+    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool)
     /// with a default texture list of {R8B8G8, LINEAR, CLAMP}
     ////////////////////////////////////////////////////////////////////////////////
-    Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, bool store_depth, RenderContext& context);
+    Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, bool store_depth);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool, RenderContext&)
+    /// \brief Calls Framebuffer(units::pixel, units::pixel, std::vector<TextureType>, bool)
     /// with a default texture list of {R8B8G8, LINEAR, CLAMP} and a store_depth of true
     ////////////////////////////////////////////////////////////////////////////////
-    Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count, RenderContext& context);
+    Framebuffer(units::pixel width, units::pixel height, unsigned int texture_count);
     ~Framebuffer() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -69,40 +68,35 @@ public:
     ///
     /// For more 3D uses you currently have to supply your own mesh data
     /// and retrieve the render targets through the textures() function.
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context);
+    void Render();
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Binds the framebuffer to the supplied rendering context causing all
+    /// \brief Binds the framebuffer to the active rendering context causing all
     /// subsequent draw calls to be drawn to this buffer. Updates the viewport to
     /// match the size of the buffer's output texture and clears all textures to the
     /// given colour
     ///
     /// \param clear_colour Colour to fill the screen with
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Bind(Vector4 clear_colour, RenderContext& context);
+    void Bind(Vector4 clear_colour);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Bind(Vector4, RenderContext&) with a default colour black
+    /// \brief Calls Bind(Vector4) with a default colour black
     ////////////////////////////////////////////////////////////////////////////////
-    void Bind(RenderContext& context);
+    void Bind();
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief If clear_buffer is false, binds the framebuffer without clearing
-    /// the old texture. Otherwise calls Bind(Vector4, RenderContext&) with a
-    /// default colour of black
+    /// the old texture. Otherwise calls Bind(Vector4) with a default colour of
+    /// black
     ////////////////////////////////////////////////////////////////////////////////
-    void Bind(bool clear_buffer, RenderContext& context);
+    void Bind(bool clear_buffer);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Unbinds the framebuffer causing all subsequent draw calls to be drawn
     /// to the default back buffer. Updates the viewport to match the size of the
     /// back buffer
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Unbind(RenderContext& context);
+    void Unbind();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Number of vertices in the quad used for rendering. Should always be
@@ -134,7 +128,7 @@ public:
     const TextureResource* depth();
 
 private:
-    void Init(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth, RenderContext& context);
+    void Init(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth);
 
     std::unique_ptr<FramebufferResource> fbo_;
 

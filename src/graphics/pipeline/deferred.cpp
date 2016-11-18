@@ -37,16 +37,16 @@ namespace blons
 {
 namespace pipeline
 {
-Deferred::Deferred(Client::Info screen, float fov, float screen_near, float screen_far, RenderContext& context)
+Deferred::Deferred(Client::Info screen, float fov, float screen_near, float screen_far)
 {
     output_ = FINAL;
     alt_output_ = ALBEDO;
-    Reload(screen, fov, screen_near, screen_far, context);
+    Reload(screen, fov, screen_near, screen_far);
 }
 
 Deferred::~Deferred() {}
 
-bool Deferred::Init(RenderContext& context)
+bool Deferred::Init()
 {
     // Projection matrix (3D space->2D screen)
     float screen_aspect = static_cast<float>(perspective_.width) / static_cast<float>(perspective_.height);
@@ -57,29 +57,29 @@ bool Deferred::Init(RenderContext& context)
                                        perspective_.screen_near, perspective_.screen_far);
 
     // Pipeline setup
-    geometry_.reset(new stage::Geometry(perspective_, context));
-    shadow_.reset(new stage::Shadow(perspective_, context));
-    lightprobe_.reset(new stage::Lightprobe(perspective_, context));
-    lighting_.reset(new stage::Lighting(perspective_, context));
+    geometry_.reset(new stage::Geometry(perspective_));
+    shadow_.reset(new stage::Shadow(perspective_));
+    lightprobe_.reset(new stage::Lightprobe(perspective_));
+    lighting_.reset(new stage::Lighting(perspective_));
 
     // Shaders
     ShaderAttributeList composite_inputs;
     composite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     composite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", composite_inputs, context));
+    composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", composite_inputs));
 
     if (composite_shader_ == nullptr)
     {
         return false;
     }
 
-    output_sprite_.reset(new Sprite("blons:none", context));
-    alt_output_sprite_.reset(new Sprite("blons:none", context));
+    output_sprite_.reset(new Sprite("blons:none"));
+    alt_output_sprite_.reset(new Sprite("blons:none"));
 
     return true;
 }
 
-void Deferred::Reload(Client::Info screen, float fov, float screen_near, float screen_far, RenderContext& context)
+void Deferred::Reload(Client::Info screen, float fov, float screen_near, float screen_far)
 {
     perspective_.width = screen.width;
     perspective_.height = screen.height;
@@ -87,15 +87,15 @@ void Deferred::Reload(Client::Info screen, float fov, float screen_near, float s
     perspective_.screen_far = screen_far;
     perspective_.fov = fov;
 
-    Init(context);
+    Init();
 }
 
-bool Deferred::Render(const Scene& scene, RenderContext& context)
+bool Deferred::Render(const Scene& scene)
 {
-    return Render(scene, nullptr, context);
+    return Render(scene, nullptr);
 }
 
-bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer, RenderContext& context)
+bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
 {
     // TODO: Support more scene lights
     assert(scene.lights.size() == 1);
@@ -106,26 +106,26 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer, RenderCont
     Matrix light_vp_matrix = sun->ViewFrustum(view_matrix * proj_matrix_, perspective_.screen_far);
 
     // Render all of the geometry and accompanying info (normal, depth, etc)
-    if (!geometry_->Render(scene, view_matrix, proj_matrix_, context))
+    if (!geometry_->Render(scene, view_matrix, proj_matrix_))
     {
         return false;
     }
 
     // Render all of the geometry and get their depth from the light's point of view
     // Then render a shadow map from the depth information
-    if (!shadow_->Render(scene, *geometry_, view_matrix, proj_matrix_, light_vp_matrix, ortho_matrix_, context))
+    if (!shadow_->Render(scene, *geometry_, view_matrix, proj_matrix_, light_vp_matrix, ortho_matrix_))
     {
         return false;
     }
 
     // Builds a direct light map and then bounce lighting
     if (!lightprobe_->Render(scene, *geometry_, *shadow_, perspective_,
-                             view_matrix, proj_matrix_, light_vp_matrix, context))
+                             view_matrix, proj_matrix_, light_vp_matrix))
     {
         return false;
     }
 
-    if (!lighting_->Render(scene, *geometry_, *shadow_, *lightprobe_, view_matrix, proj_matrix_, ortho_matrix_, context))
+    if (!lighting_->Render(scene, *geometry_, *shadow_, *lightprobe_, view_matrix, proj_matrix_, ortho_matrix_))
     {
         return false;
     }
@@ -133,15 +133,15 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer, RenderCont
     // Bind the output buffer
     if (output_buffer != nullptr)
     {
-        output_buffer->Bind(context);
+        output_buffer->Bind();
     }
     else
     {
-        context->BindFramebuffer(nullptr);
+        render::context()->BindFramebuffer(nullptr);
     }
 
     // Render the final composite of the geometry and lighting passes
-    if (!RenderComposite(scene, context))
+    if (!RenderComposite(scene))
     {
         return false;
     }
@@ -149,9 +149,9 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer, RenderCont
     return true;
 }
 
-bool Deferred::BuildLighting(const Scene& scene, RenderContext& context)
+bool Deferred::BuildLighting(const Scene& scene)
 {
-    return lightprobe_->BuildLighting(scene, context);
+    return lightprobe_->BuildLighting(scene);
 }
 
 void Deferred::set_output(Output output, Output alt_output)
@@ -160,7 +160,7 @@ void Deferred::set_output(Output output, Output alt_output)
     alt_output_ = alt_output;
 }
 
-bool Deferred::RenderComposite(const Scene& scene, RenderContext& context)
+bool Deferred::RenderComposite(const Scene& scene)
 {
     output_sprite_->set_pos(0, 0, perspective_.width, perspective_.height);
     output_sprite_->set_subtexture(0, 16, 16, -16);
@@ -230,23 +230,23 @@ bool Deferred::RenderComposite(const Scene& scene, RenderContext& context)
         }
     };
     // Needed so sprites can render over themselves
-    context->SetDepthTesting(false);
+    render::context()->SetDepthTesting(false);
 
     const TextureResource* texture;
     texture = output_texture(output_, output_sprite_.get());
     if (texture != nullptr)
     {
         // Push the full screen quad used to render FBO
-        output_sprite_->Render(context);
+        output_sprite_->Render();
 
         // Set the inputs
-        if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_, context) ||
-            !composite_shader_->SetInput("sprite", texture, context))
+        if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_) ||
+            !composite_shader_->SetInput("sprite", texture))
         {
             return false;
         }
 
-        if (!composite_shader_->Render(output_sprite_->index_count(), context))
+        if (!composite_shader_->Render(output_sprite_->index_count()))
         {
             return false;
         }
@@ -256,16 +256,16 @@ bool Deferred::RenderComposite(const Scene& scene, RenderContext& context)
     if (texture != nullptr)
     {
         // Push the mini screen quad used to render alt FBO
-        alt_output_sprite_->Render(context);
+        alt_output_sprite_->Render();
 
         // Set the inputs
-        if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_, context) ||
-            !composite_shader_->SetInput("sprite", texture, context))
+        if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_) ||
+            !composite_shader_->SetInput("sprite", texture))
         {
             return false;
         }
 
-        if (!composite_shader_->Render(alt_output_sprite_->index_count(), context))
+        if (!composite_shader_->Render(alt_output_sprite_->index_count()))
         {
             return false;
         }

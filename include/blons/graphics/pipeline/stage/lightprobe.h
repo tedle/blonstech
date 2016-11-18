@@ -70,9 +70,8 @@ public:
     /// \brief Initializes a new Lightprobe stage
     ///
     /// \param perspective Screen dimensions and perspective information
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Lightprobe(Perspective perspective, RenderContext& context);
+    Lightprobe(Perspective perspective);
     ~Lightprobe() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -88,18 +87,16 @@ public:
     /// \param proj_matrix Perspective matrix for rendering the scene
     /// \param light_vp_matrix View projetion matrix of the directional light
     /// providing shadow
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, Perspective perspective,
-                Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, RenderContext& context);
+                Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Builds light probe caching information. Should be called once after
     /// map load
     ///
     /// \param scene Contains scene information for rendering
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    bool BuildLighting(const Scene& scene, RenderContext& context);
+    bool BuildLighting(const Scene& scene);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage
@@ -115,11 +112,11 @@ private:
     void GenerateProbes();
 
     // Should only be called once per map load
-    bool BuildLightMapLookups(const Scene& scene, RenderContext& context);
-    bool BuildProbeMaps(const Scene& scene, RenderContext& context);
+    bool BuildLightMapLookups(const Scene& scene);
+    bool BuildProbeMaps(const Scene& scene);
 
-    bool RenderLightmaps(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix, RenderContext& context);
-    bool SumCoefficients(const Scene& scene, RenderContext& context);
+    bool RenderLightmaps(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix);
+    bool SumCoefficients(const Scene& scene);
 
     // Light map stuff
     std::unique_ptr<Shader> light_map_lookup_shader_;

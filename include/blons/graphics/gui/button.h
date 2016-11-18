@@ -53,10 +53,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Submits a drawbatch with mesh data & shader inputs to the parent
     /// gui::Manager
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context) override;
+    void Render() override;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs input logic to detect mouse clicks.
     ///
@@ -77,9 +75,8 @@ protected:
     /// \brief Creates mesh for the body and appends it to the button's draw queue
     ///
     /// \param b Region of the UI skin to render (active, hover, normal, etc)
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void RenderBody(const Skin::Layout::Button& b, RenderContext& context);
+    void RenderBody(const Skin::Layout::Button& b);
 
 private:
     std::unique_ptr<class Label> label_;

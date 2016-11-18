@@ -21,51 +21,28 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/gui/skin.h>
-
-// Public Includes
-#include <blons/graphics/sprite.h>
+// Includes
+#include <blons/graphics/render/context.h>
+// Local Includes
+#include "renderergl43.h"
 
 namespace blons
 {
-namespace gui
+namespace render
 {
-Skin::Skin()
+static std::unique_ptr<Renderer> g_context;
+Renderer* context()
 {
-    // TODO: Load from user supplied image
-    skin_.reset(new Sprite("skin.png", { TextureType::RAW, TextureType::LINEAR, TextureType::CLAMP }));
-
-    // TODO: Ensure DEFAULT font is somehow not nullptr before being handed over to user
-    font_list_[DEFAULT] = nullptr;
-    font_list_[HEADING] = nullptr;
-    font_list_[LABEL] = nullptr;
-    font_list_[CONSOLE] = nullptr;
-}
-
-bool Skin::LoadFont(std::string filename, units::pixel pixel_size, FontStyle style)
-{
-    font_list_[style].reset(new Font(filename, pixel_size));
-    return true;
-}
-
-Font* Skin::font(FontStyle style)
-{
-    auto& font = font_list_[style];
-    if (font != nullptr)
+    if (g_context == nullptr)
     {
-        return font.get();
+        throw "Attempted to retrieve unitialized context";
     }
-    return font_list_[DEFAULT].get();
+    return g_context.get();
 }
-
-Sprite* Skin::sprite() const
+void MakeContext(const Client::Info& info)
 {
-    return skin_.get();
+    g_context.reset(new blons::RendererGL43(info, false, kMode == Mode::FULLSCREEN));
 }
-
-const Skin::Layout* Skin::layout() const
-{
-    return &layout_;
-}
-} // namespace gui
+} // namespace render
 } // namespace blons
+

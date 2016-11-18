@@ -115,10 +115,10 @@ DebugSlider::~DebugSlider()
 {
 }
 
-void DebugSlider::Render(RenderContext& context)
+void DebugSlider::Render()
 {
-    button_->Render(context);
-    textbox_->Render(context);
+    button_->Render();
+    textbox_->Render();
 }
 
 bool DebugSlider::Update(const Input& input)

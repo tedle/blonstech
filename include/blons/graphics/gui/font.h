@@ -48,9 +48,8 @@ public:
     ///
     /// \param font_filename Location of the font file to load
     /// \param pixel_size %Font size in pixels, same as in other programs
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Font(std::string font_filename, units::pixel pixel_size, RenderContext& context);
+    Font(std::string font_filename, units::pixel pixel_size);
     ~Font();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -188,17 +187,17 @@ private:
 /// \code
 /// // Rendering a string to the screen as a batch
 /// std::string text = "Welcome, gamer!";
-/// auto batch = std::make_unique<DrawBatcher>(context);
-/// auto font = std::make_unique<Font>("font.ttf", 30, context);
+/// auto batch = std::make_unique<DrawBatcher>();
+/// auto font = std::make_unique<Font>("font.ttf", 30);
 /// int x = 100;
 /// int y = 100;
 /// for (const auto& c : text)
 /// {
 ///     auto mesh = font->BuildMesh(c, x, y);
-///     batch->Append(*mesh, context);
+///     batch->Append(*mesh);
 ///     x += font->advance();
 /// }
-/// batch->Render(context);
+/// batch->Render();
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

@@ -31,8 +31,8 @@
 #include <blons/math/math.h>
 #include <blons/temphelpers.h>
 // Local Includes
-#include "render/renderd3d11.h"
-#include "render/rendergl43.h"
+#include "render/rendererd3d11.h"
+#include "render/renderergl43.h"
 #include "resource.h"
 
 namespace blons
@@ -41,7 +41,7 @@ namespace blons
 class ManagedModel : public Model
 {
 public:
-    ManagedModel(std::string filename, RenderContext& context) : Model(filename, context) {}
+    ManagedModel(std::string filename) : Model(filename) {}
     ~ManagedModel() override;
 private:
     friend Graphics;
@@ -52,7 +52,7 @@ private:
 class ManagedSprite : public Sprite
 {
 public:
-    ManagedSprite(std::string filename, RenderContext& context) : Sprite(filename, context) {}
+    ManagedSprite(std::string filename) : Sprite(filename) {}
     ~ManagedSprite() override;
 private:
     friend Graphics;
@@ -62,13 +62,13 @@ private:
 
 Graphics::Graphics(Client::Info screen)
 {
-    if (!MakeContext(screen))
+    if (!Init(screen))
     {
         log::Fatal("Failed to initialize rendering context\n");
         throw "Failed to initiralize rendering context";
     }
 
-    pipeline_.reset(new pipeline::Deferred(screen, kPi / 4.0f, kScreenNear, kScreenFar, context_));
+    pipeline_.reset(new pipeline::Deferred(screen, kPi / 4.0f, kScreenNear, kScreenFar));
 
     // Camera
     camera_.reset(new Camera);
@@ -120,7 +120,7 @@ Graphics::~Graphics()
 
 std::unique_ptr<Model> Graphics::MakeModel(std::string filename)
 {
-    auto model = new ManagedModel(filename, context_);
+    auto model = new ManagedModel(filename);
     model->deleter_ = [&](ManagedModel* m)
     {
         models_.erase(m);
@@ -131,7 +131,7 @@ std::unique_ptr<Model> Graphics::MakeModel(std::string filename)
 
 std::unique_ptr<Sprite> Graphics::MakeSprite(std::string filename)
 {
-    auto sprite = new ManagedSprite(filename, context_);
+    auto sprite = new ManagedSprite(filename);
     sprite->deleter_ = [&](ManagedSprite* s)
     {
         sprites_.erase(s);
@@ -142,6 +142,7 @@ std::unique_ptr<Sprite> Graphics::MakeSprite(std::string filename)
 
 bool Graphics::Render()
 {
+    auto context = render::context();
     pipeline::Scene scene;
     scene.lights = { sun_.get() };
     scene.models.assign(models_.begin(), models_.end());
@@ -149,15 +150,15 @@ bool Graphics::Render()
     scene.view = *camera_;
 
     // Clear buffers
-    context_->BeginScene(Vector4(0, 0, 0, 1));
+    context->BeginScene(Vector4(0, 0, 0, 1));
 
     // Render the scene
-    if (!pipeline_->Render(scene, output_buffer_.get(), context_))
+    if (!pipeline_->Render(scene, output_buffer_.get()))
     {
         return false;
     }
 
-    output_buffer_->Bind(false, context_);
+    output_buffer_->Bind(false);
 
     // Render all 2D sprites
     if (!RenderSprites())
@@ -166,26 +167,26 @@ bool Graphics::Render()
     }
 
     // Render the GUI
-    gui_->Render(output_buffer_.get(), context_);
+    gui_->Render(output_buffer_.get());
 
     // Output the main FBO to the backbuffer
-    context_->BindFramebuffer(nullptr);
-    output_buffer_->Render(context_);
+    context->BindFramebuffer(nullptr);
+    output_buffer_->Render();
 
     // Set the inputs
-    if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
-        !sprite_shader_->SetInput("sprite", output_buffer_->textures()[0], context_))
+    if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_) ||
+        !sprite_shader_->SetInput("sprite", output_buffer_->textures()[0]))
     {
         return false;
     }
 
-    if (!sprite_shader_->Render(output_buffer_->index_count(), context_))
+    if (!sprite_shader_->Render(output_buffer_->index_count()))
     {
         return false;
     }
 
     // Swap buffers
-    context_->EndScene();
+    context->EndScene();
 
     return true;
 }
@@ -193,22 +194,22 @@ bool Graphics::Render()
 bool Graphics::RenderSprites()
 {
     // Needed so sprites can render over themselves
-    context_->SetDepthTesting(false);
+    render::context()->SetDepthTesting(false);
 
     for (const auto& sprite : sprites_)
     {
         // Prep the pipeline 4 drawering
-        sprite->Render(context_);
+        sprite->Render();
 
         // Set the inputs
-        if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_, context_) ||
-            !sprite_shader_->SetInput("sprite", sprite->texture(), context_))
+        if (!sprite_shader_->SetInput("proj_matrix", ortho_matrix_) ||
+            !sprite_shader_->SetInput("sprite", sprite->texture()))
         {
             return false;
         }
 
         // Make the draw call
-        if (!sprite_shader_->Render(sprite->index_count(), context_))
+        if (!sprite_shader_->Render(sprite->index_count()))
         {
             return false;
         }
@@ -221,15 +222,15 @@ void Graphics::Reload(Client::Info screen)
     log::Debug("Reloading ... ");
     Timer timer;
     resource::ClearBufferCache();
-    MakeContext(screen);
-    pipeline_->Reload(screen, kPi / 4.0f, kScreenNear, kScreenFar, context_);
+    Init(screen);
+    pipeline_->Reload(screen, kPi / 4.0f, kScreenNear, kScreenFar);
     for (auto& m : models_)
     {
-        m->Reload(context_);
+        m->Reload();
     }
     for (auto& s : sprites_)
     {
-        s->Reload(context_);
+        s->Reload();
     }
     log::Debug("%ims!\n", timer.ms());
     BuildLighting();
@@ -245,7 +246,7 @@ bool Graphics::BuildLighting()
 
     log::Debug("Building irradiance volumes... ");
     Timer timer;
-    if (!pipeline_->BuildLighting(scene, context_))
+    if (!pipeline_->BuildLighting(scene))
     {
         log::Debug("failed!\n");
         return false;
@@ -269,17 +270,10 @@ void Graphics::set_output(pipeline::Deferred::Output output, pipeline::Deferred:
     pipeline_->set_output(output, alt_output);
 }
 
-bool Graphics::MakeContext(Client::Info screen)
+bool Graphics::Init(Client::Info screen)
 {
     screen_ = screen;
-
-    // OpenGL
-    context_.reset();
-    context_ = RenderContext(new RenderGL43(screen, kEnableVsync, (kRenderMode == RenderMode::FULLSCREEN)));
-    if (!context_)
-    {
-        return false;
-    }
+    auto context = render::context();
 
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height), 0,
@@ -289,7 +283,7 @@ bool Graphics::MakeContext(Client::Info screen)
     ShaderAttributeList sprite_inputs;
     sprite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     sprite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    sprite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", sprite_inputs, context_));
+    sprite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", sprite_inputs));
 
     if (sprite_shader_ == nullptr)
     {
@@ -299,14 +293,14 @@ bool Graphics::MakeContext(Client::Info screen)
     // GUI
     if (gui_ == nullptr)
     {
-        gui_.reset(new gui::Manager(screen.width, screen.height, context_));
+        gui_.reset(new gui::Manager(screen.width, screen.height));
     }
     else
     {
-        gui_->Reload(screen.width, screen.height, context_);
+        gui_->Reload(screen.width, screen.height);
     }
 
-    output_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false, context_));
+    output_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false));
 
     return true;
 }

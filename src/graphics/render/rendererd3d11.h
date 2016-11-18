@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_RENDER_RENDERD3D11_H_
-#define BLONSTECH_GRAPHICS_RENDER_RENDERD3D11_H_
+#ifndef BLONSTECH_GRAPHICS_RENDER_RENDERERD3D11_H_
+#define BLONSTECH_GRAPHICS_RENDER_RENDERERD3D11_H_
 
 // NOTE: D3D11 PIPELINE HAS FALLEN DECENTLY FAR BEHIND OPENGL PIPELINE AND WILL NOT COMPILE ATM
 
@@ -36,7 +36,7 @@
 #include <d3d11.h>
 // Public Includes
 #include <blons/math/math.h>
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 
 namespace blons
 {
@@ -69,13 +69,13 @@ public:
 };
 
 
-class RenderD3D11 : public Render
+class RendererD3D11 : public Renderer
 {
     
 public:
-    RenderD3D11(int screen_width, int screen_height, bool vsync,
+    RendererD3D11(int screen_width, int screen_height, bool vsync,
                 HWND hwnd, bool fullscreen);
-    ~RenderD3D11();
+    ~RendererD3D11();
 
     void BeginScene();
     void EndScene();
@@ -120,4 +120,4 @@ private:
 };
 } // namespace blons
     
-#endif // BLONSTECH_GRAPHICS_RENDER_RENDERD3D11_H_
+#endif // BLONSTECH_GRAPHICS_RENDER_RENDERERD3D11_H_

@@ -30,12 +30,12 @@ namespace blons
 {
 namespace gui
 {
-void ConsoleTextarea::Render(RenderContext& context)
+void ConsoleTextarea::Render()
 {
     auto layout = gui_->skin()->layout();
 
-    RenderBody(layout->console.textarea, context);
-    RenderText(layout->console.textarea, context);
+    RenderBody(layout->console.textarea);
+    RenderText(layout->console.textarea);
 }
 } // namespace gui
 } // namespace blons

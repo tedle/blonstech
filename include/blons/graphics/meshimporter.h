@@ -97,7 +97,7 @@ private:
 /// // Creating a new mesh with data from a MeshImporter
 /// MeshImporter importer("mesh.bms");
 ///
-/// Mesh mesh(importer.mesh_data(), context);
+/// Mesh mesh(importer.mesh_data());
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

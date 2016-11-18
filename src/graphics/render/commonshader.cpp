@@ -30,49 +30,49 @@
 
 namespace blons
 {
-CommonShader::CommonShader(RenderContext& context)
+CommonShader::CommonShader()
 {
-    program_.reset(context->MakeShaderResource());
+    program_.reset(render::context()->MakeShaderResource());
 }
 
-bool CommonShader::SetInput(const char* field, const float value, RenderContext& context)
+bool CommonShader::SetInput(const char* field, const float value)
 {
-    return context->SetShaderInput(program_.get(), field, value);
+    return render::context()->SetShaderInput(program_.get(), field, value);
 }
 
-bool CommonShader::SetInput(const char* field, const int value, RenderContext& context)
+bool CommonShader::SetInput(const char* field, const int value)
 {
-    return context->SetShaderInput(program_.get(), field, value);
+    return render::context()->SetShaderInput(program_.get(), field, value);
 }
 
-bool CommonShader::SetInput(const char* field, const Matrix value, RenderContext& context)
+bool CommonShader::SetInput(const char* field, const Matrix value)
 {
-    return context->SetShaderInput(program_.get(), field, value);
+    return render::context()->SetShaderInput(program_.get(), field, value);
 }
 
-bool CommonShader::SetInput(const char* field, const Vector2 value, RenderContext& context)
+bool CommonShader::SetInput(const char* field, const Vector2 value)
 {
-    return context->SetShaderInput(program_.get(), field, value);
+    return render::context()->SetShaderInput(program_.get(), field, value);
 }
 
-bool CommonShader::SetInput(const char* field, const Vector3 value, RenderContext& context)
+bool CommonShader::SetInput(const char* field, const Vector3 value)
 {
-    return context->SetShaderInput(program_.get(), field, value);
+    return render::context()->SetShaderInput(program_.get(), field, value);
 }
 
-bool CommonShader::SetInput(const char* field, const Vector4 value, RenderContext& context)
+bool CommonShader::SetInput(const char* field, const Vector4 value)
 {
-    return context->SetShaderInput(program_.get(), field, value);
+    return render::context()->SetShaderInput(program_.get(), field, value);
 }
 
-bool CommonShader::SetInput(const char* field, const TextureResource* value, RenderContext& context)
+bool CommonShader::SetInput(const char* field, const TextureResource* value)
 {
-    return context->SetShaderInput(program_.get(), field, value, 0);
+    return render::context()->SetShaderInput(program_.get(), field, value, 0);
 }
 
-bool CommonShader::SetInput(const char* field, const TextureResource* value, unsigned int texture_index, RenderContext& context)
+bool CommonShader::SetInput(const char* field, const TextureResource* value, unsigned int texture_index)
 {
-    return context->SetShaderInput(program_.get(), field, value, texture_index);
+    return render::context()->SetShaderInput(program_.get(), field, value, texture_index);
 }
 
 std::string CommonShader::ParseFile(std::string filename)

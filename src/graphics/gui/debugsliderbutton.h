@@ -51,10 +51,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Submits a drawbatch with mesh data & shader inputs to the parent
     /// gui::Manager
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context) override;
+    void Render() override;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs input logic to detect mouse clicks.
     ///
@@ -74,7 +72,7 @@ public:
     void set_callback(std::function<void(units::pixel x_delta, units::pixel y_distance)> callback);
 
 protected:
-    void RenderBody(const Skin::Layout::Button& b, RenderContext& context);
+    void RenderBody(const Skin::Layout::Button& b);
 
 private:
     std::function<void(units::pixel x_delta, units::pixel y_distance)> callback_;

@@ -39,7 +39,7 @@ DebugSliderTextbox::DebugSliderTextbox(Box pos, Skin::FontStyle style, Manager* 
     set_progress(0.0f);
 }
 
-void DebugSliderTextbox::Render(RenderContext& context)
+void DebugSliderTextbox::Render()
 {
     auto layout = gui_->skin()->layout();
 
@@ -53,21 +53,21 @@ void DebugSliderTextbox::Render(RenderContext& context)
         textbox_layout = &layout->textbox.normal;
     }
 
-    RenderBody(*textbox_layout, context);
-    RenderProgress(context);
+    RenderBody(*textbox_layout);
+    RenderProgress();
     if (focus())
     {
-        RenderCursor(layout->textbox.cursor, context);
+        RenderCursor(layout->textbox.cursor);
     }
 
-    RenderText(context);
+    RenderText();
 }
 
-void DebugSliderTextbox::RenderProgress(RenderContext& context)
+void DebugSliderTextbox::RenderProgress()
 {
     auto t = gui_->skin()->layout()->textbox.progress;
     auto sprite = gui_->skin()->sprite();
-    auto batch = gui_->control_batch(crop_, feather_, context);
+    auto batch = gui_->control_batch(crop_, feather_);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
@@ -84,7 +84,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                                t.top_left.y,
                                std::min(pixel_width, t.top_left.w),
                                t.top_left.h);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Left edge
         sprite->set_pos(x,
@@ -95,7 +95,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                                t.left.y,
                                std::min(pixel_width, t.left.w),
                                t.left.h);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Bottom left corner
         sprite->set_pos(x,
@@ -106,7 +106,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                                t.bottom_left.y,
                                std::min(pixel_width, t.bottom_left.w),
                                t.bottom_left.h);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
 
     if (pixel_width > t.top_left.w)
@@ -117,7 +117,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                         std::min(pixel_width - t.top_left.w, pos_.w - (t.top_left.w + t.top_right.w)),
                         t.top.h);
         sprite->set_subtexture(t.top);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
 
     if (pixel_width > t.left.w)
@@ -128,7 +128,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                         std::min(pixel_width - t.left.w, pos_.w - (t.left.w + t.right.w)),
                         pos_.h - (t.top.h + t.bottom.h));
         sprite->set_subtexture(t.body);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
 
     if (pixel_width > t.bottom_left.w)
@@ -139,7 +139,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                         std::min(pixel_width - t.bottom_left.w, pos_.w - (t.bottom_left.w + t.bottom_right.w)),
                         t.bottom.h);
         sprite->set_subtexture(t.bottom);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
 
     if (pixel_width > pos_.w - t.top_right.w)
@@ -153,7 +153,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                                t.top_right.y,
                                std::min(pixel_width - (pos_.w - t.top_right.w), t.top_right.w),
                                t.top_right.h);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
 
     if (pixel_width > pos_.w - t.right.w)
@@ -167,7 +167,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                                t.right.y,
                                std::min(pixel_width - (pos_.w - t.right.w), t.right.w),
                                t.right.h);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
 
     if (pixel_width > pos_.w - t.bottom_right.w)
@@ -181,7 +181,7 @@ void DebugSliderTextbox::RenderProgress(RenderContext& context)
                                t.bottom_right.y,
                                std::min(pixel_width - (pos_.w - t.bottom_right.w), t.bottom_right.w),
                                t.bottom_right.h);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
 }
 

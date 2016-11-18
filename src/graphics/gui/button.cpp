@@ -51,7 +51,7 @@ Button::Button(Box pos, std::string label, Manager* parent_manager, Window* pare
     label_.reset(new Label(caption_pos, label, parent_manager, parent_window));
 }
 
-void Button::Render(RenderContext& context)
+void Button::Render()
 {
     auto layout = gui_->skin()->layout();
 
@@ -69,16 +69,16 @@ void Button::Render(RenderContext& context)
         b = &layout->button.normal;
     }
 
-    RenderBody(*b, context);
+    RenderBody(*b);
 
     // Button text yall
-    label_->Render(context);
+    label_->Render();
 }
 
-void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
+void Button::RenderBody(const Skin::Layout::Button& b)
 {
     auto sprite = gui_->skin()->sprite();
-    auto batch = gui_->control_batch(crop_, feather_, context);
+    auto batch = gui_->control_batch(crop_, feather_);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
@@ -89,7 +89,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.top_left.w,
                     b.top_left.h);
     sprite->set_subtexture(b.top_left);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Top edge
     sprite->set_pos(x + b.top_left.w,
@@ -97,7 +97,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     pos_.w - (b.top_left.w + b.top_right.w),
                     b.top.h);
     sprite->set_subtexture(b.top);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Top right corner
     sprite->set_pos(x + pos_.w - b.top_right.w,
@@ -105,7 +105,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.top_right.w,
                     b.top_right.h);
     sprite->set_subtexture(b.top_right);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Left edge
     sprite->set_pos(x,
@@ -113,7 +113,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.left.w,
                     pos_.h - (b.top_left.h + b.bottom_right.h));
     sprite->set_subtexture(b.left);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Body
     sprite->set_pos(x + b.left.w,
@@ -121,7 +121,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     pos_.w - (b.left.w + b.right.w),
                     pos_.h - (b.top.h + b.bottom.h));
     sprite->set_subtexture(b.body);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Right edge
     sprite->set_pos(x + pos_.w - b.right.w,
@@ -129,7 +129,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.right.w,
                     pos_.h - (b.top_right.h + b.bottom_right.h));
     sprite->set_subtexture(b.right);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Bottom left corner
     sprite->set_pos(x,
@@ -137,7 +137,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.bottom_left.w,
                     b.bottom_left.h);
     sprite->set_subtexture(b.bottom_left);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Bottom edge
     sprite->set_pos(x + b.bottom_left.w,
@@ -145,7 +145,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     pos_.w - (b.bottom_left.w + b.bottom_right.w),
                     b.bottom.h);
     sprite->set_subtexture(b.bottom);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Bottom right corner
     sprite->set_pos(x + pos_.w - b.bottom_right.w,
@@ -153,7 +153,7 @@ void Button::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
                     b.bottom_right.w,
                     b.bottom_right.h);
     sprite->set_subtexture(b.bottom_right);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Label base colour
     label_->set_text_colour(b.colour);

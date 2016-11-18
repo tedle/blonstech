@@ -88,20 +88,19 @@ public:
     ///
     /// \param screen_width Maximum width of the view screen in pixels
     /// \param screen_height Maximum height of the view screen in pixels
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Manager(units::pixel screen_width, units::pixel screen_height, RenderContext& context);
+    Manager(units::pixel screen_width, units::pixel screen_height);
     ~Manager();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc gui::Skin::LoadFont
     ////////////////////////////////////////////////////////////////////////////////
-    bool LoadFont(std::string filename, units::pixel pixel_size, Skin::FontStyle style, RenderContext& context);
+    bool LoadFont(std::string filename, units::pixel pixel_size, Skin::FontStyle style);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls LoadFont(std::string, units::pixel, Skin::FontStyle, RenderContext&)
+    /// \brief Calls LoadFont(std::string, units::pixel, Skin::FontStyle)
     /// with a style of `Skin::FontStyle::DEFAULT`.
     ////////////////////////////////////////////////////////////////////////////////
-    bool LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context);
+    bool LoadFont(std::string filename, units::pixel pixel_size);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new Window for containing Control%s.
@@ -140,26 +139,22 @@ public:
     /// be applied when a framebuffer is given.
     ///
     /// \param output_buffer Handle to the framebuffer to render to
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(Framebuffer* output_buffer, RenderContext& context);
+    void Render(Framebuffer* output_buffer);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the screen. Generally issued
     /// by Graphics class and not by user. Draws to the backbuffer with no blur or
     /// shadows applied.
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context);
+    void Render();
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Reloads GUI to be bound to the supplied rendering context
+    /// \brief Reloads GUI to be bound to the active rendering context
     ///
     /// \param screen_width Maximum width of the view screen in pixels
     /// \param screen_height Maximum height of the view screen in pixels
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Reload(units::pixel screen_width, units::pixel screen_height, RenderContext& context);
+    void Reload(units::pixel screen_width, units::pixel screen_height);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs input logic for all Window%s and Control%s. Generally issued
@@ -193,7 +188,7 @@ private:
     friend DebugSliderTextbox;
     friend Window;
     friend ConsoleWindow;
-    void Init(units::pixel width, units::pixel height, RenderContext& context);
+    void Init(units::pixel width, units::pixel height);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves an unnused Drawbatcher with the specific shader inputs
@@ -201,28 +196,25 @@ private:
     ///
     /// \param inputs The shader settings that will be applied to this Drawbatcher
     /// during the render cycle
-    /// \param context Handle to the current rendering context
     /// \return The Drawbatcher for rendering
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* batch(DrawCallInputs inputs, RenderContext& context);
+    DrawBatcher* batch(DrawCallInputs inputs);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
     /// towards font rendering.
     ///
     /// \param style gui::Skin::FontStyle to be drawn
     /// \param colour Colour of the text with values ranging from 0.0 to 1.0
-    /// \param context Handle to the current rendering context
     /// \return The Drawbatcher for rendering
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* font_batch(Skin::FontStyle style, Vector4 colour, Box crop, units::pixel crop_feather, RenderContext& context);
+    DrawBatcher* font_batch(Skin::FontStyle style, Vector4 colour, Box crop, units::pixel crop_feather);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
     /// towards element body rendering.
     ///
-    /// \param context Handle to the current rendering context
     /// \return The Drawbatcher for rendering
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* control_batch(Box crop, units::pixel crop_feather, RenderContext& context);
+    DrawBatcher* control_batch(Box crop, units::pixel crop_feather);
 
     Skin* skin() const;
     Window* active_window() const;

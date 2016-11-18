@@ -26,9 +26,11 @@
 
 // Strips less used APIs from inclusion
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 
 // Includes
 #include <memory>
+// TODO: Prevent this from being in client.h somehow?
 #include <Windows.h>
 // Public Includes
 #include <blons/input/inputtemp.h>

@@ -40,7 +40,7 @@ DebugSliderButton::DebugSliderButton(Box pos, Manager* parent_manager, Window* p
     callback_ = [](units::pixel, units::pixel){};
 }
 
-void DebugSliderButton::Render(RenderContext& context)
+void DebugSliderButton::Render()
 {
     auto layout = gui_->skin()->layout();
 
@@ -58,13 +58,13 @@ void DebugSliderButton::Render(RenderContext& context)
         b = &layout->button.normal;
     }
 
-    RenderBody(*b, context);
+    RenderBody(*b);
 }
 
-void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext& context)
+void DebugSliderButton::RenderBody(const Skin::Layout::Button& b)
 {
     auto sprite = gui_->skin()->sprite();
-    auto batch = gui_->control_batch(crop_, feather_, context);
+    auto batch = gui_->control_batch(crop_, feather_);
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
@@ -75,7 +75,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     b.top_left.w,
                     b.top_left.h);
     sprite->set_subtexture(b.top_left);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Top edge
     sprite->set_pos(x + b.top_left.w,
@@ -83,7 +83,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     pos_.w - (b.top_left.w + b.top_right.w),
                     b.top.h);
     sprite->set_subtexture(b.top);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Top right corner
     sprite->set_pos(x + pos_.w - b.top_right.w,
@@ -91,7 +91,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     b.top_right.w,
                     b.top_right.h);
     sprite->set_subtexture(b.top_right);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Left edge
     sprite->set_pos(x,
@@ -99,7 +99,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     b.left.w,
                     pos_.h - (b.top_left.h + b.bottom_right.h));
     sprite->set_subtexture(b.left);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Body
     sprite->set_pos(x + b.left.w,
@@ -107,7 +107,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     pos_.w - (b.left.w + b.right.w),
                     pos_.h - (b.top.h + b.bottom.h));
     sprite->set_subtexture(b.body);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Right edge
     sprite->set_pos(x + pos_.w - b.right.w,
@@ -115,7 +115,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     b.right.w,
                     pos_.h - (b.top_right.h + b.bottom_right.h));
     sprite->set_subtexture(b.right);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Bottom left corner
     sprite->set_pos(x,
@@ -123,7 +123,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     b.bottom_left.w,
                     b.bottom_left.h);
     sprite->set_subtexture(b.bottom_left);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Bottom edge
     sprite->set_pos(x + b.bottom_left.w,
@@ -131,7 +131,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     pos_.w - (b.bottom_left.w + b.bottom_right.w),
                     b.bottom.h);
     sprite->set_subtexture(b.bottom);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 
     // Bottom right corner
     sprite->set_pos(x + pos_.w - b.bottom_right.w,
@@ -139,7 +139,7 @@ void DebugSliderButton::RenderBody(const Skin::Layout::Button& b, RenderContext&
                     b.bottom_right.w,
                     b.bottom_right.h);
     sprite->set_subtexture(b.bottom_right);
-    batch->Append(sprite->mesh(), context);
+    batch->Append(sprite->mesh());
 }
 
 bool DebugSliderButton::Update(const Input& input)

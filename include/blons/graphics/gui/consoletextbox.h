@@ -56,10 +56,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Submits a drawbatch with mesh data & shader inputs to the parent
     /// gui::Manager
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context) override;
+    void Render() override;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs input logic to deal with typing, history search, and tab
     /// completion.
@@ -70,7 +68,7 @@ public:
     bool Update(const Input& input) override;
 
 private:
-    void RenderCompletionText(RenderContext& context);
+    void RenderCompletionText();
     // Takes a keycode and if its up or down arrow, sets the textbox text to a
     // recent console command
     void SearchHistory(Input::KeyCode key);

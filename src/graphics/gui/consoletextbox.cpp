@@ -43,17 +43,17 @@ ConsoleTextbox::ConsoleTextbox(Box pos, Skin::FontStyle style, Manager* parent_m
     completion_text_.reset(new Label(Vector2(0, 0), ColourString("", colour), font_style(), gui_, parent_));
 }
 
-void ConsoleTextbox::Render(RenderContext& context)
+void ConsoleTextbox::Render()
 {
     auto layout = gui_->skin()->layout();
 
-    RenderBody(layout->console.textbox, context);
-    RenderCursor(layout->console.cursor, context);
-    RenderText(context);
-    RenderCompletionText(context);
+    RenderBody(layout->console.textbox);
+    RenderCursor(layout->console.cursor);
+    RenderText();
+    RenderCompletionText();
 }
 
-void ConsoleTextbox::RenderCompletionText(RenderContext& context)
+void ConsoleTextbox::RenderCompletionText()
 {
     const auto text_label = label();
     const auto text_pos = text_label->pos();
@@ -66,7 +66,7 @@ void ConsoleTextbox::RenderCompletionText(RenderContext& context)
     auto x = text_pos.x + font->string_width(text_label->text().raw_str(), false);
     completion_text_->set_pos(x, text_pos.y);
 
-    completion_text_->Render(context);
+    completion_text_->Render();
 }
 
 bool ConsoleTextbox::Update(const Input& input)

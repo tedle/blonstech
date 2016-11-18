@@ -82,10 +82,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Submits a drawbatch with mesh data & shader inputs to the parent
     /// gui::Manager for itself and each child Control
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context) override;
+    void Render() override;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs input logic for itself and all child Control%s
     ///
@@ -172,10 +170,8 @@ protected:
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates mesh for the body and appends it to the window's draw queue
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void RenderBody(RenderContext& context);
+    void RenderBody();
 
 private:
     const std::string id_;

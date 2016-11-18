@@ -60,9 +60,8 @@ public:
     /// \brief Initializes a new Geometry stage
     ///
     /// \param perspective Screen dimensions and perspective information
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Geometry(Perspective perspective, RenderContext& context);
+    Geometry(Perspective perspective);
     ~Geometry() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -71,9 +70,8 @@ public:
     /// \param scene Contains scene information for rendering
     /// \param view_matrix View matrix of the camera rendering the scene
     /// \param proj_matrix Perspective matrix for rendering the scene
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix, RenderContext& context);
+    bool Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage

@@ -32,6 +32,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 {
     auto client = std::make_unique<blons::Client>();
     auto info = client->screen_info();
+    blons::render::MakeContext(info);
     auto graphics = std::make_unique<blons::Graphics>(info);
     auto gui = graphics->gui();
     std::vector<std::unique_ptr<blons::Model>> models;

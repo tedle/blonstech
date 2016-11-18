@@ -25,31 +25,32 @@
 
 namespace blons
 {
-Sprite::Sprite(std::string texture_filename, TextureType::Options options, RenderContext& context)
+Sprite::Sprite(std::string texture_filename, TextureType::Options options)
 {
-    texture_.reset(new Texture(texture_filename, options, context));
-    if (!Init(context))
+    texture_.reset(new Texture(texture_filename, options));
+    if (!Init())
     {
         throw "Failed to register sprite";
     }
 }
 
-Sprite::Sprite(std::string texture_filename, RenderContext& context)
-    : Sprite::Sprite(texture_filename, { TextureType::RAW, TextureType::NEAREST, TextureType::REPEAT }, context)
+Sprite::Sprite(std::string texture_filename)
+    : Sprite::Sprite(texture_filename, { TextureType::RAW, TextureType::NEAREST, TextureType::REPEAT })
 {
 }
 
-Sprite::Sprite(const PixelData& texture_data, RenderContext& context)
+Sprite::Sprite(const PixelData& texture_data)
 {
-    texture_.reset(new Texture(texture_data, context));
-    if (!Init(context))
+    texture_.reset(new Texture(texture_data));
+    if (!Init())
     {
         throw "Failed to register sprite";
     }
 }
 
-bool Sprite::Init(RenderContext& context)
+bool Sprite::Init()
 {
+    auto context = render::context();
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
     Texture::Info dimensions = texture_->info();
@@ -72,23 +73,24 @@ bool Sprite::Init(RenderContext& context)
     return true;
 }
 
-void Sprite::Render(RenderContext& context)
+void Sprite::Render()
 {
     BuildQuad();
+    auto context = render::context();
     context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
                             mesh_.vertices.data(), 0, vertex_count(),
                             mesh_.indices.data(), 0, index_count());
     context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 }
 
-bool Sprite::Reload(RenderContext& context)
+bool Sprite::Reload()
 {
     // Backup our sprite settings
     auto temp_pos = pos_;
     auto temp_tex = tex_map_;
 
     // Freshly initialize
-    if (!Init(context) || !texture_->Reload(context))
+    if (!Init() || !texture_->Reload())
     {
         return false;
     }
@@ -97,9 +99,9 @@ bool Sprite::Reload(RenderContext& context)
     pos_ = temp_pos;
     tex_map_ = temp_tex;
     BuildQuad();
-    context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
-                            mesh_.vertices.data(), 0, vertex_count(),
-                            mesh_.indices.data(), 0, index_count());
+    render::context()->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
+                                      mesh_.vertices.data(), 0, vertex_count(),
+                                      mesh_.indices.data(), 0, index_count());
 
     return true;
 }

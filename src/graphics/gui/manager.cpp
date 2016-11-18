@@ -42,15 +42,15 @@ namespace
     static const int kBlurIterations = 5;
 }
 
-Manager::Manager(units::pixel width, units::pixel height, RenderContext& context)
+Manager::Manager(units::pixel width, units::pixel height)
 {
-    Init(width, height, context);
+    Init(width, height);
     // TODO: Make the windows resize on reload
     main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
     console_window_.reset(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
 }
 
-void Manager::Init(units::pixel width, units::pixel height, RenderContext& context)
+void Manager::Init(units::pixel width, units::pixel height)
 {
     screen_dimensions_ = Box(0, 0, width, height);
     ortho_matrix_ = MatrixOrthographic(0, screen_dimensions_.w, screen_dimensions_.h, 0,
@@ -61,22 +61,22 @@ void Manager::Init(units::pixel width, units::pixel height, RenderContext& conte
     ShaderAttributeList ui_inputs;
     ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    ui_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", ui_inputs, context));
-    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-blur.frag.glsl", ui_inputs, context));
-    composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-composite.frag.glsl", ui_inputs, context));
+    ui_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", ui_inputs));
+    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-blur.frag.glsl", ui_inputs));
+    composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-composite.frag.glsl", ui_inputs));
 
-    ui_buffer_.reset(new Framebuffer(width, height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false, context));
-    blur_buffer_a_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false, context));
-    blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false, context));
+    ui_buffer_.reset(new Framebuffer(width, height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));
+    blur_buffer_a_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));
+    blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));
     //blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR } }, false, context));
 
-    skin_.reset(new Skin(context));
+    skin_.reset(new Skin());
 
     // TODO: move this out of constructor! font load included!
-    LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::DEFAULT, context);
-    LoadFont("font stuff/test-heading.ttf", 20, Skin::FontStyle::HEADING, context);
-    LoadFont("font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL, context);
-    LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE, context);
+    LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::DEFAULT);
+    LoadFont("font stuff/test-heading.ttf", 20, Skin::FontStyle::HEADING);
+    LoadFont("font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL);
+    LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE);
 
     draw_batches_.clear();
     batch_index_ = 0;
@@ -86,14 +86,14 @@ Manager::~Manager()
 {
 }
 
-bool Manager::LoadFont(std::string filename, units::pixel pixel_size, Skin::FontStyle style, RenderContext& context)
+bool Manager::LoadFont(std::string filename, units::pixel pixel_size, Skin::FontStyle style)
 {
-    return skin_->LoadFont(filename, pixel_size, style, context);
+    return skin_->LoadFont(filename, pixel_size, style);
 }
 
-bool Manager::LoadFont(std::string filename, units::pixel pixel_size, RenderContext& context)
+bool Manager::LoadFont(std::string filename, units::pixel pixel_size)
 {
-    return LoadFont(filename, pixel_size, Skin::FontStyle::DEFAULT, context);
+    return LoadFont(filename, pixel_size, Skin::FontStyle::DEFAULT);
 }
 
 Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
@@ -132,13 +132,14 @@ Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, unit
     return MakeWindow(id, x, y, width, height, "", type);
 }
 
-void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
+void Manager::Render(Framebuffer* output_buffer)
 {
+    auto context = render::context();
     // Rendering UI to a separate buffer is needed for styles
     // Styles are only possible when output_buffer is supplied
     if (output_buffer != nullptr)
     {
-        ui_buffer_->Bind(Vector4(0.0, 0.0, 0.0, 0.0), context);
+        ui_buffer_->Bind(Vector4(0.0, 0.0, 0.0, 0.0));
     }
     else
     {
@@ -146,42 +147,42 @@ void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
     }
     // TODO: Remove concept of a main window. That's dumb!
     // Main window always renders at the bottom
-    main_window_->Render(context);
+    main_window_->Render();
     // User made windows
     for (const auto& w : windows_)
     {
         if (!w->hidden())
         {
-            w->Render(context);
+            w->Render();
         }
     }
     // Console window always renders on top
     if (!console_window_->hidden())
     {
-        console_window_->Render(context);
+        console_window_->Render();
     }
     // Draw pass
-    ui_shader_->SetInput("proj_matrix", ortho_matrix_, context);
+    ui_shader_->SetInput("proj_matrix", ortho_matrix_);
     for (int i = 0; i < batch_index_; i++)
     {
         auto& batch = draw_batches_[i];
         if (batch.first.is_text)
         {
             auto font = skin_->font(batch.first.font_style);
-            ui_shader_->SetInput("skin", font->texture(), context);
-            ui_shader_->SetInput("is_text", true, context);
-            ui_shader_->SetInput("text_colour", batch.first.colour, context);
+            ui_shader_->SetInput("skin", font->texture());
+            ui_shader_->SetInput("is_text", true);
+            ui_shader_->SetInput("text_colour", batch.first.colour);
         }
         else
         {
-            ui_shader_->SetInput("is_text", false, context);
-            ui_shader_->SetInput("skin", skin_->sprite()->texture(), context);
+            ui_shader_->SetInput("is_text", false);
+            ui_shader_->SetInput("skin", skin_->sprite()->texture());
         }
-        ui_shader_->SetInput("crop", batch.first.crop, context);
-        ui_shader_->SetInput("feather", batch.first.crop_feather, context);
+        ui_shader_->SetInput("crop", batch.first.crop);
+        ui_shader_->SetInput("feather", batch.first.crop_feather);
 
-        batch.second->Render(context);
-        ui_shader_->Render(batch.second->index_count(), context);
+        batch.second->Render();
+        ui_shader_->Render(batch.second->index_count());
     }
     batch_index_ = 0;
     // Cannot apply UI styles when rendering to backbuffer
@@ -192,52 +193,52 @@ void Manager::Render(Framebuffer* output_buffer, RenderContext& context)
     // Achieve a fast, strong blur by rendering at a low resolution and skipping over pixels
     // Artifacting is resolved by iterating multiple times, which also further strengthens blur
     context->SetBlendMode(OVERWRITE);
-    blur_shader_->SetInput("proj_matrix", blur_ortho_matrix_, context);
+    blur_shader_->SetInput("proj_matrix", blur_ortho_matrix_);
     for (int i = 0; i < kBlurIterations; i++)
     {
         // It is safe to never clear buffers since it's based off a clean input texture
-        blur_buffer_a_->Bind(false, context);
-        blur_buffer_a_->Render(context);
+        blur_buffer_a_->Bind(false);
+        blur_buffer_a_->Render();
         if (i == 0)
         {
-            blur_shader_->SetInput("composite", output_buffer->textures()[0], 0, context);
-            blur_shader_->SetInput("ui", ui_buffer_->textures()[0], 1, context);
+            blur_shader_->SetInput("composite", output_buffer->textures()[0], 0);
+            blur_shader_->SetInput("ui", ui_buffer_->textures()[0], 1);
         }
         else
         {
-            blur_shader_->SetInput("composite", blur_buffer_b_->textures()[0], 0, context);
-            blur_shader_->SetInput("ui", blur_buffer_b_->textures()[0], 1, context);
+            blur_shader_->SetInput("composite", blur_buffer_b_->textures()[0], 0);
+            blur_shader_->SetInput("ui", blur_buffer_b_->textures()[0], 1);
         }
         // Uniform inputs are faster than alternating 2 separate shaders
-        blur_shader_->SetInput("horizontal", 1.0f, context);
-        blur_shader_->SetInput("screen_length", screen_dimensions_.w / kBlurFactor, context);
-        blur_shader_->Render(blur_buffer_a_->index_count(), context);
+        blur_shader_->SetInput("horizontal", 1.0f);
+        blur_shader_->SetInput("screen_length", screen_dimensions_.w / kBlurFactor);
+        blur_shader_->Render(blur_buffer_a_->index_count());
 
-        blur_buffer_b_->Bind(false, context);
-        blur_buffer_b_->Render(context);
-        blur_shader_->SetInput("composite", blur_buffer_a_->textures()[0], 0, context);
-        blur_shader_->SetInput("ui", blur_buffer_a_->textures()[0], 1, context);
-        blur_shader_->SetInput("horizontal", 0.0f, context);
-        blur_shader_->SetInput("screen_length", screen_dimensions_.h / kBlurFactor, context);
-        blur_shader_->Render(blur_buffer_b_->index_count(), context);
+        blur_buffer_b_->Bind(false);
+        blur_buffer_b_->Render();
+        blur_shader_->SetInput("composite", blur_buffer_a_->textures()[0], 0);
+        blur_shader_->SetInput("ui", blur_buffer_a_->textures()[0], 1);
+        blur_shader_->SetInput("horizontal", 0.0f);
+        blur_shader_->SetInput("screen_length", screen_dimensions_.h / kBlurFactor);
+        blur_shader_->Render(blur_buffer_b_->index_count());
     }
     context->SetBlendMode(ALPHA);
-    output_buffer->Bind(false, context);
-    output_buffer->Render(context);
-    composite_shader_->SetInput("proj_matrix", ortho_matrix_, context);
-    composite_shader_->SetInput("blurred_composite", blur_buffer_b_->textures()[0], 0, context);
-    composite_shader_->SetInput("ui", ui_buffer_->textures()[0], 1, context);
-    composite_shader_->Render(output_buffer->index_count(), context);
+    output_buffer->Bind(false);
+    output_buffer->Render();
+    composite_shader_->SetInput("proj_matrix", ortho_matrix_);
+    composite_shader_->SetInput("blurred_composite", blur_buffer_b_->textures()[0], 0);
+    composite_shader_->SetInput("ui", ui_buffer_->textures()[0], 1);
+    composite_shader_->Render(output_buffer->index_count());
 }
 
-void Manager::Render(RenderContext& context)
+void Manager::Render()
 {
-    Render(nullptr, context);
+    Render(nullptr);
 }
 
-void Manager::Reload(units::pixel screen_width, units::pixel screen_height, RenderContext& context)
+void Manager::Reload(units::pixel screen_width, units::pixel screen_height)
 {
-    Init(screen_width, screen_height, context);
+    Init(screen_width, screen_height);
 }
 
 bool Manager::Update(const Input& input)
@@ -290,7 +291,7 @@ Window* Manager::window(std::string id)
 // This is setup to recycle memory as much as we can. Used like a C array
 // that is only resized when the total batches for a frame is greater
 // than any previous frame. Can only be reset manually by calling ClearBatches().
-DrawBatcher* Manager::batch(DrawCallInputs inputs, RenderContext& context)
+DrawBatcher* Manager::batch(DrawCallInputs inputs)
 {
     DrawBatcher* batch;
     if (batch_index_ < draw_batches_.size())
@@ -300,7 +301,7 @@ DrawBatcher* Manager::batch(DrawCallInputs inputs, RenderContext& context)
     }
     else
     {
-        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(DrawBatcher::MESH_2D, context));
+        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(DrawBatcher::MESH_2D));
         draw_batches_.push_back(std::make_pair(inputs, std::move(batcher)));
         batch = draw_batches_.back().second.get();
     }
@@ -309,16 +310,16 @@ DrawBatcher* Manager::batch(DrawCallInputs inputs, RenderContext& context)
     return batch;
 }
 
-DrawBatcher* Manager::font_batch(Skin::FontStyle style, Vector4 colour, Box crop, units::pixel crop_feather, RenderContext& context)
+DrawBatcher* Manager::font_batch(Skin::FontStyle style, Vector4 colour, Box crop, units::pixel crop_feather)
 {
     DrawCallInputs inputs = { true, style, colour, crop, crop_feather };
-    return batch(inputs, context);
+    return batch(inputs);
 }
 
-DrawBatcher* Manager::control_batch(Box crop, units::pixel crop_feather, RenderContext& context)
+DrawBatcher* Manager::control_batch(Box crop, units::pixel crop_feather)
 {
     DrawCallInputs inputs = { false, Skin::FontStyle::DEFAULT, Vector4(0, 0, 0, 0), crop, crop_feather };
-    return batch(inputs, context);
+    return batch(inputs);
 }
 
 Skin* Manager::skin() const

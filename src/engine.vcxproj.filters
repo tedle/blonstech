@@ -106,9 +106,6 @@
     <ClInclude Include="..\include\blons\graphics\render\drawbatcher.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\graphics\render\render.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\graphics\render\shader.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
@@ -131,9 +128,6 @@
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="graphics\render\glfuncloader.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
-    <ClInclude Include="graphics\render\renderd3d11.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
     <ClInclude Include="debug\consoleparser.h">
@@ -211,13 +205,22 @@
     <ClInclude Include="graphics\gui\debugslidertextbox.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
-    <ClInclude Include="graphics\render\rendergl43.h">
-      <Filter>src\graphics\render</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\graphics\render\computeshader.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
     <ClInclude Include="..\include\blons\graphics\render\commonshader.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\renderer.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\render\rendererd3d11.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\render\renderergl43.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\context.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
   </ItemGroup>
@@ -262,9 +265,6 @@
       <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="graphics\render\glfuncloader.cpp">
-      <Filter>src\graphics\render</Filter>
-    </ClCompile>
-    <ClCompile Include="graphics\render\renderd3d11.cpp">
       <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="graphics\render\shader.cpp">
@@ -357,13 +357,22 @@
     <ClCompile Include="graphics\gui\debugslidertextbox.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\render\rendergl43.cpp">
-      <Filter>src\graphics\render</Filter>
-    </ClCompile>
     <ClCompile Include="graphics\render\computeshader.cpp">
       <Filter>src\graphics\render</Filter>
     </ClCompile>
     <ClCompile Include="graphics\render\commonshader.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\rendererd3d11.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\renderergl43.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\context.cpp">
+      <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\render\renderer.cpp">
       <Filter>src\graphics\render</Filter>
     </ClCompile>
   </ItemGroup>

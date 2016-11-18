@@ -21,14 +21,15 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_RENDER_RENDER_H_
-#define BLONSTECH_GRAPHICS_RENDER_RENDER_H_
+#ifndef BLONSTECH_GRAPHICS_RENDER_RENDERER_H_
+#define BLONSTECH_GRAPHICS_RENDER_RENDERER_H_
 
 // Includes
 #include <memory>
 #include <string>
 #include <vector>
 // Public Includes
+#include <blons/graphics/render/context.h>
 #include <blons/math/math.h>
 #include <blons/debug/console.h>
 #include <blons/debug/log.h>
@@ -357,18 +358,21 @@ using ShaderAttribute = std::pair<ShaderAttributeIndex, std::string>;
 /// \brief Holds a list of shader attributes
 ////////////////////////////////////////////////////////////////////////////////
 using ShaderAttributeList = std::vector<ShaderAttribute>;
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Handle to a rendering context
-////////////////////////////////////////////////////////////////////////////////
-using RenderContext = std::unique_ptr<class Render>;
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Class for interfacing with a graphics API
 ////////////////////////////////////////////////////////////////////////////////
-class Render
+class Renderer
 {
 public:
-    virtual ~Render() {};
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to identify different Renderer contexts
+    ////////////////////////////////////////////////////////////////////////////////
+    using ContextID = std::size_t;
+
+public:
+    Renderer();// : id_(context_count) { context_count++; }
+    virtual ~Renderer() {};
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Called at the beginning of each frame, allows for any necessary setup
@@ -508,7 +512,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds the supplied ShaderResource and renders a number of vertices
     /// from the currently bound mesh equal to the supplied index_count. Currently
-    /// bound mesh is determined by the most recent call to Render::BindMeshBuffer
+    /// bound mesh is determined by the most recent call to Renderer::BindMeshBuffer
     ///
     /// \param program %Shader pipeline to render with
     /// \param index_count Number of vertices to render
@@ -711,6 +715,10 @@ public:
 
 protected:
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Unique identifier for each Renderer context
+    ////////////////////////////////////////////////////////////////////////////////
+    const ContextID id_;
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief True is vsync should be enabled
     ////////////////////////////////////////////////////////////////////////////////
     bool vsync_;
@@ -722,12 +730,15 @@ protected:
     /// \brief Vendor information of video card
     ////////////////////////////////////////////////////////////////////////////////
     std::string video_card_desc_;
+
+private:
+    static ContextID context_count;
 };
 } // namespace blons
 
 // TODO: Add wayyyy more examples of dealing with the Render API at a low level
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::Render
+/// \class blons::Renderer
 /// \ingroup graphics
 ///
 /// Provides a platform independent way of rendering raw meshes and textures
@@ -735,9 +746,10 @@ protected:
 /// 
 /// ### Example:
 /// \code
-/// // Simple render loop dealing with a RenderContext
+/// // Simple render loop dealing with a Renderer context
 /// bool RenderScene()
 /// {
+///     auto context = blons::renderer::context();
 ///     // Clear buffers
 ///     context->BeginScene();
 ///
@@ -748,20 +760,20 @@ protected:
 ///     view_matrix = camera->view_matrix();
 ///
 ///     // Prep the pipeline for drawing
-///     model->Render(context);
+///     model->Render();
 ///     world_matrix = model->world_matrix();
 ///
 ///     // Set the inputs
-///     if (!shader->SetInput("world_matrix", world_matrix, context) ||
-///         !shader->SetInput("view_matrix", view_matrix, context) ||
-///         !shader->SetInput("proj_matrix", proj_matrix, context) ||
-///         !shader->SetInput("albedo", model->texture(), context))
+///     if (!shader->SetInput("world_matrix", world_matrix) ||
+///         !shader->SetInput("view_matrix", view_matrix) ||
+///         !shader->SetInput("proj_matrix", proj_matrix) ||
+///         !shader->SetInput("albedo", model->texture()))
 ///     {
 ///         return false;
 ///     }
 ///
 ///     // Finally do the render
-///     if (!shader->Render(model->index_count(), context))
+///     if (!shader->Render(model->index_count()))
 ///     {
 ///         return false;
 ///     }
@@ -774,4 +786,4 @@ protected:
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
-#endif // BLONSTECH_GRAPHICS_RENDER_RENDER_H_
+#endif // BLONSTECH_GRAPHICS_RENDER_RENDERER_H_

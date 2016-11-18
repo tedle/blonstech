@@ -51,9 +51,8 @@ public:
     /// type.
     ///
     /// \param type Specifies whether to use 2D mesh or 3D mesh
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher(Type type, RenderContext& context);
+    DrawBatcher(Type type);
     ~DrawBatcher() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -66,14 +65,13 @@ public:
     ///
     /// \param mesh_data Reference to the vertex and index data to store
     /// \param world_matrix Matrix to transform vertices by
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Append(const MeshData& mesh_data, Matrix world_matrix, RenderContext& context);
+    void Append(const MeshData& mesh_data, Matrix world_matrix);
     ////////////////////////////////////////////////////////////////////////////////
-    /// Calls Append(const MeshData&, Matrix, RenderContext&) with a default
+    /// Calls Append(const MeshData&, Matrix) with a default
     /// identity matrix
     ////////////////////////////////////////////////////////////////////////////////
-    void Append(const MeshData& mesh_data, RenderContext& context);
+    void Append(const MeshData& mesh_data);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Pushes the DrawBatcher's buffers to the current rendering context,
     /// prepping it for a draw call
@@ -83,14 +81,12 @@ public:
     /// memory, just invalidates the current data from being re-used).
     ///
     /// \param clear_buffers Clear the vertex and index buffers if true
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(bool clear_buffers, RenderContext& context);
+    void Render(bool clear_buffers);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Render(bool, RenderContext&) with a default clear_buffers of
-    /// true
+    /// \brief Calls Render(bool) with a default clear_buffers of true
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context);
+    void Render();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the number of valid, drawable indices from the current
@@ -125,7 +121,7 @@ private:
 /// ### Example:
 /// \code
 /// // Rendering a simple tile map as a single batch
-/// static Sprite sprite("32x32 tile.png", context);
+/// static Sprite sprite("32x32 tile.png");
 /// // DrawBatchers are most efficient when recycled!
 /// static DrawBatcher batch;
 ///
@@ -141,15 +137,15 @@ private:
 /// }
 ///
 /// // Set up various shader inputs...
-/// shader->SetInput("world_matrix", MatrixIdentity(), context);
-/// shader->SetInput("proj_matrix", orthographic_matrix, context);
-/// shader->SetInput("sprite", sprite->texture(), context);
+/// shader->SetInput("world_matrix", MatrixIdentity());
+/// shader->SetInput("proj_matrix", orthographic_matrix);
+/// shader->SetInput("sprite", sprite->texture());
 ///
 /// // Push the batch's mesh data to the rendering pipeline
-/// batch.Render(context);
+/// batch.Render();
 ///
 /// // Do the draw call for the whole batch
-/// shader->Render(batch.index_count(), context);
+/// shader->Render(batch.index_count());
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

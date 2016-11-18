@@ -33,7 +33,7 @@ namespace pipeline
 {
 namespace stage
 {
-Geometry::Geometry(Perspective perspective, RenderContext& context)
+Geometry::Geometry(Perspective perspective)
 {
     // Shaders
     ShaderAttributeList geometry_inputs;
@@ -42,7 +42,7 @@ Geometry::Geometry(Perspective perspective, RenderContext& context)
     geometry_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
     geometry_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
     geometry_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
-    geometry_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", geometry_inputs, context));
+    geometry_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/mesh.frag.glsl", geometry_inputs));
 
     if (geometry_shader_ == nullptr)
     {
@@ -52,16 +52,17 @@ Geometry::Geometry(Perspective perspective, RenderContext& context)
     // Framebuffers
     // 3 outputs -> diffuse, normal, debug
     // TODO: Remove debug when no longer needed
-    geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 3, context));
+    geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 3));
 }
 
-bool Geometry::Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix, RenderContext& context)
+bool Geometry::Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix)
 {
+    auto context = render::context();
     // Needed so models dont render over themselves
     context->SetDepthTesting(true);
 
     // Bind the geometry framebuffer to render all models onto
-    geometry_buffer_->Bind(context);
+    geometry_buffer_->Bind();
 
     Matrix view_proj = view_matrix * proj_matrix;
     // TODO: 3D pass ->
@@ -70,19 +71,19 @@ bool Geometry::Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix
     for (const auto& model : scene.models)
     {
         // Bind the vertex data
-        model->Render(context);
+        model->Render();
 
         Matrix model_view_proj = model->world_matrix() * view_proj;
         // Set the inputs
-        if (!geometry_shader_->SetInput("mvp_matrix", model_view_proj, context) ||
-            !geometry_shader_->SetInput("albedo", model->albedo(), 0, context) ||
-            !geometry_shader_->SetInput("normal", model->normal(), 1, context))
+        if (!geometry_shader_->SetInput("mvp_matrix", model_view_proj) ||
+            !geometry_shader_->SetInput("albedo", model->albedo(), 0) ||
+            !geometry_shader_->SetInput("normal", model->normal(), 1))
         {
             return false;
         }
 
         // Make the draw call
-        if (!geometry_shader_->Render(model->index_count(), context))
+        if (!geometry_shader_->Render(model->index_count()))
         {
             return false;
         }

@@ -25,7 +25,7 @@
 #define BLONSTECH_GRAPHICS_RENDER_SHADER_H_
 
 // Includes
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 #include <blons/graphics/render/commonshader.h>
 
 namespace blons
@@ -44,18 +44,16 @@ public:
     /// \param vertex_filename Location of the vertex shader source on disk
     /// \param pixel_filename Location of the pixel (fragment) shader source on disk
     /// \param inputs %Vertex layout to be sent to the shader every frame
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs, RenderContext& context);
+    Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs);
     ~Shader();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Issues a draw call for the specified number of indices
     ///
     /// \param index_count Number of indices to render
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(unsigned int index_count, RenderContext& context);
+    bool Render(unsigned int index_count);
 };
 } // namespace blons
 
@@ -77,27 +75,27 @@ public:
 /// inputs.push_back(blons::ShaderAttribute(0, "input_pos"));
 /// inputs.push_back(blons::ShaderAttribute(1, "input_uv"));
 /// inputs.push_back(blons::ShaderAttribute(2, "input_norm"));
-/// auto shader = std::make_unique<blons::Shader>("vertex.glsl", "pixel.glsl", inputs, context));
+/// auto shader = std::make_unique<blons::Shader>("vertex.glsl", "pixel.glsl", inputs));
 ///
 /// // Make a quick model to render with the shader
-/// auto model = std::make_unique<blons::Model>("model.bms", context);
+/// auto model = std::make_unique<blons::Model>("model.bms");
 ///
 /// // Rendering with a shader
 /// while (true)
 /// {
-///     // Push the models vertices to the RenderContext
-///     model->Render(context);
+///     // Push the models vertices to the GPU
+///     model->Render();
 ///
 ///     // Set various global variables of the shader
-///     if (!shader->SetInput("world_matrix", model->world_matrix(), context) ||
-///         !shader->SetInput("albedo", model->texture(), context))
+///     if (!shader->SetInput("world_matrix", model->world_matrix()) ||
+///         !shader->SetInput("albedo", model->texture()))
 ///     {
 ///         blons::log::Debug("Could not set shader inputs!\n");
 ///         continue;
 ///     }
 ///
 ///     // Do the draw call
-///     shader->Render(model->index_count(), context);
+///     shader->Render(model->index_count());
 /// }
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////

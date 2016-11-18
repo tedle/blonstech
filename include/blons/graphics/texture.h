@@ -27,7 +27,7 @@
 // Includes
 #include <memory>
 // Public Includes
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 
 namespace blons
 {
@@ -55,29 +55,26 @@ public:
     ///
     /// \param filename Image file on disk
     /// \param options Texture filtering and wrapping options
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Texture(std::string filename, TextureType::Options options, RenderContext& context);
+    Texture(std::string filename, TextureType::Options options);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Initializes a new texture from raw pixel data. Will throw on failure
     ///
     /// \param pixels Pixel buffer and format info
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Texture(const PixelData& pixels, RenderContext& context);
+    Texture(const PixelData& pixels);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc Texture(const PixelData&, RenderContext&)
+    /// \copydoc Texture(const PixelData&)
     ////////////////////////////////////////////////////////////////////////////////
-    Texture(const PixelData3D& pixels, RenderContext& context);
+    Texture(const PixelData3D& pixels);
     ~Texture() {}
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Reloads the texture to be active in the supplied rendering context
+    /// \brief Reloads the texture to be attached to the active rendering context
     ///
-    /// \param context Handle to the current rendering context
     /// \return True if reinitialized successfully
     ////////////////////////////////////////////////////////////////////////////////
-    bool Reload(RenderContext& context);
+    bool Reload();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves texture information like dimensions & usage type
@@ -93,9 +90,9 @@ public:
     const TextureResource* texture() const;
 
 private:
-    bool Init(std::string filename, TextureType::Options options, RenderContext& context);
-    bool Init(const PixelData& pixels, RenderContext& context);
-    bool Init(const PixelData3D& pixels, RenderContext& context);
+    bool Init(std::string filename, TextureType::Options options);
+    bool Init(const PixelData& pixels);
+    bool Init(const PixelData3D& pixels);
 
     // Empty if initialized from PixelData or voxel data
     std::string filename_;
@@ -117,8 +114,8 @@ private:
 /// \code
 /// // Using a texture is as simple as pushing it to a shader
 /// // Though sprites & models are almost always more suitable
-/// blons::Texture tex("sprite.png", blons::Texture::SPRITE, context);
-/// shader->SetInput("sprite", tex.texture(), context);
+/// blons::Texture tex("sprite.png", blons::Texture::SPRITE);
+/// shader->SetInput("sprite", tex.texture());
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

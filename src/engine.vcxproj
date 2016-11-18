@@ -220,8 +220,9 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\shadow.h" />
     <ClInclude Include="..\include\blons\graphics\render\commonshader.h" />
     <ClInclude Include="..\include\blons\graphics\render\computeshader.h" />
+    <ClInclude Include="..\include\blons\graphics\render\context.h" />
     <ClInclude Include="..\include\blons\graphics\render\drawbatcher.h" />
-    <ClInclude Include="..\include\blons\graphics\render\render.h" />
+    <ClInclude Include="..\include\blons\graphics\render\renderer.h" />
     <ClInclude Include="..\include\blons\graphics\render\shader.h" />
     <ClInclude Include="..\include\blons\graphics\sprite.h" />
     <ClInclude Include="..\include\blons\graphics\texture.h" />
@@ -240,8 +241,8 @@
     <ClInclude Include="graphics\gui\debugslidertextbox.h" />
     <ClInclude Include="graphics\internalresource.h" />
     <ClInclude Include="graphics\render\glfuncloader.h" />
-    <ClInclude Include="graphics\render\renderd3d11.h" />
-    <ClInclude Include="graphics\render\rendergl43.h" />
+    <ClInclude Include="graphics\render\rendererd3d11.h" />
+    <ClInclude Include="graphics\render\renderergl43.h" />
     <ClInclude Include="graphics\resource.h" />
   </ItemGroup>
   <ItemGroup>
@@ -279,10 +280,12 @@
     <ClCompile Include="graphics\pipeline\stage\shadow.cpp" />
     <ClCompile Include="graphics\render\commonshader.cpp" />
     <ClCompile Include="graphics\render\computeshader.cpp" />
+    <ClCompile Include="graphics\render\context.cpp" />
     <ClCompile Include="graphics\render\drawbatcher.cpp" />
     <ClCompile Include="graphics\render\glfuncloader.cpp" />
-    <ClCompile Include="graphics\render\renderd3d11.cpp" />
-    <ClCompile Include="graphics\render\rendergl43.cpp" />
+    <ClCompile Include="graphics\render\renderer.cpp" />
+    <ClCompile Include="graphics\render\rendererd3d11.cpp" />
+    <ClCompile Include="graphics\render\renderergl43.cpp" />
     <ClCompile Include="graphics\render\shader.cpp" />
     <ClCompile Include="graphics\resource.cpp" />
     <ClCompile Include="graphics\sprite.cpp" />

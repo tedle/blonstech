@@ -21,51 +21,11 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/gui/skin.h>
-
-// Public Includes
-#include <blons/graphics/sprite.h>
+#include <blons/graphics/render/renderer.h>
 
 namespace blons
 {
-namespace gui
-{
-Skin::Skin()
-{
-    // TODO: Load from user supplied image
-    skin_.reset(new Sprite("skin.png", { TextureType::RAW, TextureType::LINEAR, TextureType::CLAMP }));
-
-    // TODO: Ensure DEFAULT font is somehow not nullptr before being handed over to user
-    font_list_[DEFAULT] = nullptr;
-    font_list_[HEADING] = nullptr;
-    font_list_[LABEL] = nullptr;
-    font_list_[CONSOLE] = nullptr;
-}
-
-bool Skin::LoadFont(std::string filename, units::pixel pixel_size, FontStyle style)
-{
-    font_list_[style].reset(new Font(filename, pixel_size));
-    return true;
-}
-
-Font* Skin::font(FontStyle style)
-{
-    auto& font = font_list_[style];
-    if (font != nullptr)
-    {
-        return font.get();
-    }
-    return font_list_[DEFAULT].get();
-}
-
-Sprite* Skin::sprite() const
-{
-    return skin_.get();
-}
-
-const Skin::Layout* Skin::layout() const
-{
-    return &layout_;
-}
-} // namespace gui
+    Renderer::ContextID Renderer::context_count = 1;
+    Renderer::Renderer() : id_(context_count) { context_count++; }
+    //Renderer::context_count = 1;
 } // namespace blons

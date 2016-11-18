@@ -25,7 +25,7 @@
 #define BLONSTECH_GRAPHICS_RESOURCE_H_
 
 // Public Includes
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 #include <blons/graphics/mesh.h>
 #include <blons/graphics/texture.h>
 
@@ -54,7 +54,7 @@ struct TextureBuffer
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Loads a mesh from disk or engine, or from cache if available.
 ///
-/// If the mesh is cached and loaded into the supplied context, a pointer to
+/// If the mesh is cached and loaded into the active context, a pointer to
 /// its resource buffer is returned. If cached, but in a different context, a
 /// new resource is created and bound to the context. If uncached the file is
 /// loaded from disk and bound to the context
@@ -63,15 +63,14 @@ struct TextureBuffer
 /// * `blons:sphere~radius` Sphere mesh
 ///
 /// \param filename Filename of the mesh to load
-/// \param context Handle to the current rendering context
 /// \return MeshBuffer containing shared BufferResource pointers that will be
 /// nullptr on failure, as well as mesh information
 ////////////////////////////////////////////////////////////////////////////////
-MeshBuffer LoadMesh(const std::string& filename, RenderContext& context);
+MeshBuffer LoadMesh(const std::string& filename);
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Loads a texture from disk or engine, or from cache if available.
 ///
-/// If the texture is cached and loaded into the supplied context, a pointer to
+/// If the texture is cached and loaded into the active context, a pointer to
 /// its resource buffer is returned. If cached, but in a different context, a
 /// new resource is created and bound to the context. If uncached the file is
 /// loaded from disk and bound to the context
@@ -82,11 +81,10 @@ MeshBuffer LoadMesh(const std::string& filename, RenderContext& context);
 ///
 /// \param filename Filename of the texture to load
 /// \param type Texture parameters to bind
-/// \param context Handle to the current rendering context
 /// \return TextureBuffer containing shared TextureResource pointer that will be
 /// nullptr on failure, as well as texture information
 ////////////////////////////////////////////////////////////////////////////////
-TextureBuffer LoadTexture(const std::string& filename, TextureType::Options options, RenderContext& context);
+TextureBuffer LoadTexture(const std::string& filename, TextureType::Options options);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Clears all cached resource buffers, but not cached resource data

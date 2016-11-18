@@ -54,7 +54,8 @@
 /// {
 ///     auto client = std::make_unique<blons::Client>();
 ///     auto info = client->screen_info();
-///     auto graphics = std::make_unique<blons::Graphics>(info.width, info.height, info.hwnd);
+///     blons::render::MakeContext(info);
+///     auto graphics = std::make_unique<blons::Graphics>(info);
 ///
 ///     auto sprite = graphics->MakeSprite("image.png");
 ///     sprite->set_pos(0, 0, info.width, info.height);

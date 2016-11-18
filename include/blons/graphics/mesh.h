@@ -27,7 +27,7 @@
 // Includes
 #include <memory>
 // Public Includes
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 #include <blons/graphics/texture.h>
 
 namespace blons
@@ -63,18 +63,16 @@ public:
     /// \brief initializes a mesh from the supplied file on disk
     ///
     /// \param mesh_filename Name of the blonsmesh file on disk
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Mesh(const std::string& mesh_filename, RenderContext& context);
+    Mesh(const std::string& mesh_filename);
     ~Mesh() {}
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Reloads the mesh to be active in the supplied rendering context
+    /// \brief Reloads the mesh to be attached to the active rendering context
     ///
-    /// \param context Handle to the current rendering context
     /// \return True if reinitialized successfully
     ////////////////////////////////////////////////////////////////////////////////
-    bool Reload(RenderContext& context);
+    bool Reload();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a handle to the mesh's vertex buffer resource
@@ -115,7 +113,7 @@ public:
     const std::vector<Mesh::TextureInfo>& textures() const;
 
 private:
-    bool Init(const std::string& mesh_filename, RenderContext& context);
+    bool Init(const std::string& mesh_filename);
 
     std::string filename_;
 
@@ -136,7 +134,7 @@ private:
 /// // Creating a new mesh from a file
 /// MeshImporter importer("mesh.bms");
 ///
-/// Mesh mesh(importer.mesh_data(), context);
+/// Mesh mesh(importer.mesh_data());
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

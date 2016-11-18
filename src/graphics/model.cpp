@@ -42,7 +42,7 @@ TextureType::Options kNormalOptions = { TextureType::AUTO, TextureType::LINEAR, 
 TextureType::Options kLightOptions =  { TextureType::RAW,  TextureType::LINEAR, TextureType::REPEAT };
 }
 
-Model::Model(std::string mesh_filename, RenderContext& context)
+Model::Model(std::string mesh_filename)
 {
     mesh_ = nullptr;
     albedo_texture_ = nullptr;
@@ -57,7 +57,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     timer.start();
     static Timer total_timer;
     total_timer.start();
-    mesh_.reset(new Mesh(mesh_filename, context));
+    mesh_.reset(new Mesh(mesh_filename));
     total_timer.pause();
     log::Debug("[%ims(%ims)]\n", timer.ms(), total_timer.ms());
 
@@ -94,7 +94,7 @@ Model::Model(std::string mesh_filename, RenderContext& context)
         default:
             throw "Unknown texture type in mesh file";
         }
-        auto texture = std::unique_ptr<Texture>(new Texture(tex_file.c_str(), tex_options, context));
+        auto texture = std::unique_ptr<Texture>(new Texture(tex_file.c_str(), tex_options));
 
         if (texture == nullptr)
         {
@@ -117,41 +117,41 @@ Model::Model(std::string mesh_filename, RenderContext& context)
     }
     if (albedo_texture_ == nullptr)
     {
-        albedo_texture_.reset(new Texture("blons:none", kAlbedoOptions, context));
+        albedo_texture_.reset(new Texture("blons:none", kAlbedoOptions));
     }
     if (normal_texture_ == nullptr)
     {
-        normal_texture_.reset(new Texture("blons:normal", kNormalOptions, context));
+        normal_texture_.reset(new Texture("blons:normal", kNormalOptions));
     }
     if (light_texture_ == nullptr)
     {
-        light_texture_.reset(new Texture("blons:none", kLightOptions, context));
+        light_texture_.reset(new Texture("blons:none", kLightOptions));
     }
     log::Debug("[%ims]\n", timer.ms());
 }
 
-void Model::Render(RenderContext& context)
+void Model::Render()
 {
     // TODO: Clean this up with operator overloads
     world_matrix_ = MatrixIdentity() * MatrixTranslation(pos_.x, pos_.y, pos_.z);
-    context->BindMeshBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
+    render::context()->BindMeshBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
 }
 
-bool Model::Reload(RenderContext& context)
+bool Model::Reload()
 {
-    if (!mesh_->Reload(context))
+    if (!mesh_->Reload())
     {
         return false;
     }
-    if (!albedo_texture_->Reload(context))
+    if (!albedo_texture_->Reload())
     {
         return false;
     }
-    if (!normal_texture_->Reload(context))
+    if (!normal_texture_->Reload())
     {
         return false;
     }
-    if (!light_texture_->Reload(context))
+    if (!light_texture_->Reload())
     {
         return false;
     }

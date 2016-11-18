@@ -25,7 +25,7 @@
 #define BLONSTECH_GRAPHICS_RENDER_COMPUTESHADER_H_
 
 // Includes
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 #include <blons/graphics/render/commonshader.h>
 
 namespace blons
@@ -40,9 +40,8 @@ public:
     /// \brief Creates a new compute shader using the provided source file
     ///
     /// \param source_filename Location of the compute shader source on disk
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    ComputeShader(std::string source_filename, RenderContext& context);
+    ComputeShader(std::string source_filename);
     ~ComputeShader();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -54,10 +53,8 @@ public:
     /// \param groups_x Number of thread groups running on the X axis
     /// \param groups_y Number of thread groups running on the Y axis
     /// \param groups_z Number of thread groups running on the Z axis
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    bool Run(unsigned int groups_x, unsigned int groups_y, unsigned int groups_z,
-             RenderContext& context);
+    bool Run(unsigned int groups_x, unsigned int groups_y, unsigned int groups_z);
 };
 } // namespace blons
 

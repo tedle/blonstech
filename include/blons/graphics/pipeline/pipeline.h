@@ -45,12 +45,13 @@
 /// #include <blons/graphics/pipeline/pipeline.h>
 ///
 /// // Using the deferred pipeline
-/// auto pipeline = std::make_unique<blons::pipeline::Deferred>(screen, blons::kPi / 2.0f, screen_near, screen_far, context)
+/// auto pipeline = std::make_unique<blons::pipeline::Deferred>(screen, blons::kPi / 2.0f, screen_near, screen_far)
 ///
 /// // Rendering loop
 /// while (true)
 /// {
-///     pipeline::Scene scene;
+///     auto context = blons::render::context();
+///     blons::pipeline::Scene scene;
 ///     scene.lights = lights;
 ///     scene.models = models;
 ///     scene.sky_colour = sky_colour;
@@ -58,7 +59,7 @@
 ///
 ///     context->BeginScene(Vector4(0, 0, 0, 1));
 ///
-///     if (!pipeline->Render(scene, context))
+///     if (!pipeline->Render(scene))
 ///     {
 ///         // Uh oh!
 ///     }
@@ -90,14 +91,15 @@
 ///                                          perspective.screen_near, perspective.screen_far);
 ///
 /// // Pipeline setup
-/// auto geometry = std::make_unique<blons::pipeline::stage::Geometry>(perspective, context);
-/// auto shadow = std::make_unique<blons::pipeline::stage::Shadow>(perspective, context);
-/// auto lightprobe = std::make_unique<blons::pipeline::stage::Lightprobe>(perspective, context);
-/// auto lighting = std::make_unique<blons::pipeline::stage::Lighting>(perspective, context);
+/// auto geometry = std::make_unique<blons::pipeline::stage::Geometry>(perspective);
+/// auto shadow = std::make_unique<blons::pipeline::stage::Shadow>(perspective);
+/// auto lightprobe = std::make_unique<blons::pipeline::stage::Lightprobe>(perspective);
+/// auto lighting = std::make_unique<blons::pipeline::stage::Lighting>(perspective);
 ///
 /// while (true)
 /// {
-///     pipeline::Scene scene;
+///     auto context = blons::render::context();
+///     blons::pipeline::Scene scene;
 ///     scene.lights = lights;
 ///     scene.models = models;
 ///     scene.sky_colour = sky_colour;
@@ -110,26 +112,26 @@
 ///     Matrix light_vp_matrix = sun->ViewFrustum(view_matrix * proj_matrix, perspective.screen_far);
 ///
 ///     // Render all of the geometry and accompanying info (normal, depth, etc)
-///     if (!geometry->Render(scene, view_matrix, proj_matrix, context))
+///     if (!geometry->Render(scene, view_matrix, proj_matrix))
 ///     {
 ///         // That's not good
 ///     }
 ///
 ///     // Render all of the geometry and get their depth from the light's point of view
 ///     // Then render a shadow map from the depth information
-///     if (!shadow->Render(scene, *geometry, view_matrix, proj_matrix, light_vp_matrix, ortho_matrix, context))
+///     if (!shadow->Render(scene, *geometry, view_matrix, proj_matrix, light_vp_matrix, ortho_matrix))
 ///     {
 ///         // Better panic
 ///     }
 ///
 ///     // Builds a direct light map and then bounce lighting
 ///     if (!lightprobe->Render(scene, *geometry, *shadow, perspective,
-///                              view_matrix, proj_matrix, light_vp_matrix, context))
+///                              view_matrix, proj_matrix, light_vp_matrix))
 ///     {
 ///         // Oughta get out of here
 ///     }
 ///
-///     if (!lighting->Render(scene, *geometry, *shadow, *lightprobe, view_matrix, proj_matrix, ortho_matrix, context))
+///     if (!lighting->Render(scene, *geometry, *shadow, *lightprobe, view_matrix, proj_matrix, ortho_matrix))
 ///     {
 ///         // Whoops
 ///     }

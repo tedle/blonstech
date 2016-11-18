@@ -25,12 +25,11 @@
 
 namespace blons
 {
-ComputeShader::ComputeShader(std::string source_filename, RenderContext& context) :
-    CommonShader::CommonShader(context)
+ComputeShader::ComputeShader(std::string source_filename)
 {
     std::string source = ParseFile(source_filename);
 
-    if (!context->RegisterComputeShader(program_.get(), source))
+    if (!render::context()->RegisterComputeShader(program_.get(), source))
     {
         log::Fatal("Shaders failed to compile\n");
         throw "Shaders failed to compile";
@@ -41,10 +40,9 @@ ComputeShader::~ComputeShader()
 {
 }
 
-bool ComputeShader::Run(unsigned int groups_x, unsigned int groups_y, unsigned int groups_z,
-                        RenderContext& context)
+bool ComputeShader::Run(unsigned int groups_x, unsigned int groups_y, unsigned int groups_z)
 {
-    context->RunComputeShader(program_.get(), groups_x, groups_y, groups_z);
+    render::context()->RunComputeShader(program_.get(), groups_x, groups_y, groups_z);
 
     return true;
 }

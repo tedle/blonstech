@@ -62,9 +62,8 @@ public:
     /// \brief Initializes a new Lighting stage
     ///
     /// \param perspective Screen dimensions and perspective information
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Lighting(Perspective perspective, RenderContext& context);
+    Lighting(Perspective perspective);
     ~Lighting() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -80,10 +79,9 @@ public:
     /// \param view_matrix View matrix of the camera rendering the scene
     /// \param proj_matrix Perspective matrix for rendering the scene
     /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
     bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const Lightprobe& lightprobe,
-                Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix, RenderContext& context);
+                Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage

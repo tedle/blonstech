@@ -28,8 +28,9 @@
 
 namespace blons
 {
-DrawBatcher::DrawBatcher(Type type, RenderContext& context)
+DrawBatcher::DrawBatcher(Type type)
 {
+    auto context = render::context();
     type_ = type;
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
@@ -54,8 +55,9 @@ DrawBatcher::DrawBatcher(Type type, RenderContext& context)
     index_idx_ = 0;
 }
 
-void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix, RenderContext& context)
+void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
 {
+    auto context = render::context();
     const unsigned int vert_size = static_cast<unsigned int>(mesh_data.vertices.size());
     const unsigned int index_size = static_cast<unsigned int>(mesh_data.indices.size());
 
@@ -117,16 +119,16 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix, RenderC
     index_idx_ += index_size;
 }
 
-void DrawBatcher::Append(const MeshData& mesh_data, RenderContext& context)
+void DrawBatcher::Append(const MeshData& mesh_data)
 {
-    Append(mesh_data, MatrixIdentity(), context);
+    Append(mesh_data, MatrixIdentity());
 }
 
-void DrawBatcher::Render(bool clear_buffers, RenderContext& context)
+void DrawBatcher::Render(bool clear_buffers)
 {
     vertex_count_ = vertex_idx_;
     index_count_ = index_idx_;
-    context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
+    render::context()->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
 
     if (clear_buffers)
     {
@@ -135,9 +137,9 @@ void DrawBatcher::Render(bool clear_buffers, RenderContext& context)
     }
 }
 
-void DrawBatcher::Render(RenderContext& context)
+void DrawBatcher::Render()
 {
-    Render(true, context);
+    Render(true);
 }
 
 int DrawBatcher::index_count() const

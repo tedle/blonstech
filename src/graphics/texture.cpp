@@ -28,21 +28,21 @@
 
 namespace blons
 {
-Texture::Texture(std::string filename, TextureType::Options options, RenderContext& context)
+Texture::Texture(std::string filename, TextureType::Options options)
 {
-    if (!Init(filename, options, context))
+    if (!Init(filename, options))
     {
         throw "Failed to load texture";
     }
 }
 
-bool Texture::Init(std::string filename, TextureType::Options options, RenderContext& context)
+bool Texture::Init(std::string filename, TextureType::Options options)
 {
     filename_ = filename;
     pixel_data_ = nullptr;
     pixel_data_3d_ = nullptr;
 
-    auto tex = resource::LoadTexture(filename, options, context);
+    auto tex = resource::LoadTexture(filename, options);
     texture_ = std::move(tex.texture);
     info_ = tex.info;
     if (texture_ == nullptr)
@@ -52,16 +52,17 @@ bool Texture::Init(std::string filename, TextureType::Options options, RenderCon
     return true;
 }
 
-Texture::Texture(const PixelData& pixels, RenderContext& context)
+Texture::Texture(const PixelData& pixels)
 {
-    if (!Init(pixels, context))
+    if (!Init(pixels))
     {
         throw "Failed to load texture";
     }
 }
 
-bool Texture::Init(const PixelData& pixels, RenderContext& context)
+bool Texture::Init(const PixelData& pixels)
 {
+    auto context = render::context();
     filename_ = "";
     pixel_data_.reset(new PixelData(pixels));
     pixel_data_3d_ = nullptr;
@@ -86,16 +87,17 @@ bool Texture::Init(const PixelData& pixels, RenderContext& context)
     return true;
 }
 
-Texture::Texture(const PixelData3D& pixels, RenderContext& context)
+Texture::Texture(const PixelData3D& pixels)
 {
-    if (!Init(pixels, context))
+    if (!Init(pixels))
     {
         throw "Failed to load texture";
     }
 }
 
-bool Texture::Init(const PixelData3D& pixels, RenderContext& context)
+bool Texture::Init(const PixelData3D& pixels)
 {
+    auto context = render::context();
     filename_ = "";
     pixel_data_ = nullptr;
     pixel_data_3d_.reset(new PixelData3D(pixels));
@@ -120,16 +122,16 @@ bool Texture::Init(const PixelData3D& pixels, RenderContext& context)
     return true;
 }
 
-bool Texture::Reload(RenderContext& context)
+bool Texture::Reload()
 {
     if (filename_.length() > 0)
     {
-        return Init(filename_, { info_.type.compression, info_.type.filter, info_.type.wrap }, context);
+        return Init(filename_, { info_.type.compression, info_.type.filter, info_.type.wrap });
     }
 
     else if (pixel_data_ != nullptr)
     {
-        return Init(*pixel_data_, context);
+        return Init(*pixel_data_);
     }
 
     return false;

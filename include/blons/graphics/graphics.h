@@ -33,31 +33,13 @@
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/model.h>
 #include <blons/graphics/sprite.h>
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/pipeline/deferred.h>
 #include <blons/system/client.h>
 
 namespace blons
 {
-////////////////////////////////////////////////////////////////////////////////
-/// \brief Determines how the system window should be setup for rendering
-////////////////////////////////////////////////////////////////////////////////
-enum RenderMode
-{
-    FULLSCREEN,       ///< GPU based fullscreen rendering
-    WINDOW,           ///< Render inside a draggable window
-    BORDERLESS_WINDOW ///< Render inside a window fit to the screen, hiding taskbar
-};
-
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for graphics creation
-////////////////////////////////////////////////////////////////////////////////
-const RenderMode kRenderMode = RenderMode::WINDOW;
-////////////////////////////////////////////////////////////////////////////////
-/// \brief **Temporary** config option for graphics creation
-////////////////////////////////////////////////////////////////////////////////
-const bool kEnableVsync = false;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief **Temporary** config option for max render distance
 ////////////////////////////////////////////////////////////////////////////////
@@ -163,11 +145,9 @@ public:
     void set_output(pipeline::Deferred::Output output, pipeline::Deferred::Output alt_output);
 
 private:
-    bool MakeContext(Client::Info screen);
-
+    bool Init(Client::Info screen);
     bool RenderSprites();
 
-    RenderContext context_;
     Client::Info screen_;
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<pipeline::Deferred> pipeline_;

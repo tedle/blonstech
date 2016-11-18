@@ -57,10 +57,8 @@ public:
     /// Manager::control_batch and append any mesh data to the resulting
     /// DrawBatcher. The order these functions are called in is the same as the
     /// order they wil appear on screen.
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void Render(RenderContext& context)=0;
+    virtual void Render()=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Called once per frame during gui::Manager::Update.
     ///
@@ -162,7 +160,7 @@ protected:
 ///         : Control(pos, parent_manager, parent_window) {}
 ///     ~ClickChecker() {}
 ///
-///     void Render(RenderContext& context) override
+///     void Render() override
 ///     {
 ///         // Find which part of the user customizable skin we're supposed to render
 ///         auto layout = gui_->skin()->layout();
@@ -172,7 +170,7 @@ protected:
 ///         auto sprite = gui_->skin()->sprite();
 ///
 ///         // Batch to send mesh data to
-///         auto batch = gui_->control_batch(crop_, feather_, context);
+///         auto batch = gui_->control_batch(crop_, feather_);
 ///
 ///         // Follow the containing Window's position as it's dragged around
 ///         auto parent_pos = parent_->pos();
@@ -182,7 +180,7 @@ protected:
 ///         // Render the center body of a button
 ///         sprite->set_pos(x, y, pos_.w, pos_.h);
 ///         sprite->set_subtexture(region.body);
-///         batch->Append(sprite->mesh(), context);
+///         batch->Append(sprite->mesh());
 ///     }
 ///
 ///     bool Update(const Input& input) override

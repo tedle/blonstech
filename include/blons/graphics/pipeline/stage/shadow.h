@@ -60,9 +60,8 @@ public:
     /// \brief Initializes a new Shadow stage
     ///
     /// \param perspective Screen dimensions and perspective information
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Shadow(Perspective perspective, RenderContext& context);
+    Shadow(Perspective perspective);
     ~Shadow() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -76,9 +75,8 @@ public:
     /// \param light_vp_matrix View projection matrix of the directional light
     /// providing shadow
     /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, const Geometry& geometry, Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, Matrix ortho_matrix, RenderContext& context);
+    bool Render(const Scene& scene, const Geometry& geometry, Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, Matrix ortho_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage

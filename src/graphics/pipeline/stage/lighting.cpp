@@ -37,13 +37,13 @@ namespace pipeline
 {
 namespace stage
 {
-Lighting::Lighting(Perspective perspective, RenderContext& context)
+Lighting::Lighting(Perspective perspective)
 {
     // Shaders
     ShaderAttributeList light_inputs;
     light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     light_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/light.frag.glsl", light_inputs, context));
+    light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/light.frag.glsl", light_inputs));
 
     if (light_shader_ == nullptr)
     {
@@ -51,12 +51,13 @@ Lighting::Lighting(Perspective perspective, RenderContext& context)
     }
 
     // Framebuffers
-    light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false, context));
+    light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false));
 }
 
 bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const Lightprobe& lightprobe,
-                      Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix, RenderContext& context)
+                      Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
+    auto context = render::context();
     // Can be removed when we support more lights
     assert(scene.lights.size() == 1);
     Light* sun = scene.lights[0];
@@ -65,27 +66,27 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
     Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix);
 
     // Bind the buffer to do all lighting calculations on
-    light_buffer_->Bind(context);
+    light_buffer_->Bind();
 
-    light_buffer_->Render(context);
+    light_buffer_->Render();
 
     // Set the inputs
-    if (!light_shader_->SetInput("proj_matrix", ortho_matrix, context) ||
-        !light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context) ||
-        !light_shader_->SetInput("albedo", geometry.output(stage::Geometry::ALBEDO), 0, context) ||
-        !light_shader_->SetInput("normal", geometry.output(stage::Geometry::NORMAL), 1, context) ||
-        !light_shader_->SetInput("depth", geometry.output(stage::Geometry::DEPTH), 2, context) ||
-        !light_shader_->SetInput("direct_light", shadow.output(stage::Shadow::DIRECT_LIGHT), 3, context) ||
-        !light_shader_->SetInput("indirect_light", lightprobe.output(stage::Lightprobe::INDIRECT_LIGHT), 4, context) ||
-        !light_shader_->SetInput("sun.dir", sun->direction(), context) ||
-        !light_shader_->SetInput("sun.colour", sun->colour(), context) ||
-        !light_shader_->SetInput("sky_colour", scene.sky_colour, context))
+    if (!light_shader_->SetInput("proj_matrix", ortho_matrix) ||
+        !light_shader_->SetInput("inv_vp_matrix", inv_proj_view) ||
+        !light_shader_->SetInput("albedo", geometry.output(stage::Geometry::ALBEDO), 0) ||
+        !light_shader_->SetInput("normal", geometry.output(stage::Geometry::NORMAL), 1) ||
+        !light_shader_->SetInput("depth", geometry.output(stage::Geometry::DEPTH), 2) ||
+        !light_shader_->SetInput("direct_light", shadow.output(stage::Shadow::DIRECT_LIGHT), 3) ||
+        !light_shader_->SetInput("indirect_light", lightprobe.output(stage::Lightprobe::INDIRECT_LIGHT), 4) ||
+        !light_shader_->SetInput("sun.dir", sun->direction()) ||
+        !light_shader_->SetInput("sun.colour", sun->colour()) ||
+        !light_shader_->SetInput("sky_colour", scene.sky_colour))
     {
         return false;
     }
 
     // Finally do the render
-    if (!light_shader_->Render(light_buffer_->index_count(), context))
+    if (!light_shader_->Render(light_buffer_->index_count()))
     {
         return false;
     }

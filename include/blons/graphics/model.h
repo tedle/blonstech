@@ -29,7 +29,7 @@
 #include <memory>
 // Public Includes
 #include <blons/graphics/texture.h>
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 
 namespace blons
 {
@@ -45,26 +45,22 @@ public:
     /// texture files to be located in "../tex/" (**temporary**)
     ///
     /// \param mesh_filename Location of the mesh on disk to load
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Model(std::string mesh_filename, RenderContext& context);
+    Model(std::string mesh_filename);
     virtual ~Model() {}
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Pushes mesh data to the graphics API as well as updates the world
     /// matrix
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context);
+    void Render();
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Reloads the model to be active in the supplied rendering context
+    /// \brief Reloads the model to be attached to the active rendering context
     ///
-    /// \param context Handle to the current rendering context
     /// \return True if reinitialized successfully
     ////////////////////////////////////////////////////////////////////////////////
-    bool Reload(RenderContext& context);
+    bool Reload();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the number of indices contained in the mesh
@@ -185,14 +181,14 @@ protected:
 ///     while (true)
 ///     {
 ///         // Push the model's vertices and update world matrix
-///         model->Render(context);
+///         model->Render();
 ///
 ///         // Set the shader's inputs
-///         shader->SetInput("world_matrix", model->world_matrix(), context);
-///         shader->SetInput("albedo", model->albedo(), context);
+///         shader->SetInput("world_matrix", model->world_matrix());
+///         shader->SetInput("albedo", model->albedo());
 ///
 ///         // Make the draw call
-///         shader->Render(model->index_count(), context);
+///         shader->Render(model->index_count());
 ///     }
 /// }
 /// \endcode

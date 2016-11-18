@@ -25,13 +25,13 @@
 
 namespace blons
 {
-Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs, RenderContext& context) :
-    CommonShader::CommonShader(context)
+Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs) :
+    CommonShader::CommonShader()
 {
     std::string vertex_source = ParseFile(vertex_filename);
     std::string pixel_source = ParseFile(pixel_filename);
 
-    if (!context->RegisterShader(program_.get(), vertex_source, pixel_source, inputs))
+    if (!render::context()->RegisterShader(program_.get(), vertex_source, pixel_source, inputs))
     {
         log::Fatal("Shaders failed to compile\n");
         throw "Shaders failed to compile";
@@ -42,9 +42,9 @@ Shader::~Shader()
 {
 }
 
-bool Shader::Render(unsigned int index_count, RenderContext& context)
+bool Shader::Render(unsigned int index_count)
 {
-    context->RenderShader(program_.get(), index_count);
+    render::context()->RenderShader(program_.get(), index_count);
 
     return true;
 }

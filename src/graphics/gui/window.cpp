@@ -49,16 +49,16 @@ Window::Window(std::string id, Box pos, std::string caption, Type type, Manager*
     caption_.reset(new Label(caption_pos, ColourString(caption, colour), Skin::FontStyle::HEADING, parent_manager, this));
 }
 
-void Window::Render(RenderContext& context)
+void Window::Render()
 {
     if (type_ != INVISIBLE)
     {
-        RenderBody(context);
+        RenderBody();
     }
 
     if (type_ == DRAGGABLE)
     {
-        caption_->Render(context);
+        caption_->Render();
     }
 
     // Render controls
@@ -66,17 +66,17 @@ void Window::Render(RenderContext& context)
     {
         if (!control->hidden())
         {
-            control->Render(context);
+            control->Render();
         }
     }
 }
 
-void Window::RenderBody(RenderContext& context)
+void Window::RenderBody()
 {
     auto skin = gui_->skin();
     auto layout = skin->layout();
     auto sprite = skin->sprite();
-    auto batch = gui_->control_batch(crop_, feather_, context);
+    auto batch = gui_->control_batch(crop_, feather_);
     // Title bar
     if (type_ == Window::DRAGGABLE)
     {
@@ -87,21 +87,21 @@ void Window::RenderBody(RenderContext& context)
                         t.left.w,
                         t.left.h);
         sprite->set_subtexture(t.left);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
         // Center
         sprite->set_pos(pos_.x + t.left.w,
                         pos_.y,
                         pos_.w - (t.left.w + t.right.w),
                         t.left.h);
         sprite->set_subtexture(t.center);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
         // Right
         sprite->set_pos(pos_.x + pos_.w - t.right.w,
                         pos_.y,
                         t.right.w,
                         t.right.h);
         sprite->set_subtexture(t.right);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
     // Body
     {
@@ -120,7 +120,7 @@ void Window::RenderBody(RenderContext& context)
                         b.top_left.w,
                         b.top_left.h);
         sprite->set_subtexture(b.top_left);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Top edge
         sprite->set_pos(pos_.x + b.top_left.w,
@@ -128,7 +128,7 @@ void Window::RenderBody(RenderContext& context)
                         pos_.w - (b.top_left.w + b.top_right.w),
                         b.top.h);
         sprite->set_subtexture(b.top);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Top right corner
         sprite->set_pos(pos_.x + pos_.w - b.top_right.w,
@@ -136,7 +136,7 @@ void Window::RenderBody(RenderContext& context)
                         b.top_right.w,
                         b.top_right.h);
         sprite->set_subtexture(b.top_right);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Left edge
         sprite->set_pos(pos_.x,
@@ -144,7 +144,7 @@ void Window::RenderBody(RenderContext& context)
                         b.left.w,
                         pos_.h - (b.top_left.h + b.bottom_right.h) - t_off);
         sprite->set_subtexture(b.left);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Body
         sprite->set_pos(pos_.x + b.left.w,
@@ -152,7 +152,7 @@ void Window::RenderBody(RenderContext& context)
                         pos_.w - (b.left.w + b.right.w),
                         pos_.h - (b.top.h + b.bottom.h) - t_off);
         sprite->set_subtexture(b.body);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Right edge
         sprite->set_pos(pos_.x + pos_.w - b.right.w,
@@ -160,7 +160,7 @@ void Window::RenderBody(RenderContext& context)
                         b.right.w,
                         pos_.h - (b.top_right.h + b.bottom_right.h) - t_off);
         sprite->set_subtexture(b.right);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Bottom left corner
         sprite->set_pos(pos_.x,
@@ -168,7 +168,7 @@ void Window::RenderBody(RenderContext& context)
                         b.bottom_left.w,
                         b.bottom_left.h);
         sprite->set_subtexture(b.bottom_left);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Bottom edge
         sprite->set_pos(pos_.x + b.bottom_left.w,
@@ -176,7 +176,7 @@ void Window::RenderBody(RenderContext& context)
                         pos_.w - (b.bottom_left.w + b.bottom_right.w),
                         b.bottom.h);
         sprite->set_subtexture(b.bottom);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
 
         // Bottom right corner
         sprite->set_pos(pos_.x + pos_.w - b.bottom_right.w,
@@ -184,7 +184,7 @@ void Window::RenderBody(RenderContext& context)
                         b.bottom_right.w,
                         b.bottom_right.h);
         sprite->set_subtexture(b.bottom_right);
-        batch->Append(sprite->mesh(), context);
+        batch->Append(sprite->mesh());
     }
 }
 

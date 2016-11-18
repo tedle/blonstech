@@ -38,7 +38,7 @@ Label::Label(Vector2 pos, ColourString text, Skin::FontStyle style, Manager* par
     font_style_ = style;
 }
 
-void Label::Render(RenderContext& context)
+void Label::Render()
 {
     auto font = gui_->skin()->font(font_style_);
 
@@ -50,7 +50,7 @@ void Label::Render(RenderContext& context)
         for (const auto& frag : text_.fragments())
         {
             // One draw call per (colour,font) used across all labels combined
-            auto batcher = gui_->font_batch(font_style_, frag.colour, crop_, feather_, context);
+            auto batcher = gui_->font_batch(font_style_, frag.colour, crop_, feather_);
             for (const auto& c : frag.text)
             {
                 if (c == '\n')
@@ -62,7 +62,7 @@ void Label::Render(RenderContext& context)
                 auto mesh = font->BuildMesh(c, x, y, crop_);
                 if (mesh != nullptr)
                 {
-                    batcher->Append(*mesh, context);
+                    batcher->Append(*mesh);
                 }
                 x += font->advance();
             }
@@ -70,7 +70,7 @@ void Label::Render(RenderContext& context)
     }
     else
     {
-        auto batcher = gui_->font_batch(font_style_, text_.base_colour(), crop_, feather_, context);
+        auto batcher = gui_->font_batch(font_style_, text_.base_colour(), crop_, feather_);
         for (const auto& c : text_.raw_str())
         {
             if (c == '\n')
@@ -82,7 +82,7 @@ void Label::Render(RenderContext& context)
             auto mesh = font->BuildMesh(c, x, y, crop_);
             if (mesh != nullptr)
             {
-                batcher->Append(*mesh, context);
+                batcher->Append(*mesh);
             }
             x += font->advance();
         }

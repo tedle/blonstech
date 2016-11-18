@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "renderd3d11.h"
+#include "rendererd3d11.h"
 
 // Includes
 #include <dxgi.h>
@@ -84,7 +84,7 @@ ShaderResourceD3D11::~ShaderResourceD3D11()
     return;
 }
 
-RenderD3D11::RenderD3D11(int screen_width, int screen_height, bool vsync,
+RendererD3D11::RendererD3D11(int screen_width, int screen_height, bool vsync,
                          HWND hwnd, bool fullscreen)
 {
     swapchain_ = nullptr;
@@ -356,7 +356,7 @@ RenderD3D11::RenderD3D11(int screen_width, int screen_height, bool vsync,
     device_context_->RSSetViewports(1, &viewport);
 }
 
-RenderD3D11::~RenderD3D11()
+RendererD3D11::~RendererD3D11()
 {
     // Always shut down a swapchain in windowed mode or problems happen
     if (swapchain_)
@@ -415,7 +415,7 @@ RenderD3D11::~RenderD3D11()
     return;
 }
 
-void RenderD3D11::BeginScene()
+void RendererD3D11::BeginScene()
 {
     float colour[4];
 
@@ -431,29 +431,29 @@ void RenderD3D11::BeginScene()
     return;
 }
 
-void RenderD3D11::EndScene()
+void RendererD3D11::EndScene()
 {
     swapchain_->Present(vsync_, 0);
 
     return;
 }
 
-BufferResource* RenderD3D11::MakeBufferResource()
+BufferResource* RendererD3D11::MakeBufferResource()
 {
     return new BufferResourceD3D11;
 }
 
-TextureResource* RenderD3D11::MakeTextureResource()
+TextureResource* RendererD3D11::MakeTextureResource()
 {
     return new TextureResourceD3D11;
 }
 
-ShaderResource* RenderD3D11::MakeShaderResource()
+ShaderResource* RendererD3D11::MakeShaderResource()
 {
     return new ShaderResourceD3D11;
 }
 
-bool RenderD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+bool RendererD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                Vertex* vertices, unsigned int vert_count,
                                unsigned int* indices, unsigned int index_count)
 {
@@ -505,12 +505,12 @@ bool RenderD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* in
     return true;
 }
 
-void RenderD3D11::RegisterTexture()
+void RendererD3D11::RegisterTexture()
 {
     return;
 }
 
-bool RenderD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename, WCHAR* pixel_filename)
+bool RendererD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename, WCHAR* pixel_filename)
 {
     ShaderResourceD3D11* shader = static_cast<ShaderResourceD3D11*>(program);
 
@@ -633,7 +633,7 @@ bool RenderD3D11::RegisterShader(ShaderResource* program, WCHAR* vertex_filename
     return true;
 }
 
-void RenderD3D11::RenderShader(ShaderResource* program, int index_count)
+void RendererD3D11::RenderShader(ShaderResource* program, int index_count)
 {
     ShaderResourceD3D11* shader = static_cast<ShaderResourceD3D11*>(program);
     // Make sure we shove them verts in so they fit rite
@@ -652,7 +652,7 @@ void RenderD3D11::RenderShader(ShaderResource* program, int index_count)
     return;
 }
 
-void RenderD3D11::BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
+void RendererD3D11::BindModelBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
     BufferResourceD3D11* vertex_buf = static_cast<BufferResourceD3D11*>(vertex_buffer);
     BufferResourceD3D11* index_buf  = static_cast<BufferResourceD3D11*>(index_buffer);
@@ -674,7 +674,7 @@ void RenderD3D11::BindModelBuffer(BufferResource* vertex_buffer, BufferResource*
     return;
 }
 
-bool RenderD3D11::SetShaderInputs(ShaderResource* program, TextureResource* texture,
+bool RendererD3D11::SetShaderInputs(ShaderResource* program, TextureResource* texture,
                                   Matrix world_matrix, Matrix view_matrix, Matrix proj_matrix)
 {
     ShaderResourceD3D11* shader = static_cast<ShaderResourceD3D11*>(program);
@@ -720,14 +720,14 @@ bool RenderD3D11::SetShaderInputs(ShaderResource* program, TextureResource* text
     return true;
 }
 
-void RenderD3D11::GetVideoCardInfo(char* name, int& memory)
+void RendererD3D11::GetVideoCardInfo(char* name, int& memory)
 {
     strcpy_s(name, 128, video_card_desc_.c_str());
     memory = video_card_memory_;
     return;
 }
 
-TextureResource* RenderD3D11::LoadPixelData(WCHAR* filename)
+TextureResource* RendererD3D11::LoadPixelData(WCHAR* filename)
 {
     HRESULT result;
 
@@ -742,7 +742,7 @@ TextureResource* RenderD3D11::LoadPixelData(WCHAR* filename)
     return texture;
 }
 
-void RenderD3D11::OutputShaderErrorMessage(ID3D10Blob* error_message)
+void RendererD3D11::OutputShaderErrorMessage(ID3D10Blob* error_message)
 {
     char* compile_errors;
     std::size_t buffer_size;

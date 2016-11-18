@@ -28,7 +28,7 @@
 #include <FreeType2/include/ft2build.h>
 #include FT_FREETYPE_H
 // Public Includes
-#include <blons/graphics/render/render.h>
+#include <blons/graphics/render/renderer.h>
 
 namespace blons
 {
@@ -93,7 +93,7 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, units::pixel texture
     }
 }
 
-Font::Font(std::string font_filename, units::pixel pixel_size, RenderContext& context)
+Font::Font(std::string font_filename, units::pixel pixel_size)
 {
     fontsheet_ = nullptr;
     letter_height_ = 0;
@@ -169,7 +169,7 @@ Font::Font(std::string font_filename, units::pixel pixel_size, RenderContext& co
     // No compression or mipmaps
     font.type.compression = TextureType::RAW;
     // Make it a sprite!
-    fontsheet_.reset(new Sprite(font, context));
+    fontsheet_.reset(new Sprite(font));
 
     if (FT_Done_FreeType(library) != 0)
     {

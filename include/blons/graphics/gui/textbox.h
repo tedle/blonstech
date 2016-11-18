@@ -62,10 +62,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Submits a drawbatch with mesh data & shader inputs to the parent
     /// gui::Manager
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Render(RenderContext& context) override;
+    void Render() override;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Performs input logic to detect typing and text manipulation
     ///
@@ -136,23 +134,19 @@ protected:
     /// \brief Creates mesh for the body and appends it to the textbox's draw queue
     ///
     /// \param t Region of the UI skin to render
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void RenderBody(const Skin::Layout::Textbox& t, RenderContext& context);
+    void RenderBody(const Skin::Layout::Textbox& t);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates mesh for the blinking text cursor and appends it to the
     /// textbox's draw queue
     ///
     /// \param cursor Region of the UI skin to render
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void RenderCursor(const Box& cursor, RenderContext& context);
+    void RenderCursor(const Box& cursor);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates mesh for the text and appends it to the textbox's draw queue
-    ///
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void RenderText(RenderContext& context);
+    void RenderText();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a handle to input events and returns a modified event queue

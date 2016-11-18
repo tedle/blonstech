@@ -34,7 +34,7 @@ namespace pipeline
 {
 namespace stage
 {
-Shadow::Shadow(Perspective perspective, RenderContext& context)
+Shadow::Shadow(Perspective perspective)
 {
     shadow_map_ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(kShadowMapResolution),
                                                   units::pixel_to_subpixel(kShadowMapResolution), 0,
@@ -43,16 +43,16 @@ Shadow::Shadow(Perspective perspective, RenderContext& context)
     ShaderAttributeList blur_inputs;
     blur_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     blur_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/blur.frag.glsl", blur_inputs, context));
+    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/blur.frag.glsl", blur_inputs));
 
     ShaderAttributeList direct_light_inputs;
     direct_light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     direct_light_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    direct_light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/direct-light.frag.glsl", direct_light_inputs, context));
+    direct_light_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/direct-light.frag.glsl", direct_light_inputs));
 
     ShaderAttributeList shadow_inputs;
     shadow_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    shadow_shader_.reset(new Shader("shaders/shadow.vert.glsl", "shaders/shadow.frag.glsl", shadow_inputs, context));
+    shadow_shader_.reset(new Shader("shaders/shadow.vert.glsl", "shaders/shadow.frag.glsl", shadow_inputs));
 
     if (blur_shader_ == nullptr ||
         direct_light_shader_ == nullptr ||
@@ -61,12 +61,12 @@ Shadow::Shadow(Perspective perspective, RenderContext& context)
         throw "Failed to initialize Shadow shaders";
     }
 
-    blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureType::R16G16, TextureType::LINEAR, TextureType::CLAMP } }, context));
-    direct_light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false, context));
-    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureType::R16G16, TextureType::LINEAR } }, context));
+    blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureType::R16G16, TextureType::LINEAR, TextureType::CLAMP } }));
+    direct_light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false));
+    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureType::R16G16, TextureType::LINEAR } }));
 }
 
-bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, Matrix ortho_matrix, RenderContext& context)
+bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, Matrix ortho_matrix)
 {
     // Can be removed when we support more lights
     assert(scene.lights.size() == 1);
@@ -76,7 +76,7 @@ bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_ma
     //     Shouldn't be much harder than splitting clip distance in ndc_box of sun_->ViewFrustum
     //     along a linear blend of logarithmic and uniform splits
     // Bind the shadow depth framebuffer to render all models onto
-    shadow_buffer_->Bind(context);
+    shadow_buffer_->Bind();
 
     // TODO: Separate into shadow.cpp and shadowmap.cpp for more modularity
     // TODO: 3D pass ->
@@ -84,17 +84,17 @@ bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_ma
     for (const auto& model : scene.models)
     {
         // Bind the vertex data
-        model->Render(context);
+        model->Render();
 
         Matrix mvp_matrix = model->world_matrix() * light_vp_matrix;
         // Set the inputs
-        if (!shadow_shader_->SetInput("mvp_matrix", mvp_matrix, context))
+        if (!shadow_shader_->SetInput("mvp_matrix", mvp_matrix))
         {
             return false;
         }
 
         // Make the draw call
-        if (!shadow_shader_->Render(model->index_count(), context))
+        if (!shadow_shader_->Render(model->index_count()))
         {
             return false;
         }
@@ -106,67 +106,67 @@ bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_ma
     // Result is an efficient O(2n) box blur (instead of O(n^2)!) needing only 2 textures (instead of 3)
 
     // Blur the shadow map to make soft shadows
-    blur_buffer_->Bind(context);
+    blur_buffer_->Bind();
 
-    blur_buffer_->Render(context);
+    blur_buffer_->Render();
 
     // Horizontal blur
-    if (!blur_shader_->SetInput("proj_matrix", shadow_map_ortho_matrix_, context) ||
-        !blur_shader_->SetInput("blur_texture", shadow_buffer_->textures()[0], context) ||
-        !blur_shader_->SetInput("texture_resolution", kShadowMapResolution, context) ||
-        !blur_shader_->SetInput("direction", 0, context))
+    if (!blur_shader_->SetInput("proj_matrix", shadow_map_ortho_matrix_) ||
+        !blur_shader_->SetInput("blur_texture", shadow_buffer_->textures()[0]) ||
+        !blur_shader_->SetInput("texture_resolution", kShadowMapResolution) ||
+        !blur_shader_->SetInput("direction", 0))
     {
         return false;
     }
-    if (!blur_shader_->Render(blur_buffer_->index_count(), context))
+    if (!blur_shader_->Render(blur_buffer_->index_count()))
     {
         return false;
     }
 
     // Blur the shadow map to make soft shadows
-    shadow_buffer_->Bind(context);
+    shadow_buffer_->Bind();
 
-    shadow_buffer_->Render(context);
+    shadow_buffer_->Render();
 
     // Veritcal blur
-    if (!blur_shader_->SetInput("proj_matrix", shadow_map_ortho_matrix_, context) ||
-        !blur_shader_->SetInput("blur_texture", blur_buffer_->textures()[0], context) ||
-        !blur_shader_->SetInput("texture_resolution", kShadowMapResolution, context) ||
-        !blur_shader_->SetInput("direction", 1, context))
+    if (!blur_shader_->SetInput("proj_matrix", shadow_map_ortho_matrix_) ||
+        !blur_shader_->SetInput("blur_texture", blur_buffer_->textures()[0]) ||
+        !blur_shader_->SetInput("texture_resolution", kShadowMapResolution) ||
+        !blur_shader_->SetInput("direction", 1))
     {
         return false;
     }
-    if (!blur_shader_->Render(shadow_buffer_->index_count(), context))
+    if (!blur_shader_->Render(shadow_buffer_->index_count()))
     {
         return false;
     }
 
     // Needed so sprites can render over themselves
-    context->SetDepthTesting(false);
+    render::context()->SetDepthTesting(false);
 
     // Bind the shadow depth framebuffer to render all models onto
-    direct_light_buffer_->Bind(context);
+    direct_light_buffer_->Bind();
 
     // Render the geometry as a sprite
-    direct_light_buffer_->Render(context);
+    direct_light_buffer_->Render();
 
     // Used to turn pixel fragments into world coordinates
     Matrix inv_proj_view = MatrixInverse(view_matrix * proj_matrix);
 
     // Set the inputs
-    if (!direct_light_shader_->SetInput("proj_matrix", ortho_matrix, context) ||
-        !direct_light_shader_->SetInput("inv_vp_matrix", inv_proj_view, context) ||
-        !direct_light_shader_->SetInput("light_vp_matrix", light_vp_matrix, context) ||
-        !direct_light_shader_->SetInput("view_depth", g_buffer.output(Geometry::DEPTH), 0, context) ||
-        !direct_light_shader_->SetInput("light_depth", output(LIGHT_DEPTH), 1, context) ||
-        !direct_light_shader_->SetInput("normal", g_buffer.output(Geometry::NORMAL), 2, context) ||
-        !direct_light_shader_->SetInput("sun.dir", sun->direction(), context))
+    if (!direct_light_shader_->SetInput("proj_matrix", ortho_matrix) ||
+        !direct_light_shader_->SetInput("inv_vp_matrix", inv_proj_view) ||
+        !direct_light_shader_->SetInput("light_vp_matrix", light_vp_matrix) ||
+        !direct_light_shader_->SetInput("view_depth", g_buffer.output(Geometry::DEPTH), 0) ||
+        !direct_light_shader_->SetInput("light_depth", output(LIGHT_DEPTH), 1) ||
+        !direct_light_shader_->SetInput("normal", g_buffer.output(Geometry::NORMAL), 2) ||
+        !direct_light_shader_->SetInput("sun.dir", sun->direction()))
     {
         return false;
     }
 
     // Finally do the render
-    if (!direct_light_shader_->Render(direct_light_buffer_->index_count(), context))
+    if (!direct_light_shader_->Render(direct_light_buffer_->index_count()))
     {
         return false;
     }

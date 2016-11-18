@@ -54,7 +54,7 @@ std::unordered_map<std::string, MeshCache> g_mesh_cache;
 std::unordered_map<std::string, TextureCache> g_texture_cache;
 } // namespace
 
-MeshBuffer LoadMesh(const std::string& filename, RenderContext& context)
+MeshBuffer LoadMesh(const std::string& filename)
 {
     // Get texture data for file, or create fresh texture data if new
     auto& mesh = g_mesh_cache[filename];
@@ -92,6 +92,7 @@ MeshBuffer LoadMesh(const std::string& filename, RenderContext& context)
     // Have we made a resource for this context?
     if (mesh.vertex == nullptr || mesh.index == nullptr)
     {
+        auto context = render::context();
         std::shared_ptr<BufferResource> vertex(context->MakeBufferResource());
         std::shared_ptr<BufferResource> index(context->MakeBufferResource());
         if (!context->Register3DMesh(vertex.get(), index.get(),
@@ -118,10 +119,11 @@ MeshBuffer LoadMesh(const std::string& filename, RenderContext& context)
     return buffer;
 }
 
-TextureBuffer LoadTexture(const std::string& filename, TextureType::Options options, RenderContext& context)
+TextureBuffer LoadTexture(const std::string& filename, TextureType::Options options)
 {
     // Get texture data for file, or create fresh texture data if new
     auto& tex = g_texture_cache[filename];
+    auto context = render::context();
 
     // Have we loaded the pixels yet?
     if (tex.pixels == nullptr)

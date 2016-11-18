@@ -84,9 +84,8 @@ public:
     /// \param fov Vertical field of view in radians
     /// \param screen_near Near screen clipping distance
     /// \param screen_far Far screen clipping distance
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    Deferred(Client::Info screen, float fov, float screen_near, float screen_far, RenderContext& context);
+    Deferred(Client::Info screen, float fov, float screen_near, float screen_far);
     ~Deferred();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -94,10 +93,9 @@ public:
     ///
     /// \param scene Struct containing all of the models and information needed to
     /// render a scene
-    /// \param context Handle to the current rendering context
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, RenderContext& context);
+    bool Render(const Scene& scene);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders the supplied models and lights to the supplied framebuffer
@@ -105,10 +103,9 @@ public:
     /// \param scene Struct containing all of the models and information needed to
     /// render a scene
     /// \param output_buffer Borrowed pointer to a framebuffer for rendering
-    /// \param context Handle to the current rendering context
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, Framebuffer* output_buffer, RenderContext& context);
+    bool Render(const Scene& scene, Framebuffer* output_buffer);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Reloads graphics API. Used for applying new video settings. **Never**
@@ -118,19 +115,17 @@ public:
     /// \param fov Vertical field of view in radians
     /// \param screen_near Near screen clipping distance
     /// \param screen_far Far screen clipping distance
-    /// \param context Handle to the current rendering context
     ////////////////////////////////////////////////////////////////////////////////
-    void Reload(Client::Info screen, float fov, float screen_near, float screen_far, RenderContext& context);
+    void Reload(Client::Info screen, float fov, float screen_near, float screen_far);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Used to build global illumination for the scene. Should be called
     /// **once** after all static geometry has been loaded.
     ///
     /// \param scene Contains scene information for rendering
-    /// \param context Handle to the current rendering context
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    bool BuildLighting(const Scene& scene, RenderContext& context);
+    bool BuildLighting(const Scene& scene);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets which stage of the deferred rendering pipeline will be displayed
@@ -142,8 +137,8 @@ public:
     void set_output(Output output, Output alt_output);
 
 private:
-    bool Init(RenderContext& context);
-    bool RenderComposite(const Scene& scene, RenderContext& context);
+    bool Init();
+    bool RenderComposite(const Scene& scene);
 
     Output output_, alt_output_;
     std::unique_ptr<Sprite> output_sprite_, alt_output_sprite_;
@@ -171,12 +166,13 @@ private:
 /// #include <blons/graphics/pipeline/pipeline.h>
 ///
 /// // Using the deferred pipeline
-/// auto pipeline = std::make_unique<blons::pipeline::Deferred>(screen, blons::kPi / 2.0f, screen_near, screen_far, context)
+/// auto pipeline = std::make_unique<blons::pipeline::Deferred>(screen, blons::kPi / 2.0f, screen_near, screen_far)
 ///
 /// // Rendering loop
 /// while (true)
 /// {
-///     pipeline::Scene scene;
+///     auto context = blons::render::context();
+///     blons::pipeline::Scene scene;
 ///     scene.lights = lights;
 ///     scene.models = models;
 ///     scene.sky_colour = sky_colour;
@@ -184,7 +180,7 @@ private:
 ///
 ///     context->BeginScene(Vector4(0, 0, 0, 1));
 ///
-///     if (!pipeline->Render(scene, context))
+///     if (!pipeline->Render(scene))
 ///     {
 ///         // Uh oh!
 ///     }
