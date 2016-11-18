@@ -61,6 +61,21 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     bool Run(unsigned int groups_x, unsigned int groups_y, unsigned int groups_z);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets a shader's global output variable to be that of the given value
+    ///
+    /// \param field Name of output variable to bind
+    /// \param value Value to bind output variable to
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    bool SetOutput(const char* field, const TextureResource* value);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetOutput
+    ///
+    /// \param texture_index The slot to bind the texture to. Defaults to 0
+    ////////////////////////////////////////////////////////////////////////////////
+    bool SetOutput(const char* field, const TextureResource* value, unsigned int texture_index);
+
 private:
     std::string source_filename_;
 };

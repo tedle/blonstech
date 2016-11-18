@@ -27,7 +27,7 @@ namespace blons
 {
 ComputeShader::ComputeShader(std::string source_filename)
 {
-    std::string source_filename_ = source_filename;
+    source_filename_ = source_filename;
     Reload();
 }
 
@@ -51,5 +51,15 @@ bool ComputeShader::Run(unsigned int groups_x, unsigned int groups_y, unsigned i
     render::context()->RunComputeShader(program_.get(), groups_x, groups_y, groups_z);
 
     return true;
+}
+
+bool ComputeShader::SetOutput(const char* field, const TextureResource* value)
+{
+    return render::context()->SetShaderOutput(program_.get(), field, value, 0);
+}
+
+bool ComputeShader::SetOutput(const char* field, const TextureResource* value, unsigned int texture_index)
+{
+    return render::context()->SetShaderOutput(program_.get(), field, value, texture_index);
 }
 } // namespace blons

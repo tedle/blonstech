@@ -65,6 +65,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glBindFramebuffer");
     }
 
+    glBindImageTexture = (PFNGLBINDIMAGETEXTUREPROC)glGetProcAddress("glBindImageTexture");
+    if (glBindImageTexture == nullptr)
+    {
+        failed.push_back("glBindImageTexture");
+    }
+
     glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)glGetProcAddress("glBindRenderbuffer");
     if (glBindRenderbuffer == nullptr)
     {
@@ -392,6 +398,7 @@ PFNGLATTACHSHADERPROC glAttachShader;
 PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
 PFNGLBINDBUFFERPROC glBindBuffer;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+PFNGLBINDIMAGETEXTUREPROC glBindImageTexture;
 PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 PFNGLBLENDFUNCSEPARATEPROC glBlendFuncSeparate;

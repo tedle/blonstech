@@ -93,6 +93,7 @@ public:
 
     GLuint texture_;
     GLint type_; ///< GL_TEXTURE_2D or GL_TEXTURE_3D
+    TextureType options_;
 };
 
 class FramebufferResourceGL43 : public FramebufferResource
@@ -614,6 +615,7 @@ bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_da
 {
     TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_2D;
+    tex->options_ = pixel_data->type;
 
     // Generate an ID for the texture.
     glGenTextures(1, &tex->texture_);
@@ -630,6 +632,7 @@ bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData3D* pixel_
 {
     TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_3D;
+    tex->options_ = pixel_data->type;
 
     // Generate an ID for the texture.
     glGenTextures(1, &tex->texture_);
@@ -885,6 +888,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
 {
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_2D;
+    tex->options_ = pixels->type;
 
     glBindTexture(tex->type_, tex->texture_);
 
@@ -1035,6 +1039,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
 {
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_3D;
+    tex->options_ = pixels->type;
 
     glBindTexture(tex->type_, tex->texture_);
 
@@ -1164,6 +1169,44 @@ bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, con
     const TextureResourceGL43* tex = resource_cast<const TextureResourceGL43*>(value, id());
     glActiveTexture(GL_TEXTURE0 + texture_index);
     glBindTexture(tex->type_, tex->texture_);
+    return SetShaderInput(program, name, static_cast<int>(texture_index));
+}
+
+bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)
+{
+    const TextureResourceGL43* tex = resource_cast<const TextureResourceGL43*>(value, id());
+    GLboolean layered = (tex->type_ == GL_TEXTURE_3D) ? GL_TRUE : GL_FALSE;
+    GLenum format;
+    switch (tex->options_.format)
+    {
+    case TextureType::A8:
+        format = GL_R8;
+        break;
+    case TextureType::R8G8_UINT:
+        format = GL_RG8UI;
+        break;
+    case TextureType::R8G8B8A8_UINT:
+        format = GL_RGBA8UI;
+        break;
+    case TextureType::R8G8B8A8:
+        format = GL_RGBA8;
+        break;
+    case TextureType::R16G16:
+        format = GL_RG16;
+        break;
+    case TextureType::R32G32B32A32:
+        format = GL_RGBA32F;
+        break;
+    case TextureType::NONE:
+    case TextureType::R8G8B8:
+    case TextureType::R8G8B8_UINT:
+    case TextureType::R32G32B32:
+    case TextureType::DEPTH:
+    default:
+        throw "Unsupported shader output format";
+        break;
+    }
+    glBindImageTexture(0, tex->texture_, 0, layered, 0, GL_WRITE_ONLY, format);
     return SetShaderInput(program, name, static_cast<int>(texture_index));
 }
 

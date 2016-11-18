@@ -640,6 +640,16 @@ public:
     /// \param texture_index The slot to bind the texture to
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets a shader's global output variable to be that of the given value
+    ///
+    /// \param program Shader containing output variable
+    /// \param name Name of output variable to modify
+    /// \param value Value to set output variable to
+    /// \param texture_index The slot to bind the texture to
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the blending mode for overwritten fragments. Defaults to
