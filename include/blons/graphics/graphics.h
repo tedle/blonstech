@@ -107,8 +107,11 @@ public:
     bool Render();
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Reloads graphics API. Used for applying new video settings. **Never**
-    /// call this in the middle of rendering a frame (callbacks beware!).
+    /// \brief Reloads graphics API. Used for applying new video settings.
+    /// **Beware** this recreates the active rendering context and will make
+    /// obsolete any resources that aren't being managed by this class. When using
+    /// manually created resources the Reload function must be used on each
+    /// individual resource to re-attach them to the new rendering context.
     ////////////////////////////////////////////////////////////////////////////////
     void Reload(Client::Info screen);
 

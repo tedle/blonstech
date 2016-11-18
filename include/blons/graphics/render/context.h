@@ -54,7 +54,22 @@ const Mode kMode = Mode::WINDOW;
 ////////////////////////////////////////////////////////////////////////////////
 const bool kEnableVsync = false;
 
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Retrieves the current rendering context. Will throw when a context
+/// has not been initialized yet
+///
+/// \return Current rendering context
+////////////////////////////////////////////////////////////////////////////////
 Renderer* context();
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Recreates the current rendering context.
+/// **Beware** this recreates the active rendering context and will make
+/// obsolete any resources that aren't being managed by this class. When using
+/// manually created resources the Reload function must be used on each
+/// individual resource to re-attach them to the new rendering context.
+///
+/// \param client Holds window handle and screen dimensions
+////////////////////////////////////////////////////////////////////////////////
 void MakeContext(const Client::Info& client);
 } // namespace render
 } // namespace blons
