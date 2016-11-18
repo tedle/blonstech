@@ -38,6 +38,16 @@ namespace blons
 {
 namespace
 {
+// Safe type casting to prevent using resources in the wrong context
+template<typename T, typename U>
+T resource_cast(U value, Renderer::ContextID current_id)
+{
+    if (value->context_id != current_id)
+    {
+        throw "Renderering context mismatch";
+    }
+    return static_cast<T>(value);
+}
 // Overloaded glUniforms to keep things generic
 void Uniform(GLuint loc, float value)
 {
@@ -68,29 +78,27 @@ void Uniform(GLuint loc, Vector4 value)
 class BufferResourceGL43 : public BufferResource
 {
 public:
-    BufferResourceGL43(Renderer::ContextID parent_id) : parent_id_(parent_id) {}
+    BufferResourceGL43(Renderer::ContextID parent_id) : BufferResource(parent_id) {}
     ~BufferResourceGL43() override;
 
     GLuint buffer_, vertex_array_id_;
     enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
-    const Renderer::ContextID parent_id_;
 };
 
 class TextureResourceGL43 : public TextureResource
 {
 public:
-    TextureResourceGL43(Renderer::ContextID parent_id) : parent_id_(parent_id) {}
+    TextureResourceGL43(Renderer::ContextID parent_id) : TextureResource(parent_id) {}
     ~TextureResourceGL43() override;
 
     GLuint texture_;
-    const Renderer::ContextID parent_id_;
     GLint type_; ///< GL_TEXTURE_2D or GL_TEXTURE_3D
 };
 
 class FramebufferResourceGL43 : public FramebufferResource
 {
 public:
-    FramebufferResourceGL43(Renderer::ContextID parent_id) : parent_id_(parent_id) {}
+    FramebufferResourceGL43(Renderer::ContextID parent_id) : FramebufferResource(parent_id) {}
     ~FramebufferResourceGL43() override;
 
     GLuint framebuffer_;
@@ -98,18 +106,16 @@ public:
     std::vector<std::unique_ptr<TextureResourceGL43>> targets_;
     std::unique_ptr<TextureResourceGL43> depth_;
     GLuint depth_render_;
-    const Renderer::ContextID parent_id_;
 };
 
 class ShaderResourceGL43 : public ShaderResource
 {
 public:
-    ShaderResourceGL43(Renderer::ContextID parent_id) : parent_id_(parent_id) {}
+    ShaderResourceGL43(Renderer::ContextID parent_id) : ShaderResource(parent_id) {}
     ~ShaderResourceGL43() override;
 
     GLuint program_;
     std::vector<GLuint> shaders_;
-    const Renderer::ContextID parent_id_;
     enum ShaderType { NONE, PIPELINE, COMPUTE } type_;
 
     GLint UniformLocation(const char* name);
@@ -129,7 +135,7 @@ BufferResourceGL43::~BufferResourceGL43()
     auto active_context = render::context();
     // TODO: Something cleaner in case owning context isnt actually deleted (inactive?)
     // This is save when deleted since OpenGL contexts clean up after themselves
-    if (parent_id_ != active_context->id())
+    if (context_id != active_context->id())
     {
         return;
     }
@@ -154,7 +160,7 @@ BufferResourceGL43::~BufferResourceGL43()
 FramebufferResourceGL43::~FramebufferResourceGL43()
 {
     auto active_context = render::context();
-    if (parent_id_ != active_context->id())
+    if (context_id != active_context->id())
     {
         return;
     }
@@ -168,7 +174,7 @@ FramebufferResourceGL43::~FramebufferResourceGL43()
 TextureResourceGL43::~TextureResourceGL43()
 {
     auto active_context = render::context();
-    if (parent_id_ != active_context->id())
+    if (context_id != active_context->id())
     {
         return;
     }
@@ -179,7 +185,7 @@ TextureResourceGL43::~TextureResourceGL43()
 ShaderResourceGL43::~ShaderResourceGL43()
 {
     auto active_context = render::context();
-    if (parent_id_ != active_context->id())
+    if (context_id != active_context->id())
     {
         return;
     }
@@ -439,8 +445,8 @@ bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource*
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count)
 {
-    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
-    BufferResourceGL43* index_buf = static_cast<BufferResourceGL43*>(index_buffer);
+    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
+    BufferResourceGL43* index_buf = resource_cast<BufferResourceGL43*>(index_buffer, id());
 
     // Set the buffer types
     vertex_buf->type_ = BufferResourceGL43::VERTEX_BUFFER;
@@ -500,8 +506,8 @@ bool RendererGL43::Register2DMesh(BufferResource* vertex_buffer, BufferResource*
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count)
 {
-    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
-    BufferResourceGL43* index_buf = static_cast<BufferResourceGL43*>(index_buffer);
+    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
+    BufferResourceGL43* index_buf = resource_cast<BufferResourceGL43*>(index_buffer, id());
 
     // Set the buffer types
     vertex_buf->type_ = BufferResourceGL43::VERTEX_BUFFER;
@@ -545,7 +551,7 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
                                      units::pixel width, units::pixel height,
                                      std::vector<TextureType> formats, bool store_depth)
 {
-    FramebufferResourceGL43* fbo = static_cast<FramebufferResourceGL43*>(frame_buffer);
+    FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
 
     fbo->width = width;
     fbo->height = height;
@@ -606,7 +612,7 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
 
 bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
 {
-    TextureResourceGL43* tex = static_cast<TextureResourceGL43*>(texture);
+    TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_2D;
 
     // Generate an ID for the texture.
@@ -622,7 +628,7 @@ bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_da
 
 bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)
 {
-    TextureResourceGL43* tex = static_cast<TextureResourceGL43*>(texture);
+    TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_3D;
 
     // Generate an ID for the texture.
@@ -640,7 +646,7 @@ bool RendererGL43::RegisterShader(ShaderResource* program,
                                 std::string vertex_source, std::string pixel_source,
                                 ShaderAttributeList inputs)
 {
-    ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
+    ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
 
     // Initialize and compile the shaders
     GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
@@ -694,7 +700,7 @@ bool RendererGL43::RegisterShader(ShaderResource* program,
 
 bool RendererGL43::RegisterComputeShader(ShaderResource* program, std::string source)
 {
-    ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
+    ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
 
     // Initialize and compile the shaders
     GLuint compute_shader = glCreateShader(GL_COMPUTE_SHADER);
@@ -734,7 +740,7 @@ void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_coun
 {
     UnmapBuffers();
 
-    ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
+    ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
 
     if (shader->type_ != ShaderResourceGL43::PIPELINE)
     {
@@ -752,7 +758,7 @@ void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_coun
 void RendererGL43::RunComputeShader(ShaderResource* program, unsigned int groups_x,
                                   unsigned int groups_y, unsigned int groups_z)
 {
-    ShaderResourceGL43* shader = static_cast<ShaderResourceGL43*>(program);
+    ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
 
     if (shader->type_ != ShaderResourceGL43::COMPUTE)
     {
@@ -767,7 +773,7 @@ void RendererGL43::BindFramebuffer(FramebufferResource* frame_buffer)
 {
     if (frame_buffer != nullptr)
     {
-        FramebufferResourceGL43* fbo = static_cast<FramebufferResourceGL43*>(frame_buffer);
+        FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
         glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
         glViewport(0, 0, fbo->width, fbo->height);
     }
@@ -780,7 +786,7 @@ void RendererGL43::BindFramebuffer(FramebufferResource* frame_buffer)
 
 std::vector<const TextureResource*> RendererGL43::FramebufferTextures(FramebufferResource* frame_buffer)
 {
-    FramebufferResourceGL43* fbo = static_cast<FramebufferResourceGL43*>(frame_buffer);
+    FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
 
     std::vector<const TextureResource*> targets;
     for (const auto& tex : fbo->targets_)
@@ -793,7 +799,7 @@ std::vector<const TextureResource*> RendererGL43::FramebufferTextures(Framebuffe
 
 const TextureResource* RendererGL43::FramebufferDepthTexture(FramebufferResource* frame_buffer)
 {
-    FramebufferResourceGL43* fbo = static_cast<FramebufferResourceGL43*>(frame_buffer);
+    FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
 
     return fbo->depth_.get();
 }
@@ -802,7 +808,7 @@ void RendererGL43::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource*
 {
     UnmapBuffers();
 
-    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
+    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
     glBindVertexArray(vertex_buf->vertex_array_id_);
 }
 
@@ -810,8 +816,8 @@ void RendererGL43::SetMeshData(BufferResource* vertex_buffer, BufferResource* in
                              const Vertex* vertices, unsigned int vert_count,
                              const unsigned int* indices, unsigned int index_count)
 {
-    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
-    BufferResourceGL43* index_buf = static_cast<BufferResourceGL43*>(index_buffer);
+    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
+    BufferResourceGL43* index_buf = resource_cast<BufferResourceGL43*>(index_buffer, id());
 
     glBindVertexArray(vertex_buf->vertex_array_id_);
     // Attach vertex buffer data to VAO
@@ -829,8 +835,8 @@ void RendererGL43::UpdateMeshData(BufferResource* vertex_buffer, BufferResource*
                                 const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
                                 const unsigned int* indices, unsigned int index_offset, unsigned int index_count)
 {
-    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
-    BufferResourceGL43* index_buf  = static_cast<BufferResourceGL43*>(index_buffer);
+    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
+    BufferResourceGL43* index_buf  = resource_cast<BufferResourceGL43*>(index_buffer, id());
 
     glBindVertexArray(vertex_buf->vertex_array_id_);
     // Attach vertex buffer data to VAO
@@ -845,8 +851,8 @@ void RendererGL43::UpdateMeshData(BufferResource* vertex_buffer, BufferResource*
 void RendererGL43::MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                    Vertex** vertex_data, unsigned int** index_data)
 {
-    BufferResourceGL43* vertex_buf = static_cast<BufferResourceGL43*>(vertex_buffer);
-    BufferResourceGL43* index_buf  = static_cast<BufferResourceGL43*>(index_buffer);
+    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
+    BufferResourceGL43* index_buf  = resource_cast<BufferResourceGL43*>(index_buffer, id());
 
     if (vertex_buf->buffer_ != mapped_buffers_.vertex || index_buf->buffer_ != mapped_buffers_.index)
     {
@@ -877,7 +883,7 @@ void RendererGL43::MapMeshData(BufferResource* vertex_buffer, BufferResource* in
 
 void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
 {
-    auto tex = static_cast<TextureResourceGL43*>(texture);
+    auto tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_2D;
 
     glBindTexture(tex->type_, tex->texture_);
@@ -1027,7 +1033,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
 
 void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
 {
-    auto tex = static_cast<TextureResourceGL43*>(texture);
+    auto tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_3D;
 
     glBindTexture(tex->type_, tex->texture_);
@@ -1119,43 +1125,43 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
 
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const float value)
 {
-    auto prog = static_cast<ShaderResourceGL43*>(program);
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
     return prog->SetUniform(name, value);
 }
 
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const int value)
 {
-    auto prog = static_cast<ShaderResourceGL43*>(program);
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
     return prog->SetUniform(name, value);
 }
 
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const Matrix value)
 {
-    auto prog = static_cast<ShaderResourceGL43*>(program);
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
     return prog->SetUniform(name, value);
 }
 
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector2 value)
 {
-    auto prog = static_cast<ShaderResourceGL43*>(program);
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
     return prog->SetUniform(name, value);
 }
 
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector3 value)
 {
-    auto prog = static_cast<ShaderResourceGL43*>(program);
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
     return prog->SetUniform(name, value);
 }
 
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector4 value)
 {
-    auto prog = static_cast<ShaderResourceGL43*>(program);
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
     return prog->SetUniform(name, value);
 }
 
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)
 {
-    const TextureResourceGL43* tex = static_cast<const TextureResourceGL43*>(value);
+    const TextureResourceGL43* tex = resource_cast<const TextureResourceGL43*>(value, id());
     glActiveTexture(GL_TEXTURE0 + texture_index);
     glBindTexture(tex->type_, tex->texture_);
     return SetShaderInput(program, name, static_cast<int>(texture_index));

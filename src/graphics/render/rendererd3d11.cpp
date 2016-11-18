@@ -440,17 +440,17 @@ void RendererD3D11::EndScene()
 
 BufferResource* RendererD3D11::MakeBufferResource()
 {
-    return new BufferResourceD3D11;
+    return nullptr;// new BufferResourceD3D11;
 }
 
 TextureResource* RendererD3D11::MakeTextureResource()
 {
-    return new TextureResourceD3D11;
+    return nullptr;// new TextureResourceD3D11;
 }
 
 ShaderResource* RendererD3D11::MakeShaderResource()
 {
-    return new ShaderResourceD3D11;
+    return nullptr;// new ShaderResourceD3D11;
 }
 
 bool RendererD3D11::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
