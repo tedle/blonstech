@@ -191,5 +191,11 @@ void ClearBufferCache()
         t.second.texture.reset();
     }
 }
+
+void ClearDataCache()
+{
+    g_mesh_cache.clear();
+    g_texture_cache.clear();
+}
 } // namespace resource
 } // namespace blons
