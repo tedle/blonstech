@@ -43,8 +43,7 @@ class ManagedModel : public Model
 public:
     ManagedModel(std::string filename) : Model(filename) {}
     ~ManagedModel() override;
-private:
-    friend Graphics;
+
     void Finish();
     std::function<void(ManagedModel*)> deleter_;
 };
@@ -52,10 +51,11 @@ private:
 class ManagedSprite : public Sprite
 {
 public:
+    ManagedSprite(std::string filename, TextureType::Options options) : Sprite(filename, options) {}
     ManagedSprite(std::string filename) : Sprite(filename) {}
+    ManagedSprite(const PixelData& pixel_data) : Sprite(pixel_data) {}
     ~ManagedSprite() override;
-private:
-    friend Graphics;
+
     void Finish();
     std::function<void(ManagedSprite*)> deleter_;
 };
@@ -129,15 +129,35 @@ std::unique_ptr<Model> Graphics::MakeModel(std::string filename)
     return std::unique_ptr<Model>(model);
 }
 
-std::unique_ptr<Sprite> Graphics::MakeSprite(std::string filename)
+namespace
 {
-    auto sprite = new ManagedSprite(filename);
+// Apparently you can't use a template to define a set of overloaded methods... so we have this instead
+template<typename... Args>
+std::unique_ptr<Sprite> BuildSprite(std::set<ManagedSprite*>& sprites, Args... args)
+{
+    auto sprite = new ManagedSprite(args...);
     sprite->deleter_ = [&](ManagedSprite* s)
     {
-        sprites_.erase(s);
+        sprites.erase(s);
     };
-    sprites_.insert(sprite);
+    sprites.insert(sprite);
     return std::unique_ptr<Sprite>(sprite);
+}
+} // namespace
+
+std::unique_ptr<Sprite> Graphics::MakeSprite(std::string filename, TextureType::Options options)
+{
+    return BuildSprite(sprites_, filename, options);
+}
+
+std::unique_ptr<Sprite> Graphics::MakeSprite(std::string filename)
+{
+    return BuildSprite(sprites_, filename);
+}
+
+std::unique_ptr<Sprite> Graphics::MakeSprite(const PixelData& pixel_data)
+{
+    return BuildSprite(sprites_, pixel_data);
 }
 
 bool Graphics::Render()

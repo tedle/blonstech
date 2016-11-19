@@ -90,15 +90,27 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     std::unique_ptr<Model> MakeModel(std::string filename);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Creates a new sprite from the given image file. Sprites created with
+    /// \brief Creates a new sprite from the given image data. Sprites created with
     /// this function are automatically rendered each frame until their memory is
     /// freed. Note that deleting the graphics class before the sprite will result
     /// in all of the sprite's buffers becoming invalid
     ///
     /// \param filename Location of the image file on disk
+    /// \param options Compression, filter, and wrapping options
     /// \return Pointer to the created sprite, memory is owned by the caller
     ////////////////////////////////////////////////////////////////////////////////
+    std::unique_ptr<Sprite> MakeSprite(std::string filename, TextureType::Options options);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copybrief MakeSprite(std::string, TextureType::Options)
+    /// Uses default texture options decided by Sprite(std::string)
+    ////////////////////////////////////////////////////////////////////////////////
     std::unique_ptr<Sprite> MakeSprite(std::string filename);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copybrief MakeSprite(std::string, TextureType::Options)
+    ///
+    /// \param pixel_data Pixel buffer and format info
+    ////////////////////////////////////////////////////////////////////////////////
+    std::unique_ptr<Sprite> MakeSprite(const PixelData& pixel_data);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all sprites, models, and UI elements created through this

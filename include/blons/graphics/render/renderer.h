@@ -230,9 +230,12 @@ struct PixelData
             assert(false);
             break;
         }
-        std::size_t texture_size = p.width * p.height * (bits / 8);
-        this->pixels.reset(new unsigned char[texture_size]);
-        memcpy(this->pixels.get(), p.pixels.get(), texture_size);
+        if (p.pixels != nullptr)
+        {
+            std::size_t texture_size = p.width * p.height * (bits / 8);
+            this->pixels.reset(new unsigned char[texture_size]);
+            memcpy(this->pixels.get(), p.pixels.get(), texture_size);
+        }
     }
 };
 
