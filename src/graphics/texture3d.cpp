@@ -21,42 +21,22 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/texture.h>
+#include <blons/graphics/texture3d.h>
 
 // Local Includes
 #include "resource.h"
 
 namespace blons
 {
-Texture::Texture(std::string filename, TextureType::Options options)
-{
-    Init(filename, options);
-}
-
-void Texture::Init(std::string filename, TextureType::Options options)
-{
-    filename_ = filename;
-    pixel_data_ = nullptr;
-
-    auto tex = resource::LoadTexture(filename, options);
-    texture_ = std::move(tex.texture);
-    info_ = tex.info;
-    if (texture_ == nullptr)
-    {
-        throw "Failed to load texture";
-    }
-}
-
-Texture::Texture(const PixelData& pixels)
+Texture3D::Texture3D(const PixelData3D& pixels)
 {
     Init(pixels);
 }
 
-void Texture::Init(const PixelData& pixels)
+void Texture3D::Init(const PixelData3D& pixels)
 {
     auto context = render::context();
-    filename_ = "";
-    pixel_data_.reset(new PixelData(pixels));
+    pixel_data_.reset(new PixelData3D(pixels));
 
     // Make the actual texture
     texture_.reset(context->MakeTextureResource());
@@ -72,28 +52,21 @@ void Texture::Init(const PixelData& pixels)
 
     info_.width = pixel_data_->width;
     info_.height = pixel_data_->height;
+    info_.depth = pixel_data_->depth;
     info_.type = pixel_data_->type;
 }
 
-void Texture::Reload()
+void Texture3D::Reload()
 {
-    if (filename_.length() > 0)
-    {
-        Init(filename_, { info_.type.compression, info_.type.filter, info_.type.wrap });
-    }
-
-    else if (pixel_data_ != nullptr)
-    {
-        Init(*pixel_data_);
-    }
+    Init(*pixel_data_);
 }
 
-Texture::Info Texture::info() const
+Texture3D::Info Texture3D::info() const
 {
     return info_;
 }
 
-const TextureResource* Texture::texture() const
+const TextureResource* Texture3D::texture() const
 {
     return texture_.get();
 }

@@ -21,21 +21,22 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_TEXTURE_H_
-#define BLONSTECH_GRAPHICS_TEXTURE_H_
+#ifndef BLONSTECH_GRAPHICS_TEXTURE3D_H_
+#define BLONSTECH_GRAPHICS_TEXTURE3D_H_
 
 // Includes
 #include <memory>
 // Public Includes
+#include <blons/graphics/texture.h>
 #include <blons/graphics/render/renderer.h>
 
 namespace blons
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Wraps a texture resource with additional format and usage info for
+/// \brief Wraps a 3D texture resource with additional format and usage info for
 /// easy interaction with the graphics API
 ////////////////////////////////////////////////////////////////////////////////
-class Texture
+class Texture3D
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
@@ -45,24 +46,18 @@ public:
     {
         units::pixel width;  ///< Width of the texture in pixels
         units::pixel height; ///< Height of the texture in pixels
+        units::pixel depth;  ///< Depth of the texture in pixels
         TextureType type;    ///< Texture format and behaviour info
     };
 
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes a new texture from an image file. Will throw on failure
-    ///
-    /// \param filename Image file on disk
-    /// \param options Texture filtering and wrapping options
-    ////////////////////////////////////////////////////////////////////////////////
-    Texture(std::string filename, TextureType::Options options);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes a new texture from raw pixel data. Will throw on failure
+    /// \brief Initializes a new 3D texture from raw pixel data. Will throw on failure
     ///
     /// \param pixels Pixel buffer and format info
     ////////////////////////////////////////////////////////////////////////////////
-    Texture(const PixelData& pixels);
-    ~Texture() {}
+    Texture3D(const PixelData3D& pixels);
+    ~Texture3D() {}
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Reloads the texture to be attached to the active rendering context
@@ -84,30 +79,36 @@ public:
     const TextureResource* texture() const;
 
 private:
-    void Init(std::string filename, TextureType::Options options);
-    void Init(const PixelData& pixels);
+    void Init(const PixelData3D& pixels);
 
-    // Empty if initialized from PixelData
-    std::string filename_;
-    // nullptr if initialized from filename and never fetched from GPU
-    std::unique_ptr<PixelData> pixel_data_;
-
+    std::unique_ptr<PixelData3D> pixel_data_;
     std::shared_ptr<TextureResource> texture_;
     Info info_;
 };
 } // namespace blons
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::Texture
+/// \class blons::Texture3D
 /// \ingroup graphics
 ///
 /// ### Example:
 /// \code
-/// // Using a texture is as simple as pushing it to a shader
-/// // Though sprites & models are almost always more suitable
-/// blons::Texture tex("sprite.png", { blons::TextureType::RAW, blons::TextureType::NEAREST, blons::TextureType::REPEAT });
-/// shader->SetInput("sprite", tex.texture());
+/// // Using a 3D texture is done through initializing from a pixel buffer
+/// blons::PixelData3D pixels;
+/// pixels.type.format = TextureType::R8G8B8;
+/// pixels.type.compression = TextureType::RAW;
+/// pixels.type.filter = TextureType::LINEAR;
+/// pixels.type.wrap = TextureType::REPEAT;
+/// pixels.width = 1;
+/// pixels.height = 1;
+/// pixels.depth = 1;
+/// pixels.pixels.reset(new unsigned char[pixels.width * pixels.height * pixels.depth * 3]);
+/// pixels.pixels.get()[0] = 255;
+/// pixels.pixels.get()[1] = 255;
+/// pixels.pixels.get()[2] = 255;
+/// blons::Texture tex(pixels);
+/// shader->SetInput("white_cube", tex.texture());
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
-#endif // BLONSTECH_GRAPHICS_TEXTURE_H_
+#endif // BLONSTECH_GRAPHICS_TEXTURE3D_H_

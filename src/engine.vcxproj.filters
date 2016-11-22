@@ -223,6 +223,9 @@
     <ClInclude Include="..\include\blons\graphics\render\context.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\texture3d.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -374,6 +377,9 @@
     </ClCompile>
     <ClCompile Include="graphics\render\renderer.cpp">
       <Filter>src\graphics\render</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\texture3d.cpp">
+      <Filter>src\graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
