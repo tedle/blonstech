@@ -56,7 +56,7 @@ void noclip(Input* input, Camera* camera)
 
     static Timer last_move;
     // Welcome to the hackiest no clip wasd movement u ever see
-    if (last_move.ms() > 2)
+    while (last_move.ms() > 2)
     {
         last_move.rewind(2);
 
