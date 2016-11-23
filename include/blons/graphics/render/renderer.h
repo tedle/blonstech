@@ -214,11 +214,21 @@ struct PixelData
         }
     }
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Move constructor that takes pixel buffer without copying
+    ////////////////////////////////////////////////////////////////////////////////
+    PixelData(PixelData&& p)
+    {
+        this->width = std::move(p.width);
+        this->height = std::move(p.height);
+        this->type = std::move(p.type);
+        this->pixels = std::move(p.pixels);
+    }
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calculates the amount of bits per pixel
     ///
     /// \return Bits per pixel
     ////////////////////////////////////////////////////////////////////////////////
-    std::size_t bits_per_pixel()
+    std::size_t bits_per_pixel() const
     {
         int bits;
         switch (this->type.format)
@@ -275,6 +285,17 @@ struct PixelData3D : public PixelData
             this->pixels.reset(new unsigned char[texture_size]);
             memcpy(this->pixels.get(), p.pixels.get(), texture_size);
         }
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Move constructor that takes pixel buffer without copying
+    ////////////////////////////////////////////////////////////////////////////////
+    PixelData3D(PixelData3D&& p)
+    {
+        this->width = std::move(p.width);
+        this->height = std::move(p.height);
+        this->depth = std::move(p.depth);
+        this->type = std::move(p.type);
+        this->pixels = std::move(p.pixels);
     }
 };
 
