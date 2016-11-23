@@ -109,6 +109,11 @@ unsigned int Sprite::index_count() const
     return static_cast<unsigned int>(index_count);
 }
 
+const PixelData* Sprite::pixels(bool force_gpu_sync)
+{
+    return texture_->pixels(force_gpu_sync);
+}
+
 const TextureResource* Sprite::texture() const
 {
     return texture_->texture();

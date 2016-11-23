@@ -93,6 +93,15 @@ Texture::Info Texture::info() const
     return info_;
 }
 
+const PixelData* Texture::pixels(bool force_gpu_sync)
+{
+    if (force_gpu_sync || pixel_data_ == nullptr)
+    {
+        pixel_data_.reset(new PixelData(render::context()->GetTextureData(texture_.get())));
+    }
+    return pixel_data_.get();
+}
+
 const TextureResource* Texture::texture() const
 {
     return texture_.get();

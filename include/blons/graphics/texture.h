@@ -77,6 +77,17 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Info info() const;
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves a pointer to the pixel buffer and storage info of the
+    /// texture
+    ///
+    /// \param force_gpu_sync Fetches pixel data from the GPU and updates the
+    /// internally cached version before returning. Much slower, but necessary when
+    /// texture is modified on the GPU due to framebuffers, compute shaders, etc
+    ///
+    /// \return Pixel buffer and info
+    ////////////////////////////////////////////////////////////////////////////////
+    const PixelData* pixels(bool force_gpu_sync);
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a pointer to the texture resource for rendering
     ///
     /// \return Texture resource reference
