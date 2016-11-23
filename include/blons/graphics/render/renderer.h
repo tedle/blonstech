@@ -206,6 +206,20 @@ struct PixelData
         this->width = p.width;
         this->height = p.height;
         this->type = p.type;
+        if (p.pixels != nullptr)
+        {
+            auto texture_size = width * height * (bits_per_pixel() / 8);
+            pixels.reset(new unsigned char[texture_size]);
+            memcpy(this->pixels.get(), p.pixels.get(), texture_size);
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calculates the amount of bits per pixel
+    ///
+    /// \return Bits per pixel
+    ////////////////////////////////////////////////////////////////////////////////
+    std::size_t bits_per_pixel()
+    {
         int bits;
         switch (this->type.format)
         {
@@ -230,44 +244,23 @@ struct PixelData
             assert(false);
             break;
         }
-        if (p.pixels != nullptr)
-        {
-            std::size_t texture_size = p.width * p.height * (bits / 8);
-            this->pixels.reset(new unsigned char[texture_size]);
-            memcpy(this->pixels.get(), p.pixels.get(), texture_size);
-        }
+        return bits;
     }
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Holds raw pixel data and format info of a 3D texture
 ////////////////////////////////////////////////////////////////////////////////
-struct PixelData3D
+struct PixelData3D : public PixelData
 {
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Raw pixel data
-    ////////////////////////////////////////////////////////////////////////////////
-    std::unique_ptr<unsigned char> pixels;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Width of the texture in pixels
-    ////////////////////////////////////////////////////////////////////////////////
-    units::pixel width;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Height of the texture in pixels
-    ////////////////////////////////////////////////////////////////////////////////
-    units::pixel height;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Depth of the texture in pixels
     ////////////////////////////////////////////////////////////////////////////////
     units::pixel depth;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Determines the texture storage and behaviour options
-    ////////////////////////////////////////////////////////////////////////////////
-    TextureType type;
 
     PixelData3D() {}
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Performs a full copy of the given PixelData, including a byte for
+    /// \brief Performs a full copy of the given PixelData3D, including a byte for
     /// byte copy of the pixel buffer
     ////////////////////////////////////////////////////////////////////////////////
     PixelData3D(const PixelData3D& p)
@@ -276,35 +269,12 @@ struct PixelData3D
         this->height = p.height;
         this->depth = p.depth;
         this->type = p.type;
-        int bits;
-        switch (this->type.format)
+        if (p.pixels != nullptr)
         {
-        case TextureType::A8:
-            bits = 8;
-            break;
-        case TextureType::R8G8_UINT:
-            bits = 16;
-            break;
-        case TextureType::R8G8B8:
-        case TextureType::R8G8B8_UINT:
-            bits = 24;
-            break;
-        case TextureType::R16G16:
-        case TextureType::R8G8B8A8:
-        case TextureType::R8G8B8A8_UINT:
-            bits = 32;
-            break;
-        case TextureType::R32G32B32:
-            bits = 96;
-            break;
-        case TextureType::NONE:
-        default:
-            assert(false);
-            break;
+            std::size_t texture_size = p.width * p.height * p.depth * (bits_per_pixel() / 8);
+            this->pixels.reset(new unsigned char[texture_size]);
+            memcpy(this->pixels.get(), p.pixels.get(), texture_size);
         }
-        std::size_t texture_size = p.width * p.height * p.depth * (bits / 8);
-        this->pixels.reset(new unsigned char[texture_size]);
-        memcpy(this->pixels.get(), p.pixels.get(), texture_size);
     }
 };
 
