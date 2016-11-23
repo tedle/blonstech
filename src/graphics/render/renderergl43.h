@@ -83,6 +83,8 @@ public:
                      Vertex** vertex_data, unsigned int** index_data) override;
     void SetTextureData(TextureResource* texture, PixelData* pixels) override;
     void SetTextureData(TextureResource* texture, PixelData3D* pixels) override;
+    PixelData GetTextureData(const TextureResource* texture) override;
+    PixelData3D GetTextureData3D(const TextureResource* texture) override;
 
     bool SetShaderInput(ShaderResource* program, const char* name, const float value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const int value) override;

@@ -48,6 +48,65 @@ T resource_cast(U value, Renderer::ContextID current_id)
     }
     return static_cast<T>(value);
 }
+// Converts engine texture type into OpenGL texture type
+void TranslateTextureFormat(TextureType::Format format, GLint* internal_format, GLint* input_format, GLenum* input_type)
+{
+    switch (format)
+    {
+    case TextureType::A8:
+        *internal_format = GL_R8;
+        *input_format = GL_RED;
+        *input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureType::R8G8_UINT:
+        *internal_format = GL_RG8UI;
+        *input_format = GL_RG_INTEGER;
+        *input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureType::R8G8B8_UINT:
+        *internal_format = GL_RGB8UI;
+        *input_format = GL_RGB_INTEGER;
+        *input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureType::R8G8B8A8_UINT:
+        *internal_format = GL_RGBA8UI;
+        *input_format = GL_RGBA_INTEGER;
+        *input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureType::R8G8B8A8:
+        *internal_format = GL_RGBA8;
+        *input_format = GL_RGBA;
+        *input_type = GL_UNSIGNED_BYTE;
+        break;
+    case TextureType::R16G16:
+        *internal_format = GL_RG16;
+        *input_format = GL_RG;
+        *input_type = GL_FLOAT;
+        break;
+    case TextureType::R32G32B32:
+        *internal_format = GL_RGB32F;
+        *input_format = GL_RGB;
+        *input_type = GL_FLOAT;
+        break;
+    case TextureType::R32G32B32A32:
+        *internal_format = GL_RGBA32F;
+        *input_format = GL_RGBA;
+        *input_type = GL_FLOAT;
+        break;
+    case TextureType::DEPTH:
+        *internal_format = GL_DEPTH_COMPONENT24;
+        *input_format = GL_DEPTH_COMPONENT;
+        *input_type = GL_FLOAT;
+        break;
+    case TextureType::NONE:
+    case TextureType::R8G8B8:
+    default:
+        *internal_format = GL_RGB8;
+        *input_format = GL_RGB;
+        *input_type = GL_UNSIGNED_BYTE;
+        break;
+    }
+}
 // Overloaded glUniforms to keep things generic
 void Uniform(GLuint loc, float value)
 {
@@ -394,6 +453,7 @@ RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen
 
     // Set the row padding on textures to be 1 (default 4)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_PACK_ALIGNMENT, 1);
 
     // Configure vsync (please be false)
     vsync_ = vsync;
@@ -898,61 +958,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
         GLint internal_format;
         GLint input_format;
         GLenum input_type;
-        switch (pixels->type.format)
-        {
-        case TextureType::A8:
-            internal_format = GL_R8;
-            input_format = GL_RED;
-            input_type = GL_UNSIGNED_BYTE;
-            break;
-        case TextureType::R8G8_UINT:
-            internal_format = GL_RG8UI;
-            input_format = GL_RG_INTEGER;
-            input_type = GL_UNSIGNED_BYTE;
-            break;
-        case TextureType::R8G8B8_UINT:
-            internal_format = GL_RGB8UI;
-            input_format = GL_RGB_INTEGER;
-            input_type = GL_UNSIGNED_BYTE;
-            break;
-        case TextureType::R8G8B8A8_UINT:
-            internal_format = GL_RGBA8UI;
-            input_format = GL_RGBA_INTEGER;
-            input_type = GL_UNSIGNED_BYTE;
-            break;
-        case TextureType::R8G8B8A8:
-            internal_format = GL_RGBA8;
-            input_format = GL_RGBA;
-            input_type = GL_UNSIGNED_BYTE;
-            break;
-        case TextureType::R16G16:
-            internal_format = GL_RG16;
-            input_format = GL_RG;
-            input_type = GL_FLOAT;
-            break;
-        case TextureType::R32G32B32:
-            internal_format = GL_RGB32F;
-            input_format = GL_RGB;
-            input_type = GL_FLOAT;
-            break;
-        case TextureType::R32G32B32A32:
-            internal_format = GL_RGBA32F;
-            input_format = GL_RGBA;
-            input_type = GL_FLOAT;
-            break;
-        case TextureType::DEPTH:
-            internal_format = GL_DEPTH_COMPONENT24;
-            input_format = GL_DEPTH_COMPONENT;
-            input_type = GL_FLOAT;
-            break;
-        case TextureType::NONE:
-        case TextureType::R8G8B8:
-        default:
-            internal_format = GL_RGB8;
-            input_format = GL_RGB;
-            input_type = GL_UNSIGNED_BYTE;
-            break;
-        }
+        TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
         glTexImage2D(tex->type_, 0, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels.get());
     }
     // Upload compressed textures thru SOIL because its way easier
@@ -1046,61 +1052,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
     GLint internal_format;
     GLint input_format;
     GLenum input_type;
-    switch (pixels->type.format)
-    {
-    case TextureType::A8:
-        internal_format = GL_R8;
-        input_format = GL_RED;
-        input_type = GL_UNSIGNED_BYTE;
-        break;
-    case TextureType::R8G8_UINT:
-        internal_format = GL_RG8UI;
-        input_format = GL_RG_INTEGER;
-        input_type = GL_UNSIGNED_BYTE;
-        break;
-    case TextureType::R8G8B8_UINT:
-        internal_format = GL_RGB8UI;
-        input_format = GL_RGB_INTEGER;
-        input_type = GL_UNSIGNED_BYTE;
-        break;
-    case TextureType::R8G8B8A8_UINT:
-        internal_format = GL_RGBA8UI;
-        input_format = GL_RGBA_INTEGER;
-        input_type = GL_UNSIGNED_BYTE;
-        break;
-    case TextureType::R8G8B8A8:
-        internal_format = GL_RGBA8;
-        input_format = GL_RGBA;
-        input_type = GL_UNSIGNED_BYTE;
-        break;
-    case TextureType::R16G16:
-        internal_format = GL_RG16;
-        input_format = GL_RG;
-        input_type = GL_FLOAT;
-        break;
-    case TextureType::R32G32B32:
-        internal_format = GL_RGB32F;
-        input_format = GL_RGB;
-        input_type = GL_FLOAT;
-        break;
-    case TextureType::R32G32B32A32:
-        internal_format = GL_RGBA32F;
-        input_format = GL_RGBA;
-        input_type = GL_FLOAT;
-        break;
-    case TextureType::DEPTH:
-        internal_format = GL_DEPTH_COMPONENT24;
-        input_format = GL_DEPTH_COMPONENT;
-        input_type = GL_FLOAT;
-        break;
-    case TextureType::NONE:
-    case TextureType::R8G8B8:
-    default:
-        internal_format = GL_RGB8;
-        input_format = GL_RGB;
-        input_type = GL_UNSIGNED_BYTE;
-        break;
-    }
+    TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
     glTexImage3D(tex->type_, 0, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.get());
 
     // Apply our texture settings (we do this after to override SOIL settings)
@@ -1126,6 +1078,54 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
+}
+
+PixelData RendererGL43::GetTextureData(const TextureResource* texture)
+{
+    auto tex = resource_cast<const TextureResourceGL43*>(texture, id());
+    if (tex->type_ != GL_TEXTURE_2D)
+    {
+        throw "Attemped to retrieve mismatched texture type";
+    }
+    GLint width, height;
+    GLint internal_format, input_format;
+    GLenum input_type;
+    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_HEIGHT, &height);
+    TranslateTextureFormat(tex->options_.format, &internal_format, &input_format, &input_type);
+
+    PixelData pixels;
+    pixels.width = width;
+    pixels.height = height;
+    pixels.type = tex->options_;
+    pixels.pixels.reset(new unsigned char[width * height * (pixels.bits_per_pixel() / 8)]);
+    glGetTexImage(tex->type_, 0, input_format, input_type, pixels.pixels.get());
+    return pixels;
+}
+
+PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
+{
+    auto tex = resource_cast<const TextureResourceGL43*>(texture, id());
+    if (tex->type_ != GL_TEXTURE_3D)
+    {
+        throw "Attemped to retrieve mismatched texture type";
+    }
+    GLint width, height, depth;
+    GLint internal_format, input_format;
+    GLenum input_type;
+    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_HEIGHT, &height);
+    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_DEPTH, &depth);
+    TranslateTextureFormat(tex->options_.format, &internal_format, &input_format, &input_type);
+
+    PixelData3D pixels;
+    pixels.width = width;
+    pixels.height = height;
+    pixels.depth = depth;
+    pixels.type = tex->options_;
+    pixels.pixels.reset(new unsigned char[width * height * depth * (pixels.bits_per_pixel() / 8)]);
+    glGetTexImage(tex->type_, 0, input_format, input_type, pixels.pixels.get());
+    return pixels;
 }
 
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const float value)
