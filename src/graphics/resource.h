@@ -67,6 +67,9 @@ struct TextureBuffer
 /// nullptr on failure, as well as mesh information
 ////////////////////////////////////////////////////////////////////////////////
 MeshBuffer LoadMesh(const std::string& filename);
+// TODO: Make a cache of different resource buffers for different Texture options
+// Currently the first call of a texture load is dictating options for all subsequent loads
+// due to caching
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Loads a texture from disk or engine, or from cache if available.
 ///
