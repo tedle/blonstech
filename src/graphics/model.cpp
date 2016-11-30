@@ -133,7 +133,7 @@ Model::Model(std::string mesh_filename)
 void Model::Render()
 {
     // TODO: Clean this up with operator overloads
-    world_matrix_ = MatrixIdentity() * MatrixTranslation(pos_.x, pos_.y, pos_.z);
+    world_matrix_ = MatrixTranslation(pos_.x, pos_.y, pos_.z);
     render::context()->BindMeshBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
 }
 
