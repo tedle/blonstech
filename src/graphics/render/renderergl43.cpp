@@ -657,12 +657,6 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
 
     if (store_depth)
     {
-        // Render with a depth buffer
-        glGenRenderbuffers(1, &fbo->depth_render_);
-        glBindRenderbuffer(GL_RENDERBUFFER, fbo->depth_render_);
-        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-        glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, fbo->depth_render_);
-
         // Create and bind the depth target
         fbo->depth_ = make_texture({ TextureType::DEPTH, TextureType::LINEAR, TextureType::CLAMP });
         glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_->texture_, 0);
