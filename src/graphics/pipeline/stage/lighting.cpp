@@ -26,6 +26,7 @@
 // Public Includes
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
+#include <blons/graphics/pipeline/stage/debug/shprobes.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
@@ -51,6 +52,8 @@ Lighting::Lighting(Perspective perspective)
 
     // Framebuffers
     light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false));
+
+    probe_view_.reset(new debug::SHProbes());
 }
 
 bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
@@ -87,6 +90,12 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
     if (!light_shader_->Render(light_buffer_->index_count()))
     {
         return false;
+    }
+
+    // Debug view of SH probes
+    if (true) // debug_mode == true
+    {
+        probe_view_->Render(light_buffer_.get(), geometry.output(stage::Geometry::DEPTH), view_matrix, proj_matrix, ortho_matrix);
     }
     return true;
 }

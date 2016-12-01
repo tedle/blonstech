@@ -35,6 +35,9 @@
     <Filter Include="src\graphics\pipeline\stage">
       <UniqueIdentifier>{c1b31eba-cbc9-4b75-803d-29614bc2e4d6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\graphics\pipeline\stage\debug">
+      <UniqueIdentifier>{eefe16aa-86d1-4c76-9b36-507eacca362a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons\debug\console.h">
@@ -226,6 +229,9 @@
     <ClInclude Include="..\include\blons\graphics\render\shaderdata.h">
       <Filter>src\graphics\render</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\shprobes.h">
+      <Filter>src\graphics\pipeline\stage\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -378,6 +384,9 @@
     <ClCompile Include="graphics\texture3d.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\debug\shprobes.cpp">
+      <Filter>src\graphics\pipeline\stage\debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\mesh.frag.glsl">
@@ -420,6 +429,9 @@
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\gamma.lib.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\debug-shprobe.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>

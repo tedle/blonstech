@@ -27,6 +27,7 @@
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
+#include <blons/graphics/pipeline/stage/debug/shprobes.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>

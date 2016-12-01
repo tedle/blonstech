@@ -106,7 +106,8 @@ void main(void)
     // Diffuse lighting (temporary)
     //vec4 indirect_full = texture(indirect_light, tex_coord);
     //vec3 diffuse = (direct * sun.colour) + (indirect_full.rgb / indirect_full.a);
-    vec3 diffuse = (direct * sun.colour);
+    vec3 ambient = vec3(0.01f);
+    vec3 diffuse = (direct * sun.colour) + ambient;
 
     vec3 surface_colour = texture(albedo, tex_coord).rgb;
     surface_colour *= diffuse;

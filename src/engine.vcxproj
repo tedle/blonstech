@@ -214,6 +214,7 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\deferred.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\pipeline.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\scene.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\shprobes.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\shadow.h" />
@@ -275,6 +276,7 @@
     <ClCompile Include="graphics\meshimporter.cpp" />
     <ClCompile Include="graphics\model.cpp" />
     <ClCompile Include="graphics\pipeline\deferred.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\debug\shprobes.cpp" />
     <ClCompile Include="graphics\pipeline\stage\geometry.cpp" />
     <ClCompile Include="graphics\pipeline\stage\lighting.cpp" />
     <ClCompile Include="graphics\pipeline\stage\shadow.cpp" />
@@ -301,6 +303,7 @@
   <ItemGroup>
     <None Include="shaders\blur.frag.glsl" />
     <None Include="shaders\blur.vert.glsl" />
+    <None Include="shaders\debug-shprobe.frag.glsl" />
     <None Include="shaders\gamma.lib.glsl" />
     <None Include="shaders\light.frag.glsl" />
     <None Include="shaders\mesh.frag.glsl" />

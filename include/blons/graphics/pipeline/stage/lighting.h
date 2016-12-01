@@ -40,6 +40,7 @@ namespace stage
 // Forward declarations
 class Geometry;
 class Shadow;
+namespace debug { class SHProbes; }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Composites lighting information from previous passes and adds
@@ -91,6 +92,7 @@ public:
 private:
     std::unique_ptr<Shader> light_shader_;
     std::unique_ptr<Framebuffer> light_buffer_;
+    std::unique_ptr<debug::SHProbes> probe_view_;
 };
 } // namespace stage
 } // namespace pipeline
