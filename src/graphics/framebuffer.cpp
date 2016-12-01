@@ -140,6 +140,12 @@ void Framebuffer::Unbind()
     context->BindFramebuffer(nullptr);
 }
 
+void Framebuffer::BindDepthTexture(const TextureResource* depth)
+{
+    auto context = render::context();
+    context->SetFramebufferDepthTexture(fbo_.get(), depth);
+}
+
 unsigned int Framebuffer::vertex_count() const
 {
     // 4

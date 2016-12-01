@@ -165,7 +165,6 @@ public:
     units::pixel width, height;
     std::vector<std::unique_ptr<TextureResourceGL43>> targets_;
     std::unique_ptr<TextureResourceGL43> depth_;
-    GLuint depth_render_;
 };
 
 class ShaderResourceGL43 : public ShaderResource
@@ -225,9 +224,7 @@ FramebufferResourceGL43::~FramebufferResourceGL43()
         return;
     }
 
-    glDeleteRenderbuffers(1, &depth_render_);
-
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    active_context->BindFramebuffer(nullptr);
     glDeleteFramebuffers(1, &framebuffer_);
 }
 
@@ -301,6 +298,8 @@ RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen
 {
     // Mitigates repeated calls to glUseProgram
     active_shader_ = 0;
+    // Mitigates repeated calls to glBindFramebuffer
+    active_framebuffer_ = 0;
 
     screen_ = screen_info;
 
@@ -621,7 +620,7 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
     glGenFramebuffers(1, &fbo->framebuffer_);
 
     // Bind it so we can put stuff in it
-    glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
+    BindFramebuffer(fbo);
 
     // Creates empty render targets
     auto make_texture = [&](TextureType type)
@@ -832,13 +831,34 @@ void RendererGL43::BindFramebuffer(FramebufferResource* frame_buffer)
     {
         FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
         glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
+        active_framebuffer_ = fbo->framebuffer_;
         glViewport(0, 0, fbo->width, fbo->height);
     }
     else
     {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        active_framebuffer_ = 0;
         glViewport(0, 0, screen_.width, screen_.height);
     }
+}
+
+void RendererGL43::SetFramebufferDepthTexture(FramebufferResource* frame_buffer, const TextureResource* depth_texture)
+{
+    if (frame_buffer == nullptr)
+    {
+        throw "Framebuffer cannot be null";
+    }
+    FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
+
+    // If depth_texture is a nullptr, unbind the depth attachment
+    GLuint depth = 0;
+    if (depth_texture != nullptr)
+    {
+        const TextureResourceGL43* tex = resource_cast<const TextureResourceGL43*>(depth_texture, id());
+        depth = tex->texture_;
+    }
+    BindFramebuffer(frame_buffer);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth, 0);
 }
 
 std::vector<const TextureResource*> RendererGL43::FramebufferTextures(FramebufferResource* frame_buffer)

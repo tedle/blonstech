@@ -99,6 +99,15 @@ public:
     void Unbind();
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Binds a borrowed texture to be used for depth testing and writing.
+    /// Will ignore, but not overwrite, internally stored depth texture. Can be
+    /// undone with a call such as `fbo->BindDepthTexture(fbo->depth())`
+    ///
+    /// \param depth Texture to be used for depth testing
+    ////////////////////////////////////////////////////////////////////////////////
+    void BindDepthTexture(const TextureResource* depth);
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Number of vertices in the quad used for rendering. Should always be
     /// 4, really
     ///

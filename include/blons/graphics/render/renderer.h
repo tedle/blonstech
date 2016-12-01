@@ -515,6 +515,15 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     virtual void BindFramebuffer(FramebufferResource* frame_buffer)=0;
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a FramebufferResource and binds attaches a provided depth
+    /// texture to it. If `depth_texture` is null, the current depth buffer will be
+    /// unbound from the framebuffer
+    ///
+    /// \param frame_buffer Frame buffer resource
+    /// \param depth_texture Texture resource of depth texture
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void SetFramebufferDepthTexture(FramebufferResource* frame_buffer, const TextureResource* depth_texture)=0;
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a list of all the render targets bound to a frame buffer
     ///
     /// \return Ordered list of TextureResources representing each render target

@@ -70,6 +70,7 @@ public:
                           unsigned int groups_y, unsigned int groups_z) override;
 
     void BindFramebuffer(FramebufferResource* frame_buffer) override;
+    void SetFramebufferDepthTexture(FramebufferResource* frame_buffer, const TextureResource* depth_texture) override;
     std::vector<const TextureResource*> FramebufferTextures(FramebufferResource* frame_buffer) override;
     const TextureResource* FramebufferDepthTexture(FramebufferResource* frame_buffer) override;
     void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer) override;
@@ -122,6 +123,7 @@ private:
 
     // Caching to prevent unnecessary API calls
     GLuint active_shader_;
+    GLuint active_framebuffer_;
     bool depth_testing_;
     struct MappedBuffers
     {
