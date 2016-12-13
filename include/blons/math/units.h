@@ -59,14 +59,15 @@ inline subpixel pixel_to_subpixel(pixel p)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Converts a given subpixel coordinate to a pixel coordinate
+/// \brief Converts a given subpixel coordinate to a pixel coordinate, rounding
+/// to the nearest whole integer
 ///
 /// \param p Subpixel coordinate to convert
 /// \return Pixel value
 ////////////////////////////////////////////////////////////////////////////////
 inline pixel subpixel_to_pixel(subpixel p)
 {
-    return static_cast<pixel>(p);
+    return static_cast<pixel>(p > 0 ? p + 0.5f : p - 0.5f);
 }
 
 ////////////////////////////////////////////////////////////////////////////////

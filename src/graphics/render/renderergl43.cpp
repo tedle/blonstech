@@ -1297,10 +1297,10 @@ bool RendererGL43::SetDepthTesting(bool enable)
 
 bool RendererGL43::SetViewport(Box viewport)
 {
-    glViewport(static_cast<GLint>(viewport.x),
-               static_cast<GLint>(viewport.y),
-               static_cast<GLint>(viewport.w),
-               static_cast<GLint>(viewport.h));
+    glViewport(units::subpixel_to_pixel(viewport.x),
+               units::subpixel_to_pixel(viewport.y),
+               units::subpixel_to_pixel(viewport.w),
+               units::subpixel_to_pixel(viewport.h));
     return true;
 }
 
