@@ -80,6 +80,8 @@ public:
     Graphics(Client::Info screen);
     ~Graphics();
 
+    void BakeRadianceTransfer();
+
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new model from the given mesh file. Models created with
     /// this function are automatically rendered each frame until their memory is

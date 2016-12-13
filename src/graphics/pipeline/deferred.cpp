@@ -26,8 +26,9 @@
 // Public Includes
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
+#include <blons/graphics/pipeline/stage/lightprobes.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
-#include <blons/graphics/pipeline/stage/debug/shprobes.h>
+#include <blons/graphics/pipeline/stage/debug/probeview.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
@@ -59,6 +60,7 @@ bool Deferred::Init()
     // Pipeline setup
     geometry_.reset(new stage::Geometry(perspective_));
     shadow_.reset(new stage::Shadow(perspective_));
+    light_probes_.reset(new stage::LightProbes());
     lighting_.reset(new stage::Lighting(perspective_));
 
     // Shaders
@@ -147,6 +149,11 @@ void Deferred::set_output(Output output, Output alt_output)
     alt_output_ = alt_output;
 }
 
+void Deferred::BakeRadianceTransfer(const Scene& scene)
+{
+    light_probes_->BakeRadianceTransfer(scene);
+}
+
 bool Deferred::RenderComposite(const Scene& scene)
 {
     output_sprite_->set_pos(0, 0, perspective_.width, perspective_.height);
@@ -175,6 +182,10 @@ bool Deferred::RenderComposite(const Scene& scene)
             break;
         case DIRECT_LIGHT:
             return shadow_->output(stage::Shadow::DIRECT_LIGHT);
+            break;
+        case PROBE_ENV_MAPS:
+            output_sprite->set_pos(output_sprite->pos().x, output_sprite->pos().y, output_sprite->dimensions().x / 8.0f, output_sprite->dimensions().y);
+            return light_probes_->output(stage::LightProbes::ENV_MAPS);
             break;
         case NONE:
             return nullptr;

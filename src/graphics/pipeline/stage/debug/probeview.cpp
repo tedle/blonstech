@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/pipeline/stage/debug/shprobes.h>
+#include <blons/graphics/pipeline/stage/debug/probeview.h>
 
 // Public Includes
 #include <blons/graphics/framebuffer.h>
@@ -36,7 +36,7 @@ namespace stage
 {
 namespace debug
 {
-SHProbes::SHProbes()
+ProbeView::ProbeView()
 {
     // Shaders
     ShaderAttributeList probe_inputs;
@@ -75,7 +75,7 @@ SHProbes::SHProbes()
     }
 }
 
-bool SHProbes::Render(Framebuffer* target, const TextureResource* depth, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
+bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
     auto context = render::context();
     // Bind the buffer to render the probes on top of

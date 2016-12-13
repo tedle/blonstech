@@ -118,6 +118,17 @@ Graphics::~Graphics()
     }
 }
 
+void Graphics::BakeRadianceTransfer()
+{
+    pipeline::Scene scene;
+    scene.lights = { sun_.get() };
+    scene.models.assign(models_.begin(), models_.end());
+    scene.sky_colour = sky_colour_;
+    scene.view = *camera_;
+
+    pipeline_->BakeRadianceTransfer(scene);
+}
+
 std::unique_ptr<Model> Graphics::MakeModel(std::string filename)
 {
     auto model = new ManagedModel(filename);

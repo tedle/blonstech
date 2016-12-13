@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
@@ -37,16 +37,11 @@ namespace pipeline
 {
 namespace stage
 {
-// Forward declarations
-class Geometry;
-class Shadow;
-namespace debug { class ProbeView; }
-
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Composites lighting information from previous passes and adds
-/// specular
+/// \brief Manages light probes used to calculate indirect illumination at
+/// runtime with the use of precomputed radiance transfer
 ////////////////////////////////////////////////////////////////////////////////
-class Lighting
+class LightProbes
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
@@ -54,32 +49,22 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        LIGHT ///< Composited lighting information applied to the scene
+        ENV_MAPS ///< Cached albedo environment maps
+    };
+
+private:
+    struct Probe
+    {
+        const std::size_t id;
+        Vector3 pos;
+        float sh_sky_visibility[3 * 3];
     };
 
 public:
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes a new Lighting stage
-    ///
-    /// \param perspective Screen dimensions and perspective information
-    ////////////////////////////////////////////////////////////////////////////////
-    Lighting(Perspective perspective);
-    ~Lighting() {}
+    LightProbes();
+    ~LightProbes() {}
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Renders out the composited lighting targets
-    ///
-    /// \param scene Contains scene information for rendering
-    /// \param geometry Handle to the geometry buffer pass performed earlier in the
-    /// frame
-    /// \param shadow Handle to the shadow buffer pass performed earlier in the
-    /// frame
-    /// \param view_matrix View matrix of the camera rendering the scene
-    /// \param proj_matrix Perspective matrix for rendering the scene
-    /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
-    ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
-                Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
+    void BakeRadianceTransfer(const Scene& scene);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage
@@ -90,9 +75,9 @@ public:
     const TextureResource* output(Output buffer) const;
 
 private:
-    std::unique_ptr<Shader> light_shader_;
-    std::unique_ptr<Framebuffer> light_buffer_;
-    std::unique_ptr<debug::ProbeView> probe_debug_view_;
+    std::vector<Probe> probes_;
+    std::unique_ptr<Framebuffer> environment_maps_;
+    std::unique_ptr<Shader> environment_map_shader_;
 };
 } // namespace stage
 } // namespace pipeline
@@ -100,12 +85,12 @@ private:
 
 /// \NEEDS_DOCUMENTATION
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::pipeline::stage::Lighting
+/// \class blons::pipeline::stage::LightProbes
 /// \ingroup pipeline
-/// 
+///
 /// ### Example:
 /// \code
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_

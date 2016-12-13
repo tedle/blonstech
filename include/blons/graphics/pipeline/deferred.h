@@ -41,6 +41,7 @@ namespace pipeline
 // Forward declarations
 namespace stage { class Geometry; }
 namespace stage { class Shadow; }
+namespace stage { class LightProbes; }
 namespace stage { class Lighting; }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -62,6 +63,7 @@ public:
         G_DEPTH,                 ///< Depth buffer of the geometry
         LIGHT_DEPTH,             ///< Depth buffer from the light's point of view
         DIRECT_LIGHT,            ///< Direct lighting pass
+        PROBE_ENV_MAPS,
         NONE                     ///< Results in nullptr
     };
 
@@ -117,6 +119,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     void set_output(Output output, Output alt_output);
 
+    void BakeRadianceTransfer(const Scene& scene);
+
 private:
     bool Init();
     bool RenderComposite(const Scene& scene);
@@ -130,6 +134,7 @@ private:
     // TODO: Document the pipeline
     std::unique_ptr<stage::Geometry> geometry_;
     std::unique_ptr<stage::Shadow> shadow_;
+    std::unique_ptr<stage::LightProbes> light_probes_;
     std::unique_ptr<stage::Lighting> lighting_;
 
     std::unique_ptr<Shader> composite_shader_;

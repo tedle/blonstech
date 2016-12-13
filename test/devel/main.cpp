@@ -60,6 +60,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models.push_back(graphics->MakeModel("blons:sphere~0.5"));
     models.back()->set_pos(0.0, 5.0, 0.0);
 
+    graphics->BakeRadianceTransfer();
+
     // Sprite 1
     auto sprite = graphics->MakeSprite("me.dds");
     sprite->set_pos(0, 0, 32, 32);
@@ -182,6 +184,9 @@ void SetRenderingOutput(blons::Graphics* graphics)
             break;
         case 6:
             return blons::pipeline::Deferred::DIRECT_LIGHT;
+            break;
+        case 7:
+            return blons::pipeline::Deferred::PROBE_ENV_MAPS;
             break;
         case 0:
         default:

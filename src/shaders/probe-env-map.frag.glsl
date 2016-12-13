@@ -21,40 +21,28 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_SHPROBES_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_SHPROBES_H_
+#version 430
 
-// Public Includes
-#include <blons/graphics/pipeline/scene.h>
+// Includes
+#include <shaders/gamma.lib.glsl>
 
-namespace blons
+// Ins n outs
+in vec2 tex_coord;
+in mat3 norm;
+
+out vec4 frag_colour;
+out vec4 norm_colour;
+
+// Globals
+uniform sampler2D albedo;
+uniform sampler2D normal;
+
+void main(void)
 {
-// Forward declarations
-class DrawBatcher;
-class Framebuffer;
-class Shader;
+    // Albedo
+    frag_colour = vec4(GammaDecode(texture(albedo, tex_coord).rgb), 1.0);
 
-namespace pipeline
-{
-namespace stage
-{
-namespace debug
-{
-class SHProbes
-{
-public:
-    SHProbes();
-    ~SHProbes() {}
-
-    bool Render(Framebuffer* target, const TextureResource* depth, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
-
-private:
-    std::unique_ptr<DrawBatcher> probe_meshes_;
-    std::unique_ptr<Shader> probe_shader_;
-};
-} // namespace debug
-} // namespace stage
-} // namespace pipeline
-} // namespace blons
-
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_SHPROBES_H_
+    // Normal
+    vec3 norm_map = texture(normal, tex_coord).rgb * 2 - 1;
+    norm_colour = vec4((norm_map * norm + 1) / 2, 1.0);
+}
