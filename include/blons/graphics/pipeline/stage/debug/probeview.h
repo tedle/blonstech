@@ -38,6 +38,9 @@ namespace pipeline
 {
 namespace stage
 {
+// Forward declarations
+class LightProbes;
+
 namespace debug
 {
 class ProbeView
@@ -46,7 +49,7 @@ public:
     ProbeView();
     ~ProbeView() {}
 
-    bool Render(Framebuffer* target, const TextureResource* depth, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
+    bool Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
 
 private:
     std::unique_ptr<DrawBatcher> probe_meshes_;

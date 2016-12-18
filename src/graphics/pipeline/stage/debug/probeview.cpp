@@ -24,6 +24,7 @@
 #include <blons/graphics/pipeline/stage/debug/probeview.h>
 
 // Public Includes
+#include <blons/graphics/pipeline/stage/lightprobes.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
@@ -54,28 +55,10 @@ ProbeView::ProbeView()
     probe_meshes_.reset(new DrawBatcher());
     std::unique_ptr<Mesh> probe_mesh(new Mesh("blons:sphere~0.5"));
     MeshData probe_mesh_data = probe_mesh->mesh();
-    for (int i = 0; i < 8; i++)
-    {
-        // First floor
-        probe_meshes_->Append(probe_mesh_data, MatrixTranslation(-14.0f + i * 4.0f, 2.0f, -5.0f));
-        probe_meshes_->Append(probe_mesh_data, MatrixTranslation(-14.0f + i * 4.0f, 2.0f, 0));
-        probe_meshes_->Append(probe_mesh_data, MatrixTranslation(-14.0f + i * 4.0f, 2.0f, 5.0f));
-
-        // Second floor
-        probe_meshes_->Append(probe_mesh_data, MatrixTranslation(-14.0f + i * 4.0f, 7.0f, -5.0f));
-        probe_meshes_->Append(probe_mesh_data, MatrixTranslation(-14.0f + i * 4.0f, 7.0f, 0));
-        probe_meshes_->Append(probe_mesh_data, MatrixTranslation(-14.0f + i * 4.0f, 7.0f, 5.0f));
-    }
-
-    for (int i = 0; i < 6; i++)
-    {
-        // Sky hole
-        probe_meshes_->Append(probe_mesh_data, MatrixTranslation(-10.0f + i * 4.0f, 11.0f, 0));
-        probe_meshes_->Append(probe_mesh_data, MatrixTranslation(-10.0f + i * 4.0f, 14.0f, 0));
-    }
+    probe_meshes_->Append(probe_mesh_data);
 }
 
-bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
+bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
     auto context = render::context();
     // Bind the buffer to render the probes on top of
@@ -83,22 +66,31 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, Matrix
     context->SetDepthTesting(true);
 
     Matrix vp_matrix = view_matrix * proj_matrix;
+    Matrix cube_face_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 10000.0f);
 
-    // Bind the vertex data
-    probe_meshes_->Render(false);
-
-    // Set the inputs
-    if (!probe_shader_->SetInput("mvp_matrix", vp_matrix))
+    for (const auto& probe : probes.probes_)
     {
-        return false;
-    }
+        // Bind the vertex data
+        probe_meshes_->Render(false);
 
-    // Finally do the render
-    target->BindDepthTexture(depth);
-    if (!probe_shader_->Render(probe_meshes_->index_count()))
-    {
-        target->BindDepthTexture(target->depth());
-        return false;
+        // Set the inputs
+        if (!probe_shader_->SetInput("mvp_matrix", MatrixTranslation(probe.pos.x, probe.pos.y, probe.pos.z) * vp_matrix) ||
+            !probe_shader_->SetInput("env_proj_matrix", cube_face_projection) ||
+            !probe_shader_->SetInput("env_tex_size", kProbeMapSize) ||
+            !probe_shader_->SetInput("probe_count", static_cast<int>(probes.probes_.size())) ||
+            !probe_shader_->SetInput("probe_id", static_cast<int>(probe.id)) ||
+            !probe_shader_->SetInput("probe_env_maps", probes.environment_maps_->textures()[0], 0))
+        {
+            return false;
+        }
+
+        // Finally do the render
+        target->BindDepthTexture(depth);
+        if (!probe_shader_->Render(probe_meshes_->index_count()))
+        {
+            target->BindDepthTexture(target->depth());
+            return false;
+        }
     }
     target->BindDepthTexture(target->depth());
     return true;

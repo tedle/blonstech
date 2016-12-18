@@ -97,27 +97,27 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
         cube_view.set_pos(probe.pos.x, probe.pos.y, probe.pos.z);
 
         cube_view.set_rot(0, 0, 0);
-        context->SetViewport(Box(0 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize));
+        context->SetViewport(0 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
         render_scene();
 
         cube_view.set_rot(0, -kPi / 2.0f, 0);
-        context->SetViewport(Box(1 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize));
+        context->SetViewport(1 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
         render_scene();
 
         cube_view.set_rot(0, kPi, 0);
-        context->SetViewport(Box(2 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize));
+        context->SetViewport(2 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
         render_scene();
 
         cube_view.set_rot(0, kPi / 2.0f, 0);
-        context->SetViewport(Box(3 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize));
+        context->SetViewport(3 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
         render_scene();
 
         cube_view.set_rot(kPi / 2.0f, 0, 0);
-        context->SetViewport(Box(4 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize));
+        context->SetViewport(4 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
         render_scene();
 
         cube_view.set_rot(-kPi / 2.0f, 0, 0);
-        context->SetViewport(Box(5 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize));
+        context->SetViewport(5 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
         render_scene();
     }
     environment_maps_->Unbind();

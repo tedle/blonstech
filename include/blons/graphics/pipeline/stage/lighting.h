@@ -40,6 +40,7 @@ namespace stage
 // Forward declarations
 class Geometry;
 class Shadow;
+class LightProbes;
 namespace debug { class ProbeView; }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -74,11 +75,12 @@ public:
     /// frame
     /// \param shadow Handle to the shadow buffer pass performed earlier in the
     /// frame
+    /// \param probes Handle to lightprobe data
     /// \param view_matrix View matrix of the camera rendering the scene
     /// \param proj_matrix Perspective matrix for rendering the scene
     /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
+    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const LightProbes& probes,
                 Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////

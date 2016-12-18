@@ -26,6 +26,7 @@
 // Public Includes
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
+#include <blons/graphics/pipeline/stage/lightprobes.h>
 #include <blons/graphics/pipeline/stage/debug/probeview.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
@@ -56,7 +57,7 @@ Lighting::Lighting(Perspective perspective)
     probe_debug_view_.reset(new debug::ProbeView());
 }
 
-bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
+bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const LightProbes& probes,
                       Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
     auto context = render::context();
@@ -95,7 +96,7 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
     // Debug view of SH probes
     if (true) // debug_mode == true
     {
-        probe_debug_view_->Render(light_buffer_.get(), geometry.output(stage::Geometry::DEPTH), view_matrix, proj_matrix, ortho_matrix);
+        probe_debug_view_->Render(light_buffer_.get(), geometry.output(stage::Geometry::DEPTH), probes, view_matrix, proj_matrix, ortho_matrix);
     }
 
     return true;

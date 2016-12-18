@@ -29,9 +29,74 @@ in mat3 norm;
 
 out vec4 frag_colour;
 
+// Globals
+uniform sampler2D probe_env_maps;
+uniform mat4 env_proj_matrix;
+uniform int env_tex_size;
+uniform int probe_count;
+uniform int probe_id;
+
+// Re-orients surface normal to fit within cube face frustum (-Z normal, RH coordinates)
+// i.e., vec3(1,0,0) * inv_rotation_matrices[1/*+X*/] = vec3(0,0,-1)
+const mat3 inv_rotation_matrices[6] = {
+    mat3( // -Z
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1
+    ),
+    mat3( // +X
+        0, 0, 1,
+        0, 1, 0,
+       -1, 0, 0
+    ),
+    mat3( // +Z
+       -1, 0, 0,
+        0, 1, 0,
+        0, 0,-1
+    ),
+    mat3( // -X
+        0, 0,-1,
+        0, 1, 0,
+        1, 0, 0
+    ),
+    mat3( // +Y
+        1, 0, 0,
+        0, 0, 1,
+        0,-1, 0
+    ),
+    mat3( // -Y
+        1, 0, 0,
+        0, 0,-1,
+        0, 1, 0
+    )
+};
+
 void main(void)
 {
     // equivilent of transpose(norm)[2].xyz;
     vec3 surface_normal = vec3(norm[0].z, norm[1].z, norm[2].z);
-    frag_colour = vec4((surface_normal + 1) / 2, 1.0);
+    vec3 abs_normal = abs(surface_normal);
+    // Since branching in shaders is bad, welcome to a really ugly ternary operator
+    int face_index =
+        // if
+        (abs_normal.x > abs_normal.y && abs_normal.x > abs_normal.z ?
+            (surface_normal.x > 0.0f ? 1 : 3) :
+        // else if
+        (abs_normal.y > abs_normal.z ?
+            (surface_normal.y > 0.0f ? 4 : 5) :
+        // else
+            (surface_normal.z > 0.0f ? 2 : 0)));
+    surface_normal *= inv_rotation_matrices[face_index];
+
+    vec4 texel_pos = env_proj_matrix * vec4(surface_normal, 1.0);
+    texel_pos /= texel_pos.w;
+    texel_pos.xy = (texel_pos.xy + 1.0f) / 2.0f;
+
+    texel_pos.xy *= env_tex_size;
+    // Offset in env map texture atlas
+    texel_pos.xy += vec2(face_index * env_tex_size, probe_id * env_tex_size);
+    // Normalize
+    texel_pos.x /= env_tex_size * 6;
+    texel_pos.y /= env_tex_size * probe_count;
+    frag_colour = vec4(texture(probe_env_maps, texel_pos.xy).rgb, 1.0);
 }

@@ -37,6 +37,9 @@ namespace pipeline
 {
 namespace stage
 {
+// Forward declarations
+namespace debug { class ProbeView; }
+
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Manages light probes used to calculate indirect illumination at
 /// runtime with the use of precomputed radiance transfer
@@ -75,6 +78,9 @@ public:
     const TextureResource* output(Output buffer) const;
 
 private:
+    // Since this is for debugging we can be alittle hacky with accessing dependencies
+    friend debug::ProbeView;
+
     std::vector<Probe> probes_;
     std::unique_ptr<Framebuffer> environment_maps_;
     std::unique_ptr<Shader> environment_map_shader_;
