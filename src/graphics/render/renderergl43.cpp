@@ -1295,12 +1295,9 @@ bool RendererGL43::SetDepthTesting(bool enable)
     return true;
 }
 
-bool RendererGL43::SetViewport(Box viewport)
+bool RendererGL43::SetViewport(units::pixel x, units::pixel y, units::pixel width, units::pixel height)
 {
-    glViewport(units::subpixel_to_pixel(viewport.x),
-               units::subpixel_to_pixel(viewport.y),
-               units::subpixel_to_pixel(viewport.w),
-               units::subpixel_to_pixel(viewport.h));
+    glViewport(x, y, width, height);
     return true;
 }
 

@@ -99,7 +99,7 @@ public:
     bool SetBlendMode(BlendMode mode) override;
     bool SetCullMode(CullMode mode) override;
     bool SetDepthTesting(bool enable) override;
-    bool SetViewport(Box viewport) override;
+    bool SetViewport(units::pixel x, units::pixel y, units::pixel width, units::pixel height) override;
 
     void VideoCardInfo(char* buffer, int& len_buffer) override;
 

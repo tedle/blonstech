@@ -692,10 +692,13 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the region of the buffer to render to during drawcalls
     ///
-    /// \param viewport Box defining the render region
+    /// \param x Left-most edge of the viewport
+    /// \param y Upper-most edge of the viewport
+    /// \param width Width of the viewport
+    /// \param height Height of the viewport
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetViewport(Box viewport)=0;
+    virtual bool SetViewport(units::pixel x, units::pixel y, units::pixel width, units::pixel height)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the video card information
