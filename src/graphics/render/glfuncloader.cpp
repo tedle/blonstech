@@ -59,6 +59,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glBindBuffer");
     }
 
+    glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)glGetProcAddress("glBindBufferBase");
+    if (glBindBufferBase == nullptr)
+    {
+        failed.push_back("glBindBufferBase");
+    }
+
     glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)glGetProcAddress("glBindFramebuffer");
     if (glBindFramebuffer == nullptr)
     {
@@ -257,6 +263,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glGetBufferParameteriv");
     }
 
+    glGetBufferSubData = (PFNGLGETBUFFERSUBDATAPROC)glGetProcAddress("glGetBufferSubData");
+    if (glGetBufferSubData == nullptr)
+    {
+        failed.push_back("glGetBufferSubData");
+    }
+
     glGetProgramiv = (PFNGLGETPROGRAMIVPROC)glGetProcAddress("glGetProgramiv");
     if (glGetProgramiv == nullptr)
     {
@@ -267,6 +279,12 @@ std::vector<std::string> LoadGLFunctions()
     if (glGetProgramInfoLog == nullptr)
     {
         failed.push_back("glGetProgramInfoLog");
+    }
+
+    glGetProgramResourceIndex = (PFNGLGETPROGRAMRESOURCEINDEXPROC)glGetProcAddress("glGetProgramResourceIndex");
+    if (glGetProgramResourceIndex == nullptr)
+    {
+        failed.push_back("glGetProgramResourceIndex");
     }
 
     glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)glGetProcAddress("glGetShaderInfoLog");
@@ -303,6 +321,12 @@ std::vector<std::string> LoadGLFunctions()
     if (glShaderSource == nullptr)
     {
         failed.push_back("glShaderSource");
+    }
+
+    glShaderStorageBlockBinding = (PFNGLSHADERSTORAGEBLOCKBINDINGPROC)glGetProcAddress("glShaderStorageBlockBinding");
+    if (glShaderStorageBlockBinding == nullptr)
+    {
+        failed.push_back("glShaderStorageBlockBinding");
     }
 
     glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)glGetProcAddress("glTexImage2DMultisample");
@@ -397,6 +421,7 @@ PFNGLACTIVETEXTUREPROC glActiveTexture;
 PFNGLATTACHSHADERPROC glAttachShader;
 PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
 PFNGLBINDBUFFERPROC glBindBuffer;
+PFNGLBINDBUFFERBASEPROC glBindBufferBase;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 PFNGLBINDIMAGETEXTUREPROC glBindImageTexture;
 PFNGLBINDRENDERBUFFERPROC glBindRenderbuffer;
@@ -430,14 +455,17 @@ PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 PFNGLGENRENDERBUFFERSPROC glGenRenderbuffers;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLGETBUFFERPARAMETERIVPROC glGetBufferParameteriv;
+PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+PFNGLGETPROGRAMRESOURCEINDEXPROC glGetProgramResourceIndex;
 PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLGETSHADERIVPROC glGetShaderiv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLLINKPROGRAMPROC glLinkProgram;
 PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
 PFNGLSHADERSOURCEPROC glShaderSource;
+PFNGLSHADERSTORAGEBLOCKBINDINGPROC glShaderStorageBlockBinding;
 PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
 PFNGLTEXIMAGE3DPROC glTexImage3D;
 PFNGLUNIFORM1FPROC glUniform1f;

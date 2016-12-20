@@ -75,6 +75,11 @@ bool CommonShader::SetInput(const char* field, const TextureResource* value, uns
     return render::context()->SetShaderInput(program_.get(), field, value, texture_index);
 }
 
+bool CommonShader::SetInput(const char* field, const ShaderDataResource* value)
+{
+    return render::context()->SetShaderInput(program_.get(), field, value);
+}
+
 std::string CommonShader::ParseFile(std::string filename)
 {
     // Load source file into memory

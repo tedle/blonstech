@@ -167,6 +167,16 @@ public:
     std::unique_ptr<TextureResourceGL43> depth_;
 };
 
+class ShaderDataResourceGL43 : public ShaderDataResource
+{
+public:
+    ShaderDataResourceGL43(Renderer::ContextID parent_id) : ShaderDataResource(parent_id) {}
+    ~ShaderDataResourceGL43() override;
+
+    GLuint buffer_;
+    std::size_t size_;
+};
+
 class ShaderResourceGL43 : public ShaderResource
 {
 public:
@@ -180,11 +190,13 @@ public:
     GLint UniformLocation(const char* name);
     template <typename T>
     bool SetUniform(const char* name, T value);
+    bool BindSSBO(const char* name, const ShaderDataResourceGL43* ssbo);
 
 private:
     struct HashFunc { unsigned int operator()(const char* s) const { return FastHash(s); } };
     struct CompFunc { bool operator()(const char* a, const char* b) const { return strcmp(a, b) == 0; } };
     std::unordered_map<const char*, GLint, HashFunc, CompFunc> uniform_location_cache_;
+    std::unordered_map<const char*, GLint, HashFunc, CompFunc> ssbo_binding_point_cache_;
     // slow, but clean. possible memory leak with const char* key anyway, iduno
     // std::unordered_map<std::string, GLint> uniform_location_cache_;
 };
@@ -260,6 +272,21 @@ ShaderResourceGL43::~ShaderResourceGL43()
     context->UnbindShader();
 }
 
+ShaderDataResourceGL43::~ShaderDataResourceGL43()
+{
+    auto active_context = render::context();
+    // TODO: Something cleaner in case owning context isnt actually deleted (inactive?)
+    // This is save when deleted since OpenGL contexts clean up after themselves
+    if (context_id != active_context->id())
+    {
+        return;
+    }
+
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glDeleteBuffers(1, &buffer_);
+}
+
+
 GLint ShaderResourceGL43::UniformLocation(const char* name)
 {
     auto it = uniform_location_cache_.find(name);
@@ -287,6 +314,37 @@ bool ShaderResourceGL43::SetUniform(const char* name, T value)
         return false;
     }
     Uniform(location, value);
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return false;
+    }
+    return true;
+}
+
+bool ShaderResourceGL43::BindSSBO(const char* name, const ShaderDataResourceGL43* ssbo)
+{
+    // Clear errors so we know problems are isolated to this function
+    glGetError();
+
+    auto context = static_cast<RendererGL43*>(render::context());
+    context->BindShader(program_);
+
+    GLint binding_point = 0;
+    auto it = ssbo_binding_point_cache_.find(name);
+    if (it == ssbo_binding_point_cache_.end())
+    {
+        auto index = glGetProgramResourceIndex(program_, GL_SHADER_STORAGE_BLOCK, name);
+        binding_point = static_cast<GLint>(ssbo_binding_point_cache_.size());
+        glShaderStorageBlockBinding(program_, index, binding_point);
+        ssbo_binding_point_cache_[_strdup(name)] = binding_point;
+    }
+    else
+    {
+        binding_point = it->second;
+    }
+
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point, ssbo->buffer_);
+
     if (glGetError() != GL_NO_ERROR)
     {
         return false;
@@ -499,6 +557,11 @@ TextureResource* RendererGL43::MakeTextureResource()
 ShaderResource* RendererGL43::MakeShaderResource()
 {
     return new ShaderResourceGL43(id());
+}
+
+ShaderDataResource* RendererGL43::MakeShaderDataResource()
+{
+    return new ShaderDataResourceGL43(id());
 }
 
 bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
@@ -789,6 +852,21 @@ bool RendererGL43::RegisterComputeShader(ShaderResource* program, std::string so
     }
     shader->type_ = ShaderResourceGL43::COMPUTE;
 
+    return true;
+}
+
+bool RendererGL43::RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size)
+{
+    auto data_buffer = resource_cast<ShaderDataResourceGL43*>(data_handle, id());
+    glGenBuffers(1, &data_buffer->buffer_);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, data_buffer->buffer_);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_COPY);
+    data_buffer->size_ = size;
+    // TODO: Could erroneously trigger on previously made errors, do smarter checking here?
+    if (glGetError() != GL_NO_ERROR)
+    {
+        return false;
+    }
     return true;
 }
 
@@ -1142,6 +1220,20 @@ PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
     return pixels;
 }
 
+void RendererGL43::SetShaderData(ShaderDataResource* data_handle, const void* data)
+{
+    auto data_buffer = resource_cast<ShaderDataResourceGL43*>(data_handle, id());
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, data_buffer->buffer_);
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, data_buffer->size_, data);
+}
+
+void RendererGL43::GetShaderData(ShaderDataResource* data_handle, void* data)
+{
+    auto data_buffer = resource_cast<ShaderDataResourceGL43*>(data_handle, id());
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, data_buffer->buffer_);
+    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, data_buffer->size_, data);
+}
+
 bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const float value)
 {
     auto prog = resource_cast<ShaderResourceGL43*>(program, id());
@@ -1184,6 +1276,12 @@ bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, con
     glActiveTexture(GL_TEXTURE0 + texture_index);
     glBindTexture(tex->type_, tex->texture_);
     return SetShaderInput(program, name, static_cast<int>(texture_index));
+}
+
+bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const ShaderDataResource* value)
+{
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
+    return prog->BindSSBO(name, resource_cast<const ShaderDataResourceGL43*>(value, id()));
 }
 
 bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)

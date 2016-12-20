@@ -48,6 +48,7 @@ public:
     FramebufferResource* MakeFramebufferResource() override;
     TextureResource* MakeTextureResource() override;
     ShaderResource* MakeShaderResource() override;
+    ShaderDataResource* MakeShaderDataResource() override;
 
     bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                         Vertex* vertices, unsigned int vert_count,
@@ -64,6 +65,7 @@ public:
                         std::string vertex_source, std::string pixel_source,
                         ShaderAttributeList inputs) override;
     bool RegisterComputeShader(ShaderResource* program, std::string source) override;
+    bool RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size) override;
 
     void RenderShader(ShaderResource* program, unsigned int index_count) override;
     void RunComputeShader(ShaderResource* program, unsigned int groups_x,
@@ -86,6 +88,8 @@ public:
     void SetTextureData(TextureResource* texture, PixelData3D* pixels) override;
     PixelData GetTextureData(const TextureResource* texture) override;
     PixelData3D GetTextureData3D(const TextureResource* texture) override;
+    void SetShaderData(ShaderDataResource* data_handle, const void* data) override;
+    void GetShaderData(ShaderDataResource* data_handle, void* data) override;
 
     bool SetShaderInput(ShaderResource* program, const char* name, const float value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const int value) override;
@@ -94,6 +98,7 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector3 value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector4 value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const ShaderDataResource* value) override;
     bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
 
     bool SetBlendMode(BlendMode mode) override;

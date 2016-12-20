@@ -324,6 +324,7 @@ using ShaderAttributeList = std::vector<ShaderAttribute>;
 class BufferResource;
 class FramebufferResource;
 class ShaderResource;
+class ShaderDataResource;
 class TextureResource;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Class for interfacing with a graphics API
@@ -387,6 +388,13 @@ public:
     /// \return New ShaderResource
     ////////////////////////////////////////////////////////////////////////////////
     virtual ShaderResource* MakeShaderResource()=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates an implementation specific ShaderDataResource to be stored as
+    /// its base class
+    ///
+    /// \return New ShaderDataResource
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual ShaderDataResource* MakeShaderDataResource()=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a pair of BufferResource%s and binds them to the graphics API
@@ -481,6 +489,17 @@ public:
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool RegisterComputeShader(ShaderResource* program, std::string source)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a ShaderDataResource and arbitrary memory creating a bindable
+    /// block allowing easy communication between CPU & GPU memory.
+    ///
+    /// \param data_handle ShaderDataResource for identifying memory block in future
+    /// calls
+    /// \param data Memory to be copied. May be nullptr for unitialized memory
+    /// \param size Size of memory block to allocate. Immutable
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds the supplied ShaderResource and renders a number of vertices
@@ -621,6 +640,23 @@ public:
     virtual PixelData3D GetTextureData3D(const TextureResource* texture)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets arbitrary data of shader memory blocks. Size is immutable and
+    /// determined at ShaderDataResource creation time
+    ///
+    /// \param data_handle Storage block handle
+    /// \param[in] data Memory block to copy data from
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void SetShaderData(ShaderDataResource* data_handle, const void* data)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves arbitrary data from shader memory blocks. Size is immutable
+    /// and determined at ShaderDataResource creation time
+    ///
+    /// \param data_handle Storage block handle
+    /// \param[out] data Allocated memory block to copy data into
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void GetShaderData(ShaderDataResource* data_handle, void* data)=0;
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets a shader's global variable to be that of the given value
     ///
     /// \param program Shader containing global variable
@@ -655,6 +691,11 @@ public:
     /// \param texture_index The slot to bind the texture to
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const ShaderDataResource* value)=0;
+
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets a shader's global output variable to be that of the given value
     ///
@@ -797,6 +838,24 @@ protected:
     /// \copydoc BufferResource::BufferResource(Renderer::ContextID)
     ////////////////////////////////////////////////////////////////////////////////
     ShaderResource(Renderer::ContextID parent_id) : context_id(parent_id) {}
+};
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Contains identifying data to ineract with shader memory
+////////////////////////////////////////////////////////////////////////////////
+class ShaderDataResource
+{
+public:
+    virtual ~ShaderDataResource() {};
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc BufferResource::context_id
+    ////////////////////////////////////////////////////////////////////////////////
+    const Renderer::ContextID context_id;
+
+protected:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc BufferResource::BufferResource(Renderer::ContextID)
+    ////////////////////////////////////////////////////////////////////////////////
+    ShaderDataResource(Renderer::ContextID parent_id) : context_id(parent_id) {}
 };
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Contains identifying data to bind textures
