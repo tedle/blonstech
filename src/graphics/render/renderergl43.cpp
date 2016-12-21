@@ -884,13 +884,19 @@ void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_coun
     BindShader(shader->program_);
 
     glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+    // TODO: Add some kind of option for enabling this? It's necessary if we want to
+    // write to incoherent memory in a pipeline shader but also slows things significantly.
+    // Would probably not be noticable if restricted to only deferred rendering calls
+    // and ignored during g-buffer rendering:
+    //     glMemoryBarrier(GL_ALL_BARRIER_BITS);
+
     // TODO: make this only called once per shader somehow
     // nvogl32.dll loves it when i clean up my VAOs!
     glBindVertexArray(0);
 }
 
 void RendererGL43::RunComputeShader(ShaderResource* program, unsigned int groups_x,
-                                  unsigned int groups_y, unsigned int groups_z)
+                                    unsigned int groups_y, unsigned int groups_z)
 {
     ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
 
@@ -901,6 +907,8 @@ void RendererGL43::RunComputeShader(ShaderResource* program, unsigned int groups
 
     BindShader(shader->program_);
     glDispatchCompute(groups_x, groups_y, groups_z);
+    // TODO: Test performance implications of aggressive mem barrier once we have more stuff to test it on
+    glMemoryBarrier(GL_ALL_BARRIER_BITS);
 }
 
 void RendererGL43::BindFramebuffer(FramebufferResource* frame_buffer)

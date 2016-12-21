@@ -311,6 +311,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glLinkProgram");
     }
 
+    glMemoryBarrier = (PFNGLMEMORYBARRIERPROC)glGetProcAddress("glMemoryBarrier");
+    if (glMemoryBarrier == nullptr)
+    {
+        failed.push_back("glMemoryBarrier");
+    }
+
     glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)glGetProcAddress("glRenderbufferStorage");
     if (glRenderbufferStorage == nullptr)
     {
@@ -463,6 +469,7 @@ PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLGETSHADERIVPROC glGetShaderiv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLLINKPROGRAMPROC glLinkProgram;
+PFNGLMEMORYBARRIERPROC glMemoryBarrier;
 PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLSHADERSTORAGEBLOCKBINDINGPROC glShaderStorageBlockBinding;
