@@ -275,8 +275,6 @@ ShaderResourceGL43::~ShaderResourceGL43()
 ShaderDataResourceGL43::~ShaderDataResourceGL43()
 {
     auto active_context = render::context();
-    // TODO: Something cleaner in case owning context isnt actually deleted (inactive?)
-    // This is save when deleted since OpenGL contexts clean up after themselves
     if (context_id != active_context->id())
     {
         return;

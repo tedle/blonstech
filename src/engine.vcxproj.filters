@@ -223,6 +223,9 @@
     <ClInclude Include="..\include\blons\graphics\texture3d.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\render\shaderdata.h">
+      <Filter>src\graphics\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">

@@ -36,6 +36,7 @@
 #include <blons/graphics/render/renderer.h>
 #include <blons/graphics/render/shader.h>
 #include <blons/graphics/render/computeshader.h>
+#include <blons/graphics/render/shaderdata.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/pipeline/deferred.h>
 #include <blons/system/client.h>

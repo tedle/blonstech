@@ -75,6 +75,7 @@ struct Box
         h(units::pixel_to_subpixel(_h)) {}
 };
 
+// TODO: Add [] operator for vectors: return *(&x+idx) or something
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
 /// \brief 2D vector containing an X and Y coordinate
