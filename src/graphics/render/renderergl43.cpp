@@ -1188,6 +1188,7 @@ PixelData RendererGL43::GetTextureData(const TextureResource* texture)
     GLint width, height;
     GLint internal_format, input_format;
     GLenum input_type;
+    glBindTexture(tex->type_, tex->texture_);
     glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_WIDTH, &width);
     glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_HEIGHT, &height);
     TranslateTextureFormat(tex->options_.format, &internal_format, &input_format, &input_type);
@@ -1211,6 +1212,7 @@ PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
     GLint width, height, depth;
     GLint internal_format, input_format;
     GLenum input_type;
+    glBindTexture(tex->type_, tex->texture_);
     glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_WIDTH, &width);
     glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_HEIGHT, &height);
     glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_DEPTH, &depth);
