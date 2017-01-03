@@ -355,6 +355,81 @@ Vector3 VectorPitchYawRoll(Matrix view_matrix)
     return rot;
 }
 
+namespace
+{
+// Pre-computed basis functions
+inline units::world sh_l0m0()
+{
+    // {l=0,m=0} = 1 / (2 * sqrt(pi))
+    return 0.28209479177387814347403972578039f;
+}
+inline units::world sh_l1m_1(const Vector3& v)
+{
+    // {l=1,m=-1} = -(sqrt(3) * y) / (2 * sqrt(pi))
+    return -0.48860251190291992158638462283835f * v.y;
+}
+inline units::world sh_l1m0(const Vector3& v)
+{
+    // {l=1,m=0} = (sqrt(3) * z) / (2 * sqrt(pi))
+    return 0.48860251190291992158638462283835f * v.z;
+}
+inline units::world sh_l1m1(const Vector3& v)
+{
+    // {l=1,m=1} = -(sqrt(3) * x) / (2 * sqrt(pi))
+    return -0.48860251190291992158638462283835f * v.x;
+}
+inline units::world sh_l2m_2(const Vector3& v)
+{
+    // {l=2,m=-2} = (sqrt(15) * y * x) / (2 * sqrt(pi))
+    return 1.0925484305920790705433857058027f * v.y * v.x;
+}
+inline units::world sh_l2m_1(const Vector3& v)
+{
+    // {l=2,m=-1} = -(sqrt(15) * y * z) / (2 * sqrt(pi))
+    return -1.0925484305920790705433857058027f * v.y * v.z;
+}
+inline units::world sh_l2m0(const Vector3& v)
+{
+    // {l=2,m=0} = (sqrt(5) * (3 * z^2 - 1)) / (4 * sqrt(pi))
+    return 0.94617469575756001809268107088713f * v.z * v.z - 0.31539156525252000603089369029571f;
+}
+inline units::world sh_l2m1(const Vector3& v)
+{
+    // {l=2,m=1} = -(sqrt(15) * x * z) / (2 * sqrt(pi))
+    return -1.0925484305920790705433857058027f * v.x * v.z;
+}
+inline units::world sh_l2m2(const Vector3& v)
+{
+    // {l=2,m=2} = (sqrt(15) * (x^2 - y^2)) / (4 * sqrt(pi))
+    return 0.54627421529603953527169285290134f * (v.x * v.x - v.y * v.y);
+}
+} // namespace
+
+SHCoeffs2 SHProjectDirection2(Vector3 direction)
+{
+    SHCoeffs2 result;
+    result.coeffs[0] = sh_l0m0();
+    result.coeffs[1] = sh_l1m_1(direction);
+    result.coeffs[2] = sh_l1m0(direction);
+    result.coeffs[3] = sh_l1m1(direction);
+    return result;
+}
+
+SHCoeffs3 SHProjectDirection3(Vector3 direction)
+{
+    SHCoeffs3 result;
+    result.coeffs[0] = sh_l0m0();
+    result.coeffs[1] = sh_l1m_1(direction);
+    result.coeffs[2] = sh_l1m0(direction);
+    result.coeffs[3] = sh_l1m1(direction);
+    result.coeffs[4] = sh_l2m_2(direction);
+    result.coeffs[5] = sh_l2m_1(direction);
+    result.coeffs[6] = sh_l2m0(direction);
+    result.coeffs[7] = sh_l2m1(direction);
+    result.coeffs[8] = sh_l2m2(direction);
+    return result;
+}
+
 unsigned int FastHash(const void* data, std::size_t size)
 {
     static const unsigned int kPrime = 16777619;
