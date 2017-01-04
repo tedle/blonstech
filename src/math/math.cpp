@@ -405,6 +405,42 @@ inline units::world sh_l2m2(const Vector3& v)
 }
 } // namespace
 
+////////////////////////////////////////////////////////////////////////////////
+/// SHCoeffs2 Operators
+////////////////////////////////////////////////////////////////////////////////
+SHCoeffs2& SHCoeffs2::operator= (const SHCoeffs2& shc) { for (int i = 0; i < 4; i++) coeffs[i] = shc.coeffs[i]; return *this; }
+
+SHCoeffs2& SHCoeffs2::operator+= (const SHCoeffs2& shc) { for (int i = 0; i < 4; i++) coeffs[i] += shc.coeffs[i]; return *this; }
+SHCoeffs2 SHCoeffs2::operator+ (const SHCoeffs2& shc) const { SHCoeffs2 val; for (int i = 0; i < 4; i++) val.coeffs[i] = coeffs[i] + shc.coeffs[i]; return val; }
+
+SHCoeffs2& SHCoeffs2::operator*= (const SHCoeffs2& shc) { for (int i = 0; i < 4; i++) coeffs[i] *= shc.coeffs[i]; return *this; }
+SHCoeffs2& SHCoeffs2::operator*= (const units::world& f) { for (int i = 0; i < 4; i++) coeffs[i] *= f; return *this; }
+SHCoeffs2 SHCoeffs2::operator* (const SHCoeffs2& shc) const { SHCoeffs2 val; for (int i = 0; i < 4; i++) val.coeffs[i] = coeffs[i] * shc.coeffs[i]; return val; }
+SHCoeffs2 SHCoeffs2::operator* (const units::world& f) const { SHCoeffs2 val; for (int i = 0; i < 4; i++) val.coeffs[i] = coeffs[i] * f; return val; }
+
+SHCoeffs2& SHCoeffs2::operator/= (const SHCoeffs2& shc) { for (int i = 0; i < 4; i++) coeffs[i] /= shc.coeffs[i]; return *this; }
+SHCoeffs2& SHCoeffs2::operator/= (const units::world& f) { for (int i = 0; i < 4; i++) coeffs[i] /= f; return *this; }
+SHCoeffs2 SHCoeffs2::operator/ (const SHCoeffs2& shc) const { SHCoeffs2 val; for (int i = 0; i < 4; i++) val.coeffs[i] = coeffs[i] / shc.coeffs[i]; return val; }
+SHCoeffs2 SHCoeffs2::operator/ (const units::world& f) const { SHCoeffs2 val; for (int i = 0; i < 4; i++) val.coeffs[i] = coeffs[i] / f; return val; }
+
+////////////////////////////////////////////////////////////////////////////////
+/// SHCoeffs3 Operators
+////////////////////////////////////////////////////////////////////////////////
+SHCoeffs3& SHCoeffs3::operator= (const SHCoeffs3& shc) { for (int i = 0; i < 9; i++) coeffs[i] = shc.coeffs[i]; return *this; }
+
+SHCoeffs3& SHCoeffs3::operator+= (const SHCoeffs3& shc) { for (int i = 0; i < 9; i++) coeffs[i] += shc.coeffs[i]; return *this; }
+SHCoeffs3 SHCoeffs3::operator+ (const SHCoeffs3& shc) const { SHCoeffs3 val; for (int i = 0; i < 9; i++) val.coeffs[i] = coeffs[i] + shc.coeffs[i]; return val; }
+
+SHCoeffs3& SHCoeffs3::operator*= (const SHCoeffs3& shc) { for (int i = 0; i < 9; i++) coeffs[i] *= shc.coeffs[i]; return *this; }
+SHCoeffs3& SHCoeffs3::operator*= (const units::world& f) { for (int i = 0; i < 9; i++) coeffs[i] *= f; return *this; }
+SHCoeffs3 SHCoeffs3::operator* (const SHCoeffs3& shc) const { SHCoeffs3 val; for (int i = 0; i < 9; i++) val.coeffs[i] = coeffs[i] * shc.coeffs[i]; return val; }
+SHCoeffs3 SHCoeffs3::operator* (const units::world& f) const { SHCoeffs3 val; for (int i = 0; i < 9; i++) val.coeffs[i] = coeffs[i] * f; return val; }
+
+SHCoeffs3& SHCoeffs3::operator/= (const SHCoeffs3& shc) { for (int i = 0; i < 9; i++) coeffs[i] /= shc.coeffs[i]; return *this; }
+SHCoeffs3& SHCoeffs3::operator/= (const units::world& f) { for (int i = 0; i < 9; i++) coeffs[i] /= f; return *this; }
+SHCoeffs3 SHCoeffs3::operator/ (const SHCoeffs3& shc) const { SHCoeffs3 val; for (int i = 0; i < 9; i++) val.coeffs[i] = coeffs[i] / shc.coeffs[i]; return val; }
+SHCoeffs3 SHCoeffs3::operator/ (const units::world& f) const { SHCoeffs3 val; for (int i = 0; i < 9; i++) val.coeffs[i] = coeffs[i] / f; return val; }
+
 SHCoeffs2 SHProjectDirection2(Vector3 direction)
 {
     SHCoeffs2 result;
