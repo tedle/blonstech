@@ -26,6 +26,7 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/pipeline/stage/lightprobes.h>
 
 namespace blons
 {
@@ -33,14 +34,13 @@ namespace blons
 class DrawBatcher;
 class Framebuffer;
 class Shader;
+template <typename T>
+class ShaderData;
 
 namespace pipeline
 {
 namespace stage
 {
-// Forward declarations
-class LightProbes;
-
 namespace debug
 {
 class ProbeView
@@ -54,6 +54,8 @@ public:
 private:
     std::unique_ptr<DrawBatcher> probe_meshes_;
     std::unique_ptr<Shader> probe_shader_;
+    std::unique_ptr<ShaderData<LightProbes::Probe>> probe_shader_data_;
+    const console::Variable* debug_mode_;
 };
 } // namespace debug
 } // namespace stage

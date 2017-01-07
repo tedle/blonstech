@@ -31,6 +31,7 @@
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
+#include <blons/graphics/render/shaderdata.h>
 
 namespace blons
 {
@@ -93,10 +94,11 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
         return false;
     }
 
+    // TODO: Replace true with actual debug mode config option/compile time var
     // Debug view of SH probes
-    if (true) // debug_mode == true
+    if (true && !probe_debug_view_->Render(light_buffer_.get(), geometry.output(stage::Geometry::DEPTH), probes, view_matrix, proj_matrix, ortho_matrix))
     {
-        probe_debug_view_->Render(light_buffer_.get(), geometry.output(stage::Geometry::DEPTH), probes, view_matrix, proj_matrix, ortho_matrix);
+        return false;
     }
 
     return true;

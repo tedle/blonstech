@@ -58,9 +58,9 @@ public:
 private:
     struct Probe
     {
-        const std::size_t id;
+        const int id;
         Vector3 pos;
-        float sh_sky_visibility[3 * 3];
+        SHCoeffs3 sh_sky_visibility;
     };
 
 public:

@@ -28,6 +28,7 @@
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
+#include <blons/graphics/render/shaderdata.h>
 
 namespace blons
 {
@@ -56,10 +57,31 @@ ProbeView::ProbeView()
     std::unique_ptr<Mesh> probe_mesh(new Mesh("blons:sphere~0.5"));
     MeshData probe_mesh_data = probe_mesh->mesh();
     probe_meshes_->Append(probe_mesh_data);
+
+    // Will throw if already initialized (gfx:reload, etc)
+    try
+    {
+        console::RegisterVariable<int>("gfx:probe-debug", 0);
+    }
+    catch (...) {}
+    debug_mode_ = console::var("gfx:probe-debug");
 }
 
 bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
+    auto debug_mode = debug_mode_->to<int>();
+    if (!debug_mode)
+    {
+        return true;
+    }
+
+    // This info doesn't exist at initialization time, and in the future could
+    // vary from frame to frame... (would likely need better optimizations then)
+    if (probe_shader_data_ == nullptr || probe_shader_data_->length() != probes.probes_.size())
+    {
+        probe_shader_data_.reset(new ShaderData<LightProbes::Probe>(nullptr, probes.probes_.size()));
+    }
+
     auto context = render::context();
     // Bind the buffer to render the probes on top of
     target->Bind(false);
@@ -67,6 +89,8 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
 
     Matrix vp_matrix = view_matrix * proj_matrix;
     Matrix cube_face_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 10000.0f);
+
+    probe_shader_data_->set_value(probes.probes_.data());
 
     for (const auto& probe : probes.probes_)
     {
@@ -79,7 +103,9 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
             !probe_shader_->SetInput("env_tex_size", kProbeMapSize) ||
             !probe_shader_->SetInput("probe_count", static_cast<int>(probes.probes_.size())) ||
             !probe_shader_->SetInput("probe_id", static_cast<int>(probe.id)) ||
-            !probe_shader_->SetInput("probe_env_maps", probes.environment_maps_->textures()[0], 0))
+            !probe_shader_->SetInput("probe_buffer", probe_shader_data_->data()) ||
+            !probe_shader_->SetInput("probe_env_maps", probes.environment_maps_->textures()[0], 0) ||
+            !probe_shader_->SetInput("debug_mode", debug_mode))
         {
             return false;
         }

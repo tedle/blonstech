@@ -23,6 +23,9 @@
 
 #version 430
 
+// Includes
+#include <shaders/sh-math.lib.glsl>
+
 // Ins n outs
 in vec2 tex_coord;
 in mat3 norm;
@@ -35,6 +38,20 @@ uniform mat4 env_proj_matrix;
 uniform int env_tex_size;
 uniform int probe_count;
 uniform int probe_id;
+uniform int debug_mode;
+
+struct Probe
+{
+    int id;
+    // vec3 is secretly the size of vec4, don't use it!!!!!!!!!!!
+    float pos[3];
+    float sh_coeffs[9];
+};
+
+layout(std430) buffer probe_buffer
+{
+    Probe probes[];
+};
 
 // Re-orients surface normal to fit within cube face frustum (-Z normal, RH coordinates)
 // i.e., vec3(1,0,0) * inv_rotation_matrices[1/*+X*/] = vec3(0,0,-1)
@@ -86,9 +103,9 @@ void main(void)
             (surface_normal.y > 0.0f ? 4 : 5) :
         // else
             (surface_normal.z > 0.0f ? 2 : 0)));
-    surface_normal *= inv_rotation_matrices[face_index];
+    vec3 local_surface_normal = surface_normal * inv_rotation_matrices[face_index];
 
-    vec4 texel_pos = env_proj_matrix * vec4(surface_normal, 1.0);
+    vec4 texel_pos = env_proj_matrix * vec4(local_surface_normal, 1.0);
     texel_pos /= texel_pos.w;
     texel_pos.xy = (texel_pos.xy + 1.0f) / 2.0f;
 
@@ -98,5 +115,13 @@ void main(void)
     // Normalize
     texel_pos.x /= env_tex_size * 6;
     texel_pos.y /= env_tex_size * probe_count;
-    frag_colour = vec4(texture(probe_env_maps, texel_pos.xy).rgb, 1.0);
+
+    float sh_normal[9];
+    SHProjectDirection3(surface_normal, sh_normal);
+    float sky_vis = SHDot3(sh_normal, probes[probe_id].sh_coeffs);
+
+    frag_colour = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+    frag_colour.rgb += texture(probe_env_maps, texel_pos.xy).rgb * (debug_mode == 1 ? 1.0f : 0.0f);
+    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f * (debug_mode == 2 ? 1.0f : 0.0f);
+    frag_colour.rgb += sky_vis * (debug_mode == 3 ? 1.0f : 0.0f);
 }

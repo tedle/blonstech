@@ -33,6 +33,38 @@ namespace pipeline
 {
 namespace stage
 {
+namespace
+{
+    Vector3 FaceRotation(int face)
+    {
+        units::world pitch = 0.0f;
+        units::world yaw = 0.0f;
+        switch (face)
+        {
+        case 0: // -Z
+            break;
+        case 1: // +X
+            yaw = -kPi / 2.0f;
+            break;
+        case 2: // +Z
+            yaw = kPi;
+            break;
+        case 3: // -X
+            yaw = kPi / 2.0f;
+            break;
+        case 4: // +Y
+            pitch = kPi / 2.0f;
+            break;
+        case 5: // -Y
+            pitch = -kPi / 2.0f;
+            break;
+        default:
+            throw "Impossible case statment reached during face selection";
+        }
+        return Vector3(pitch, yaw, 0.0f);
+    }
+} // namespace
+
 LightProbes::LightProbes()
 {
     // Generate sponza probes, ofc we have to make this scene independant at some point...
@@ -42,7 +74,7 @@ LightProbes::LightProbes()
         {
             for (int z = 0; z < 3; z++)
             {
-                Probe probe { probes_.size(), Vector3(-14.0f + x * 4.0f, y * 5.0f + 2.0f, z * 5.0f - 5.0f) };
+                Probe probe { static_cast<int>(probes_.size()), Vector3(-14.0f + x * 4.0f, y * 5.0f + 2.0f, z * 5.0f - 5.0f) };
                 probes_.push_back(probe);
             }
         }
@@ -51,7 +83,7 @@ LightProbes::LightProbes()
     {
         for (int y = 0; y < 2; y++)
         {
-            Probe probe { probes_.size(), Vector3(-10.0f + x * 4.0f, y * 3.0f + 11.0f, 0) };
+            Probe probe { static_cast<int>(probes_.size()), Vector3(-10.0f + x * 4.0f, y * 3.0f + 11.0f, 0) };
             probes_.push_back(probe);
         }
     }
@@ -80,46 +112,81 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
     environment_maps_->Bind(Vector4(0, 1, 0, 1));
     context->SetDepthTesting(true);
     context->SetBlendMode(BlendMode::OVERWRITE);
-    auto render_scene = [&]()
-    {
-        for (const auto& m : scene.models)
-        {
-            m->Render();
-            environment_map_shader_->SetInput("mvp_matrix", m->world_matrix() * cube_view.view_matrix() * cube_face_projection);
-            environment_map_shader_->SetInput("albedo", m->albedo(), 0);
-            environment_map_shader_->SetInput("normal", m->normal(), 1);
-            environment_map_shader_->Render(m->index_count());
-        }
-    };
 
+    log::Debug("Baking environment maps... ");
+    Timer bake_stats;
+    // G-Buffer env map generation
     for (const auto& probe : probes_)
     {
         cube_view.set_pos(probe.pos.x, probe.pos.y, probe.pos.z);
-
-        cube_view.set_rot(0, 0, 0);
-        context->SetViewport(0 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
-        render_scene();
-
-        cube_view.set_rot(0, -kPi / 2.0f, 0);
-        context->SetViewport(1 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
-        render_scene();
-
-        cube_view.set_rot(0, kPi, 0);
-        context->SetViewport(2 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
-        render_scene();
-
-        cube_view.set_rot(0, kPi / 2.0f, 0);
-        context->SetViewport(3 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
-        render_scene();
-
-        cube_view.set_rot(kPi / 2.0f, 0, 0);
-        context->SetViewport(4 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
-        render_scene();
-
-        cube_view.set_rot(-kPi / 2.0f, 0, 0);
-        context->SetViewport(5 * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
-        render_scene();
+        for (int face = 0; face < 6; face++)
+        {
+            Vector3 rot = FaceRotation(face);
+            cube_view.set_rot(rot.x, rot.y, rot.z);
+            context->SetViewport(face * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
+            for (const auto& m : scene.models)
+            {
+                m->Render();
+                environment_map_shader_->SetInput("mvp_matrix", m->world_matrix() * cube_view.view_matrix() * cube_face_projection);
+                environment_map_shader_->SetInput("albedo", m->albedo(), 0);
+                environment_map_shader_->SetInput("normal", m->normal(), 1);
+                environment_map_shader_->Render(m->index_count());
+            }
+        }
     }
+    log::Debug("[%ims]\n", bake_stats.ms());
+    log::Debug("Baking sky visibility... ");
+    bake_stats.start();
+
+    // TODO: Move this to a compute shader
+    // Sky visibility SH
+    auto tex = context->GetTextureData(environment_maps_->textures()[0]);
+    std::size_t pixel_size = tex.bits_per_pixel() / 8;
+    for (const auto& probe : probes_)
+    {
+        SHCoeffs3 sh_sky_visibility;
+        float sh_total_weight = 0.0f;
+        for (int face = 0; face < 6; face++)
+        {
+            Vector3 rot = FaceRotation(face);
+            cube_view.set_pos(0, 0, 0);
+            cube_view.set_rot(rot.x, rot.y, rot.z);
+
+            for (int x = 0; x < kProbeMapSize; x++)
+            {
+                for (int y = 0; y < kProbeMapSize; y++)
+                {
+                    Vector2 uv;
+                    uv.x = static_cast<units::world>(x) / static_cast<units::world>(kProbeMapSize) * 2.0f - 1.0f;
+                    uv.y = static_cast<units::world>(y) / static_cast<units::world>(kProbeMapSize) * 2.0f - 1.0f;
+
+                    Vector3 normal;
+                    normal.x = uv.x;
+                    normal.y = uv.y;
+                    normal.z = -1.0f;
+                    normal *= cube_view.view_matrix();
+                    normal = VectorNormalize(normal);
+
+                    int px = x + face * kProbeMapSize;
+                    int py = y + probe.id * kProbeMapSize;
+
+                    // Retrieve sky alpha value from texture and normalize
+                    auto sky_visibility = static_cast<units::world>(tex.pixels.get()[(px + py * tex.width) * pixel_size + 3]) / 255.0f;
+                    // Weight texels contribution by its solid angle on the sphere
+                    units::world sh_weight_intermediate = 1.0f + uv.x * uv.x + uv.y * uv.y;
+                    units::world sh_texel_weight = 4.0f / (sqrt(sh_weight_intermediate) * sh_weight_intermediate);
+                    // Add sample to SH coefficients
+                    sh_sky_visibility += SHProjectDirection3(normal) * sky_visibility * sh_texel_weight;
+                    // Build up averaging sums
+                    sh_total_weight += sh_texel_weight;
+                }
+            }
+        }
+        // Normalize to surface area of unit sphere
+        sh_sky_visibility *= 4.0f * kPi / sh_total_weight;
+        probes_[probe.id].sh_sky_visibility = sh_sky_visibility;
+    }
+    log::Debug("[%ims]\n", bake_stats.ms());
     environment_maps_->Unbind();
 }
 

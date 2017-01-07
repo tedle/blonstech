@@ -32,6 +32,7 @@
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
+#include <blons/graphics/render/shaderdata.h>
 #include <blons/graphics/sprite.h>
 
 namespace blons
