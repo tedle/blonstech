@@ -443,5 +443,8 @@
     <None Include="shaders\probe-env-map.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\sh-math.lib.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
