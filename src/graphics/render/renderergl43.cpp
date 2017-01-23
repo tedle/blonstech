@@ -142,6 +142,7 @@ public:
 
     GLuint buffer_, vertex_array_id_;
     enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
+    DrawMode draw_mode_;
 };
 
 class TextureResourceGL43 : public TextureResource
@@ -494,7 +495,7 @@ RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen
     glClearDepth(1.0);
     SetDepthTesting(true);
 
-    // Configure how we render primitives
+    // Configure backface culling
     SetCullMode(ENABLE_CCW);
 
     // Enable transparency
@@ -559,7 +560,8 @@ ShaderDataResource* RendererGL43::MakeShaderDataResource()
 
 bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
-                                unsigned int* indices, unsigned int index_count)
+                                unsigned int* indices, unsigned int index_count,
+                                DrawMode draw_mode)
 {
     BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
     BufferResourceGL43* index_buf = resource_cast<BufferResourceGL43*>(index_buffer, id());
@@ -567,6 +569,10 @@ bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource*
     // Set the buffer types
     vertex_buf->type_ = BufferResourceGL43::VERTEX_BUFFER;
     index_buf->type_ = BufferResourceGL43::INDEX_BUFFER;
+
+    // Set the draw mode
+    vertex_buf->draw_mode_ = draw_mode;
+    index_buf->draw_mode_ = draw_mode;
 
     // Generate a vertex array and set it
     GLuint vertex_array_id;
@@ -620,7 +626,8 @@ bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource*
 
 bool RendererGL43::Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
-                                unsigned int* indices, unsigned int index_count)
+                                unsigned int* indices, unsigned int index_count,
+                                DrawMode draw_mode)
 {
     BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
     BufferResourceGL43* index_buf = resource_cast<BufferResourceGL43*>(index_buffer, id());
@@ -628,6 +635,10 @@ bool RendererGL43::Register2DMesh(BufferResource* vertex_buffer, BufferResource*
     // Set the buffer types
     vertex_buf->type_ = BufferResourceGL43::VERTEX_BUFFER;
     index_buf->type_ = BufferResourceGL43::INDEX_BUFFER;
+
+    // Set the draw mode
+    vertex_buf->draw_mode_ = draw_mode;
+    index_buf->draw_mode_ = draw_mode;
 
     // Generate a vertex array and set it
     GLuint vertex_array_id;
@@ -876,7 +887,7 @@ void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_coun
 
     BindShader(shader->program_);
 
-    glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, 0);
+    glDrawElements(draw_mode_, index_count, GL_UNSIGNED_INT, 0);
     // TODO: Add some kind of option for enabling this? It's necessary if we want to
     // write to incoherent memory in a pipeline shader but also slows things significantly.
     // Would probably not be noticable if restricted to only deferred rendering calls
@@ -966,6 +977,19 @@ void RendererGL43::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource*
 
     BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
     glBindVertexArray(vertex_buf->vertex_array_id_);
+
+    switch (vertex_buf->draw_mode_)
+    {
+    case LINES:
+        draw_mode_ = GL_LINES;
+        break;
+    case TRIANGLES:
+        draw_mode_ = GL_TRIANGLES;
+        break;
+    default:
+        throw "Unknown draw mode set for mesh buffer";
+        break;
+    }
 }
 
 void RendererGL43::SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,

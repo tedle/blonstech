@@ -28,20 +28,21 @@
 
 namespace blons
 {
-DrawBatcher::DrawBatcher(Type type)
+DrawBatcher::DrawBatcher(Type type, DrawMode draw_mode)
 {
     auto context = render::context();
     type_ = type;
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
+    draw_mode_ = draw_mode;
 
     if (type_ == MESH_2D)
     {
-        context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0);
+        context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0, draw_mode_);
     }
     else if (type_ == MESH_3D)
     {
-        context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0);
+        context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0, draw_mode_);
     }
     else
     {
@@ -57,6 +58,11 @@ DrawBatcher::DrawBatcher(Type type)
 
 void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
 {
+    if (mesh_data.draw_mode != draw_mode_)
+    {
+        throw "DrawBatcher supplied with mismatched primitive types";
+    }
+
     auto context = render::context();
     const unsigned int vert_size = static_cast<unsigned int>(mesh_data.vertices.size());
     const unsigned int index_size = static_cast<unsigned int>(mesh_data.indices.size());
@@ -82,11 +88,11 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
         index_buffer_.reset(context->MakeBufferResource());
         if (type_ == MESH_2D)
         {
-            context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_);
+            context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_);
         }
         else if (type_ == MESH_3D)
         {
-            context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_);
+            context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_);
         }
 
         // Move our backup copy of mesh data into the new buffer

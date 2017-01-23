@@ -160,6 +160,16 @@ enum CullMode
 };
 
 ////////////////////////////////////////////////////////////////////////////////
+/// \brief Used to set how vertices are interpreted as primitives in future draw
+/// calls
+////////////////////////////////////////////////////////////////////////////////
+enum DrawMode
+{
+    LINES,    ///< Draw vertices in groups of two as lines
+    TRIANGLES ///< Draw vertices in groups of three as triangles
+};
+
+////////////////////////////////////////////////////////////////////////////////
 /// \brief Stores the vertices and indices of a mesh
 ////////////////////////////////////////////////////////////////////////////////
 struct MeshData
@@ -172,6 +182,10 @@ struct MeshData
     /// \brief Vector of indices
     ////////////////////////////////////////////////////////////////////////////////
     std::vector<unsigned int> indices;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Determines how to structure vertices into primitives
+    ////////////////////////////////////////////////////////////////////////////////
+    DrawMode draw_mode;
 };
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -411,11 +425,13 @@ public:
     /// and index_count are 0
     /// \param index_count Number of indices to be bound to buffer, may be 0 for an
     /// empty mesh
+    /// \param draw_mode Describes how to form primitives from vertices
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
-                                unsigned int* indices, unsigned int index_count)=0;
+                                unsigned int* indices, unsigned int index_count,
+                                DrawMode draw_mode)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a pair of BufferResource%s and binds them to the graphics API
     /// permitting their use for rendering calls. Sets up shader inputs using a
@@ -432,11 +448,13 @@ public:
     /// and index_count are 0
     /// \param index_count Number of indices to be bound to buffer, may be 0 for an
     /// empty mesh
+    /// \param draw_mode Describes how to form primitives from vertices
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
-                                unsigned int* indices, unsigned int index_count)=0;
+                                unsigned int* indices, unsigned int index_count,
+                                DrawMode draw_mode)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a FramebufferResource and binds it to the graphics API
     /// permitting its use for rendering calls. Expects an output to the supplied

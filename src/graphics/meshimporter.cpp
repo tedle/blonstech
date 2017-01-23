@@ -108,6 +108,9 @@ MeshImporter::MeshImporter(std::string filename, bool invert_y)
             v.light_tex.y = 1.0f - v.light_tex.y;
         }
     }
+
+    // TODO: Specify this in file format?
+    mesh_data_.draw_mode = DrawMode::TRIANGLES;
 }
 
 unsigned int MeshImporter::vertex_count() const

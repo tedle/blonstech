@@ -99,7 +99,8 @@ MeshBuffer LoadMesh(const std::string& filename)
                                      mesh.data->vertices.data(),
                                      static_cast<unsigned int>(mesh.data->vertices.size()),
                                      mesh.data->indices.data(),
-                                     static_cast<unsigned int>(mesh.data->indices.size())))
+                                     static_cast<unsigned int>(mesh.data->indices.size()),
+                                     mesh.data->draw_mode))
         {
             return MeshBuffer();
         }

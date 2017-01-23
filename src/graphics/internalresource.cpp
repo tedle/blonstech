@@ -41,6 +41,7 @@ std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_m
         "blons:quad", [](const std::string& args)
         {
             MeshData quad;
+            quad.draw_mode = DrawMode::TRIANGLES;
 
             const float width = static_cast<float>(atof(args.c_str()));
             const float height = static_cast<float>(atof(args.c_str()));
@@ -74,6 +75,7 @@ std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_m
         "blons:sphere", [](const std::string& args)
         {
             MeshData sphere;
+            sphere.draw_mode = DrawMode::TRIANGLES;
 
             const unsigned int count = 20;
             const unsigned int semi_count = count / 2 + 1;

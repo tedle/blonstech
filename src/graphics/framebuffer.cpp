@@ -95,9 +95,12 @@ void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<Text
 
     render_quad_.indices = { 0, 1, 2, 0, 2, 3 };
 
+    render_quad_.draw_mode = DrawMode::TRIANGLES;
+
     if (!context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(),
         render_quad_.vertices.data(), vertex_count(),
-        render_quad_.indices.data(), index_count()))
+        render_quad_.indices.data(), index_count(),
+        render_quad_.draw_mode))
     {
         throw "Failed to register rendering quad";
     }

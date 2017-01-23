@@ -51,8 +51,15 @@ public:
     /// type.
     ///
     /// \param type Specifies whether to use 2D mesh or 3D mesh
+    /// \param type Specifies how vertices are formed into primitives
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher(Type type);
+    DrawBatcher(Type type, DrawMode draw_mode);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls DrawBatcher(Type, DrawMode) with a draw mode of
+    /// DrawMode::TRIANGLES
+    ////////////////////////////////////////////////////////////////////////////////
+    DrawBatcher(Type type)
+        : DrawBatcher(type, DrawMode::TRIANGLES) {}
     ~DrawBatcher() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -98,6 +105,7 @@ public:
 
 private:
     Type type_;
+    DrawMode draw_mode_;
 
     std::unique_ptr<BufferResource> vertex_buffer_;
     std::unique_ptr<BufferResource> index_buffer_;
