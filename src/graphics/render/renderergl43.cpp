@@ -491,16 +491,11 @@ RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen
     video_card_memory_ = 0;
 
     // Enable depth testing, with a default of 1.0
-    depth_testing_ = true;
     glClearDepth(1.0);
-    glEnable(GL_DEPTH_TEST);
+    SetDepthTesting(true);
 
-    // Configure how we render tris
-    // TODO: re enable back face cullin
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CCW);
-    glCullFace(GL_BACK);
-    //glDisable(GL_CULL_FACE);
+    // Configure how we render primitives
+    SetCullMode(ENABLE_CCW);
 
     // Enable transparency
     glEnable(GL_BLEND);
