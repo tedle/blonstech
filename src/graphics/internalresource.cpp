@@ -35,16 +35,85 @@ namespace internal
 {
 namespace
 {
-std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_mesh_generators =
+std::unordered_map<std::string, std::function<MeshData(const std::vector<std::string>& args)>> g_mesh_generators =
 {
     {
-        "blons:quad", [](const std::string& args)
+        "blons:line-grid", [](const std::vector<std::string>& args)
         {
+            if (args.size() != 3)
+            {
+                throw "Incorrect arguments supplied for blons:quad mesh (expected 3)";
+            }
+
+            MeshData grid;
+            grid.draw_mode = DrawMode::LINES;
+
+            const std::size_t xsize = static_cast<std::size_t>(atoi(args[0].c_str()));
+            const std::size_t ysize = static_cast<std::size_t>(atoi(args[1].c_str()));
+            const std::size_t zsize = static_cast<std::size_t>(atoi(args[2].c_str()));
+            unsigned int index = 0;
+            for (int x = 0; x <= xsize; x++)
+            {
+                for (int y = 0; y <= ysize; y++)
+                {
+                    for (int z = 0; z <= zsize; z++)
+                    {
+                        Vertex v1, v2;
+                        units::world wx, wy, wz;
+                        unsigned int v1_index = index;
+                        wx = static_cast<units::world>(x) / static_cast<units::world>(xsize);
+                        wy = static_cast<units::world>(y) / static_cast<units::world>(ysize);
+                        wz = static_cast<units::world>(z) / static_cast<units::world>(zsize);
+                        v1.pos = Vector3(wx, wy, wz);
+                        grid.vertices.push_back(v1);
+                        index++;
+
+                        if (x < xsize)
+                        {
+                            wx += 1.0f / static_cast<units::world>(xsize);
+                            v2.pos = Vector3(wx, v1.pos.y, v1.pos.z);
+                            grid.vertices.push_back(v2);
+                            grid.indices.push_back(v1_index);
+                            grid.indices.push_back(index);
+                            index++;
+                        }
+                        if (y < ysize)
+                        {
+                            wy += 1.0f / static_cast<units::world>(ysize);
+                            v2.pos = Vector3(v1.pos.x, wy, v1.pos.z);
+                            grid.vertices.push_back(v2);
+                            grid.indices.push_back(v1_index);
+                            grid.indices.push_back(index);
+                            index++;
+                        }
+                        if (z < zsize)
+                        {
+                            wz += 1.0f / static_cast<units::world>(zsize);
+                            v2.pos = Vector3(v1.pos.x, v1.pos.y, wz);
+                            grid.vertices.push_back(v2);
+                            grid.indices.push_back(v1_index);
+                            grid.indices.push_back(index);
+                            index++;
+                        }
+                    }
+                }
+            }
+            return grid;
+        }
+    },
+    {
+        "blons:quad", [](const std::vector<std::string>& args)
+        {
+            if (args.size() != 1)
+            {
+                throw "Incorrect arguments supplied for blons:quad mesh (expected 1)";
+            }
+
             MeshData quad;
             quad.draw_mode = DrawMode::TRIANGLES;
 
-            const float width = static_cast<float>(atof(args.c_str()));
-            const float height = static_cast<float>(atof(args.c_str()));
+            const float width = static_cast<float>(atof(args[0].c_str()));
+            const float height = static_cast<float>(atof(args[0].c_str()));
 
             Vertex v;
             v.pos = Vector3(0.0, 0.0, 0.0);
@@ -72,15 +141,20 @@ std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_m
         }
     },
     {
-        "blons:sphere", [](const std::string& args)
+        "blons:sphere", [](const std::vector<std::string>& args)
         {
+            if (args.size() != 1)
+            {
+                throw "Incorrect arguments supplied for blons:quad mesh (expected 1)";
+            }
+
             MeshData sphere;
             sphere.draw_mode = DrawMode::TRIANGLES;
 
             const unsigned int count = 20;
             const unsigned int semi_count = count / 2 + 1;
             const unsigned int vert_count = count * semi_count;
-            const float radius = static_cast<float>(atof(args.c_str()));
+            const float radius = static_cast<float>(atof(args[0].c_str()));
             const float dist = (2 * kPi) / count;
 
             static_assert(count % 2 == 0, "Sphere vertex ring size must be an even number");
@@ -129,10 +203,10 @@ std::unordered_map<std::string, std::function<MeshData(const std::string&)>> g_m
         }
     }
 };
-std::unordered_map<std::string, std::function<PixelData(const std::string& args)>> g_texture_generators =
+std::unordered_map<std::string, std::function<PixelData(const std::vector<std::string>& args)>> g_texture_generators =
 {
     {
-        "blons:none", [](const std::string& args)
+        "blons:none", [](const std::vector<std::string>& args)
         {
             PixelData none;
             none.type.format = TextureType::R8G8B8;
@@ -156,7 +230,7 @@ std::unordered_map<std::string, std::function<PixelData(const std::string& args)
         }
     },
     {
-        "blons:normal", [](const std::string& args)
+        "blons:normal", [](const std::vector<std::string>& args)
         {
             PixelData normal;
             normal.type.format = TextureType::R8G8B8;
@@ -174,36 +248,51 @@ std::unordered_map<std::string, std::function<PixelData(const std::string& args)
     }
 };
 
+struct EngineAsset
+{
+    std::string func;
+    std::vector<std::string> args;
+};
+
+// Form EngineAsset based on func~arg,arg,arg syntax
+EngineAsset ParseEngineAsset(const std::string& name)
+{
+    EngineAsset asset;
+    auto split = name.find_first_of('~');
+    asset.func = name.substr(0, split);
+    while (split != std::string::npos)
+    {
+        auto start = split + 1;
+        split = name.find_first_of(',', start);
+        auto segment_length = split != std::string::npos ? split - start : split;
+        asset.args.push_back(name.substr(start, segment_length));
+    }
+    return asset;
+}
 } // namespace
 
 MeshData MakeEngineMesh(const std::string& name)
 {
-    auto split = name.find_first_of('~');
-    std::string func = name.substr(0, split);
-    std::string args = split != std::string::npos ? name.substr(split + 1) : "";
-    return g_mesh_generators.at(func)(args);
+    auto asset = ParseEngineAsset(name);
+    return g_mesh_generators.at(asset.func)(asset.args);
 }
 
 bool ValidEngineMesh(const std::string& name)
 {
-    auto split = name.find_first_of('~');
-    std::string func = name.substr(0, split);
-    return (g_mesh_generators.find(func) != g_mesh_generators.end());
+    auto asset = ParseEngineAsset(name);
+    return (g_mesh_generators.find(asset.func) != g_mesh_generators.end());
 }
 
 PixelData MakeEngineTexture(const std::string& name)
 {
-    auto split = name.find_first_of('~');
-    std::string func = name.substr(0, split);
-    std::string args = split != std::string::npos ? name.substr(split + 1) : "";
-    return g_texture_generators.at(func)(args);
+    auto asset = ParseEngineAsset(name);
+    return g_texture_generators.at(asset.func)(asset.args);
 }
 
 bool ValidEngineTexture(const std::string& name)
 {
-    auto split = name.find_first_of('~');
-    std::string func = name.substr(0, split);
-    return (g_texture_generators.find(func) != g_texture_generators.end());
+    auto asset = ParseEngineAsset(name);
+    return (g_texture_generators.find(asset.func) != g_texture_generators.end());
 }
 } // namespace internal
 } // namespace resource
