@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVOLUME_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVOLUME_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
@@ -32,16 +32,20 @@ namespace blons
 // Forward declarations
 class Framebuffer;
 class Shader;
+class Texture3D;
 
 namespace pipeline
 {
 namespace stage
 {
+// Forward declarations
+class LightProbes;
+
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Manages light probes used to calculate indirect illumination at
-/// runtime with the use of precomputed radiance transfer
+/// \brief Turns blons::pipeline::stage::LightProbe data into a volumetric grid
+/// of directional light for shading
 ////////////////////////////////////////////////////////////////////////////////
-class LightProbes
+class IrradianceVolume
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
@@ -49,36 +53,30 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        ENV_MAPS ///< Cached albedo environment maps
-    };
-
-    struct Probe
-    {
-        const int id;
-        Vector3 pos;
-        SHCoeffs3 sh_sky_visibility;
+        IRRADIANCE_VOLUME ///< 3D volume texture of indirect irradiance
     };
 
 public:
-    LightProbes();
-    ~LightProbes() {}
+    IrradianceVolume();
+    ~IrradianceVolume() {}
 
-    void BakeRadianceTransfer(const Scene& scene);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Injects supplied light probe data and fills volume grid
+    ///
+    /// \param probes Handle to lightprobe data
+    ////////////////////////////////////////////////////////////////////////////////
+    bool Render(const LightProbes& probes);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage
     ///
-    /// \param buffer Lighting::Output target to retrieve
+    /// \param buffer IrradianceVolume::Output target to retrieve
     /// \return Handle to the output target texture
     ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
 
-    const std::vector<Probe>& probes() const;
-
 private:
-    std::vector<Probe> probes_;
-    std::unique_ptr<Framebuffer> environment_maps_;
-    std::unique_ptr<Shader> environment_map_shader_;
+    std::unique_ptr<Texture3D> irradiance_volume_;
 };
 } // namespace stage
 } // namespace pipeline
@@ -86,7 +84,7 @@ private:
 
 /// \NEEDS_DOCUMENTATION
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::pipeline::stage::LightProbes
+/// \class blons::pipeline::stage::IrradianceVolume
 /// \ingroup pipeline
 ///
 /// ### Example:
@@ -94,4 +92,4 @@ private:
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVOLUME_H_

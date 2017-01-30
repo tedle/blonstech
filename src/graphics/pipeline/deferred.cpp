@@ -27,6 +27,7 @@
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
 #include <blons/graphics/pipeline/stage/debug/probeview.h>
 #include <blons/graphics/framebuffer.h>
@@ -34,6 +35,7 @@
 #include <blons/graphics/render/shader.h>
 #include <blons/graphics/render/shaderdata.h>
 #include <blons/graphics/sprite.h>
+#include <blons/graphics/texture3d.h>
 
 namespace blons
 {
@@ -62,6 +64,7 @@ bool Deferred::Init()
     geometry_.reset(new stage::Geometry(perspective_));
     shadow_.reset(new stage::Shadow(perspective_));
     light_probes_.reset(new stage::LightProbes());
+    irradiance_volume_.reset(new stage::IrradianceVolume());
     lighting_.reset(new stage::Lighting(perspective_));
 
     // Shaders
@@ -116,6 +119,11 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
     // Render all of the geometry and get their depth from the light's point of view
     // Then render a shadow map from the depth information
     if (!shadow_->Render(scene, *geometry_, view_matrix, proj_matrix_, light_vp_matrix, ortho_matrix_))
+    {
+        return false;
+    }
+
+    if (!irradiance_volume_->Render(*light_probes_))
     {
         return false;
     }

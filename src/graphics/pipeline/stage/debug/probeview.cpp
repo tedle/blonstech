@@ -61,10 +61,10 @@ ProbeView::ProbeView()
     // Will throw if already initialized (gfx:reload, etc)
     try
     {
-        console::RegisterVariable<int>("gfx:probe-debug", 0);
+        console::RegisterVariable<int>("dbg:probe-view", 0);
     }
     catch (...) {}
-    debug_mode_ = console::var("gfx:probe-debug");
+    debug_mode_ = console::var("dbg:probe-view");
 }
 
 bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
@@ -75,11 +75,13 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         return true;
     }
 
+    auto light_probes = probes.probes();
+
     // This info doesn't exist at initialization time, and in the future could
     // vary from frame to frame... (would likely need better optimizations then)
-    if (probe_shader_data_ == nullptr || probe_shader_data_->length() != probes.probes_.size())
+    if (probe_shader_data_ == nullptr || probe_shader_data_->length() != light_probes.size())
     {
-        probe_shader_data_.reset(new ShaderData<LightProbes::Probe>(nullptr, probes.probes_.size()));
+        probe_shader_data_.reset(new ShaderData<LightProbes::Probe>(nullptr, light_probes.size()));
     }
 
     auto context = render::context();
@@ -90,9 +92,9 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
     Matrix vp_matrix = view_matrix * proj_matrix;
     Matrix cube_face_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 10000.0f);
 
-    probe_shader_data_->set_value(probes.probes_.data());
+    probe_shader_data_->set_value(light_probes.data());
 
-    for (const auto& probe : probes.probes_)
+    for (const auto& probe : light_probes)
     {
         // Bind the vertex data
         probe_meshes_->Render(false);
@@ -101,10 +103,10 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         if (!probe_shader_->SetInput("mvp_matrix", MatrixTranslation(probe.pos.x, probe.pos.y, probe.pos.z) * vp_matrix) ||
             !probe_shader_->SetInput("env_proj_matrix", cube_face_projection) ||
             !probe_shader_->SetInput("env_tex_size", kProbeMapSize) ||
-            !probe_shader_->SetInput("probe_count", static_cast<int>(probes.probes_.size())) ||
+            !probe_shader_->SetInput("probe_count", static_cast<int>(light_probes.size())) ||
             !probe_shader_->SetInput("probe_id", static_cast<int>(probe.id)) ||
             !probe_shader_->SetInput("probe_buffer", probe_shader_data_->data()) ||
-            !probe_shader_->SetInput("probe_env_maps", probes.environment_maps_->textures()[0], 0) ||
+            !probe_shader_->SetInput("probe_env_maps", probes.output(LightProbes::ENV_MAPS), 0) ||
             !probe_shader_->SetInput("debug_mode", debug_mode))
         {
             return false;

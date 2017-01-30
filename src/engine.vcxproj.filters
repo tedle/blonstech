@@ -235,6 +235,9 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\probeview.h">
       <Filter>src\graphics\pipeline\stage\debug</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\irradiancevolume.h">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -392,6 +395,9 @@
     </ClCompile>
     <ClCompile Include="graphics\pipeline\stage\debug\probeview.cpp">
       <Filter>src\graphics\pipeline\stage\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\irradiancevolume.cpp">
+      <Filter>src\graphics\pipeline\stage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

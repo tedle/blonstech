@@ -42,7 +42,9 @@ namespace pipeline
 namespace stage { class Geometry; }
 namespace stage { class Shadow; }
 namespace stage { class LightProbes; }
+namespace stage { class IrradianceVolume; }
 namespace stage { class Lighting; }
+namespace stage { namespace debug { class ProbeView; } }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Provides an easy to use deferred rendering pipeline
@@ -135,7 +137,11 @@ private:
     std::unique_ptr<stage::Geometry> geometry_;
     std::unique_ptr<stage::Shadow> shadow_;
     std::unique_ptr<stage::LightProbes> light_probes_;
+    std::unique_ptr<stage::IrradianceVolume> irradiance_volume_;
     std::unique_ptr<stage::Lighting> lighting_;
+
+    // Debug stuff
+    std::unique_ptr<stage::debug::ProbeView> probe_debug_view_;
 
     std::unique_ptr<Shader> composite_shader_;
 };

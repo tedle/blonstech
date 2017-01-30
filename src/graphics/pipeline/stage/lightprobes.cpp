@@ -201,6 +201,11 @@ const TextureResource* LightProbes::output(Output buffer) const
         return nullptr;
     }
 }
+
+const std::vector<LightProbes::Probe>& LightProbes::probes() const
+{
+    return probes_;
+}
 } // namespace stage
 } // namespace pipeline
 } // namespace blons
