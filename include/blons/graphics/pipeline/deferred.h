@@ -26,27 +26,23 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/pipeline/stage/geometry.h>
+#include <blons/graphics/pipeline/stage/shadow.h>
+#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/irradiancevolume.h>
+#include <blons/graphics/pipeline/stage/lighting.h>
+#include <blons/graphics/pipeline/stage/composite.h>
+#include <blons/graphics/pipeline/stage/debug/debugoutput.h>
+#include <blons/graphics/pipeline/stage/debug/probeview.h>
+#include <blons/graphics/framebuffer.h>
+#include <blons/graphics/sprite.h>
+#include <blons/graphics/render/shader.h>
 #include <blons/system/client.h>
 
 namespace blons
 {
-// Forward declarations
-class DrawBatcher;
-class Framebuffer;
-class Shader;
-class Sprite;
-
 namespace pipeline
 {
-// Forward declarations
-namespace stage { class Geometry; }
-namespace stage { class Shadow; }
-namespace stage { class LightProbes; }
-namespace stage { class IrradianceVolume; }
-namespace stage { class Lighting; }
-namespace stage { class Composite; }
-namespace stage { namespace debug { class DebugOutput; } }
-
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Provides an easy to use deferred rendering pipeline
 ////////////////////////////////////////////////////////////////////////////////

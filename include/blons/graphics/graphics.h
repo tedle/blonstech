@@ -54,7 +54,6 @@ const units::world kScreenNear = 0.1f;
 
 // Forward declarations
 class Light;
-class Shader;
 namespace gui { class Manager; }
 
 // TODO: Custom shader pipelines like

@@ -26,13 +26,11 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/framebuffer.h>
+#include <blons/graphics/render/shader.h>
 
 namespace blons
 {
-// Forward declarations
-class Framebuffer;
-class Shader;
-
 namespace pipeline
 {
 namespace stage

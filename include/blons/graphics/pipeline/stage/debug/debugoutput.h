@@ -27,21 +27,17 @@
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/debug/probeview.h>
+#include <blons/graphics/framebuffer.h>
 
 namespace blons
 {
-// Forward declarations
-class Framebuffer;
-
 namespace pipeline
 {
 namespace stage
 {
 namespace debug
 {
-// Forward declarations
-class ProbeView;
-
 class DebugOutput
 {
 public:

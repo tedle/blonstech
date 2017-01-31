@@ -26,20 +26,16 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/pipeline/stage/geometry.h>
+#include <blons/graphics/framebuffer.h>
+#include <blons/graphics/render/shader.h>
 
 namespace blons
 {
-// Forward declarations
-class Framebuffer;
-class Shader;
-
 namespace pipeline
 {
 namespace stage
 {
-// Forward declarations
-class Geometry;
-
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Calculates cascading shadow maps and applys them to a scene
 ////////////////////////////////////////////////////////////////////////////////

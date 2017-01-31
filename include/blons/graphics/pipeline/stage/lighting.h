@@ -26,21 +26,15 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/pipeline/stage/geometry.h>
+#include <blons/graphics/pipeline/stage/shadow.h>
 
 namespace blons
 {
-// Forward declarations
-class Framebuffer;
-class Shader;
-
 namespace pipeline
 {
 namespace stage
 {
-// Forward declarations
-class Geometry;
-class Shadow;
-
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Composites lighting information from previous passes and adds
 /// specular

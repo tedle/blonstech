@@ -26,21 +26,15 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/texture3d.h>
 
 namespace blons
 {
-// Forward declarations
-class Framebuffer;
-class Shader;
-class Texture3D;
-
 namespace pipeline
 {
 namespace stage
 {
-// Forward declarations
-class LightProbes;
-
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Turns blons::pipeline::stage::LightProbe data into a volumetric grid
 /// of directional light for shading
