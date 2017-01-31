@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUGOUTPUT_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUGOUTPUT_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
@@ -31,11 +31,7 @@
 namespace blons
 {
 // Forward declarations
-class DrawBatcher;
 class Framebuffer;
-class Shader;
-template <typename T>
-class ShaderData;
 
 namespace pipeline
 {
@@ -43,23 +39,32 @@ namespace stage
 {
 namespace debug
 {
-class ProbeView
+// Forward declarations
+class ProbeView;
+
+class DebugOutput
 {
 public:
-    ProbeView();
-    ~ProbeView() {}
+    enum Output
+    {
+        DEBUG
+    };
 
-    bool Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix);
+public:
+    DebugOutput(Perspective perspective);
+    ~DebugOutput() {}
+
+    bool Render(const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix);
+
+    const TextureResource* output(Output buffer) const;
 
 private:
-    std::unique_ptr<DrawBatcher> probe_meshes_;
-    std::unique_ptr<Shader> probe_shader_;
-    std::unique_ptr<ShaderData<LightProbes::Probe>> probe_shader_data_;
-    const console::Variable* debug_mode_;
+    std::unique_ptr<Framebuffer> debug_output_buffer_;
+    std::unique_ptr<ProbeView> probeview_;
 };
 } // namespace debug
 } // namespace stage
 } // namespace pipeline
 } // namespace blons
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUGOUTPUT_H_

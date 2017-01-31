@@ -21,45 +21,47 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+#include <blons/graphics/pipeline/stage/debug/debugoutput.h>
 
 // Public Includes
-#include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/framebuffer.h>
+#include <blons/graphics/render/drawbatcher.h>
+#include <blons/graphics/render/shader.h>
+#include <blons/graphics/render/shaderdata.h>
+#include <blons/graphics/pipeline/stage/debug/probeview.h>
 
 namespace blons
 {
-// Forward declarations
-class DrawBatcher;
-class Framebuffer;
-class Shader;
-template <typename T>
-class ShaderData;
-
 namespace pipeline
 {
 namespace stage
 {
 namespace debug
 {
-class ProbeView
+DebugOutput::DebugOutput(Perspective perspective)
 {
-public:
-    ProbeView();
-    ~ProbeView() {}
+    debug_output_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }));
+    probeview_.reset(new ProbeView());
+}
 
-    bool Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix);
+bool DebugOutput::Render(const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix)
+{
+    debug_output_buffer_->Bind(Vector4(0, 0, 0, 0));
+    return probeview_->Render(debug_output_buffer_.get(), depth, probes, view_matrix, proj_matrix);
+}
 
-private:
-    std::unique_ptr<DrawBatcher> probe_meshes_;
-    std::unique_ptr<Shader> probe_shader_;
-    std::unique_ptr<ShaderData<LightProbes::Probe>> probe_shader_data_;
-    const console::Variable* debug_mode_;
-};
+const TextureResource* DebugOutput::output(Output buffer) const
+{
+    switch (buffer)
+    {
+    case Output::DEBUG:
+        return debug_output_buffer_->textures()[0];
+        break;
+    default:
+        return nullptr;
+    }
+}
 } // namespace debug
 } // namespace stage
 } // namespace pipeline
 } // namespace blons
-
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_

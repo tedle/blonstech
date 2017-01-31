@@ -188,6 +188,9 @@ void SetRenderingOutput(blons::Graphics* graphics)
         case 7:
             return blons::pipeline::Deferred::PROBE_ENV_MAPS;
             break;
+        case 8:
+            return blons::pipeline::Deferred::LIGHT;
+            break;
         case 0:
         default:
             return blons::pipeline::Deferred::FINAL;

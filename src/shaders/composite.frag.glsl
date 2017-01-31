@@ -21,45 +21,22 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+#version 430
 
-// Public Includes
-#include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
+// Ins n outs
+in vec2 tex_coord;
 
-namespace blons
+out vec4 frag_colour;
+
+// Globals
+uniform sampler2D scene;
+uniform sampler2D debug_output;
+
+void main(void)
 {
-// Forward declarations
-class DrawBatcher;
-class Framebuffer;
-class Shader;
-template <typename T>
-class ShaderData;
+    vec4 scene_colour = texture(scene, tex_coord);
+    vec4 debug_output_colour = texture(debug_output, tex_coord);
 
-namespace pipeline
-{
-namespace stage
-{
-namespace debug
-{
-class ProbeView
-{
-public:
-    ProbeView();
-    ~ProbeView() {}
-
-    bool Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix);
-
-private:
-    std::unique_ptr<DrawBatcher> probe_meshes_;
-    std::unique_ptr<Shader> probe_shader_;
-    std::unique_ptr<ShaderData<LightProbes::Probe>> probe_shader_data_;
-    const console::Variable* debug_mode_;
-};
-} // namespace debug
-} // namespace stage
-} // namespace pipeline
-} // namespace blons
-
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+    // Final composite
+    frag_colour = vec4(mix(scene_colour.rgb, debug_output_colour.rgb, debug_output_colour.a), 1.0f);
+}

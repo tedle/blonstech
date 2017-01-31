@@ -24,18 +24,7 @@
 #include <blons/graphics/pipeline/deferred.h>
 
 // Public Includes
-#include <blons/graphics/pipeline/stage/geometry.h>
-#include <blons/graphics/pipeline/stage/shadow.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
-#include <blons/graphics/pipeline/stage/irradiancevolume.h>
-#include <blons/graphics/pipeline/stage/lighting.h>
-#include <blons/graphics/pipeline/stage/debug/probeview.h>
-#include <blons/graphics/framebuffer.h>
-#include <blons/graphics/render/drawbatcher.h>
-#include <blons/graphics/render/shader.h>
-#include <blons/graphics/render/shaderdata.h>
-#include <blons/graphics/sprite.h>
-#include <blons/graphics/texture3d.h>
+#include <blons/graphics/pipeline/pipeline.h>
 
 namespace blons
 {
@@ -66,14 +55,16 @@ bool Deferred::Init()
     light_probes_.reset(new stage::LightProbes());
     irradiance_volume_.reset(new stage::IrradianceVolume());
     lighting_.reset(new stage::Lighting(perspective_));
+    debug_output_.reset(new stage::debug::DebugOutput(perspective_));
+    composite_.reset(new stage::Composite(perspective_));
 
     // Shaders
-    ShaderAttributeList composite_inputs;
-    composite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    composite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", composite_inputs));
+    ShaderAttributeList output_inputs; // dont worry about it
+    output_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    output_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    output_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", output_inputs));
 
-    if (composite_shader_ == nullptr)
+    if (output_shader_ == nullptr)
     {
         return false;
     }
@@ -128,7 +119,17 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!lighting_->Render(scene, *geometry_, *shadow_, *light_probes_, view_matrix, proj_matrix_, ortho_matrix_))
+    if (!lighting_->Render(scene, *geometry_, *shadow_, view_matrix, proj_matrix_, ortho_matrix_))
+    {
+        return false;
+    }
+
+    if (!debug_output_->Render(geometry_->output(stage::Geometry::DEPTH), *light_probes_, view_matrix, proj_matrix_))
+    {
+        return false;
+    }
+
+    if (!composite_->Render(lighting_->output(stage::Lighting::LIGHT), debug_output_->output(stage::debug::DebugOutput::DEBUG), ortho_matrix_))
     {
         return false;
     }
@@ -144,7 +145,7 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
     }
 
     // Render the final composite of the geometry and lighting passes
-    if (!RenderComposite(scene))
+    if (!RenderOutput())
     {
         return false;
     }
@@ -163,7 +164,7 @@ void Deferred::BakeRadianceTransfer(const Scene& scene)
     light_probes_->BakeRadianceTransfer(scene);
 }
 
-bool Deferred::RenderComposite(const Scene& scene)
+bool Deferred::RenderOutput()
 {
     output_sprite_->set_pos(0, 0, perspective_.width, perspective_.height);
     output_sprite_->set_subtexture(0, 16, 16, -16);
@@ -196,12 +197,15 @@ bool Deferred::RenderComposite(const Scene& scene)
             output_sprite->set_pos(output_sprite->pos().x, output_sprite->pos().y, output_sprite->dimensions().x / 8.0f, output_sprite->dimensions().y);
             return light_probes_->output(stage::LightProbes::ENV_MAPS);
             break;
+        case LIGHT:
+            return lighting_->output(stage::Lighting::LIGHT);
+            break;
         case NONE:
             return nullptr;
             break;
         case FINAL:
         default:
-            return lighting_->output(stage::Lighting::LIGHT);
+            return composite_->output(stage::Composite::FINAL);
             break;
         }
     };
@@ -216,13 +220,13 @@ bool Deferred::RenderComposite(const Scene& scene)
         output_sprite_->Render();
 
         // Set the inputs
-        if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_) ||
-            !composite_shader_->SetInput("sprite", texture))
+        if (!output_shader_->SetInput("proj_matrix", ortho_matrix_) ||
+            !output_shader_->SetInput("sprite", texture))
         {
             return false;
         }
 
-        if (!composite_shader_->Render(output_sprite_->index_count()))
+        if (!output_shader_->Render(output_sprite_->index_count()))
         {
             return false;
         }
@@ -235,13 +239,13 @@ bool Deferred::RenderComposite(const Scene& scene)
         alt_output_sprite_->Render();
 
         // Set the inputs
-        if (!composite_shader_->SetInput("proj_matrix", ortho_matrix_) ||
-            !composite_shader_->SetInput("sprite", texture))
+        if (!output_shader_->SetInput("proj_matrix", ortho_matrix_) ||
+            !output_shader_->SetInput("sprite", texture))
         {
             return false;
         }
 
-        if (!composite_shader_->Render(alt_output_sprite_->index_count()))
+        if (!output_shader_->Render(alt_output_sprite_->index_count()))
         {
             return false;
         }

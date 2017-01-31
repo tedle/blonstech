@@ -238,6 +238,12 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\irradiancevolume.h">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\debugoutput.h">
+      <Filter>src\graphics\pipeline\stage\debug</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\composite.h">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -399,6 +405,12 @@
     <ClCompile Include="graphics\pipeline\stage\irradiancevolume.cpp">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\debug\debugoutput.cpp">
+      <Filter>src\graphics\pipeline\stage\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\composite.cpp">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\mesh.frag.glsl">
@@ -450,6 +462,9 @@
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\sh-math.lib.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\composite.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>

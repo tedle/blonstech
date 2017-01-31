@@ -67,7 +67,7 @@ ProbeView::ProbeView()
     debug_mode_ = console::var("dbg:probe-view");
 }
 
-bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
+bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix)
 {
     auto debug_mode = debug_mode_->to<int>();
     if (!debug_mode)

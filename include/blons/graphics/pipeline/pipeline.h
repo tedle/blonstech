@@ -25,12 +25,22 @@
 #define BLONSTECH_GRAPHICS_PIPELINE_PIPELINE_H_
 
 // Public Includes
+#include <blons/graphics/framebuffer.h>
+#include <blons/graphics/render/drawbatcher.h>
+#include <blons/graphics/render/shader.h>
+#include <blons/graphics/render/shaderdata.h>
+#include <blons/graphics/sprite.h>
+#include <blons/graphics/texture3d.h>
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/pipeline/deferred.h>
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
+#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
+#include <blons/graphics/pipeline/stage/debug/debugoutput.h>
 #include <blons/graphics/pipeline/stage/debug/probeview.h>
-#include <blons/graphics/pipeline/deferred.h>
+#include <blons/graphics/pipeline/stage/composite.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \defgroup pipeline Pipeline

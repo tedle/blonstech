@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_COMPOSITE_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_COMPOSITE_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
@@ -37,15 +37,11 @@ namespace pipeline
 {
 namespace stage
 {
-// Forward declarations
-class Geometry;
-class Shadow;
-
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Composites lighting information from previous passes and adds
 /// specular
 ////////////////////////////////////////////////////////////////////////////////
-class Lighting
+class Composite
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
@@ -53,44 +49,38 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        LIGHT ///< Composited lighting information applied to the scene
+        FINAL ///< Final composite of all shading passes
     };
 
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes a new Lighting stage
+    /// \brief Initializes a new Composite stage
     ///
     /// \param perspective Screen dimensions and perspective information
     ////////////////////////////////////////////////////////////////////////////////
-    Lighting(Perspective perspective);
-    ~Lighting() {}
+    Composite(Perspective perspective);
+    ~Composite() {}
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Renders out the composited lighting targets
+    /// \brief Renders out the composited shading targets
     ///
-    /// \param scene Contains scene information for rendering
-    /// \param geometry Handle to the geometry buffer pass performed earlier in the
-    /// frame
-    /// \param shadow Handle to the shadow buffer pass performed earlier in the
-    /// frame
-    /// \param view_matrix View matrix of the camera rendering the scene
-    /// \param proj_matrix Perspective matrix for rendering the scene
+    /// \param scene Contains texture of rendered and shaded scene
+    /// \param debug_output Any debug information to be overlayed onto scene
     /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
-                Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
+    bool Render(const TextureResource* scene, const TextureResource* debug_output, Matrix ortho_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage
     ///
-    /// \param buffer Lighting::Output target to retrieve
+    /// \param buffer Composite::Output target to retrieve
     /// \return Handle to the output target texture
     ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
 
 private:
-    std::unique_ptr<Shader> light_shader_;
-    std::unique_ptr<Framebuffer> light_buffer_;
+    std::unique_ptr<Shader> composite_shader_;
+    std::unique_ptr<Framebuffer> composite_buffer_;
 };
 } // namespace stage
 } // namespace pipeline
@@ -98,7 +88,7 @@ private:
 
 /// \NEEDS_DOCUMENTATION
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::pipeline::stage::Lighting
+/// \class blons::pipeline::stage::Composite
 /// \ingroup pipeline
 /// 
 /// ### Example:
@@ -106,4 +96,4 @@ private:
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_COMPOSITE_H_

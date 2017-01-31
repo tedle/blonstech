@@ -44,7 +44,8 @@ namespace stage { class Shadow; }
 namespace stage { class LightProbes; }
 namespace stage { class IrradianceVolume; }
 namespace stage { class Lighting; }
-namespace stage { namespace debug { class ProbeView; } }
+namespace stage { class Composite; }
+namespace stage { namespace debug { class DebugOutput; } }
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Provides an easy to use deferred rendering pipeline
@@ -66,6 +67,7 @@ public:
         LIGHT_DEPTH,             ///< Depth buffer from the light's point of view
         DIRECT_LIGHT,            ///< Direct lighting pass
         PROBE_ENV_MAPS,
+        LIGHT,
         NONE                     ///< Results in nullptr
     };
 
@@ -125,7 +127,7 @@ public:
 
 private:
     bool Init();
-    bool RenderComposite(const Scene& scene);
+    bool RenderOutput();
 
     Output output_, alt_output_;
     std::unique_ptr<Sprite> output_sprite_, alt_output_sprite_;
@@ -139,11 +141,12 @@ private:
     std::unique_ptr<stage::LightProbes> light_probes_;
     std::unique_ptr<stage::IrradianceVolume> irradiance_volume_;
     std::unique_ptr<stage::Lighting> lighting_;
+    std::unique_ptr<stage::Composite> composite_;
 
     // Debug stuff
-    std::unique_ptr<stage::debug::ProbeView> probe_debug_view_;
+    std::unique_ptr<stage::debug::DebugOutput> debug_output_;
 
-    std::unique_ptr<Shader> composite_shader_;
+    std::unique_ptr<Shader> output_shader_;
 };
 } // namespace pipeline
 } // namespace blons

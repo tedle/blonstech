@@ -26,8 +26,6 @@
 // Public Includes
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
-#include <blons/graphics/pipeline/stage/debug/probeview.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
@@ -54,11 +52,9 @@ Lighting::Lighting(Perspective perspective)
 
     // Framebuffers
     light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false));
-
-    probe_debug_view_.reset(new debug::ProbeView());
 }
 
-bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const LightProbes& probes,
+bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
                       Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
     auto context = render::context();
@@ -90,13 +86,6 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
 
     // Finally do the render
     if (!light_shader_->Render(light_buffer_->index_count()))
-    {
-        return false;
-    }
-
-    // TODO: Replace true with actual debug mode config option/compile time var
-    // Debug view of SH probes
-    if (true && !probe_debug_view_->Render(light_buffer_.get(), geometry.output(stage::Geometry::DEPTH), probes, view_matrix, proj_matrix, ortho_matrix))
     {
         return false;
     }
