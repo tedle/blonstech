@@ -386,6 +386,16 @@ Matrix MatrixPerspective(float fov, float screen_aspect,
                          units::world screen_near, units::world screen_depth);
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
+/// \brief Generates a new matrix scaled by the supplied values
+///
+/// \param x X-axis scaling
+/// \param y Y-axis scaling
+/// \param z Z-axis scaling
+/// \return Scaled matrix
+////////////////////////////////////////////////////////////////////////////////
+Matrix MatrixScale(units::world x, units::world y, units::world z);
+////////////////////////////////////////////////////////////////////////////////
+/// \ingroup math
 /// \brief Generates a new matrix located at the supplied coordinates
 ///
 /// \param x X coordinate of the new matrix

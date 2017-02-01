@@ -240,6 +240,16 @@ Matrix MatrixPerspective(float fov, float screen_aspect,
     return proj_matrix;
 }
 
+Matrix MatrixScale(units::world x, units::world y, units::world z)
+{
+    Matrix scale;
+    scale.m[0][0] = x;
+    scale.m[1][1] = y;
+    scale.m[2][2] = z;
+    scale.m[3][3] = 1.0f;
+    return scale;
+}
+
 Matrix MatrixTranslation(units::world x, units::world y, units::world z)
 {
     Matrix trans;
