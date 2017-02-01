@@ -580,10 +580,10 @@ struct Vertex
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Makes vertices sortable allowing for efficient std::map lookups
     ///
-    /// Uses sizeof(float) * 8 to avoid comparing tangent and bitangent in a very
+    /// Uses sizeof(units::world) * 10 to avoid comparing tangent and bitangent in a very
     /// hacky, but simple way. This will probably turn into a super nasty bug later.
     ////////////////////////////////////////////////////////////////////////////////
-    bool operator< (const Vertex vert) const { return memcmp(this, &vert, sizeof(float) * 10) > 0; }
+    bool operator< (const Vertex vert) const { return memcmp(this, &vert, sizeof(units::world) * 10) > 0; }
 };
 
 ////////////////////////////////////////////////////////////////////////////////

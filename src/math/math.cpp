@@ -218,8 +218,8 @@ Matrix MatrixLookAt(Vector3 pos, Vector3 look, Vector3 up)
     return view_matrix;
 }
 
-Matrix MatrixOrthographic(float left, float right, float bottom, float top,
-                          float screen_near, float screen_depth)
+Matrix MatrixOrthographic(units::world left, units::world right, units::world bottom, units::world top,
+                          units::world screen_near, units::world screen_depth)
 {
     Matrix ortho_matrix;
     XMFLOAT4X4 xm;
@@ -230,7 +230,7 @@ Matrix MatrixOrthographic(float left, float right, float bottom, float top,
 }
 
 Matrix MatrixPerspective(float fov, float screen_aspect,
-                         float screen_near, float screen_depth)
+                         units::world screen_near, units::world screen_depth)
 {
     Matrix proj_matrix;
     XMFLOAT4X4 xm;
@@ -240,7 +240,7 @@ Matrix MatrixPerspective(float fov, float screen_aspect,
     return proj_matrix;
 }
 
-Matrix MatrixTranslation(float x, float y, float z)
+Matrix MatrixTranslation(units::world x, units::world y, units::world z)
 {
     Matrix trans;
     XMFLOAT4X4 xmt;
