@@ -175,11 +175,12 @@ Vector4 Matrix::operator* (const Vector4& vec) const
 ////////////////////////////////////////////////////////////////////////////////
 Matrix MatrixIdentity()
 {
-    XMFLOAT4X4 id;
-    Matrix mid;
-    XMStoreFloat4x4(&id, XMMatrixIdentity());
-    mid = id;
-    return mid;
+    Matrix id;
+    id.m[0][0] = 1.0f;
+    id.m[1][1] = 1.0f;
+    id.m[2][2] = 1.0f;
+    id.m[3][3] = 1.0f;
+    return id;
 }
 
 Matrix MatrixInverse(Matrix mat)
