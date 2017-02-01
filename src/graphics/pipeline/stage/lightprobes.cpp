@@ -157,8 +157,8 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
                 for (int y = 0; y < kProbeMapSize; y++)
                 {
                     Vector2 uv;
-                    uv.x = static_cast<units::world>(x) / static_cast<units::world>(kProbeMapSize) * 2.0f - 1.0f;
-                    uv.y = static_cast<units::world>(y) / static_cast<units::world>(kProbeMapSize) * 2.0f - 1.0f;
+                    uv.x = (static_cast<units::world>(x) + 0.5f) / static_cast<units::world>(kProbeMapSize) * 2.0f - 1.0f;
+                    uv.y = (static_cast<units::world>(y) + 0.5f) / static_cast<units::world>(kProbeMapSize) * 2.0f - 1.0f;
 
                     Vector3 normal;
                     normal.x = uv.x;
