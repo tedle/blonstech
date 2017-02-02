@@ -133,7 +133,7 @@ private:
 void __registerfunction(const std::string& name, Function* func);
 
 // Registers a variable the console
-void __registervariable(const std::string& name, const Variable& var);
+const Variable* __registervariable(const std::string& name, const Variable& var);
 
 // Retrieves a variable from the console
 const Variable* __var(const std::string& name);

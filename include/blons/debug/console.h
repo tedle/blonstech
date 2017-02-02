@@ -181,12 +181,13 @@ inline void RegisterFunction(const std::string& name, Lambda func)
 ///
 /// \param name Name of the variable
 /// \param value Value of the variable
+/// \return Pointer to the newly created variable
 ////////////////////////////////////////////////////////////////////////////////
 template <typename T>
-inline void RegisterVariable(const std::string& name, T value)
+inline const Variable* RegisterVariable(const std::string& name, T value)
 {
     Variable v(value);
-    internal::__registervariable(name, v);
+    return internal::__registervariable(name, v);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
