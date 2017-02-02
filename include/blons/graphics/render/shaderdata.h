@@ -132,7 +132,7 @@ protected:
 /// for (int i = 0; i < array_data.length(); i++)
 /// {
 ///     auto v = transformed_array[i];
-///     blons::console::out("x:%.2f y:%.2f z:%.2f w:%.2f\n", v.x, v.y, v.z, v.w);
+///     blons::log::Debug("x:%.2f y:%.2f z:%.2f w:%.2f\n", v.x, v.y, v.z, v.w);
 /// }
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
