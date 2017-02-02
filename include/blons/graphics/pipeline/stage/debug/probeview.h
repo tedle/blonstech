@@ -51,7 +51,6 @@ private:
     std::unique_ptr<DrawBatcher> probe_meshes_;
     std::unique_ptr<Shader> probe_shader_;
     std::unique_ptr<ShaderData<LightProbes::Probe>> probe_shader_data_;
-    const console::Variable* debug_mode_;
 };
 } // namespace debug
 } // namespace stage

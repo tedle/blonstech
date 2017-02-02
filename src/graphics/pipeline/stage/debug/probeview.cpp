@@ -38,6 +38,11 @@ namespace stage
 {
 namespace debug
 {
+namespace
+{
+auto const cvar_debug_mode = console::RegisterVariable("dbg:probe-view", 0);
+} // namespace
+
 ProbeView::ProbeView()
 {
     // Shaders
@@ -57,19 +62,11 @@ ProbeView::ProbeView()
     std::unique_ptr<Mesh> probe_mesh(new Mesh("blons:sphere~0.5"));
     MeshData probe_mesh_data = probe_mesh->mesh();
     probe_meshes_->Append(probe_mesh_data);
-
-    // Will throw if already initialized (gfx:reload, etc)
-    try
-    {
-        console::RegisterVariable<int>("dbg:probe-view", 0);
-    }
-    catch (...) {}
-    debug_mode_ = console::var("dbg:probe-view");
 }
 
 bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix)
 {
-    auto debug_mode = debug_mode_->to<int>();
+    auto debug_mode = cvar_debug_mode->to<int>();
     if (!debug_mode)
     {
         return true;
