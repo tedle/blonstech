@@ -39,14 +39,30 @@ namespace
 {
 using FunctionList = std::vector<std::unique_ptr<Function>>;
 
+// We use a singleton because it's important that console variables
+// can be registered at initialization time and ensuring this global
+// is initialized before any other calls is hard otherwise
 struct ConsoleState
 {
+public:
     // Stored as a vector to allow function overloading
     std::unordered_map<std::string, FunctionList> functions;
     std::unordered_map<std::string, Variable> variables;
     std::vector<PrintCallback> print_callbacks;
     std::vector<std::string> history;
-} g_state;
+
+private:
+    friend ConsoleState& g_state();
+    ConsoleState() {}
+    ConsoleState(ConsoleState&) = delete;
+    void operator=(ConsoleState&) = delete;
+};
+
+inline ConsoleState& g_state()
+{
+    static ConsoleState state;
+    return state;
+}
 
 const std::string kErrorPrefix = "* $E33";
 const std::string kUserPrefix = "~ $CCE";
@@ -86,13 +102,13 @@ void PrintUsage(const std::string& func_name, const FunctionList& func_list)
 // into the library.
 void internal::__registerfunction(const std::string& name, Function* func)
 {
-    if (g_state.variables.find(name) != g_state.variables.end())
+    if (g_state().variables.find(name) != g_state().variables.end())
     {
         throw "Variable already exists with this name";
     }
 
     const auto arg_list = func->ArgList();
-    auto& func_list = g_state.functions[name];
+    auto& func_list = g_state().functions[name];
     // Check if there's already a function with this name and argument list
     for (auto& f : func_list)
     {
@@ -109,11 +125,11 @@ void internal::__registerfunction(const std::string& name, Function* func)
 // into the library.
 const Variable* internal::__registervariable(const std::string& name, const Variable& variable)
 {
-    if (g_state.variables.find(name) != g_state.variables.end())
+    if (g_state().variables.find(name) != g_state().variables.end())
     {
         throw "Variable already defined";
     }
-    if (g_state.functions.find(name) != g_state.functions.end())
+    if (g_state().functions.find(name) != g_state().functions.end())
     {
         throw "Function already exists with this name";
     }
@@ -144,14 +160,14 @@ const Variable* internal::__registervariable(const std::string& name, const Vari
         break;
     }
 
-    g_state.variables[name] = variable;
+    g_state().variables[name] = variable;
     return internal::__var(name);
 }
 
 const Variable* internal::__var(const std::string& name)
 {
-    auto v = g_state.variables.find(name);
-    if (v != g_state.variables.end())
+    auto v = g_state().variables.find(name);
+    if (v != g_state().variables.end())
     {
         return &v->second;
     }
@@ -163,8 +179,8 @@ const Variable* internal::__var(const std::string& name)
 
 void internal::__set_var(const std::string& name, const Variable& value)
 {
-    auto v = g_state.variables.find(name);
-    if (v != g_state.variables.end())
+    auto v = g_state().variables.find(name);
+    if (v != g_state().variables.end())
     {
         if (v->second.type() == value.type())
         {
@@ -188,7 +204,7 @@ void in(const std::string& command)
     {
         return;
     }
-    g_state.history.push_back(command);
+    g_state().history.push_back(command);
 
     std::vector<Variable> args;
     try
@@ -208,8 +224,8 @@ void in(const std::string& command)
     }
 
     auto func_name = args[0].to<std::string>();
-    auto func_list = g_state.functions.find(func_name);
-    if (func_list == g_state.functions.end())
+    auto func_list = g_state().functions.find(func_name);
+    if (func_list == g_state().functions.end())
     {
         out(kErrorPrefix + "Unknown function \"%s\"\n", func_name.c_str());
         return;
@@ -261,7 +277,7 @@ void out(const std::string fmt, ...)
     va_end(args);
 
     // Send formatted text to every registered print callback
-    for (const auto& output : g_state.print_callbacks)
+    for (const auto& output : g_state().print_callbacks)
     {
         output(formatted_out);
     }
@@ -270,7 +286,7 @@ void out(const std::string fmt, ...)
 const std::vector<std::string> functions()
 {
     std::vector<std::string> func_list;
-    for (const auto& func_name : g_state.functions)
+    for (const auto& func_name : g_state().functions)
     {
         func_list.push_back(func_name.first);
     }
@@ -279,12 +295,12 @@ const std::vector<std::string> functions()
 
 const std::vector<std::string>& history()
 {
-    return g_state.history;
+    return g_state().history;
 }
 
 void RegisterPrintCallback(PrintCallback callback)
 {
-    g_state.print_callbacks.push_back(callback);
+    g_state().print_callbacks.push_back(callback);
 }
 } // namespace console
 } // namespace blons
