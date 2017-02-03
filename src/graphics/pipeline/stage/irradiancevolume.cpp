@@ -36,21 +36,21 @@ namespace stage
 {
 IrradianceVolume::IrradianceVolume()
 {
+    // Dummy volume built to wrap sponza in almost properly formed cubes
     PixelData3D dummy_volume;
-    units::pixel dims = 8;
-    dummy_volume.width = dims;
-    dummy_volume.height = dims;
-    dummy_volume.depth = dims;
-    dummy_volume.type = TextureType(TextureType::R8G8B8);
+    dummy_volume.width = 32;
+    dummy_volume.height = 16;
+    dummy_volume.depth = 16;
+    dummy_volume.type = TextureType(TextureType::R8G8B8, TextureType::NEAREST);
     auto pixel_size = dummy_volume.bits_per_pixel() / 8;
-    dummy_volume.pixels.reset(new unsigned char[dims * dims * dims * pixel_size]);
-    for (int z = 0; z < dims; z++)
+    dummy_volume.pixels.reset(new unsigned char[dummy_volume.width * dummy_volume.height * dummy_volume.depth * pixel_size]);
+    for (int z = 0; z < dummy_volume.depth; z++)
     {
-        for (int y = 0; y < dims; y++)
+        for (int y = 0; y < dummy_volume.height; y++)
         {
-            for (int x = 0; x < dims; x++)
+            for (int x = 0; x < dummy_volume.width; x++)
             {
-                auto index = (z * dims * dims + y * dims + x) * pixel_size;
+                auto index = (z * dummy_volume.width * dummy_volume.height + y * dummy_volume.width + x) * pixel_size;
                 // green channel only
                 dummy_volume.pixels.get()[index+0] = 1;
                 dummy_volume.pixels.get()[index+1] = 255;
@@ -59,6 +59,15 @@ IrradianceVolume::IrradianceVolume()
         }
     }
     irradiance_volume_.reset(new Texture3D(dummy_volume));
+
+    // World matrix sized to wrap sponza scene
+    static const units::world grid_width = 38.0f;
+    static const units::world grid_height = 19.0f;
+    static const units::world grid_depth = 18.0f;
+    static const units::world x_offset = -grid_width / 2.0f;
+    static const units::world y_offset = -2.0f;
+    static const units::world z_offset = -grid_depth / 2.0f;
+    world_matrix_ = MatrixScale(grid_width, grid_height, grid_depth) * MatrixTranslation(x_offset, y_offset, z_offset);
 }
 
 bool IrradianceVolume::Render(const LightProbes& probes)
@@ -69,6 +78,11 @@ bool IrradianceVolume::Render(const LightProbes& probes)
 const TextureResource* IrradianceVolume::output(Output buffer) const
 {
     return irradiance_volume_->texture();
+}
+
+Matrix IrradianceVolume::world_matrix() const
+{
+    return world_matrix_;
 }
 } // namespace stage
 } // namespace pipeline

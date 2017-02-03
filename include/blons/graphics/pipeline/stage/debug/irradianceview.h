@@ -21,16 +21,15 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVIEW_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVIEW_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
-#include <blons/graphics/render/shaderdata.h>
 
 namespace blons
 {
@@ -40,22 +39,23 @@ namespace stage
 {
 namespace debug
 {
-class ProbeView
+class IrradianceView
 {
 public:
-    ProbeView();
-    ~ProbeView() {}
+    IrradianceView(const IrradianceVolume& irradiance);
+    ~IrradianceView() {}
 
-    bool Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix);
+    bool Render(Framebuffer* target, const TextureResource* depth, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
 
 private:
-    std::unique_ptr<DrawBatcher> probe_meshes_;
-    std::unique_ptr<Shader> probe_shader_;
-    std::unique_ptr<ShaderData<LightProbes::Probe>> probe_shader_data_;
+    std::unique_ptr<DrawBatcher> grid_mesh_;
+    std::unique_ptr<DrawBatcher> voxel_meshes_;
+    std::unique_ptr<Shader> grid_shader_;
+    std::unique_ptr<Shader> volume_shader_;
 };
 } // namespace debug
 } // namespace stage
 } // namespace pipeline
 } // namespace blons
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVIEW_H_

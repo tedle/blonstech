@@ -68,9 +68,11 @@ public:
     /// \return Handle to the output target texture
     ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
+    Matrix world_matrix() const;
 
 private:
     std::unique_ptr<Texture3D> irradiance_volume_;
+    Matrix world_matrix_;
 };
 } // namespace stage
 } // namespace pipeline

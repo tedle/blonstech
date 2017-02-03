@@ -55,7 +55,7 @@ bool Deferred::Init()
     light_probes_.reset(new stage::LightProbes());
     irradiance_volume_.reset(new stage::IrradianceVolume());
     lighting_.reset(new stage::Lighting(perspective_));
-    debug_output_.reset(new stage::debug::DebugOutput(perspective_));
+    debug_output_.reset(new stage::debug::DebugOutput(perspective_, *irradiance_volume_));
     composite_.reset(new stage::Composite(perspective_));
 
     // Shaders
@@ -124,7 +124,7 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!debug_output_->Render(geometry_->output(stage::Geometry::DEPTH), *light_probes_, view_matrix, proj_matrix_))
+    if (!debug_output_->Render(geometry_->output(stage::Geometry::DEPTH), *light_probes_, *irradiance_volume_, view_matrix, proj_matrix_))
     {
         return false;
     }

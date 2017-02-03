@@ -23,13 +23,6 @@
 
 #include <blons/graphics/pipeline/stage/debug/debugoutput.h>
 
-// Public Includes
-#include <blons/graphics/framebuffer.h>
-#include <blons/graphics/render/drawbatcher.h>
-#include <blons/graphics/render/shader.h>
-#include <blons/graphics/render/shaderdata.h>
-#include <blons/graphics/pipeline/stage/debug/probeview.h>
-
 namespace blons
 {
 namespace pipeline
@@ -38,16 +31,25 @@ namespace stage
 {
 namespace debug
 {
-DebugOutput::DebugOutput(Perspective perspective)
+DebugOutput::DebugOutput(Perspective perspective, const IrradianceVolume& irradiance)
 {
     debug_output_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }));
     probeview_.reset(new ProbeView());
+    irradianceview_.reset(new IrradianceView(irradiance));
 }
 
-bool DebugOutput::Render(const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix)
+bool DebugOutput::Render(const TextureResource* depth, const LightProbes& probes, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)
 {
     debug_output_buffer_->Bind(Vector4(0, 0, 0, 0));
-    return probeview_->Render(debug_output_buffer_.get(), depth, probes, view_matrix, proj_matrix);
+    if (!probeview_->Render(debug_output_buffer_.get(), depth, probes, view_matrix, proj_matrix))
+    {
+        return false;
+    }
+    if (!irradianceview_->Render(debug_output_buffer_.get(), depth, irradiance, view_matrix, proj_matrix))
+    {
+        return false;
+    }
+    return true;
 }
 
 const TextureResource* DebugOutput::output(Output buffer) const

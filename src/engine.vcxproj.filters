@@ -244,6 +244,9 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\composite.h">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\irradianceview.h">
+      <Filter>src\graphics\pipeline\stage\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -411,6 +414,9 @@
     <ClCompile Include="graphics\pipeline\stage\composite.cpp">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\debug\irradianceview.cpp">
+      <Filter>src\graphics\pipeline\stage\debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\mesh.frag.glsl">
@@ -465,6 +471,12 @@
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\composite.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\debug-irradiance-volume.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\debug-irradiance-grid.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>
