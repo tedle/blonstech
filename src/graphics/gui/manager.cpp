@@ -301,7 +301,7 @@ DrawBatcher* Manager::batch(DrawCallInputs inputs)
     }
     else
     {
-        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher(DrawBatcher::MESH_2D));
+        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher());
         draw_batches_.push_back(std::make_pair(inputs, std::move(batcher)));
         batch = draw_batches_.back().second.get();
     }

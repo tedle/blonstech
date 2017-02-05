@@ -50,14 +50,10 @@ public:
     ShaderResource* MakeShaderResource() override;
     ShaderDataResource* MakeShaderDataResource() override;
 
-    bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                        Vertex* vertices, unsigned int vert_count,
-                        unsigned int* indices, unsigned int index_count,
-                        DrawMode draw_mode) override;
-    bool Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                        Vertex* vertices, unsigned int vert_count,
-                        unsigned int* indices, unsigned int index_count,
-                        DrawMode draw_mode) override;
+    bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                      Vertex* vertices, unsigned int vert_count,
+                      unsigned int* indices, unsigned int index_count,
+                      DrawMode draw_mode) override;
     bool RegisterFramebuffer(FramebufferResource* frame_buffer,
                              units::pixel width, units::pixel height,
                              std::vector<TextureType> formats, bool store_depth) override;

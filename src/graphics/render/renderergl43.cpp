@@ -558,7 +558,7 @@ ShaderDataResource* RendererGL43::MakeShaderDataResource()
     return new ShaderDataResourceGL43(id());
 }
 
-bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+bool RendererGL43::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
                                 Vertex* vertices, unsigned int vert_count,
                                 unsigned int* indices, unsigned int index_count,
                                 DrawMode draw_mode)
@@ -611,54 +611,6 @@ bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource*
     glGenBuffers(1, &index_buf->buffer_);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
-
-    // nvogl32.dll loves it when i clean up my VAOs!
-    glBindVertexArray(0);
-
-    return true;
-}
-
-bool RendererGL43::Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                                Vertex* vertices, unsigned int vert_count,
-                                unsigned int* indices, unsigned int index_count,
-                                DrawMode draw_mode)
-{
-    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
-    BufferResourceGL43* index_buf = resource_cast<BufferResourceGL43*>(index_buffer, id());
-
-    // Set the buffer types
-    vertex_buf->type_ = BufferResourceGL43::VERTEX_BUFFER;
-    index_buf->type_ = BufferResourceGL43::INDEX_BUFFER;
-
-    // Set the draw mode
-    vertex_buf->draw_mode_ = draw_mode;
-    index_buf->draw_mode_ = draw_mode;
-
-    // Generate a vertex array and set it
-    GLuint vertex_array_id;
-    glGenVertexArrays(1, &vertex_array_id);
-    vertex_buf->vertex_array_id_ = index_buf->vertex_array_id_ = vertex_array_id;
-    glBindVertexArray(vertex_array_id);
-
-    // Attach vertex buffer data to VAO
-    glGenBuffers(1, &vertex_buf->buffer_);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
-    glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_DYNAMIC_DRAW);
-
-    // Enable pos and uv inputs ??
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-
-    // Layout the Vertex struct type to gpu vertex attributes
-    // Position declaration
-    glVertexAttribPointer(POS, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
-    // UV declaration
-    glVertexAttribPointer(TEX, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
-
-    // Setup the index buffer
-    glGenBuffers(1, &index_buf->buffer_);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
 
     // nvogl32.dll loves it when i clean up my VAOs!
     glBindVertexArray(0);

@@ -37,29 +37,17 @@ class DrawBatcher
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Determines how the batch mesh is stored internally
-    ////////////////////////////////////////////////////////////////////////////////
-    enum Type
-    {
-        MESH_2D, ///< Mesh only contains 2D position and UV information
-        MESH_3D  ///< Mesh stores full vertex information
-    };
-
-public:
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes a DrawBatcher with empty buffers of the specified mesh
-    /// type.
+    /// \brief Initializes a DrawBatcher with empty buffers
     ///
-    /// \param type Specifies whether to use 2D mesh or 3D mesh
     /// \param type Specifies how vertices are formed into primitives
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher(Type type, DrawMode draw_mode);
+    DrawBatcher(DrawMode draw_mode);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls DrawBatcher(Type, DrawMode) with a draw mode of
+    /// \brief Calls DrawBatcher(DrawMode) with a draw mode of
     /// DrawMode::TRIANGLES
     ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher(Type type)
-        : DrawBatcher(type, DrawMode::TRIANGLES) {}
+    DrawBatcher()
+        : DrawBatcher(DrawMode::TRIANGLES) {}
     ~DrawBatcher() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +92,6 @@ public:
     int index_count() const;
 
 private:
-    Type type_;
     DrawMode draw_mode_;
 
     std::unique_ptr<BufferResource> vertex_buffer_;

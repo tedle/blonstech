@@ -60,10 +60,10 @@ void Sprite::Init()
 
     mesh_.draw_mode = DrawMode::TRIANGLES;
 
-    if (!context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(),
-                                 mesh_.vertices.data(), vertex_count(),
-                                 mesh_.indices.data(), index_count(),
-                                 mesh_.draw_mode))
+    if (!context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(),
+                               mesh_.vertices.data(), vertex_count(),
+                               mesh_.indices.data(), index_count(),
+                               mesh_.draw_mode))
     {
         throw "Failed to register sprite";
     }

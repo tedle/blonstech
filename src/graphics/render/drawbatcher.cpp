@@ -28,26 +28,14 @@
 
 namespace blons
 {
-DrawBatcher::DrawBatcher(Type type, DrawMode draw_mode)
+DrawBatcher::DrawBatcher(DrawMode draw_mode)
 {
     auto context = render::context();
-    type_ = type;
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
     draw_mode_ = draw_mode;
 
-    if (type_ == MESH_2D)
-    {
-        context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0, draw_mode_);
-    }
-    else if (type_ == MESH_3D)
-    {
-        context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0, draw_mode_);
-    }
-    else
-    {
-        throw "Unsupported mesh type";
-    }
+    context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0, draw_mode_);
 
     buffer_size_ = 0;
     vertex_count_ = 0;
@@ -86,14 +74,7 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
         // Make the new, larger buffers
         vertex_buffer_.reset(context->MakeBufferResource());
         index_buffer_.reset(context->MakeBufferResource());
-        if (type_ == MESH_2D)
-        {
-            context->Register2DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_);
-        }
-        else if (type_ == MESH_3D)
-        {
-            context->Register3DMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_);
-        }
+        context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_);
 
         // Move our backup copy of mesh data into the new buffer
         context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),

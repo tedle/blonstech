@@ -95,12 +95,12 @@ MeshBuffer LoadMesh(const std::string& filename)
         auto context = render::context();
         std::shared_ptr<BufferResource> vertex(context->MakeBufferResource());
         std::shared_ptr<BufferResource> index(context->MakeBufferResource());
-        if (!context->Register3DMesh(vertex.get(), index.get(),
-                                     mesh.data->vertices.data(),
-                                     static_cast<unsigned int>(mesh.data->vertices.size()),
-                                     mesh.data->indices.data(),
-                                     static_cast<unsigned int>(mesh.data->indices.size()),
-                                     mesh.data->draw_mode))
+        if (!context->RegisterMesh(vertex.get(), index.get(),
+                                   mesh.data->vertices.data(),
+                                   static_cast<unsigned int>(mesh.data->vertices.size()),
+                                   mesh.data->indices.data(),
+                                   static_cast<unsigned int>(mesh.data->indices.size()),
+                                   mesh.data->draw_mode))
         {
             return MeshBuffer();
         }

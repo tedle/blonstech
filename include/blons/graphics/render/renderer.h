@@ -428,33 +428,10 @@ public:
     /// \param draw_mode Describes how to form primitives from vertices
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool Register3DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                                Vertex* vertices, unsigned int vert_count,
-                                unsigned int* indices, unsigned int index_count,
-                                DrawMode draw_mode)=0;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a pair of BufferResource%s and binds them to the graphics API
-    /// permitting their use for rendering calls. Sets up shader inputs using a
-    /// subset of the supplied vertex data useful for 2D rendering. This includes
-    /// the X & Y coordinates of the vertex position as well as UV texture
-    ///
-    /// \param vertex_buffer Buffer for vertices to bind to
-    /// \param index_buffer Buffer for indices to bind to
-    /// \param vertices Vertices to be bound to buffer, may be nullptr if vert_count
-    /// and index_count are 0
-    /// \param vert_count Number of vertices to be bound to buffer, may be 0 for an
-    /// empty mesh
-    /// \param indices Indices to be bound to buffer, may be nullptr if vert_count
-    /// and index_count are 0
-    /// \param index_count Number of indices to be bound to buffer, may be 0 for an
-    /// empty mesh
-    /// \param draw_mode Describes how to form primitives from vertices
-    /// \return True on success
-    ////////////////////////////////////////////////////////////////////////////////
-    virtual bool Register2DMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                                Vertex* vertices, unsigned int vert_count,
-                                unsigned int* indices, unsigned int index_count,
-                                DrawMode draw_mode)=0;
+    virtual bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
+                              Vertex* vertices, unsigned int vert_count,
+                              unsigned int* indices, unsigned int index_count,
+                              DrawMode draw_mode)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a FramebufferResource and binds it to the graphics API
     /// permitting its use for rendering calls. Expects an output to the supplied
