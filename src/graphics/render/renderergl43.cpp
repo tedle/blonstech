@@ -595,22 +595,16 @@ bool RendererGL43::Register3DMesh(BufferResource* vertex_buffer, BufferResource*
 
     // Layout the Vertex struct type to gpu vertex attributes
     // Position declaration
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(POS, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     // UV declaration
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(TEX, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
     // Lightmap UV declaration
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(LIGHT_TEX, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(5*sizeof(float)));
     // Normal declaration
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(7*sizeof(float)));
     // Tangent declaration
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(10*sizeof(float)));
     // Bitangent declaration
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(13*sizeof(float)));
 
     // Setup the index buffer
@@ -657,10 +651,8 @@ bool RendererGL43::Register2DMesh(BufferResource* vertex_buffer, BufferResource*
 
     // Layout the Vertex struct type to gpu vertex attributes
     // Position declaration
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(POS, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), 0);
     // UV declaration
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
     glVertexAttribPointer(TEX, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(3*sizeof(float)));
 
     // Setup the index buffer
