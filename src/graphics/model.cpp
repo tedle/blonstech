@@ -49,6 +49,7 @@ Model::Model(std::string mesh_filename)
     normal_texture_ = nullptr;
     light_texture_ = nullptr;
     pos_ = Vector3(0.0f, 0.0f, 0.0f);
+    scale_ = Vector3(1.0f, 1.0f, 1.0f);
     world_matrix_ = MatrixIdentity();
 
     log::Debug("Loading %s... ", mesh_filename.c_str());
@@ -133,7 +134,7 @@ Model::Model(std::string mesh_filename)
 void Model::Render()
 {
     // TODO: Clean this up with operator overloads
-    world_matrix_ = MatrixTranslation(pos_.x, pos_.y, pos_.z);
+    world_matrix_ = MatrixScale(scale_.x, scale_.y, scale_.z) * MatrixTranslation(pos_.x, pos_.y, pos_.z);
     render::context()->BindMeshBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
 }
 
@@ -175,6 +176,11 @@ Vector3 Model::pos() const
     return pos_;
 }
 
+Vector3 Model::scale() const
+{
+    return scale_;
+}
+
 Matrix Model::world_matrix() const
 {
     return world_matrix_;
@@ -183,5 +189,10 @@ Matrix Model::world_matrix() const
 void Model::set_pos(units::world x, units::world y, units::world z)
 {
     pos_ = Vector3(x, y, z);
+}
+
+void Model::set_scale(units::world x, units::world y, units::world z)
+{
+    scale_ = Vector3(x, y, z);
 }
 } // namespace blons
