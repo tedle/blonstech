@@ -42,7 +42,7 @@ std::unordered_map<std::string, std::function<MeshData(const std::vector<std::st
         {
             if (args.size() != 3)
             {
-                throw "Incorrect arguments supplied for blons:quad mesh (expected 3)";
+                throw "Incorrect arguments supplied for blons:line-grid mesh (expected 3)";
             }
 
             MeshData grid;
@@ -104,16 +104,13 @@ std::unordered_map<std::string, std::function<MeshData(const std::vector<std::st
     {
         "blons:quad", [](const std::vector<std::string>& args)
         {
-            if (args.size() != 1)
+            if (args.size() != 0)
             {
-                throw "Incorrect arguments supplied for blons:quad mesh (expected 1)";
+                throw "Incorrect arguments supplied for blons:quad mesh (expected 0)";
             }
 
             MeshData quad;
             quad.draw_mode = DrawMode::TRIANGLES;
-
-            const float width = static_cast<float>(atof(args[0].c_str()));
-            const float height = static_cast<float>(atof(args[0].c_str()));
 
             Vertex v;
             v.pos = Vector3(0.0, 0.0, 0.0);
@@ -123,16 +120,16 @@ std::unordered_map<std::string, std::function<MeshData(const std::vector<std::st
             v.bitan = Vector3(0.0, 1.0, 0.0);
             quad.vertices.push_back(v);
 
-            v.pos = Vector3(width, 0.0, 0.0);
-            v.tex = Vector2(width, 0.0);
+            v.pos = Vector3(1.0, 0.0, 0.0);
+            v.tex = Vector2(1.0, 0.0);
             quad.vertices.push_back(v);
 
-            v.pos = Vector3(0.0, height, 0.0);
-            v.tex = Vector2(0.0, height);
+            v.pos = Vector3(0.0, 1.0, 0.0);
+            v.tex = Vector2(0.0, 1.0);
             quad.vertices.push_back(v);
 
-            v.pos = Vector3(width, height, 0.0);
-            v.tex = Vector2(width, height);
+            v.pos = Vector3(1.0, 1.0, 0.0);
+            v.tex = Vector2(1.0, 1.0);
             quad.vertices.push_back(v);
 
             quad.indices = { 2, 1, 0, 3, 1, 2 };
@@ -143,9 +140,9 @@ std::unordered_map<std::string, std::function<MeshData(const std::vector<std::st
     {
         "blons:sphere", [](const std::vector<std::string>& args)
         {
-            if (args.size() != 1)
+            if (args.size() != 0)
             {
-                throw "Incorrect arguments supplied for blons:quad mesh (expected 1)";
+                throw "Incorrect arguments supplied for blons:sphere mesh (expected 0)";
             }
 
             MeshData sphere;
@@ -154,7 +151,7 @@ std::unordered_map<std::string, std::function<MeshData(const std::vector<std::st
             const unsigned int count = 20;
             const unsigned int semi_count = count / 2 + 1;
             const unsigned int vert_count = count * semi_count;
-            const float radius = static_cast<float>(atof(args[0].c_str()));
+            const float radius = 1.0f;
             const float dist = (2 * kPi) / count;
 
             static_assert(count % 2 == 0, "Sphere vertex ring size must be an even number");
@@ -208,6 +205,11 @@ std::unordered_map<std::string, std::function<PixelData(const std::vector<std::s
     {
         "blons:none", [](const std::vector<std::string>& args)
         {
+            if (args.size() != 0)
+            {
+                throw "Incorrect arguments supplied for blons:none texture (expected 0)";
+            }
+
             PixelData none;
             none.type.format = TextureType::R8G8B8;
             none.type.compression = TextureType::RAW;
@@ -232,6 +234,11 @@ std::unordered_map<std::string, std::function<PixelData(const std::vector<std::s
     {
         "blons:normal", [](const std::vector<std::string>& args)
         {
+            if (args.size() != 0)
+            {
+                throw "Incorrect arguments supplied for blons:normal texture (expected 0)";
+            }
+
             PixelData normal;
             normal.type.format = TextureType::R8G8B8;
             normal.type.compression = TextureType::RAW;

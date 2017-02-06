@@ -57,8 +57,9 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models.back()->set_pos(30.0, 0.0, 20.0);
 
     // Model 5
-    models.push_back(graphics->MakeModel("blons:sphere~0.5"));
+    models.push_back(graphics->MakeModel("blons:sphere"));
     models.back()->set_pos(0.0, 5.0, 0.0);
+    models.back()->set_scale(0.5, 0.5, 0.5);
 
     graphics->BakeRadianceTransfer();
 

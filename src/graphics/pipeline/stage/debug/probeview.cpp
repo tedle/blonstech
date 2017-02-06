@@ -52,9 +52,9 @@ ProbeView::ProbeView()
         throw "Failed to initialize debug SH Probe shaders";
     }
     probe_meshes_.reset(new DrawBatcher());
-    std::unique_ptr<Mesh> probe_mesh(new Mesh("blons:sphere~0.5"));
+    std::unique_ptr<Mesh> probe_mesh(new Mesh("blons:sphere"));
     MeshData probe_mesh_data = probe_mesh->mesh();
-    probe_meshes_->Append(probe_mesh_data);
+    probe_meshes_->Append(probe_mesh_data, MatrixScale(0.5f, 0.5f, 0.5f));
 }
 
 bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix)

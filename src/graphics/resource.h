@@ -60,7 +60,9 @@ struct TextureBuffer
 /// loaded from disk and bound to the context
 ///
 /// List of valid engine meshes include:
-/// * `blons:sphere~radius` Sphere mesh
+/// * `blons:sphere` Sphere mesh
+/// * `blons:quad` Quad mesh
+/// * `blons:line-grid~width,height,depth` Line grid mesh
 ///
 /// \param filename Filename of the mesh to load
 /// \return MeshBuffer containing shared BufferResource pointers that will be
