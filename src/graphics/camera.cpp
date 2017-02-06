@@ -29,10 +29,6 @@ Camera::Camera()
 {
 }
 
-Camera::~Camera()
-{
-}
-
 void Camera::set_pos(units::world x, units::world y, units::world z)
 {
     pos_ = Vector3(x, y, z);
