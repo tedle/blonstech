@@ -48,8 +48,8 @@ Model::Model(std::string mesh_filename)
     albedo_texture_ = nullptr;
     normal_texture_ = nullptr;
     light_texture_ = nullptr;
-    pos_ = Vector3(0.0f, 0.0f, 0.0f);
-    scale_ = Vector3(1.0f, 1.0f, 1.0f);
+    pos_ = Vector3(0);
+    scale_ = Vector3(1);
     world_matrix_ = MatrixIdentity();
 
     log::Debug("Loading %s... ", mesh_filename.c_str());

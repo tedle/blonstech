@@ -139,7 +139,7 @@ void Manager::Render(Framebuffer* output_buffer)
     // Styles are only possible when output_buffer is supplied
     if (output_buffer != nullptr)
     {
-        ui_buffer_->Bind(Vector4(0.0, 0.0, 0.0, 0.0));
+        ui_buffer_->Bind(Vector4(0.0));
     }
     else
     {
@@ -318,7 +318,7 @@ DrawBatcher* Manager::font_batch(Skin::FontStyle style, Vector4 colour, Box crop
 
 DrawBatcher* Manager::control_batch(Box crop, units::pixel crop_feather)
 {
-    DrawCallInputs inputs = { false, Skin::FontStyle::DEFAULT, Vector4(0, 0, 0, 0), crop, crop_feather };
+    DrawCallInputs inputs = { false, Skin::FontStyle::DEFAULT, Vector4(0), crop, crop_feather };
     return batch(inputs);
 }
 

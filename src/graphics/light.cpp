@@ -40,10 +40,6 @@ Light::Light(Type type, Vector3 pos, Vector3 dir, Vector3 colour)
     {
         set_pos(pos);
     }
-    else
-    {
-        pos_ = Vector3(0, 0, 0);
-    }
 }
 
 Matrix Light::ViewFrustum(Matrix frustum, units::world depth) const

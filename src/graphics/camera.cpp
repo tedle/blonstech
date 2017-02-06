@@ -27,8 +27,6 @@ namespace blons
 {
 Camera::Camera()
 {
-    pos_ = Vector3(0.0f, 0.0f, 0.0f);
-    rot_ = Vector3(0.0f, 0.0f, 0.0f);
 }
 
 Camera::~Camera()
