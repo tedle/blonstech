@@ -38,6 +38,69 @@ namespace
 std::unordered_map<std::string, std::function<MeshData(const std::vector<std::string>& args)>> g_mesh_generators =
 {
     {
+        "blons:cube", [](const std::vector<std::string>& args)
+        {
+            if (args.size() != 0)
+            {
+                throw "Incorrect arguments supplied for blons:quad mesh (expected 0)";
+            }
+
+            MeshData quad = MakeEngineMesh("blons:quad");
+            for (auto& v : quad.vertices)
+            {
+                v.pos *= MatrixTranslation(0.0f, 0.0f, 1.0f);
+            }
+
+            MeshData cube;
+            cube.draw_mode = DrawMode::TRIANGLES;
+
+            for (int face = 0; face < 6; face++)
+            {
+                units::world pitch = 0.0f;
+                units::world yaw = 0.0f;
+                switch (face)
+                {
+                case 0:
+                    break;
+                case 1:
+                    yaw = kPi / 2.0f;
+                    break;
+                case 2:
+                    yaw = kPi;
+                    break;
+                case 3:
+                    yaw = -kPi / 2.0f;
+                    break;
+                case 4:
+                    pitch = kPi / 2.0f;
+                    break;
+                case 5:
+                    pitch = -kPi / 2.0f;
+                    break;
+                default:
+                    throw "Bad face index during cube generation";
+                }
+                auto view = MatrixView(Vector3(0), Vector3(pitch, yaw, 0.0f));
+                for (const auto& vert : quad.vertices)
+                {
+                    Vertex v;
+                    v.pos = vert.pos * view;
+                    v.tex = vert.tex;
+                    v.norm = vert.norm * view;
+                    v.tan = vert.tan * view;
+                    v.bitan = vert.bitan * view;
+                    cube.vertices.push_back(v);
+                }
+                for (int i = 0; i < 6; i++)
+                {
+                    cube.indices.push_back(quad.indices[i] + (face * 4));
+                }
+            }
+
+            return cube;
+        }
+    },
+    {
         "blons:line-grid", [](const std::vector<std::string>& args)
         {
             if (args.size() != 3)
@@ -113,18 +176,18 @@ std::unordered_map<std::string, std::function<MeshData(const std::vector<std::st
             quad.draw_mode = DrawMode::TRIANGLES;
 
             Vertex v;
-            v.pos = Vector3(0.0, 0.0, 0.0);
+            v.pos = Vector3(-1.0, -1.0, 0.0);
             v.tex = Vector2(0.0, 0.0);
             v.norm = Vector3(0.0, 0.0, 1.0);
             v.tan = Vector3(1.0, 0.0, 0.0);
             v.bitan = Vector3(0.0, 1.0, 0.0);
             quad.vertices.push_back(v);
 
-            v.pos = Vector3(1.0, 0.0, 0.0);
+            v.pos = Vector3(1.0, -1.0, 0.0);
             v.tex = Vector2(1.0, 0.0);
             quad.vertices.push_back(v);
 
-            v.pos = Vector3(0.0, 1.0, 0.0);
+            v.pos = Vector3(-1.0, 1.0, 0.0);
             v.tex = Vector2(0.0, 1.0);
             quad.vertices.push_back(v);
 
@@ -132,7 +195,7 @@ std::unordered_map<std::string, std::function<MeshData(const std::vector<std::st
             v.tex = Vector2(1.0, 1.0);
             quad.vertices.push_back(v);
 
-            quad.indices = { 2, 1, 0, 3, 1, 2 };
+            quad.indices = { 0, 1, 2, 2, 1, 3 };
 
             return quad;
         }
