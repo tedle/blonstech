@@ -41,7 +41,7 @@ IrradianceVolume::IrradianceVolume()
     dummy_volume.width = 32;
     dummy_volume.height = 16;
     dummy_volume.depth = 16;
-    dummy_volume.type = TextureType(TextureType::R8G8B8, TextureType::NEAREST);
+    dummy_volume.type = TextureType(TextureType::R8G8B8, TextureType::LINEAR, TextureType::CLAMP);
     auto pixel_size = dummy_volume.bits_per_pixel() / 8;
     dummy_volume.pixels.reset(new unsigned char[dummy_volume.width * dummy_volume.height * dummy_volume.depth * pixel_size]);
     for (int z = 0; z < dummy_volume.depth; z++)
@@ -51,10 +51,10 @@ IrradianceVolume::IrradianceVolume()
             for (int x = 0; x < dummy_volume.width; x++)
             {
                 auto index = (z * dummy_volume.width * dummy_volume.height + y * dummy_volume.width + x) * pixel_size;
-                // green channel only
-                dummy_volume.pixels.get()[index+0] = 1;
-                dummy_volume.pixels.get()[index+1] = 255;
-                dummy_volume.pixels.get()[index+2] = 3;
+                // Hey this doesnt look nice! But it'll be gone soon!!!!!!!
+                dummy_volume.pixels.get()[index+0] = static_cast<unsigned char>(static_cast<float>(x) / static_cast<float>(dummy_volume.width - 1) * 255.0f);
+                dummy_volume.pixels.get()[index+1] = static_cast<unsigned char>(static_cast<float>(y) / static_cast<float>(dummy_volume.height - 1) * 255.0f);
+                dummy_volume.pixels.get()[index+2] = static_cast<unsigned char>(static_cast<float>(z) / static_cast<float>(dummy_volume.depth - 1) * 255.0f);
             }
         }
     }

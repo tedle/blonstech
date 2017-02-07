@@ -479,5 +479,8 @@
     <None Include="shaders\debug-irradiance-grid.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\debug-irradiance-volume.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

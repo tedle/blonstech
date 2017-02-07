@@ -24,17 +24,22 @@
 #version 430
 
 // Ins n outs
-in vec3 norm;
-in vec3 sample_pos;
+in vec3 input_pos;
+in vec3 input_norm;
+in vec3 input_grid_pos;
 
-out vec4 frag_colour;
+out vec3 norm;
+out vec3 sample_pos;
 
 // Globals
-uniform sampler3D irradiance_volume;
+uniform mat4 world_matrix;
+uniform mat4 vp_matrix;
 
 void main(void)
 {
-    vec4 norm_colour = vec4((norm + 1.0f) / 2.0f, 1.0f);
-    frag_colour = texture(irradiance_volume, sample_pos);
-    frag_colour += norm_colour * 0.00001;
+    gl_Position = (world_matrix * vec4(input_grid_pos, 1.0)) + vec4(input_pos, 0.0);
+    gl_Position = vp_matrix * gl_Position;
+
+    norm = input_norm;
+    sample_pos = input_grid_pos;
 }

@@ -42,14 +42,18 @@ auto const cvar_debug_mode = console::RegisterVariable("dbg:irradiance-view", 0)
 IrradianceView::IrradianceView(const IrradianceVolume& irradiance)
 {
     // Shaders
-    ShaderAttributeList shader_inputs;
-    shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    shader_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    shader_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
-    shader_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
-    shader_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
-    volume_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug-irradiance-volume.frag.glsl", shader_inputs));
-    grid_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug-irradiance-grid.frag.glsl", shader_inputs));
+    ShaderAttributeList grid_shader_inputs;
+    grid_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    grid_shader_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    grid_shader_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
+    grid_shader_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
+    grid_shader_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
+    grid_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug-irradiance-grid.frag.glsl", grid_shader_inputs));
+    ShaderAttributeList volume_shader_inputs;
+    volume_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    volume_shader_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
+    volume_shader_inputs.push_back(ShaderAttribute(TANGENT, "input_grid_pos"));
+    volume_shader_.reset(new Shader("shaders/debug-irradiance-volume.vert.glsl", "shaders/debug-irradiance-volume.frag.glsl", volume_shader_inputs));
 
     if (volume_shader_ == nullptr || grid_shader_ == nullptr)
     {
@@ -59,10 +63,34 @@ IrradianceView::IrradianceView(const IrradianceVolume& irradiance)
     // Grab the dimensions of the irradiance volume and construct a matching grid mesh
     auto grid_data = render::context()->GetTextureData3D(irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME));
     std::stringstream dimension_args;
-    dimension_args << grid_data.width << "," << grid_data.height << "," << grid_data.depth;
+    // We use -1 because we want the samples to be per intersection, not per voxel
+    dimension_args << (grid_data.width - 1) << "," << (grid_data.height - 1) << "," << (grid_data.depth - 1);
     grid_mesh_.reset(new DrawBatcher(DrawMode::LINES));
-    std::unique_ptr<Mesh> grid_mesh(new Mesh("blons:line-grid~" + dimension_args.str()));
-    grid_mesh_->Append(grid_mesh->mesh());
+    Mesh grid_mesh("blons:line-grid~" + dimension_args.str());
+    grid_mesh_->Append(grid_mesh.mesh());
+
+    // Construct a cloud of cubes positioned to each voxel of the irradiance volume
+    voxel_meshes_.reset(new DrawBatcher());
+    Mesh cube_mesh("blons:cube");
+    MeshData cube_mesh_data = cube_mesh.mesh();
+    Matrix cube_scale = MatrixScale(0.05f, 0.05f, 0.05f);
+    for (int x = 0; x < grid_data.width; x++)
+    {
+        for (int y = 0; y < grid_data.height; y++)
+        {
+            for (int z = 0; z < grid_data.depth; z++)
+            {
+
+                for (auto& v : cube_mesh_data.vertices)
+                {
+                    v.tan = Vector3(static_cast<units::world>(x) / static_cast<units::world>(grid_data.width - 1),
+                                    static_cast<units::world>(y) / static_cast<units::world>(grid_data.height - 1),
+                                    static_cast<units::world>(z) / static_cast<units::world>(grid_data.depth - 1));
+                }
+                voxel_meshes_->Append(cube_mesh_data, cube_scale);
+            }
+        }
+    }
 }
 
 bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)
@@ -74,23 +102,40 @@ bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, c
     }
 
     auto context = render::context();
-    // Bind the buffer to render the probes on top of
+    // Bind the buffer to render the volume on top of
     target->Bind(false);
     context->SetDepthTesting(true);
     target->BindDepthTexture(depth);
 
     Matrix vp_matrix = view_matrix * proj_matrix;
 
-    // Bind the vertex data
+    // Rendering the volume's grid lines
     grid_mesh_->Render(false);
-
     // Set the inputs
     if (!grid_shader_->SetInput("mvp_matrix", irradiance.world_matrix() * vp_matrix))
     {
         target->BindDepthTexture(target->depth());
         return false;
     }
+    // Run the shader
     if (!grid_shader_->Render(grid_mesh_->index_count()))
+    {
+        target->BindDepthTexture(target->depth());
+        return false;
+    }
+
+    // Rendering the volume's voxels
+    voxel_meshes_->Render(false);
+    // Set the inputs
+    if (!volume_shader_->SetInput("world_matrix", irradiance.world_matrix()) ||
+        !volume_shader_->SetInput("vp_matrix", vp_matrix) ||
+        !volume_shader_->SetInput("irradiance_volume", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME)))
+    {
+        target->BindDepthTexture(target->depth());
+        return false;
+    }
+    // Run the shader
+    if (!volume_shader_->Render(voxel_meshes_->index_count()))
     {
         target->BindDepthTexture(target->depth());
         return false;
