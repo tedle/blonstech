@@ -429,7 +429,7 @@ Matrix MatrixTranspose(Matrix in);
 /// \brief Generates a view matrix from a given position and rotation
 ///
 /// \param pos Position of the view matrix
-/// \param rot Rotation of the view matrix
+/// \param rot Rotation of the view matrix (pitch, yaw, roll)
 /// \return Generated view matrix
 ////////////////////////////////////////////////////////////////////////////////
 Matrix MatrixView(Vector3 pos, Vector3 rot);
