@@ -63,9 +63,9 @@ Matrix Light::ViewFrustum(Matrix frustum, units::world depth) const
                                      y % 2 ? -1.0f : 1.0f,
                                      z % 2 ?  0.0f : 1.0f);
                 // Shape the box like the camera frustum
-                ndc_box[i] = inv_frustum * ndc_box[i];
+                ndc_box[i] *= inv_frustum;
                 // Align the box to the light's view space
-                ndc_box[i] = light_view_matrix * ndc_box[i];
+                ndc_box[i] *= light_view_matrix;
                 if (i == 0)
                 {
                     min.x = max.x = ndc_box[i].x;

@@ -35,34 +35,34 @@ namespace stage
 {
 namespace
 {
-    Vector3 FaceRotation(int face)
+Vector3 FaceRotation(int face)
+{
+    units::world pitch = 0.0f;
+    units::world yaw = 0.0f;
+    switch (face)
     {
-        units::world pitch = 0.0f;
-        units::world yaw = 0.0f;
-        switch (face)
-        {
-        case 0: // -Z
-            break;
-        case 1: // +X
-            yaw = -kPi / 2.0f;
-            break;
-        case 2: // +Z
-            yaw = kPi;
-            break;
-        case 3: // -X
-            yaw = kPi / 2.0f;
-            break;
-        case 4: // +Y
-            pitch = kPi / 2.0f;
-            break;
-        case 5: // -Y
-            pitch = -kPi / 2.0f;
-            break;
-        default:
-            throw "Impossible case statment reached during face selection";
-        }
-        return Vector3(pitch, yaw, 0.0f);
+    case 0: // -Z
+        break;
+    case 1: // +X
+        yaw = -kPi / 2.0f;
+        break;
+    case 2: // +Z
+        yaw = kPi;
+        break;
+    case 3: // -X
+        yaw = kPi / 2.0f;
+        break;
+    case 4: // +Y
+        pitch = kPi / 2.0f;
+        break;
+    case 5: // -Y
+        pitch = -kPi / 2.0f;
+        break;
+    default:
+        throw "Impossible case statment reached during face selection";
     }
+    return Vector3(pitch, yaw, 0.0f);
+}
 } // namespace
 
 LightProbes::LightProbes()
@@ -150,7 +150,10 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
         {
             Vector3 rot = FaceRotation(face);
             cube_view.set_pos(0, 0, 0);
-            cube_view.set_rot(rot.x, rot.y, rot.z);
+            // Since a view matrix rotates things in the opposite of the direction given
+            // We reverse the pitch and yaw values
+            cube_view.set_rot(-rot.x, -rot.y, rot.z);
+            Matrix rotation_matrix = cube_view.view_matrix();
 
             for (int x = 0; x < kProbeMapSize; x++)
             {
@@ -160,11 +163,8 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
                     uv.x = (static_cast<units::world>(x) + 0.5f) / static_cast<units::world>(kProbeMapSize) * 2.0f - 1.0f;
                     uv.y = (static_cast<units::world>(y) + 0.5f) / static_cast<units::world>(kProbeMapSize) * 2.0f - 1.0f;
 
-                    Vector3 normal;
-                    normal.x = uv.x;
-                    normal.y = uv.y;
-                    normal.z = -1.0f;
-                    normal *= cube_view.view_matrix();
+                    Vector3 normal(uv.x, uv.y, -1.0f);
+                    normal *= rotation_matrix;
                     normal = VectorNormalize(normal);
 
                     int px = x + face * kProbeMapSize;

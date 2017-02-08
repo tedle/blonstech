@@ -70,10 +70,9 @@ Vector3 Vector3::operator- (const units::world& f) const { return Vector3(x - f,
 
 Vector3& Vector3::operator*= (const Vector3& vec) {x *= vec.x; y *= vec.y; z *= vec.z; return *this;}
 Vector3& Vector3::operator*= (const units::world& f) {x *= f; y *= f; z *= f; return *this;}
-Vector3& Vector3::operator*= (const Matrix& mat) { Vector3 vec = MatrixTranspose(mat) * (*this); x = vec.x; y = vec.y; z = vec.z; return *this; }
+Vector3& Vector3::operator*= (const Matrix& mat) { Vector3 vec = (*this) * mat; x = vec.x; y = vec.y; z = vec.z; return *this; }
 Vector3 Vector3::operator* (const Vector3& vec) const { return Vector3(x * vec.x, y * vec.y, z * vec.z); }
 Vector3 Vector3::operator* (const units::world& f) const { return Vector3(x * f, y * f, z * f); }
-Vector3 Vector3::operator* (const Matrix& mat) const { return MatrixTranspose(mat) * (*this); }
 
 Vector3& Vector3::operator/= (const Vector3& vec) {x /= vec.x; y /= vec.y; z /= vec.z; return *this;}
 Vector3& Vector3::operator/= (const units::world& f) {x /= f; y /= f; z /= f; return *this;}
@@ -100,10 +99,9 @@ Vector4 Vector4::operator- (const units::world& f) const { return Vector4(x - f,
 
 Vector4& Vector4::operator*= (const Vector4& vec) { x *= vec.x; y *= vec.y; z *= vec.z; w = vec.w; return *this; }
 Vector4& Vector4::operator*= (const units::world& f) { x *= f; y *= f; z *= f; return *this; }
-Vector4& Vector4::operator*= (const Matrix& mat) { Vector4 vec = MatrixTranspose(mat) * (*this); x = vec.x; y = vec.y; z = vec.z; w = vec.w; return *this; }
+Vector4& Vector4::operator*= (const Matrix& mat) { Vector4 vec = (*this) * mat; x = vec.x; y = vec.y; z = vec.z; w = vec.w; return *this; }
 Vector4 Vector4::operator* (const Vector4& vec) const { return Vector4(x * vec.x, y * vec.y, z * vec.z, vec.w); }
 Vector4 Vector4::operator* (const units::world& f) const { return Vector4(x * f, y * f, z * f, w); }
-Vector4 Vector4::operator* (const Matrix& mat) const { return MatrixTranspose(mat) * (*this); }
 
 Vector4& Vector4::operator/= (const Vector4& vec) { x /= vec.x; y /= vec.y; z /= vec.z; w = vec.w; return *this; }
 Vector4& Vector4::operator/= (const units::world& f) { x /= f; y /= f; z /= f; return *this; }
@@ -138,12 +136,12 @@ Matrix Matrix::operator* (const Matrix& mat) const
     return ret;
 }
 
-Vector3 Matrix::operator* (const Vector3& vec) const
+Vector3 Vector3::operator* (const Matrix& mat) const
 {
-    Vector4 ret(vec.x, vec.y, vec.z, 1.0f);
+    Vector4 ret(this->x, this->y, this->z, 1.0f);
     XMFLOAT4X4 xm;
     XMFLOAT4 xv;
-    memcpy(xm.m, this->m, sizeof(float) * 4 * 4);
+    memcpy(xm.m, mat.m, sizeof(float) * 4 * 4);
     memcpy(&xv, &ret, sizeof(float) * 4);
 
     auto xret = XMVector3Transform(XMLoadFloat4(&xv), XMLoadFloat4x4(&xm));
@@ -155,15 +153,15 @@ Vector3 Matrix::operator* (const Vector3& vec) const
     return Vector3(ret.x, ret.y, ret.z);
 }
 
-Vector4 Matrix::operator* (const Vector4& vec) const
+Vector4 Vector4::operator* (const Matrix& mat) const
 {
     Vector4 ret;
     XMFLOAT4X4 xm;
     XMFLOAT4 xv;
-    memcpy(xm.m, this->m, sizeof(float) * 4 * 4);
-    memcpy(&xv, &vec, sizeof(float) * 4);
+    memcpy(xm.m, mat.m, sizeof(float) * 4 * 4);
+    memcpy(&xv, this, sizeof(float) * 4);
 
-    auto xret = XMVector3Transform(XMLoadFloat4(&xv), XMLoadFloat4x4(&xm));
+    auto xret = XMVector4Transform(XMLoadFloat4(&xv), XMLoadFloat4x4(&xm));
     XMStoreFloat4(&xv, xret);
     memcpy(&ret, &xv, sizeof(float) * 4);
 

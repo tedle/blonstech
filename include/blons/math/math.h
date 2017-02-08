@@ -332,8 +332,6 @@ struct Matrix
     /// Multiplication operator
     Matrix& operator*= (const Matrix& mat);
     Matrix operator* (const Matrix& mat) const;
-    Vector3 operator* (const Vector3& vec) const;
-    Vector4 operator* (const Vector4& vec) const;
     //@}
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Equality operator

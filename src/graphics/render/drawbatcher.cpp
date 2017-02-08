@@ -99,7 +99,7 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
     {
         for (std::size_t i = 0; i < vert_size; i++)
         {
-            vertices[vertex_idx_ + i].pos = world_matrix * vertices[vertex_idx_ + i].pos;
+            vertices[vertex_idx_ + i].pos *= world_matrix;
         }
     }
     // Caching this helps debug perf
