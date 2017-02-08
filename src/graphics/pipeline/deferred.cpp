@@ -57,7 +57,7 @@ bool Deferred::Init()
     light_probes_.reset(new stage::LightProbes());
     irradiance_volume_.reset(new stage::IrradianceVolume());
     lighting_.reset(new stage::Lighting(perspective_));
-    debug_output_.reset(new stage::debug::DebugOutput(perspective_, *irradiance_volume_));
+    debug_output_.reset(new stage::debug::DebugOutput(perspective_));
     composite_.reset(new stage::Composite(perspective_));
     log::Debug(" [%ims]\n", pipeline_setup.ms());
 

@@ -49,7 +49,7 @@ public:
     };
 
 public:
-    DebugOutput(Perspective perspective, const IrradianceVolume& irradiance);
+    DebugOutput(Perspective perspective);
     ~DebugOutput() {}
 
     bool Render(const TextureResource* depth, const LightProbes& probes, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);

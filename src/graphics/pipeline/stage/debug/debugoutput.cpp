@@ -31,11 +31,11 @@ namespace stage
 {
 namespace debug
 {
-DebugOutput::DebugOutput(Perspective perspective, const IrradianceVolume& irradiance)
+DebugOutput::DebugOutput(Perspective perspective)
 {
     debug_output_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }));
     probeview_.reset(new ProbeView());
-    irradianceview_.reset(new IrradianceView(irradiance));
+    irradianceview_.reset(new IrradianceView());
 }
 
 bool DebugOutput::Render(const TextureResource* depth, const LightProbes& probes, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)

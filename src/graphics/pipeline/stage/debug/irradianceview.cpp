@@ -24,6 +24,7 @@
 #include <blons/graphics/pipeline/stage/debug/irradianceview.h>
 
 // Includes
+#include <algorithm>
 #include <sstream>
 
 namespace blons
@@ -39,7 +40,7 @@ namespace
 auto const cvar_debug_mode = console::RegisterVariable("dbg:irradiance-view", 0);
 } // namespace
 
-IrradianceView::IrradianceView(const IrradianceVolume& irradiance)
+IrradianceView::IrradianceView()
 {
     // Shaders
     ShaderAttributeList grid_shader_inputs;
@@ -59,38 +60,6 @@ IrradianceView::IrradianceView(const IrradianceVolume& irradiance)
     {
         throw "Failed to initialize debug Irradiance Volume shaders";
     }
-
-    // Grab the dimensions of the irradiance volume and construct a matching grid mesh
-    auto grid_data = render::context()->GetTextureData3D(irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME));
-    std::stringstream dimension_args;
-    // We use -1 because we want the samples to be per intersection, not per voxel
-    dimension_args << (grid_data.width - 1) << "," << (grid_data.height - 1) << "," << (grid_data.depth - 1);
-    grid_mesh_.reset(new DrawBatcher(DrawMode::LINES));
-    Mesh grid_mesh("blons:line-grid~" + dimension_args.str());
-    grid_mesh_->Append(grid_mesh.mesh());
-
-    // Construct a cloud of cubes positioned to each voxel of the irradiance volume
-    voxel_meshes_.reset(new DrawBatcher());
-    Mesh cube_mesh("blons:cube");
-    MeshData cube_mesh_data = cube_mesh.mesh();
-    Matrix cube_scale = MatrixScale(0.05f, 0.05f, 0.05f);
-    for (int x = 0; x < grid_data.width; x++)
-    {
-        for (int y = 0; y < grid_data.height; y++)
-        {
-            for (int z = 0; z < grid_data.depth; z++)
-            {
-
-                for (auto& v : cube_mesh_data.vertices)
-                {
-                    v.tan = Vector3(static_cast<units::world>(x) / static_cast<units::world>(grid_data.width - 1),
-                                    static_cast<units::world>(y) / static_cast<units::world>(grid_data.height - 1),
-                                    static_cast<units::world>(z) / static_cast<units::world>(grid_data.depth - 1));
-                }
-                voxel_meshes_->Append(cube_mesh_data, cube_scale);
-            }
-        }
-    }
 }
 
 bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)
@@ -99,6 +68,12 @@ bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, c
     if (!debug_mode)
     {
         return true;
+    }
+
+    // Mesh initialization is deferred because it's optional and adds significant startup time
+    if (grid_mesh_ == nullptr || voxel_meshes_ == nullptr)
+    {
+        InitMeshBuffers(irradiance);
     }
 
     auto context = render::context();
@@ -142,6 +117,52 @@ bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, c
     }
     target->BindDepthTexture(target->depth());
     return true;
+}
+
+void IrradianceView::InitMeshBuffers(const IrradianceVolume& irradiance)
+{
+    // Grab the dimensions of the irradiance volume and construct a matching grid mesh
+    auto grid_data = render::context()->GetTextureData3D(irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME));
+    std::stringstream dimension_args;
+    // We use -1 because we want the samples to be per intersection, not per voxel
+    dimension_args << (grid_data.width - 1) << "," << (grid_data.height - 1) << "," << (grid_data.depth - 1);
+    grid_mesh_.reset(new DrawBatcher(DrawMode::LINES));
+    Mesh grid_mesh("blons:line-grid~" + dimension_args.str());
+    grid_mesh_->Append(grid_mesh.mesh());
+
+    // Construct a cloud of cubes positioned to each voxel of the irradiance volume
+    voxel_meshes_.reset(new DrawBatcher());
+    Mesh cube_mesh("blons:cube");
+    MeshData cube_mesh_data = cube_mesh.mesh();
+    Matrix cube_scale = MatrixScale(0.05f, 0.05f, 0.05f);
+    MeshData cloud_mesh_data;
+    cloud_mesh_data.draw_mode = DrawMode::TRIANGLES;
+    cloud_mesh_data.vertices.reserve(grid_data.width * grid_data.height * grid_data.depth * cube_mesh_data.vertices.size());
+    cloud_mesh_data.indices.reserve(grid_data.width * grid_data.height * grid_data.depth * cube_mesh_data.indices.size());
+    for (int x = 0; x < grid_data.width; x++)
+    {
+        for (int y = 0; y < grid_data.height; y++)
+        {
+            for (int z = 0; z < grid_data.depth; z++)
+            {
+
+                for (auto& v : cube_mesh_data.vertices)
+                {
+                    v.tan = Vector3(static_cast<units::world>(x) / static_cast<units::world>(grid_data.width - 1),
+                                    static_cast<units::world>(y) / static_cast<units::world>(grid_data.height - 1),
+                                    static_cast<units::world>(z) / static_cast<units::world>(grid_data.depth - 1));
+                }
+                // Insert modified cube into cube cloud
+                cloud_mesh_data.vertices.insert(cloud_mesh_data.vertices.end(), cube_mesh_data.vertices.begin(), cube_mesh_data.vertices.end());
+                cloud_mesh_data.indices.insert(cloud_mesh_data.indices.end(), cube_mesh_data.indices.begin(), cube_mesh_data.indices.end());
+                // Add current vertex count to newly inserted indices
+                std::transform(cube_mesh_data.indices.begin(), cube_mesh_data.indices.end(),
+                               cloud_mesh_data.indices.end() - cube_mesh_data.indices.size(),
+                               [&](auto i) { return i + static_cast<unsigned int>(cloud_mesh_data.vertices.size() - cube_mesh_data.vertices.size()); });
+            }
+        }
+    }
+    voxel_meshes_->Append(cloud_mesh_data, cube_scale);
 }
 } // namespace debug
 } // namespace stage

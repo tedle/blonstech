@@ -42,12 +42,15 @@ namespace debug
 class IrradianceView
 {
 public:
-    IrradianceView(const IrradianceVolume& irradiance);
+    IrradianceView();
     ~IrradianceView() {}
 
     bool Render(Framebuffer* target, const TextureResource* depth, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
 
 private:
+    // Full init is deferred until first Render() because it's optional and adds significant startup time
+    void InitMeshBuffers(const IrradianceVolume& irradiance);
+
     std::unique_ptr<DrawBatcher> grid_mesh_;
     std::unique_ptr<DrawBatcher> voxel_meshes_;
     std::unique_ptr<Shader> grid_shader_;
