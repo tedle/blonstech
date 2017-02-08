@@ -36,11 +36,14 @@ out mat3 norm;
 
 // Globals
 uniform mat4 mvp_matrix;
+uniform mat4 normal_matrix;
 
 void main(void)
 {
     gl_Position = mvp_matrix * vec4(input_pos, 1.0);
 
     tex_coord = input_uv;
-    norm = transpose(mat3(input_tan, input_bitan, input_norm));
+    norm = transpose(mat3(normalize((normal_matrix * vec4(input_tan, 1.0f)).xyz),
+                          normalize((normal_matrix * vec4(input_bitan, 1.0f)).xyz),
+                          normalize((normal_matrix * vec4(input_norm, 1.0f)).xyz)));
 }

@@ -128,6 +128,7 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
             {
                 m->Render();
                 environment_map_shader_->SetInput("mvp_matrix", m->world_matrix() * cube_view.view_matrix() * cube_face_projection);
+                environment_map_shader_->SetInput("normal_matrix", MatrixTranspose(MatrixInverse(m->world_matrix())));
                 environment_map_shader_->SetInput("albedo", m->albedo(), 0);
                 environment_map_shader_->SetInput("normal", m->normal(), 1);
                 environment_map_shader_->Render(m->index_count());

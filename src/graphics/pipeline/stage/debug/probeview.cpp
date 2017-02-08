@@ -89,8 +89,10 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         // Bind the vertex data
         probe_meshes_->Render(false);
 
+        Matrix world_matrix = MatrixTranslation(probe.pos.x, probe.pos.y, probe.pos.z);
         // Set the inputs
-        if (!probe_shader_->SetInput("mvp_matrix", MatrixTranslation(probe.pos.x, probe.pos.y, probe.pos.z) * vp_matrix) ||
+        if (!probe_shader_->SetInput("mvp_matrix",  world_matrix * vp_matrix) ||
+            !probe_shader_->SetInput("normal_matrix", MatrixTranspose(MatrixInverse(world_matrix))) ||
             !probe_shader_->SetInput("env_proj_matrix", cube_face_projection) ||
             !probe_shader_->SetInput("env_tex_size", kProbeMapSize) ||
             !probe_shader_->SetInput("probe_count", static_cast<int>(light_probes.size())) ||

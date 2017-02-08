@@ -73,9 +73,9 @@ bool Geometry::Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix
         // Bind the vertex data
         model->Render();
 
-        Matrix model_view_proj = model->world_matrix() * view_proj;
         // Set the inputs
-        if (!geometry_shader_->SetInput("mvp_matrix", model_view_proj) ||
+        if (!geometry_shader_->SetInput("mvp_matrix", model->world_matrix() * view_proj) ||
+            !geometry_shader_->SetInput("normal_matrix", MatrixTranspose(MatrixInverse(model->world_matrix()))) ||
             !geometry_shader_->SetInput("albedo", model->albedo(), 0) ||
             !geometry_shader_->SetInput("normal", model->normal(), 1))
         {
