@@ -49,6 +49,8 @@ bool Deferred::Init()
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(perspective_.width), units::pixel_to_subpixel(perspective_.height), 0,
                                        perspective_.screen_near, perspective_.screen_far);
 
+    log::Debug("Initializing pipeline...");
+    Timer pipeline_setup;
     // Pipeline setup
     geometry_.reset(new stage::Geometry(perspective_));
     shadow_.reset(new stage::Shadow(perspective_));
@@ -57,6 +59,7 @@ bool Deferred::Init()
     lighting_.reset(new stage::Lighting(perspective_));
     debug_output_.reset(new stage::debug::DebugOutput(perspective_, *irradiance_volume_));
     composite_.reset(new stage::Composite(perspective_));
+    log::Debug(" [%ims]\n", pipeline_setup.ms());
 
     // Shaders
     ShaderAttributeList output_inputs; // dont worry about it
