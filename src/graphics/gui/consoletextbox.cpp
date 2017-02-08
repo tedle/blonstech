@@ -200,7 +200,10 @@ void ConsoleTextbox::TabCompletion(Input::KeyCode key)
             current_func = matching_funcs[tab_completion_index_];
         }
         // Update the textbox
-        set_text(current_func);
+        if (current_func.length() > 0)
+        {
+            set_text(current_func);
+        }
     }
 
     // Build completion hint string
