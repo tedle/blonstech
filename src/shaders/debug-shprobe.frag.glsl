@@ -54,7 +54,7 @@ layout(std430) buffer probe_buffer
 };
 
 // Re-orients surface normal to fit within cube face frustum (-Z normal, RH coordinates)
-// i.e., vec3(1,0,0) * inv_rotation_matrices[1/*+X*/] = vec3(0,0,-1)
+// i.e.,  inv_rotation_matrices[1/*+X*/] * vec3(1,0,0) = vec3(0,0,-1)
 const mat3 inv_rotation_matrices[6] = {
     mat3( // -Z
         1, 0, 0,
@@ -62,9 +62,9 @@ const mat3 inv_rotation_matrices[6] = {
         0, 0, 1
     ),
     mat3( // +X
-        0, 0, 1,
+        0, 0,-1,
         0, 1, 0,
-       -1, 0, 0
+        1, 0, 0
     ),
     mat3( // +Z
        -1, 0, 0,
@@ -72,19 +72,19 @@ const mat3 inv_rotation_matrices[6] = {
         0, 0,-1
     ),
     mat3( // -X
-        0, 0,-1,
+        0, 0, 1,
         0, 1, 0,
-        1, 0, 0
+       -1, 0, 0
     ),
     mat3( // +Y
         1, 0, 0,
-        0, 0, 1,
-        0,-1, 0
+        0, 0,-1,
+        0, 1, 0
     ),
     mat3( // -Y
         1, 0, 0,
-        0, 0,-1,
-        0, 1, 0
+        0, 0, 1,
+        0,-1, 0
     )
 };
 
@@ -103,7 +103,7 @@ void main(void)
             (surface_normal.y > 0.0f ? 4 : 5) :
         // else
             (surface_normal.z > 0.0f ? 2 : 0)));
-    vec3 local_surface_normal = surface_normal * inv_rotation_matrices[face_index];
+    vec3 local_surface_normal = inv_rotation_matrices[face_index] * surface_normal;
 
     vec4 texel_pos = env_proj_matrix * vec4(local_surface_normal, 1.0);
     texel_pos /= texel_pos.w;
