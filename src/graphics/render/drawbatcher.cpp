@@ -42,6 +42,7 @@ DrawBatcher::DrawBatcher(DrawMode draw_mode)
     index_count_ = 0;
     vertex_idx_ = 0;
     index_idx_ = 0;
+    allocation_count_ = 0;
 }
 
 void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
@@ -59,9 +60,16 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
     if (vertex_idx_ + vert_size > buffer_size_ ||
         index_idx_ + index_size > buffer_size_)
     {
-        // TODO: Change this to *= 2? Maybe? Maybe not?
         buffer_size_ = std::max(vertex_idx_ + vert_size, index_idx_ + index_size);
 
+        // Test to see if we're making frequent allocations, and make larger ones if so
+        allocation_count_++;
+        if (allocation_count_ > 5)
+        {
+            buffer_size_ = static_cast<unsigned int>(buffer_size_ * pow(1.05f, static_cast<float>(allocation_count_) / 10.0f));
+        }
+
+        //blons::log::Debug("old size %i / new size %i\n", old_buffer_size, buffer_size_);
         // Make a backup copy of mesh data we've already pushed to render API
         Vertex* vptr = nullptr;
         unsigned int* iptr = nullptr;

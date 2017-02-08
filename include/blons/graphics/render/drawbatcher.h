@@ -97,9 +97,14 @@ private:
     std::unique_ptr<BufferResource> vertex_buffer_;
     std::unique_ptr<BufferResource> index_buffer_;
 
-    unsigned int vertex_count_, index_count_;
+    // Total number of vertices/indices being used by memory
     unsigned int vertex_idx_, index_idx_;
+    // Cached version of vertex/index count in case buffers are flushed during rendering
+    unsigned int vertex_count_, index_count_;
+    // Total size of allocated buffer memory (sometimes larger than is actually used)
     unsigned int buffer_size_;
+    // Used to optimize frequent allocations by getting larger chunks of memory
+    unsigned int allocation_count_;
 };
 } // namespace blons
 
