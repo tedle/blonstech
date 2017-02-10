@@ -87,6 +87,8 @@ LightProbes::LightProbes()
             probes_.push_back(probe);
         }
     }
+    // Initialize shader buffer to fit all probes in
+    probe_shader_data_.reset(new ShaderData<LightProbes::Probe>(nullptr, probes_.size()));
 
     ShaderAttributeList env_map_inputs;
     env_map_inputs.push_back(ShaderAttribute(POS, "input_pos"));
@@ -189,6 +191,8 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
     }
     log::Debug("[%ims]\n", bake_stats.ms());
     environment_maps_->Unbind();
+    // Update shader buffer with generated probe data
+    probe_shader_data_->set_value(probes_.data());
 }
 
 const TextureResource* LightProbes::output(Output buffer) const
@@ -206,6 +210,11 @@ const TextureResource* LightProbes::output(Output buffer) const
 const std::vector<LightProbes::Probe>& LightProbes::probes() const
 {
     return probes_;
+}
+
+const ShaderDataResource* LightProbes::probe_shader_data() const
+{
+    return probe_shader_data_->data();
 }
 } // namespace stage
 } // namespace pipeline

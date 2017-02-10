@@ -30,7 +30,6 @@
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
-#include <blons/graphics/render/shaderdata.h>
 
 namespace blons
 {
@@ -51,7 +50,6 @@ public:
 private:
     std::unique_ptr<DrawBatcher> probe_meshes_;
     std::unique_ptr<Shader> probe_shader_;
-    std::unique_ptr<ShaderData<LightProbes::Probe>> probe_shader_data_;
 };
 } // namespace debug
 } // namespace stage

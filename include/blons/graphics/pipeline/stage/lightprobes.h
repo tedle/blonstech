@@ -28,6 +28,7 @@
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/shader.h>
+#include <blons/graphics/render/shaderdata.h>
 
 namespace blons
 {
@@ -72,11 +73,13 @@ public:
     const TextureResource* output(Output buffer) const;
 
     const std::vector<Probe>& probes() const;
+    const ShaderDataResource* probe_shader_data() const;
 
 private:
     std::vector<Probe> probes_;
     std::unique_ptr<Framebuffer> environment_maps_;
     std::unique_ptr<Shader> environment_map_shader_;
+    std::unique_ptr<ShaderData<Probe>> probe_shader_data_;
 };
 } // namespace stage
 } // namespace pipeline
