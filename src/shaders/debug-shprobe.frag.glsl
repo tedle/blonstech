@@ -36,7 +36,6 @@ out vec4 frag_colour;
 uniform sampler2D probe_env_maps;
 uniform mat4 env_proj_matrix;
 uniform int env_tex_size;
-uniform int probe_count;
 uniform int probe_id;
 uniform int debug_mode;
 
@@ -114,7 +113,7 @@ void main(void)
     texel_pos.xy += vec2(face_index * env_tex_size, probe_id * env_tex_size);
     // Normalize
     texel_pos.x /= env_tex_size * 6;
-    texel_pos.y /= env_tex_size * probe_count;
+    texel_pos.y /= env_tex_size * probes.length();
 
     float sh_normal[9];
     SHProjectDirection3(surface_normal, sh_normal);
