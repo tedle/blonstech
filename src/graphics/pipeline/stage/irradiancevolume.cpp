@@ -36,29 +36,13 @@ namespace stage
 {
 IrradianceVolume::IrradianceVolume()
 {
-    // Dummy volume built to wrap sponza in almost properly formed cubes
-    PixelData3D dummy_volume;
-    dummy_volume.width = 32;
-    dummy_volume.height = 16;
-    dummy_volume.depth = 16;
-    dummy_volume.type = TextureType(TextureType::R8G8B8, TextureType::LINEAR, TextureType::CLAMP);
-    auto pixel_size = dummy_volume.bits_per_pixel() / 8;
-    dummy_volume.pixels.reset(new unsigned char[dummy_volume.width * dummy_volume.height * dummy_volume.depth * pixel_size]);
-    for (int z = 0; z < dummy_volume.depth; z++)
-    {
-        for (int y = 0; y < dummy_volume.height; y++)
-        {
-            for (int x = 0; x < dummy_volume.width; x++)
-            {
-                auto index = (z * dummy_volume.width * dummy_volume.height + y * dummy_volume.width + x) * pixel_size;
-                // Hey this doesnt look nice! But it'll be gone soon!!!!!!!
-                dummy_volume.pixels.get()[index+0] = static_cast<unsigned char>(static_cast<float>(x) / static_cast<float>(dummy_volume.width - 1) * 255.0f);
-                dummy_volume.pixels.get()[index+1] = static_cast<unsigned char>(static_cast<float>(y) / static_cast<float>(dummy_volume.height - 1) * 255.0f);
-                dummy_volume.pixels.get()[index+2] = static_cast<unsigned char>(static_cast<float>(z) / static_cast<float>(dummy_volume.depth - 1) * 255.0f);
-            }
-        }
-    }
-    irradiance_volume_.reset(new Texture3D(dummy_volume));
+    // Initialize 3D texture containing volume data
+    PixelData3D volume;
+    volume.width = kIrradianceVolumeWidth;
+    volume.height = kIrradianceVolumeHeight;
+    volume.depth = kIrradianceVolumeDepth;
+    volume.type = TextureType(TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::REPEAT);
+    irradiance_volume_.reset(new Texture3D(volume));
 
     // World matrix sized to wrap sponza scene
     static const units::world grid_width = 38.0f;
@@ -68,10 +52,19 @@ IrradianceVolume::IrradianceVolume()
     static const units::world y_offset = -2.0f;
     static const units::world z_offset = -grid_depth / 2.0f;
     world_matrix_ = MatrixScale(grid_width, grid_height, grid_depth) * MatrixTranslation(x_offset, y_offset, z_offset);
+
+    // Compute shader for updating irradiance volume each frame
+    irradiance_volume_shader_.reset(new ComputeShader("shaders/irradiance-volume.comp.glsl"));
 }
 
 bool IrradianceVolume::Render(const LightProbes& probes)
 {
+    if (!irradiance_volume_shader_->SetInput("world_matrix", world_matrix_) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_out", irradiance_volume_->texture()))
+    {
+        return false;
+    }
+    irradiance_volume_shader_->Run(kIrradianceVolumeWidth, kIrradianceVolumeHeight, kIrradianceVolumeDepth);
     return true;
 }
 

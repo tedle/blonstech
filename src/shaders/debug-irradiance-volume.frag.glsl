@@ -35,6 +35,6 @@ uniform sampler3D irradiance_volume;
 void main(void)
 {
     vec4 norm_colour = vec4((norm + 1.0f) / 2.0f, 1.0f);
-    frag_colour = texture(irradiance_volume, sample_pos);
-    frag_colour += norm_colour * 0.00001;
+    frag_colour = vec4(texture(irradiance_volume, sample_pos).rgb, 1.0f);
+    frag_colour += norm_colour * 0.0000001;
 }

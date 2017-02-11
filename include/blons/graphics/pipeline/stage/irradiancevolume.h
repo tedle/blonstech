@@ -28,6 +28,7 @@
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/lightprobes.h>
 #include <blons/graphics/texture3d.h>
+#include <blons/graphics/render/computeshader.h>
 
 namespace blons
 {
@@ -72,6 +73,7 @@ public:
 
 private:
     std::unique_ptr<Texture3D> irradiance_volume_;
+    std::unique_ptr<ComputeShader> irradiance_volume_shader_;
     Matrix world_matrix_;
 };
 } // namespace stage

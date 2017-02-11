@@ -124,8 +124,7 @@ void IrradianceView::InitMeshBuffers(const IrradianceVolume& irradiance)
     // Grab the dimensions of the irradiance volume and construct a matching grid mesh
     auto grid_data = render::context()->GetTextureData3D(irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME));
     std::stringstream dimension_args;
-    // We use -1 because we want the samples to be per intersection, not per voxel
-    dimension_args << (grid_data.width - 1) << "," << (grid_data.height - 1) << "," << (grid_data.depth - 1);
+    dimension_args << (grid_data.width) << "," << (grid_data.height) << "," << (grid_data.depth);
     grid_mesh_.reset(new DrawBatcher(DrawMode::LINES));
     Mesh grid_mesh("blons:line-grid~" + dimension_args.str());
     grid_mesh_->Append(grid_mesh.mesh());
@@ -137,20 +136,27 @@ void IrradianceView::InitMeshBuffers(const IrradianceVolume& irradiance)
     Matrix cube_scale = MatrixScale(0.05f, 0.05f, 0.05f);
     MeshData cloud_mesh_data;
     cloud_mesh_data.draw_mode = DrawMode::TRIANGLES;
+    // Pre-allocate for optimization (it helps! really!)
     cloud_mesh_data.vertices.reserve(grid_data.width * grid_data.height * grid_data.depth * cube_mesh_data.vertices.size());
     cloud_mesh_data.indices.reserve(grid_data.width * grid_data.height * grid_data.depth * cube_mesh_data.indices.size());
+    Vector3 grid_dimensions(static_cast<units::world>(grid_data.width),
+                            static_cast<units::world>(grid_data.height),
+                            static_cast<units::world>(grid_data.depth));
     for (int x = 0; x < grid_data.width; x++)
     {
         for (int y = 0; y < grid_data.height; y++)
         {
             for (int z = 0; z < grid_data.depth; z++)
             {
-
                 for (auto& v : cube_mesh_data.vertices)
                 {
-                    v.tan = Vector3(static_cast<units::world>(x) / static_cast<units::world>(grid_data.width - 1),
-                                    static_cast<units::world>(y) / static_cast<units::world>(grid_data.height - 1),
-                                    static_cast<units::world>(z) / static_cast<units::world>(grid_data.depth - 1));
+                    // We use the tangent memory to store each cube's texel space position
+                    v.tan = Vector3(static_cast<units::world>(x),
+                                    static_cast<units::world>(y),
+                                    static_cast<units::world>(z));
+                    // Offset by half a texel so we sample the center
+                    v.tan += Vector3(0.5f);
+                    v.tan /= grid_dimensions;
                 }
                 // Insert modified cube into cube cloud
                 cloud_mesh_data.vertices.insert(cloud_mesh_data.vertices.end(), cube_mesh_data.vertices.begin(), cube_mesh_data.vertices.end());

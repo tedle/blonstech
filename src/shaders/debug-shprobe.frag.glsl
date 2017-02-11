@@ -25,6 +25,7 @@
 
 // Includes
 #include <shaders/sh-math.lib.glsl>
+#include <shaders/probe.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;
@@ -38,14 +39,6 @@ uniform mat4 env_proj_matrix;
 uniform int env_tex_size;
 uniform int probe_id;
 uniform int debug_mode;
-
-struct Probe
-{
-    int id;
-    // vec3 is secretly the size of vec4, don't use it!!!!!!!!!!!
-    float pos[3];
-    float sh_coeffs[9];
-};
 
 layout(std430) buffer probe_buffer
 {
@@ -119,8 +112,15 @@ void main(void)
     SHProjectDirection3(surface_normal, sh_normal);
     float sky_vis = SHDot3(sh_normal, probes[probe_id].sh_coeffs);
 
+    // Encode probe id into 3 colour channels
+    vec3 id_colour;
+    id_colour.r = float( probe_id & 0xFF           ) / 255.0f;
+    id_colour.g = float((probe_id & 0xFF00)   >>  8) / 255.0f;
+    id_colour.b = float((probe_id & 0xFF0000) >> 16) / 255.0f;
+
     frag_colour = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     frag_colour.rgb += texture(probe_env_maps, texel_pos.xy).rgb * (debug_mode == 1 ? 1.0f : 0.0f);
     frag_colour.rgb += (surface_normal + 1.0f) / 2.0f * (debug_mode == 2 ? 1.0f : 0.0f);
     frag_colour.rgb += sky_vis * (debug_mode == 3 ? 1.0f : 0.0f);
+    frag_colour.rgb += id_colour * (debug_mode == 4 ? 1.0f : 0.0f);
 }

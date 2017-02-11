@@ -482,5 +482,11 @@
     <None Include="shaders\debug-irradiance-volume.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\irradiance-volume.comp.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\probe.lib.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
