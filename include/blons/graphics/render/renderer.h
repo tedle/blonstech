@@ -52,9 +52,11 @@ struct TextureType
         R8G8B8_UINT,  ///< 3-channel, 8-bit per channel
         R8G8B8A8_UINT,///< 4-channel, 8-bit per channel
         R8G8B8,       ///< 3-channel, 8-bit per channel
-        R32G32B32,    ///< 3-channel, 32-bit per channel
         R16G16,       ///< 2-channel, 16-bit per channel
         R8G8B8A8,     ///< 3-channel, 8-bit per channel
+        A32,          ///< 1-channel, 32-bit per channel
+        R32G32,       ///< 2-channel, 32-bit per channel
+        R32G32B32,    ///< 3-channel, 32-bit per channel
         R32G32B32A32, ///< 4-channel, 32-bit per channel
         DEPTH         ///< Depth information
     } format; ///< \copybrief Format
@@ -256,12 +258,19 @@ struct PixelData
         case TextureType::R8G8B8:
             bits = 24;
             break;
+        case TextureType::A32:
         case TextureType::R16G16:
         case TextureType::R8G8B8A8:
             bits = 32;
             break;
+        case TextureType::R32G32:
+            bits = 64;
+            break;
         case TextureType::R32G32B32:
             bits = 96;
+            break;
+        case TextureType::R32G32B32A32:
+            bits = 128;
             break;
         case TextureType::NONE:
         default:
