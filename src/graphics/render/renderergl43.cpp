@@ -1289,7 +1289,7 @@ bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, co
         throw "Unsupported shader output format";
         break;
     }
-    glBindImageTexture(0, tex->texture_, 0, layered, 0, GL_WRITE_ONLY, format);
+    glBindImageTexture(texture_index, tex->texture_, 0, layered, 0, GL_WRITE_ONLY, format);
     return SetShaderInput(program, name, static_cast<int>(texture_index));
 }
 
