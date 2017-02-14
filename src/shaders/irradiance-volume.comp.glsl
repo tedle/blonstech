@@ -25,12 +25,14 @@
 
 // Includes
 #include <shaders/probe.lib.glsl>
+#include <shaders/sh-math.lib.glsl>
 
 // Workgroup size
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 // Globals
-layout(rgba8, binding = 0) writeonly uniform image3D irradiance_volume_out;
+layout(rgba32f, binding = 0) writeonly uniform image3D irradiance_volume_px_nx_py_ny_out;
+layout(rg32f, binding = 1) writeonly uniform image3D irradiance_volume_pz_nz_out;
 uniform mat4 world_matrix;
 
 layout(std430) buffer probe_buffer
@@ -59,13 +61,33 @@ void main(void)
         }
     }
 
-    int probe_id = nearest_probe.id;
-    // Encode probe id into 3 colour channels
-    vec3 id_colour;
-    id_colour.r = float( probe_id & 0xFF           ) / 255.0f;
-    id_colour.g = float((probe_id & 0xFF00)   >>  8) / 255.0f;
-    id_colour.b = float((probe_id & 0xFF0000) >> 16) / 255.0f;
+    // Sample the nearest probe's sky vis coefficients in each principle normal direction
+    // Store as an ambient cube
+    // TODO: This will eventually be done per-probe instead of per-voxel
+    float ambient_cube[6];
+    float direction_coeffs[9];
 
-    vec4 colour = vec4(id_colour, 1.0);
-    imageStore(irradiance_volume_out, ivec3(gl_GlobalInvocationID), colour);
+    // +X
+    SHProjectDirection3(vec3(1.0, 0.0, 0.0), direction_coeffs);
+    ambient_cube[0] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
+    // -X
+    SHProjectDirection3(vec3(-1.0, 0.0, 0.0), direction_coeffs);
+    ambient_cube[1] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
+    // +Y
+    SHProjectDirection3(vec3(0.0, 1.0, 0.0), direction_coeffs);
+    ambient_cube[2] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
+    // -Y
+    SHProjectDirection3(vec3(0.0, -1.0, 0.0), direction_coeffs);
+    ambient_cube[3] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
+    // +Z
+    SHProjectDirection3(vec3(0.0, 0.0, 1.0), direction_coeffs);
+    ambient_cube[4] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
+    // -Z
+    SHProjectDirection3(vec3(0.0, 0.0, -1.0), direction_coeffs);
+    ambient_cube[5] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
+
+    imageStore(irradiance_volume_px_nx_py_ny_out, ivec3(gl_GlobalInvocationID),
+               vec4(ambient_cube[0], ambient_cube[1], ambient_cube[2], ambient_cube[3]));
+    imageStore(irradiance_volume_pz_nz_out, ivec3(gl_GlobalInvocationID),
+               vec4(ambient_cube[4], ambient_cube[5], 0.0f, 0.0f));
 }

@@ -41,8 +41,10 @@ IrradianceVolume::IrradianceVolume()
     volume.width = kIrradianceVolumeWidth;
     volume.height = kIrradianceVolumeHeight;
     volume.depth = kIrradianceVolumeDepth;
-    volume.type = TextureType(TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::REPEAT);
-    irradiance_volume_.reset(new Texture3D(volume));
+    volume.type = TextureType(TextureType::R32G32B32A32, TextureType::LINEAR, TextureType::REPEAT);
+    irradiance_volume_px_nx_py_ny_.reset(new Texture3D(volume));
+    volume.type = TextureType(TextureType::R32G32, TextureType::LINEAR, TextureType::REPEAT);
+    irradiance_volume_pz_nz_.reset(new Texture3D(volume));
 
     // World matrix sized to wrap sponza scene
     static const units::world grid_width = 38.0f;
@@ -60,7 +62,9 @@ IrradianceVolume::IrradianceVolume()
 bool IrradianceVolume::Render(const LightProbes& probes)
 {
     if (!irradiance_volume_shader_->SetInput("world_matrix", world_matrix_) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_out", irradiance_volume_->texture()))
+        !irradiance_volume_shader_->SetInput("probe_buffer", probes.probe_shader_data()) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_px_nx_py_ny_out", irradiance_volume_px_nx_py_ny_->texture(), 0) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_pz_nz_out", irradiance_volume_pz_nz_->texture(), 1))
     {
         return false;
     }
@@ -70,7 +74,15 @@ bool IrradianceVolume::Render(const LightProbes& probes)
 
 const TextureResource* IrradianceVolume::output(Output buffer) const
 {
-    return irradiance_volume_->texture();
+    switch (buffer)
+    {
+    case IRRADIANCE_VOLUME_PX_NX_PY_NY:
+        return irradiance_volume_px_nx_py_ny_->texture();
+    case IRRADIANCE_VOLUME_PZ_NZ:
+        return irradiance_volume_pz_nz_->texture();
+    default:
+        throw "Requested non-existant output buffer from IrradianceVolume";
+    }
 }
 
 Matrix IrradianceVolume::world_matrix() const

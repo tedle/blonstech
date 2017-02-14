@@ -48,7 +48,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        IRRADIANCE_VOLUME ///< 3D volume texture of indirect irradiance
+        IRRADIANCE_VOLUME_PX_NX_PY_NY, ///< 3D volume texture of ambient cube coefficients [+X,-X,+Y,-Y]
+        IRRADIANCE_VOLUME_PZ_NZ        ///< 3D volume texture of ambient cube coefficients [+Z,-Z]
     };
 
 public:
@@ -72,7 +73,8 @@ public:
     Matrix world_matrix() const;
 
 private:
-    std::unique_ptr<Texture3D> irradiance_volume_;
+    std::unique_ptr<Texture3D> irradiance_volume_px_nx_py_ny_; // Stores ambient cube coefficients +X,-X,+Y,-Y
+    std::unique_ptr<Texture3D> irradiance_volume_pz_nz_; // Stores ambient cube coefficients +Z,-Z
     std::unique_ptr<ComputeShader> irradiance_volume_shader_;
     Matrix world_matrix_;
 };
