@@ -24,6 +24,7 @@
 #version 430
 
 // Includes
+#include <shaders/math.lib.glsl>
 #include <shaders/sh-math.lib.glsl>
 #include <shaders/probe.lib.glsl>
 
@@ -83,7 +84,7 @@ const mat3 inv_rotation_matrices[6] = {
 void main(void)
 {
     // equivilent of transpose(norm)[2].xyz;
-    vec3 surface_normal = vec3(norm[0].z, norm[1].z, norm[2].z);
+    vec3 surface_normal = normalize(vec3(norm[0].z, norm[1].z, norm[2].z));
     vec3 abs_normal = abs(surface_normal);
     // Since branching in shaders is bad, welcome to a really ugly ternary operator
     int face_index =
@@ -109,8 +110,13 @@ void main(void)
     texel_pos.y /= env_tex_size * probes.length();
 
     float sh_normal[9];
+    // Calculate direct sky vis data
     SHProjectDirection3(surface_normal, sh_normal);
     float sky_vis = SHDot3(sh_normal, probes[probe_id].sh_coeffs);
+    // Calculate sky vis as viewed on a diffuse material
+    SHProjectCosineLobe3(surface_normal, sh_normal);
+    // Divide by pi to turn irradiance into exit radiance
+    float sky_vis_diffuse = SHDot3(sh_normal, probes[probe_id].sh_coeffs) / kPi;
 
     // Encode probe id into 3 colour channels
     vec3 id_colour;
@@ -120,7 +126,8 @@ void main(void)
 
     frag_colour = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     frag_colour.rgb += texture(probe_env_maps, texel_pos.xy).rgb * (debug_mode == 1 ? 1.0f : 0.0f);
-    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f * (debug_mode == 2 ? 1.0f : 0.0f);
-    frag_colour.rgb += sky_vis * (debug_mode == 3 ? 1.0f : 0.0f);
-    frag_colour.rgb += id_colour * (debug_mode == 4 ? 1.0f : 0.0f);
+    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f            * (debug_mode == 2 ? 1.0f : 0.0f);
+    frag_colour.rgb += sky_vis                                   * (debug_mode == 3 ? 1.0f : 0.0f);
+    frag_colour.rgb += sky_vis_diffuse                           * (debug_mode == 4 ? 1.0f : 0.0f);
+    frag_colour.rgb += id_colour                                 * (debug_mode == 5 ? 1.0f : 0.0f);
 }

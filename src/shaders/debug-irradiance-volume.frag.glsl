@@ -23,6 +23,9 @@
 
 #version 430
 
+// Includes
+#include <shaders/math.lib.glsl>
+
 // Ins n outs
 in vec3 norm;
 in vec3 sample_pos;
@@ -43,5 +46,7 @@ void main(void)
     float sky_vis = norm_sq.x * px_nx_py_ny[is_negative.x] +
                     norm_sq.y * px_nx_py_ny[is_negative.y + 2] +
                     norm_sq.z * pz_nz[is_negative.z];
+    // Visualize as exit irradiance, divide by pi
+    sky_vis /= kPi;
     frag_colour = vec4(vec3(sky_vis), 1.0f);
 }

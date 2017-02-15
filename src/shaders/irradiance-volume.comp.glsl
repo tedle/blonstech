@@ -68,22 +68,22 @@ void main(void)
     float direction_coeffs[9];
 
     // +X
-    SHProjectDirection3(vec3(1.0, 0.0, 0.0), direction_coeffs);
+    SHProjectCosineLobe3(vec3(1.0, 0.0, 0.0), direction_coeffs);
     ambient_cube[0] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
     // -X
-    SHProjectDirection3(vec3(-1.0, 0.0, 0.0), direction_coeffs);
+    SHProjectCosineLobe3(vec3(-1.0, 0.0, 0.0), direction_coeffs);
     ambient_cube[1] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
     // +Y
-    SHProjectDirection3(vec3(0.0, 1.0, 0.0), direction_coeffs);
+    SHProjectCosineLobe3(vec3(0.0, 1.0, 0.0), direction_coeffs);
     ambient_cube[2] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
     // -Y
-    SHProjectDirection3(vec3(0.0, -1.0, 0.0), direction_coeffs);
+    SHProjectCosineLobe3(vec3(0.0, -1.0, 0.0), direction_coeffs);
     ambient_cube[3] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
     // +Z
-    SHProjectDirection3(vec3(0.0, 0.0, 1.0), direction_coeffs);
+    SHProjectCosineLobe3(vec3(0.0, 0.0, 1.0), direction_coeffs);
     ambient_cube[4] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
     // -Z
-    SHProjectDirection3(vec3(0.0, 0.0, -1.0), direction_coeffs);
+    SHProjectCosineLobe3(vec3(0.0, 0.0, -1.0), direction_coeffs);
     ambient_cube[5] = max(SHDot3(nearest_probe.sh_coeffs, direction_coeffs), 0.0f);
 
     imageStore(irradiance_volume_px_nx_py_ny_out, ivec3(gl_GlobalInvocationID),

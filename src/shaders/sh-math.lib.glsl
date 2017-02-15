@@ -52,6 +52,15 @@ float __sh_l2m2(const vec3 v)
     return 0.54627421529603953527169285290134f * (v.x * v.x - v.y * v.y);
 }
 
+float _kSHCosineLobe[3] = float[3](
+    // pi
+    3.1415926535897932384626433832795f,
+    // 2 * pi / 3
+    2.0943951023931954923084289221863f,
+    // pi / 4
+    0.78539816339744830961566084581988f
+);
+
 void SHProjectDirection2(vec3 direction, inout vec4 coefficients)
 {
     coefficients = vec4(__sh_l0m0(), __sh_l1m_1(direction), __sh_l1m0(direction), __sh_l1m1(direction));
@@ -68,6 +77,27 @@ void SHProjectDirection3(vec3 direction, inout float coefficients[9])
     coefficients[6] = __sh_l2m0(direction);
     coefficients[7] = __sh_l2m1(direction);
     coefficients[8] = __sh_l2m2(direction);
+}
+
+void SHProjectCosineLobe2(vec3 direction, inout vec4 coefficients)
+{
+    coefficients = vec4(__sh_l0m0()           * _kSHCosineLobe[0],
+                        __sh_l1m_1(direction) * _kSHCosineLobe[1],
+                        __sh_l1m0(direction)  * _kSHCosineLobe[1],
+                        __sh_l1m1(direction)  * _kSHCosineLobe[1]);
+}
+
+void SHProjectCosineLobe3(vec3 direction, inout float coefficients[9])
+{
+    coefficients[0] = __sh_l0m0()           * _kSHCosineLobe[0];
+    coefficients[1] = __sh_l1m_1(direction) * _kSHCosineLobe[1];
+    coefficients[2] = __sh_l1m0(direction)  * _kSHCosineLobe[1];
+    coefficients[3] = __sh_l1m1(direction)  * _kSHCosineLobe[1];
+    coefficients[4] = __sh_l2m_2(direction) * _kSHCosineLobe[2];
+    coefficients[5] = __sh_l2m_1(direction) * _kSHCosineLobe[2];
+    coefficients[6] = __sh_l2m0(direction)  * _kSHCosineLobe[2];
+    coefficients[7] = __sh_l2m1(direction)  * _kSHCosineLobe[2];
+    coefficients[8] = __sh_l2m2(direction)  * _kSHCosineLobe[2];
 }
 
 float SHDot2(vec4 coeffs_a, vec4 coeffs_b)
