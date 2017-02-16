@@ -41,7 +41,7 @@ struct Scene
     Camera view;                ///< Camera the scene is viewed from
     std::vector<Model*> models; ///< List of models to be rendered on screen
     std::vector<Light*> lights; ///< List of lights to be used in the scene
-    Vector3 sky_colour;         ///< Colour of the sky
+    SHColourCoeffs3 sky_box;    ///< Sky box mapped to spherical harmonics
 };
 
 ////////////////////////////////////////////////////////////////////////////////

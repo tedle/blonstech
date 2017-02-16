@@ -93,9 +93,20 @@ Graphics::Graphics(Client::Info screen)
                          Vector3(-2.0f, -5.0f, -0.5f),
                          Vector3(1.0f, 0.95f, 0.8f))); // colour
     // Sunny day
-    sky_colour_ = Vector3(0.3f, 0.6f, 1.0f);
+    Vector3 sky_colour(0.3f, 0.6f, 1.0f);
     // Midnight
-    //sky_colour_ = Vector3(0.1f, 0.1f, 0.4f);
+    //Vector3 sky_colour(0.1f, 0.1f, 0.4f);
+
+    // Describes a function f(x) = 1.0
+    SHCoeffs3 uniform_function;
+    uniform_function.coeffs[0] = 2.0f * sqrt(kPi);
+    // Generate skybox coefficients by weighting uniform function with desired sky colour
+    for (int i = 0; i < sizeof(uniform_function.coeffs) / sizeof(decltype(uniform_function.coeffs[0])); i++)
+    {
+        sky_box_.r.coeffs[i] = uniform_function.coeffs[i] * sky_colour.r;
+        sky_box_.g.coeffs[i] = uniform_function.coeffs[i] * sky_colour.g;
+        sky_box_.b.coeffs[i] = uniform_function.coeffs[i] * sky_colour.b;
+    }
 }
 
 Graphics::~Graphics()
@@ -123,7 +134,7 @@ void Graphics::BakeRadianceTransfer()
     pipeline::Scene scene;
     scene.lights = { sun_.get() };
     scene.models.assign(models_.begin(), models_.end());
-    scene.sky_colour = sky_colour_;
+    scene.sky_box = sky_box_;
     scene.view = *camera_;
 
     pipeline_->BakeRadianceTransfer(scene);
@@ -177,7 +188,7 @@ bool Graphics::Render()
     pipeline::Scene scene;
     scene.lights = { sun_.get() };
     scene.models.assign(models_.begin(), models_.end());
-    scene.sky_colour = sky_colour_;
+    scene.sky_box = sky_box_;
     scene.view = *camera_;
 
     // Clear buffers

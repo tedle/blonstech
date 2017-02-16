@@ -79,7 +79,9 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
         !light_shader_->SetInput("direct_light", shadow.output(stage::Shadow::DIRECT_LIGHT), 3) ||
         !light_shader_->SetInput("sun.dir", sun->direction()) ||
         !light_shader_->SetInput("sun.colour", sun->colour()) ||
-        !light_shader_->SetInput("sky_colour", scene.sky_colour))
+        !light_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
+        !light_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
+        !light_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9))
     {
         return false;
     }

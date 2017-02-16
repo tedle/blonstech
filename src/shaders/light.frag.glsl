@@ -25,6 +25,7 @@
 
 // Includes
 #include <shaders/gamma.lib.glsl>
+#include <shaders/sh-math.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;
@@ -54,16 +55,17 @@ struct DirectionalLight
     vec3 colour;
 };
 uniform DirectionalLight sun;
-uniform vec3 sky_colour;
+struct SHColourCoeffs
+{
+    float r[9];
+    float g[9];
+    float b[9];
+};
+uniform SHColourCoeffs sh_sky_colour;
 
 void main(void)
 {
     float depth_sample = texture(depth, tex_coord).r;
-    if (depth_sample == 1.0)
-    {
-        frag_colour = vec4(sky_colour, 1.0);
-        return;
-    }
     // World coordinates of the pixel we're rendering
     vec4 pos = vec4(tex_coord.x,
                     tex_coord.y,
@@ -76,6 +78,17 @@ void main(void)
     vec4 eye_pos = inv_vp_matrix * vec4(0.0, 0.0, 0.0, 1.0);
     eye_pos /= eye_pos.w;
     vec3 view_dir = normalize(eye_pos.xyz - pos.xyz);
+
+    if (depth_sample == 1.0)
+    {
+        float direction_coeffs[9];
+        SHProjectDirection3(-view_dir, direction_coeffs);
+        vec3 sky_colour = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
+                               SHDot3(direction_coeffs, sh_sky_colour.g),
+                               SHDot3(direction_coeffs, sh_sky_colour.b));
+        frag_colour = vec4(sky_colour, 1.0);
+        return;
+    }
 
     vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
     vec3 halfway = normalize(-sun.dir + view_dir);
