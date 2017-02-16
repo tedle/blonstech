@@ -97,6 +97,12 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector4 value) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const ShaderDataResource* value) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const float* value, std::size_t elements) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const int* value, std::size_t elements) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const Matrix* value, std::size_t elements) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const Vector2* value, std::size_t elements) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const Vector3* value, std::size_t elements) override;
+    bool SetShaderInput(ShaderResource* program, const char* name, const Vector4* value, std::size_t elements) override;
     bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
 
     bool SetBlendMode(BlendMode mode) override;

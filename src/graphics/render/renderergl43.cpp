@@ -118,29 +118,29 @@ void TranslateTextureFormat(TextureType::Format format, GLint* internal_format, 
     }
 }
 // Overloaded glUniforms to keep things generic
-void Uniform(GLuint loc, float value)
+void Uniform(GLuint loc, const float* value, GLsizei elements)
 {
-    glUniform1f(loc, value);
+    glUniform1fv(loc, elements, value);
 }
-void Uniform(GLuint loc, int value)
+void Uniform(GLuint loc, const int* value, GLsizei elements)
 {
-    glUniform1i(loc, value);
+    glUniform1iv(loc, elements, value);
 }
-void Uniform(GLuint loc, Matrix value)
+void Uniform(GLuint loc, const Matrix* value, GLsizei elements)
 {
-    glUniformMatrix4fv(loc, 1, GL_FALSE, (float*)value.m);
+    glUniformMatrix4fv(loc, elements, GL_FALSE, (float*)value->m);
 }
-void Uniform(GLuint loc, Vector2 value)
+void Uniform(GLuint loc, const Vector2* value, GLsizei elements)
 {
-    glUniform2fv(loc, 1, &value.x);
+    glUniform2fv(loc, elements, &value->x);
 }
-void Uniform(GLuint loc, Vector3 value)
+void Uniform(GLuint loc, const Vector3* value, GLsizei elements)
 {
-    glUniform3fv(loc, 1, &value.x);
+    glUniform3fv(loc, elements, &value->x);
 }
-void Uniform(GLuint loc, Vector4 value)
+void Uniform(GLuint loc, const Vector4* value, GLsizei elements)
 {
-    glUniform4fv(loc, 1, &value.x);
+    glUniform4fv(loc, elements, &value->x);
 }
 } // namespace
 
@@ -199,6 +199,8 @@ public:
     enum ShaderType { NONE, PIPELINE, COMPUTE } type_;
 
     GLint UniformLocation(const char* name);
+    template <typename T>
+    bool SetUniform(const char* name, T* value, GLsizei elements);
     template <typename T>
     bool SetUniform(const char* name, T value);
     bool BindSSBO(const char* name, const ShaderDataResourceGL43* ssbo);
@@ -309,7 +311,7 @@ GLint ShaderResourceGL43::UniformLocation(const char* name)
 }
 
 template <typename T>
-bool ShaderResourceGL43::SetUniform(const char* name, T value)
+bool ShaderResourceGL43::SetUniform(const char* name, T* value, GLsizei elements)
 {
     // Clear errors so we know problems are isolated to this function
     glGetError();
@@ -322,12 +324,18 @@ bool ShaderResourceGL43::SetUniform(const char* name, T value)
     {
         return false;
     }
-    Uniform(location, value);
+    Uniform(location, value, elements);
     if (glGetError() != GL_NO_ERROR)
     {
         return false;
     }
     return true;
+}
+
+template <typename T>
+bool ShaderResourceGL43::SetUniform(const char* name, T value)
+{
+    return SetUniform(name, &value, 1);
 }
 
 bool ShaderResourceGL43::BindSSBO(const char* name, const ShaderDataResourceGL43* ssbo)
@@ -1263,6 +1271,42 @@ bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, con
 {
     auto prog = resource_cast<ShaderResourceGL43*>(program, id());
     return prog->BindSSBO(name, resource_cast<const ShaderDataResourceGL43*>(value, id()));
+}
+
+bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const float* value, std::size_t elements)
+{
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
+    return prog->SetUniform(name, value, static_cast<GLsizei>(elements));
+}
+
+bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const int* value, std::size_t elements)
+{
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
+    return prog->SetUniform(name, value, static_cast<GLsizei>(elements));
+}
+
+bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const Matrix* value, std::size_t elements)
+{
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
+    return prog->SetUniform(name, value, static_cast<GLsizei>(elements));
+}
+
+bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector2* value, std::size_t elements)
+{
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
+    return prog->SetUniform(name, value, static_cast<GLsizei>(elements));
+}
+
+bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector3* value, std::size_t elements)
+{
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
+    return prog->SetUniform(name, value, static_cast<GLsizei>(elements));
+}
+
+bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, const Vector4* value, std::size_t elements)
+{
+    auto prog = resource_cast<ShaderResourceGL43*>(program, id());
+    return prog->SetUniform(name, value, static_cast<GLsizei>(elements));
 }
 
 bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)

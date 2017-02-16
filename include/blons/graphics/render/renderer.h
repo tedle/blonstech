@@ -699,6 +699,36 @@ public:
     /// \copydoc SetShaderInput
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderInput(ShaderResource* program, const char* name, const ShaderDataResource* value)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets a shader's global array to be that of the given value
+    ///
+    /// \param program Shader containing global array
+    /// \param name Name of global array to modify
+    /// \param value Pointer to an array of values
+    /// \param elements Number of elements in array
+    /// \return True on success
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const float* value, std::size_t elements)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput(ShaderResource*, const char*, const float*, std::size_t)
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const int* value, std::size_t elements)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput(ShaderResource*, const char*, const float*, std::size_t)
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const Matrix* value, std::size_t elements)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput(ShaderResource*, const char*, const float*, std::size_t)
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const Vector2* value, std::size_t elements)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput(ShaderResource*, const char*, const float*, std::size_t)
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const Vector3* value, std::size_t elements)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc SetShaderInput(ShaderResource*, const char*, const float*, std::size_t)
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual bool SetShaderInput(ShaderResource* program, const char* name, const Vector4* value, std::size_t elements)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets a shader's global output variable to be that of the given value

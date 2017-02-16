@@ -80,6 +80,36 @@ bool CommonShader::SetInput(const char* field, const ShaderDataResource* value)
     return render::context()->SetShaderInput(program_.get(), field, value);
 }
 
+bool CommonShader::SetInput(const char* field, const float* value, std::size_t elements)
+{
+    return render::context()->SetShaderInput(program_.get(), field, value, elements);
+}
+
+bool CommonShader::SetInput(const char* field, const int* value, std::size_t elements)
+{
+    return render::context()->SetShaderInput(program_.get(), field, value, elements);
+}
+
+bool CommonShader::SetInput(const char* field, const Matrix* value, std::size_t elements)
+{
+    return render::context()->SetShaderInput(program_.get(), field, value, elements);
+}
+
+bool CommonShader::SetInput(const char* field, const Vector2* value, std::size_t elements)
+{
+    return render::context()->SetShaderInput(program_.get(), field, value, elements);
+}
+
+bool CommonShader::SetInput(const char* field, const Vector3* value, std::size_t elements)
+{
+    return render::context()->SetShaderInput(program_.get(), field, value, elements);
+}
+
+bool CommonShader::SetInput(const char* field, const Vector4* value, std::size_t elements)
+{
+    return render::context()->SetShaderInput(program_.get(), field, value, elements);
+}
+
 std::string CommonShader::ParseFile(std::string filename)
 {
     // Load source file into memory
