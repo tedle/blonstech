@@ -25,6 +25,7 @@
 
 // Includes
 #include <shaders/gamma.lib.glsl>
+#include <shaders/types.lib.glsl>
 #include <shaders/math.lib.glsl>
 
 // Ins n outs
@@ -38,7 +39,8 @@ uniform sampler2D albedo;
 uniform sampler2D normal;
 uniform sampler2D depth;
 uniform sampler2D direct_light;
-//uniform sampler2D indirect_light;
+uniform DirectionalLight sun;
+uniform SHColourCoeffs sh_sky_colour;
 
 // Used to give stronger specular when light bounces at shallower angles
 // refraction_index of 1.0 gives a fresnel of about 0.058~ and 0.1 gives a coef of about 0.72
@@ -48,20 +50,6 @@ const float extinction_coef = 0.5;
 const float fresnel_coef = (pow(refraction_index - 1, 2) + pow(extinction_coef, 2)) / (pow(refraction_index + 1, 2) + pow(extinction_coef, 2));
 // Pop this somewhere between 0.1-100,000 idk
 const float gloss = 20.0;
-
-struct DirectionalLight
-{
-    vec3 dir;
-    vec3 colour;
-};
-uniform DirectionalLight sun;
-struct SHColourCoeffs
-{
-    float r[9];
-    float g[9];
-    float b[9];
-};
-uniform SHColourCoeffs sh_sky_colour;
 
 void main(void)
 {

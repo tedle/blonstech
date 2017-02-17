@@ -25,7 +25,7 @@
 
 // Includes
 #include <shaders/math.lib.glsl>
-#include <shaders/probe.lib.glsl>
+#include <shaders/types.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;

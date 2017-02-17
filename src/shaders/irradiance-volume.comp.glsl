@@ -24,7 +24,7 @@
 #version 430
 
 // Includes
-#include <shaders/probe.lib.glsl>
+#include <shaders/types.lib.glsl>
 #include <shaders/math.lib.glsl>
 
 // Workgroup size
