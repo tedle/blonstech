@@ -117,7 +117,12 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!irradiance_volume_->Render(*light_probes_))
+    if (!light_probes_->Relight(scene))
+    {
+        return false;
+    }
+
+    if (!irradiance_volume_->Relight(*light_probes_))
     {
         return false;
     }

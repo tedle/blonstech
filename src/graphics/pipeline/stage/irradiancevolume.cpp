@@ -42,9 +42,12 @@ IrradianceVolume::IrradianceVolume()
     volume.height = kIrradianceVolumeHeight;
     volume.depth = kIrradianceVolumeDepth;
     volume.type = TextureType(TextureType::R32G32B32A32, TextureType::LINEAR, TextureType::REPEAT);
-    irradiance_volume_px_nx_py_ny_.reset(new Texture3D(volume));
-    volume.type = TextureType(TextureType::R32G32, TextureType::LINEAR, TextureType::REPEAT);
-    irradiance_volume_pz_nz_.reset(new Texture3D(volume));
+    irradiance_volume_px_.reset(new Texture3D(volume));
+    irradiance_volume_nx_.reset(new Texture3D(volume));
+    irradiance_volume_py_.reset(new Texture3D(volume));
+    irradiance_volume_ny_.reset(new Texture3D(volume));
+    irradiance_volume_pz_.reset(new Texture3D(volume));
+    irradiance_volume_nz_.reset(new Texture3D(volume));
 
     // World matrix sized to wrap sponza scene
     static const units::world grid_width = 38.0f;
@@ -59,12 +62,16 @@ IrradianceVolume::IrradianceVolume()
     irradiance_volume_shader_.reset(new ComputeShader("shaders/irradiance-volume.comp.glsl"));
 }
 
-bool IrradianceVolume::Render(const LightProbes& probes)
+bool IrradianceVolume::Relight(const LightProbes& probes)
 {
     if (!irradiance_volume_shader_->SetInput("world_matrix", world_matrix_) ||
         !irradiance_volume_shader_->SetInput("probe_buffer", probes.probe_shader_data()) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_px_nx_py_ny_out", irradiance_volume_px_nx_py_ny_->texture(), 0) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_pz_nz_out", irradiance_volume_pz_nz_->texture(), 1))
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_px_out", irradiance_volume_px_->texture(), 0) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_nx_out", irradiance_volume_nx_->texture(), 1) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_py_out", irradiance_volume_py_->texture(), 2) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_ny_out", irradiance_volume_ny_->texture(), 3) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_pz_out", irradiance_volume_pz_->texture(), 4) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_nz_out", irradiance_volume_nz_->texture(), 5))
     {
         return false;
     }
@@ -76,10 +83,18 @@ const TextureResource* IrradianceVolume::output(Output buffer) const
 {
     switch (buffer)
     {
-    case IRRADIANCE_VOLUME_PX_NX_PY_NY:
-        return irradiance_volume_px_nx_py_ny_->texture();
-    case IRRADIANCE_VOLUME_PZ_NZ:
-        return irradiance_volume_pz_nz_->texture();
+    case IRRADIANCE_VOLUME_PX:
+        return irradiance_volume_px_->texture();
+    case IRRADIANCE_VOLUME_NX:
+        return irradiance_volume_nx_->texture();
+    case IRRADIANCE_VOLUME_PY:
+        return irradiance_volume_py_->texture();
+    case IRRADIANCE_VOLUME_NY:
+        return irradiance_volume_ny_->texture();
+    case IRRADIANCE_VOLUME_PZ:
+        return irradiance_volume_pz_->texture();
+    case IRRADIANCE_VOLUME_NZ:
+        return irradiance_volume_nz_->texture();
     default:
         throw "Requested non-existant output buffer from IrradianceVolume";
     }

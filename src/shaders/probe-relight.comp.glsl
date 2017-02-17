@@ -24,35 +24,44 @@
 #version 430
 
 // Includes
+#include <shaders/probe.lib.glsl>
 #include <shaders/math.lib.glsl>
 
-// Ins n outs
-in vec3 norm;
-in vec3 sample_pos;
-
-out vec4 frag_colour;
+// Workgroup size
+layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 // Globals
-uniform sampler3D irradiance_volume_px;
-uniform sampler3D irradiance_volume_nx;
-uniform sampler3D irradiance_volume_py;
-uniform sampler3D irradiance_volume_ny;
-uniform sampler3D irradiance_volume_pz;
-uniform sampler3D irradiance_volume_nz;
+layout(std430) buffer probe_buffer
+{
+    Probe probes[];
+};
+
+void ComputeAmbientCubeDirection(const uint probe_id, const int cube_face, const vec3 direction)
+{
+    float direction_coeffs[9];
+    SHProjectCosineLobe3(direction, direction_coeffs);
+    vec3 diffuse_colour = vec3(max(SHDot3(probes[probe_id].sh_coeffs, direction_coeffs), 0.0f));
+    probes[probe_id].cube_coeffs[cube_face][0] = diffuse_colour.r;
+    probes[probe_id].cube_coeffs[cube_face][1] = diffuse_colour.g;
+    probes[probe_id].cube_coeffs[cube_face][2] = diffuse_colour.b;
+}
 
 void main(void)
 {
-    // Irradiance volume stored as ambient cube, reconstruct sky vis from data
-    vec3 ambient_cube[6] = vec3[6](
-        vec3(texture(irradiance_volume_px, sample_pos).rgb),
-        vec3(texture(irradiance_volume_nx, sample_pos).rgb),
-        vec3(texture(irradiance_volume_py, sample_pos).rgb),
-        vec3(texture(irradiance_volume_ny, sample_pos).rgb),
-        vec3(texture(irradiance_volume_pz, sample_pos).rgb),
-        vec3(texture(irradiance_volume_nz, sample_pos).rgb)
-    );
-    vec3 sky_vis = SampleAmbientCube(ambient_cube, norm);
-    // Visualize as exit irradiance, divide by pi
-    sky_vis /= kPi;
-    frag_colour = vec4(sky_vis, 1.0f);
+    uint probe_id = gl_GlobalInvocationID.x;
+
+    // Sample the probe's sky vis coefficients in each principle normal direction
+    // Store as an ambient cube
+    // +X
+    ComputeAmbientCubeDirection(probe_id, kPositiveX, vec3(1.0, 0.0, 0.0));
+    // -X
+    ComputeAmbientCubeDirection(probe_id, kNegativeX, vec3(-1.0, 0.0, 0.0));
+    // +Y
+    ComputeAmbientCubeDirection(probe_id, kPositiveY, vec3(0.0, 1.0, 0.0));
+    // -Y
+    ComputeAmbientCubeDirection(probe_id, kNegativeY, vec3(0.0, -1.0, 0.0));
+    // +Z
+    ComputeAmbientCubeDirection(probe_id, kPositiveZ, vec3(0.0, 0.0, 1.0));
+    // -Z
+    ComputeAmbientCubeDirection(probe_id, kNegativeZ, vec3(0.0, 0.0, -1.0));
 }

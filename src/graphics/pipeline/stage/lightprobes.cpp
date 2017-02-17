@@ -90,6 +90,7 @@ LightProbes::LightProbes()
     // Initialize shader buffer to fit all probes in
     probe_shader_data_.reset(new ShaderData<LightProbes::Probe>(nullptr, probes_.size()));
 
+    // Setup shader for generating environment maps to build surfel and sky visibility data
     ShaderAttributeList env_map_inputs;
     env_map_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     env_map_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
@@ -102,6 +103,19 @@ LightProbes::LightProbes()
                                             { { TextureType::R8G8B8A8, TextureType::RAW, TextureType::NEAREST, TextureType::CLAMP },   // albedo + sky vis
                                               { TextureType::R8G8B8,   TextureType::RAW, TextureType::NEAREST, TextureType::CLAMP } }, // normal
                                             true));
+
+    // Relight compute shader to be run every frame
+    probe_relight_shader_.reset(new ComputeShader("shaders/probe-relight.comp.glsl"));
+}
+
+bool LightProbes::Relight(const Scene& scene)
+{
+    if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()))
+    {
+        return false;
+    }
+    probe_relight_shader_->Run(static_cast<unsigned int>(probes_.size()), 1, 1);
+    return true;
 }
 
 void LightProbes::BakeRadianceTransfer(const Scene& scene)

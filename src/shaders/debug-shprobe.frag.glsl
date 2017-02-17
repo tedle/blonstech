@@ -108,8 +108,21 @@ void main(void)
     texel_pos.x /= env_tex_size * 6;
     texel_pos.y /= env_tex_size * probes.length();
 
-    float sh_normal[9];
+    // Calculate ambient cube data
+    vec3 ambient_cube[6] = vec3[6](
+        vec3(probes[probe_id].cube_coeffs[kPositiveX][0], probes[probe_id].cube_coeffs[kPositiveX][1], probes[probe_id].cube_coeffs[kPositiveX][2]),
+        vec3(probes[probe_id].cube_coeffs[kNegativeX][0], probes[probe_id].cube_coeffs[kNegativeX][1], probes[probe_id].cube_coeffs[kNegativeX][2]),
+        vec3(probes[probe_id].cube_coeffs[kPositiveY][0], probes[probe_id].cube_coeffs[kPositiveY][1], probes[probe_id].cube_coeffs[kPositiveY][2]),
+        vec3(probes[probe_id].cube_coeffs[kNegativeY][0], probes[probe_id].cube_coeffs[kNegativeY][1], probes[probe_id].cube_coeffs[kNegativeY][2]),
+        vec3(probes[probe_id].cube_coeffs[kPositiveZ][0], probes[probe_id].cube_coeffs[kPositiveZ][1], probes[probe_id].cube_coeffs[kPositiveZ][2]),
+        vec3(probes[probe_id].cube_coeffs[kNegativeZ][0], probes[probe_id].cube_coeffs[kNegativeZ][1], probes[probe_id].cube_coeffs[kNegativeZ][2])
+    );
+    vec3 ambient_light = SampleAmbientCube(ambient_cube, surface_normal);
+    // Ambient cubes store irradiance data, view as exit irradiance with pi division
+    ambient_light /= kPi;
+
     // Calculate direct sky vis data
+    float sh_normal[9];
     SHProjectDirection3(surface_normal, sh_normal);
     float sky_vis = SHDot3(sh_normal, probes[probe_id].sh_coeffs);
     // Calculate sky vis as viewed on a diffuse material
@@ -126,7 +139,8 @@ void main(void)
     frag_colour = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     frag_colour.rgb += texture(probe_env_maps, texel_pos.xy).rgb * (debug_mode == 1 ? 1.0f : 0.0f);
     frag_colour.rgb += (surface_normal + 1.0f) / 2.0f            * (debug_mode == 2 ? 1.0f : 0.0f);
-    frag_colour.rgb += sky_vis                                   * (debug_mode == 3 ? 1.0f : 0.0f);
-    frag_colour.rgb += sky_vis_diffuse                           * (debug_mode == 4 ? 1.0f : 0.0f);
-    frag_colour.rgb += id_colour                                 * (debug_mode == 5 ? 1.0f : 0.0f);
+    frag_colour.rgb += ambient_light                             * (debug_mode == 3 ? 1.0f : 0.0f);
+    frag_colour.rgb += sky_vis                                   * (debug_mode == 4 ? 1.0f : 0.0f);
+    frag_colour.rgb += sky_vis_diffuse                           * (debug_mode == 5 ? 1.0f : 0.0f);
+    frag_colour.rgb += id_colour                                 * (debug_mode == 6 ? 1.0f : 0.0f);
 }

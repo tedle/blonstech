@@ -104,8 +104,12 @@ bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, c
     // Set the inputs
     if (!volume_shader_->SetInput("world_matrix", irradiance.world_matrix()) ||
         !volume_shader_->SetInput("vp_matrix", vp_matrix) ||
-        !volume_shader_->SetInput("irradiance_volume_px_nx_py_ny", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PX_NX_PY_NY), 0) ||
-        !volume_shader_->SetInput("irradiance_volume_pz_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ_NZ), 1))
+        !volume_shader_->SetInput("irradiance_volume_px", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PX), 0) ||
+        !volume_shader_->SetInput("irradiance_volume_nx", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NX), 1) ||
+        !volume_shader_->SetInput("irradiance_volume_py", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PY), 2) ||
+        !volume_shader_->SetInput("irradiance_volume_ny", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NY), 3) ||
+        !volume_shader_->SetInput("irradiance_volume_pz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ), 4) ||
+        !volume_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 5))
     {
         target->BindDepthTexture(target->depth());
         return false;
@@ -123,7 +127,7 @@ bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, c
 void IrradianceView::InitMeshBuffers(const IrradianceVolume& irradiance)
 {
     // Grab the dimensions of the irradiance volume and construct a matching grid mesh
-    auto grid_data = render::context()->GetTextureData3D(irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ_NZ));
+    auto grid_data = render::context()->GetTextureData3D(irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PX));
     std::stringstream dimension_args;
     dimension_args << (grid_data.width) << "," << (grid_data.height) << "," << (grid_data.depth);
     grid_mesh_.reset(new DrawBatcher(DrawMode::LINES));

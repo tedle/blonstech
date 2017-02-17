@@ -48,8 +48,12 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        IRRADIANCE_VOLUME_PX_NX_PY_NY, ///< 3D volume texture of ambient cube coefficients [+X,-X,+Y,-Y]
-        IRRADIANCE_VOLUME_PZ_NZ        ///< 3D volume texture of ambient cube coefficients [+Z,-Z]
+        IRRADIANCE_VOLUME_PX = AxisAlignedNormal::POSITIVE_X, ///< 3D volume texture of ambient cube coefficient for +X
+        IRRADIANCE_VOLUME_NX = AxisAlignedNormal::NEGATIVE_X, ///< 3D volume texture of ambient cube coefficient for -X
+        IRRADIANCE_VOLUME_PY = AxisAlignedNormal::POSITIVE_Y, ///< 3D volume texture of ambient cube coefficient for +Y
+        IRRADIANCE_VOLUME_NY = AxisAlignedNormal::NEGATIVE_Y, ///< 3D volume texture of ambient cube coefficient for -Y
+        IRRADIANCE_VOLUME_PZ = AxisAlignedNormal::POSITIVE_Z, ///< 3D volume texture of ambient cube coefficient for +Z
+        IRRADIANCE_VOLUME_NZ = AxisAlignedNormal::NEGATIVE_Z  ///< 3D volume texture of ambient cube coefficient for -Z
     };
 
 public:
@@ -61,7 +65,7 @@ public:
     ///
     /// \param probes Handle to lightprobe data
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const LightProbes& probes);
+    bool Relight(const LightProbes& probes);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage
@@ -73,8 +77,12 @@ public:
     Matrix world_matrix() const;
 
 private:
-    std::unique_ptr<Texture3D> irradiance_volume_px_nx_py_ny_; // Stores ambient cube coefficients +X,-X,+Y,-Y
-    std::unique_ptr<Texture3D> irradiance_volume_pz_nz_; // Stores ambient cube coefficients +Z,-Z
+    std::unique_ptr<Texture3D> irradiance_volume_px_; // Stores ambient cube coefficient for +X
+    std::unique_ptr<Texture3D> irradiance_volume_nx_; // Stores ambient cube coefficient for -X
+    std::unique_ptr<Texture3D> irradiance_volume_py_; // Stores ambient cube coefficient for +Y
+    std::unique_ptr<Texture3D> irradiance_volume_ny_; // Stores ambient cube coefficient for -Y
+    std::unique_ptr<Texture3D> irradiance_volume_pz_; // Stores ambient cube coefficient for +Z
+    std::unique_ptr<Texture3D> irradiance_volume_nz_; // Stores ambient cube coefficient for -Z
     std::unique_ptr<ComputeShader> irradiance_volume_shader_;
     Matrix world_matrix_;
 };

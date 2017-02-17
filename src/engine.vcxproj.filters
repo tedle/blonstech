@@ -488,5 +488,8 @@
     <None Include="shaders\math.lib.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\probe-relight.comp.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
