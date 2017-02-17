@@ -42,7 +42,7 @@ uniform sampler3D irradiance_volume_nz;
 
 void main(void)
 {
-    // Irradiance volume stored as ambient cube, reconstruct sky vis from data
+    // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
     vec3 ambient_cube[6] = vec3[6](
         vec3(texture(irradiance_volume_px, sample_pos).rgb),
         vec3(texture(irradiance_volume_nx, sample_pos).rgb),
@@ -51,8 +51,8 @@ void main(void)
         vec3(texture(irradiance_volume_pz, sample_pos).rgb),
         vec3(texture(irradiance_volume_nz, sample_pos).rgb)
     );
-    vec3 sky_vis = SampleAmbientCube(ambient_cube, norm);
+    vec3 ambient_light = SampleAmbientCube(ambient_cube, norm);
     // Visualize as exit irradiance, divide by pi
-    sky_vis /= kPi;
-    frag_colour = vec4(sky_vis, 1.0f);
+    ambient_light /= kPi;
+    frag_colour = vec4(ambient_light, 1.0f);
 }

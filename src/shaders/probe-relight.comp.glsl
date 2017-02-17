@@ -31,6 +31,8 @@
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 // Globals
+uniform SHColourCoeffs sh_sky_colour;
+
 layout(std430) buffer probe_buffer
 {
     Probe probes[];
@@ -40,10 +42,17 @@ void ComputeAmbientCubeDirection(const uint probe_id, const int cube_face, const
 {
     float direction_coeffs[9];
     SHProjectCosineLobe3(direction, direction_coeffs);
-    vec3 diffuse_colour = vec3(max(SHDot3(probes[probe_id].sh_coeffs, direction_coeffs), 0.0f));
-    probes[probe_id].cube_coeffs[cube_face][0] = diffuse_colour.r;
-    probes[probe_id].cube_coeffs[cube_face][1] = diffuse_colour.g;
-    probes[probe_id].cube_coeffs[cube_face][2] = diffuse_colour.b;
+    // Divide by pi because sky_vis is merely a visibility function and is not meant to be scaled for irradiance
+    // The irradiance scaling is applied on the sky_colour itself
+    float sky_vis = max(SHDot3(probes[probe_id].sh_coeffs, direction_coeffs), 0.0f) / kPi;
+    vec3 sky_colour = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
+                           SHDot3(direction_coeffs, sh_sky_colour.g),
+                           SHDot3(direction_coeffs, sh_sky_colour.b));
+    // Scale sky irradiance by visibility function
+    sky_colour *= sky_vis;
+    probes[probe_id].cube_coeffs[cube_face][0] = sky_colour.r;
+    probes[probe_id].cube_coeffs[cube_face][1] = sky_colour.g;
+    probes[probe_id].cube_coeffs[cube_face][2] = sky_colour.b;
 }
 
 void main(void)

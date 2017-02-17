@@ -28,6 +28,7 @@
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
+#include <blons/graphics/pipeline/stage/irradiancevolume.h>
 
 namespace blons
 {
@@ -67,11 +68,13 @@ public:
     /// frame
     /// \param shadow Handle to the shadow buffer pass performed earlier in the
     /// frame
+    /// \param irradiance Handle to the irradiance volume pass performed earlier in
+    /// the frame
     /// \param view_matrix View matrix of the camera rendering the scene
     /// \param proj_matrix Perspective matrix for rendering the scene
     /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
+    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const IrradianceVolume& irradiance,
                 Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////

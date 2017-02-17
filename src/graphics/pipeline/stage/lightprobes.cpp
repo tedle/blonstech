@@ -67,6 +67,7 @@ Vector3 FaceRotation(AxisAlignedNormal face)
 
 LightProbes::LightProbes()
 {
+    // TODO: Higher light probe density. Will stall load times so should optimize baking in tandem (compute shader? instancing?)
     // Generate sponza probes, ofc we have to make this scene independant at some point...
     for (int x = 0; x < 8; x++)
     {
@@ -110,7 +111,10 @@ LightProbes::LightProbes()
 
 bool LightProbes::Relight(const Scene& scene)
 {
-    if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()))
+    if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()) ||
+        !probe_relight_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
+        !probe_relight_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
+        !probe_relight_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9))
     {
         return false;
     }

@@ -35,12 +35,19 @@ out vec4 frag_colour;
 
 // Globals
 uniform mat4 inv_vp_matrix;
+uniform mat4 inv_irradiance_matrix;
 uniform sampler2D albedo;
 uniform sampler2D normal;
 uniform sampler2D depth;
 uniform sampler2D direct_light;
 uniform DirectionalLight sun;
 uniform SHColourCoeffs sh_sky_colour;
+uniform sampler3D irradiance_volume_px;
+uniform sampler3D irradiance_volume_nx;
+uniform sampler3D irradiance_volume_py;
+uniform sampler3D irradiance_volume_ny;
+uniform sampler3D irradiance_volume_pz;
+uniform sampler3D irradiance_volume_nz;
 
 // Used to give stronger specular when light bounces at shallower angles
 // refraction_index of 1.0 gives a fresnel of about 0.058~ and 0.1 gives a coef of about 0.72
@@ -104,19 +111,31 @@ void main(void)
     // This has the N.L pre-applied
     specular *= direct;
 
-    // Diffuse lighting (temporary)
-    //vec4 indirect_full = texture(indirect_light, tex_coord);
-    //vec3 diffuse = (direct * sun.colour) + (indirect_full.rgb / indirect_full.a);
-    vec3 ambient = vec3(0.01f);
+    // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
+    vec4 irradiance_sample_pos = inv_irradiance_matrix * pos;
+    irradiance_sample_pos /= irradiance_sample_pos.w;
+    vec3 ambient_cube[6] = vec3[6](
+        vec3(texture(irradiance_volume_px, irradiance_sample_pos.xyz).rgb),
+        vec3(texture(irradiance_volume_nx, irradiance_sample_pos.xyz).rgb),
+        vec3(texture(irradiance_volume_py, irradiance_sample_pos.xyz).rgb),
+        vec3(texture(irradiance_volume_ny, irradiance_sample_pos.xyz).rgb),
+        vec3(texture(irradiance_volume_pz, irradiance_sample_pos.xyz).rgb),
+        vec3(texture(irradiance_volume_nz, irradiance_sample_pos.xyz).rgb)
+    );
+    vec3 sky_light = SampleAmbientCube(ambient_cube, surface_normal);
+    // This pi divide should actually be done during surface colour calculation but the whole BRDF is a mess right now
+    // Will be fixed during proper PBR pass
+    sky_light /= kPi;
+    vec3 ambient = vec3(0.01f) + sky_light;
     vec3 diffuse = (direct * sun.colour) + ambient;
 
     vec3 surface_colour = texture(albedo, tex_coord).rgb;
     surface_colour *= diffuse;
     surface_colour += specular;
 
-    // Uncomment to see GI only
+    // Uncomment to see sky light only
     //surface_colour *= 0.000001;
-    //surface_colour += indirect_full.rgb / indirect_full.a;
+    //surface_colour += vec3(sky_light);
 
     // Uncomment to see specular only
     //surface_colour *= 0.000001;
