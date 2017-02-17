@@ -475,6 +475,17 @@ SHCoeffs3 SHProjectDirection3(Vector3 direction)
     return result;
 }
 
+Vector3 SampleAmbientCube(const AmbientCube& cube, Vector3 direction)
+{
+    AxisAlignedNormal normal_sign[3] = { direction.x > 0.0 ? POSITIVE_X : NEGATIVE_X,
+                                         direction.y > 0.0 ? POSITIVE_Y : NEGATIVE_Y,
+                                         direction.z > 0.0 ? POSITIVE_Z : NEGATIVE_Z };
+    Vector3 direction_sq = direction * direction;
+    return cube.coeffs[normal_sign[0]] * direction_sq.x +
+           cube.coeffs[normal_sign[1]] * direction_sq.y +
+           cube.coeffs[normal_sign[2]] * direction_sq.z;
+}
+
 unsigned int FastHash(const void* data, std::size_t size)
 {
     static const unsigned int kPrime = 16777619;

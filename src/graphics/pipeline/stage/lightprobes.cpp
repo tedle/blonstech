@@ -35,27 +35,27 @@ namespace stage
 {
 namespace
 {
-Vector3 FaceRotation(int face)
+Vector3 FaceRotation(AxisAlignedNormal face)
 {
     units::world pitch = 0.0f;
     units::world yaw = 0.0f;
     switch (face)
     {
-    case 0: // -Z
+    case NEGATIVE_Z:
         break;
-    case 1: // +X
+    case POSITIVE_X:
         yaw = -kPi / 2.0f;
         break;
-    case 2: // +Z
+    case POSITIVE_Z:
         yaw = kPi;
         break;
-    case 3: // -X
+    case NEGATIVE_X:
         yaw = kPi / 2.0f;
         break;
-    case 4: // +Y
+    case POSITIVE_Y:
         pitch = kPi / 2.0f;
         break;
-    case 5: // -Y
+    case NEGATIVE_Y:
         pitch = -kPi / 2.0f;
         break;
     default:
@@ -109,6 +109,7 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
     // Hard coded distance clipping as graphics option values are tuned for performance
     Matrix cube_face_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 10000.0f);
     Camera cube_view;
+    std::vector<AxisAlignedNormal> faces = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
     auto context = render::context();
 
     environment_maps_->Bind(Vector4(0, 1, 0, 1));
@@ -121,11 +122,12 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
     for (const auto& probe : probes_)
     {
         cube_view.set_pos(probe.pos.x, probe.pos.y, probe.pos.z);
-        for (int face = 0; face < 6; face++)
+        int face_index = 0;
+        for (const auto& face : faces)
         {
             Vector3 rot = FaceRotation(face);
             cube_view.set_rot(rot.x, rot.y, rot.z);
-            context->SetViewport(face * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
+            context->SetViewport(face_index * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
             for (const auto& m : scene.models)
             {
                 m->Render();
@@ -135,6 +137,7 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
                 environment_map_shader_->SetInput("normal", m->normal(), 1);
                 environment_map_shader_->Render(m->index_count());
             }
+            face_index++;
         }
     }
     log::Debug("[%ims]\n", bake_stats.ms());
@@ -149,7 +152,8 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
     {
         SHCoeffs3 sh_sky_visibility;
         float sh_total_weight = 0.0f;
-        for (int face = 0; face < 6; face++)
+        int face_index = 0;
+        for (const auto& face : faces)
         {
             Vector3 rot = FaceRotation(face);
             cube_view.set_pos(0, 0, 0);
@@ -170,7 +174,7 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
                     normal *= rotation_matrix;
                     normal = VectorNormalize(normal);
 
-                    int px = x + face * kProbeMapSize;
+                    int px = x + face_index * kProbeMapSize;
                     int py = y + probe.id * kProbeMapSize;
 
                     // Retrieve sky alpha value from texture and normalize
@@ -184,6 +188,7 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
                     sh_total_weight += sh_texel_weight;
                 }
             }
+            face_index++;
         }
         // Normalize to surface area of unit sphere
         sh_sky_visibility *= 4.0f * kPi / sh_total_weight;
