@@ -25,7 +25,7 @@
 
 // Includes
 #include <shaders/probe.lib.glsl>
-#include <shaders/sh-math.lib.glsl>
+#include <shaders/math.lib.glsl>
 
 // Workgroup size
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;

@@ -25,7 +25,7 @@
 
 // Includes
 #include <shaders/gamma.lib.glsl>
-#include <shaders/sh-math.lib.glsl>
+#include <shaders/math.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;

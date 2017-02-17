@@ -25,7 +25,6 @@
 
 // Includes
 #include <shaders/math.lib.glsl>
-#include <shaders/sh-math.lib.glsl>
 #include <shaders/probe.lib.glsl>
 
 // Ins n outs

@@ -55,6 +55,7 @@ public:
     {
         const int id;
         Vector3 pos;
+        AmbientCube irradiance;
         SHCoeffs3 sh_sky_visibility;
     };
 

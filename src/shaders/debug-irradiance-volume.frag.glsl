@@ -39,13 +39,17 @@ uniform sampler3D irradiance_volume_pz_nz;
 void main(void)
 {
     // Irradiance volume stored as ambient cube, reconstruct sky vis from data
-    vec3 norm_sq = norm * norm;
-    ivec3 is_negative = ivec3(norm.x < 0.0f, norm.y < 0.0f, norm.z < 0.0f);
     vec4 px_nx_py_ny = texture(irradiance_volume_px_nx_py_ny, sample_pos);
     vec2 pz_nz = texture(irradiance_volume_pz_nz, sample_pos).rg;
-    float sky_vis = norm_sq.x * px_nx_py_ny[is_negative.x] +
-                    norm_sq.y * px_nx_py_ny[is_negative.y + 2] +
-                    norm_sq.z * pz_nz[is_negative.z];
+    vec3 ambient_cube[6] = vec3[6](
+        vec3(px_nx_py_ny.r),
+        vec3(px_nx_py_ny.g),
+        vec3(px_nx_py_ny.b),
+        vec3(px_nx_py_ny.a),
+        vec3(pz_nz.r),
+        vec3(pz_nz.g)
+    );
+    float sky_vis = SampleAmbientCube(ambient_cube, norm).r;
     // Visualize as exit irradiance, divide by pi
     sky_vis /= kPi;
     frag_colour = vec4(vec3(sky_vis), 1.0f);
