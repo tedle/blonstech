@@ -114,14 +114,22 @@ void main(void)
     // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
     vec4 irradiance_sample_pos = inv_irradiance_matrix * pos;
     irradiance_sample_pos /= irradiance_sample_pos.w;
-    vec3 ambient_cube[6] = vec3[6](
-        vec3(texture(irradiance_volume_px, irradiance_sample_pos.xyz).rgb),
-        vec3(texture(irradiance_volume_nx, irradiance_sample_pos.xyz).rgb),
-        vec3(texture(irradiance_volume_py, irradiance_sample_pos.xyz).rgb),
-        vec3(texture(irradiance_volume_ny, irradiance_sample_pos.xyz).rgb),
-        vec3(texture(irradiance_volume_pz, irradiance_sample_pos.xyz).rgb),
-        vec3(texture(irradiance_volume_nz, irradiance_sample_pos.xyz).rgb)
-    );
+    vec3 ambient_cube[6];
+    // We do a lot of ugly busywork to cut texture fetches down in half because these are dependent texture fetches and wow those are expensive!!!
+    // TODO: Shove indirect lighting computation into a half-res bilaterally-upsampled buffer? This currently adds 0.6ms
+    bvec3 is_positive = bvec3(surface_normal.x > 0.0, surface_normal.y > 0.0, surface_normal.z > 0.0);
+    ivec3 cube_indices = ivec3(is_positive.x ? kPositiveX : kNegativeX,
+                               is_positive.y ? kPositiveY : kNegativeY,
+                               is_positive.z ? kPositiveZ : kNegativeZ);
+    ambient_cube[cube_indices.x] = is_positive.x ?
+                                       vec3(texture(irradiance_volume_px, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_nx, irradiance_sample_pos.xyz).rgb);
+    ambient_cube[cube_indices.y] = is_positive.y ?
+                                       vec3(texture(irradiance_volume_py, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_ny, irradiance_sample_pos.xyz).rgb);
+    ambient_cube[cube_indices.z] = is_positive.z ?
+                                       vec3(texture(irradiance_volume_pz, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_nz, irradiance_sample_pos.xyz).rgb);
     vec3 sky_light = SampleAmbientCube(ambient_cube, surface_normal);
     // This pi divide should actually be done during surface colour calculation but the whole BRDF is a mess right now
     // Will be fixed during proper PBR pass
