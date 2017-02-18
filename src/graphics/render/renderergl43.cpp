@@ -838,6 +838,11 @@ bool RendererGL43::RegisterShaderData(ShaderDataResource* data_handle, const voi
 
 void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_count)
 {
+    RenderShaderInstanced(program, index_count, 1);
+}
+
+void RendererGL43::RenderShaderInstanced(ShaderResource* program, unsigned int index_count, unsigned int instance_count)
+{
     UnmapBuffers();
 
     ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
@@ -849,7 +854,14 @@ void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_coun
 
     BindShader(shader->program_);
 
-    glDrawElements(draw_mode_, index_count, GL_UNSIGNED_INT, 0);
+    if (instance_count > 1)
+    {
+        glDrawElementsInstanced(draw_mode_, index_count, GL_UNSIGNED_INT, 0, instance_count);
+    }
+    else
+    {
+        glDrawElements(draw_mode_, index_count, GL_UNSIGNED_INT, 0);
+    }
     // TODO: Add some kind of option for enabling this? It's necessary if we want to
     // write to incoherent memory in a pipeline shader but also slows things significantly.
     // Would probably not be noticable if restricted to only deferred rendering calls

@@ -59,10 +59,15 @@ public:
     /// \param index_count Number of indices to render
     ////////////////////////////////////////////////////////////////////////////////
     bool Render(unsigned int index_count);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Issues a draw call for the specified number of indices and instances
+    ///
+    /// \param index_count Number of indices to render
+    /// \param instance_count Number of instances to render
+    ////////////////////////////////////////////////////////////////////////////////
+    bool RenderInstanced(unsigned int index_count, unsigned int instance_count);
 
 private:
-    void Init();
-
     std::string vertex_filename_;
     std::string pixel_filename_;
     ShaderAttributeList inputs_;

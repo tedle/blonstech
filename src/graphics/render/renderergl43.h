@@ -66,6 +66,7 @@ public:
     bool RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size) override;
 
     void RenderShader(ShaderResource* program, unsigned int index_count) override;
+    void RenderShaderInstanced(ShaderResource* program, unsigned int index_count, unsigned int instance_count) override;
     void RunComputeShader(ShaderResource* program, unsigned int groups_x,
                           unsigned int groups_y, unsigned int groups_z) override;
 

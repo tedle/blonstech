@@ -515,6 +515,11 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     virtual void RenderShader(ShaderResource* program, unsigned int index_count)=0;
     ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc RenderShader(ShaderResource*,unsigned int)
+    /// \param instance_count Number of instances to render
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void RenderShaderInstanced(ShaderResource* program, unsigned int index_count, unsigned int instance_count)=0;
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds and runs the supplied ShaderResource with the specified thread
     /// group dimensions. Further granularity of threads can usually be described at
     /// the shader level and in this case the total number of threads will be

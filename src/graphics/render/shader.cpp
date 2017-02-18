@@ -53,7 +53,11 @@ void Shader::Reload()
 bool Shader::Render(unsigned int index_count)
 {
     render::context()->RenderShader(program_.get(), index_count);
-
+    return true;
+}
+bool Shader::RenderInstanced(unsigned int index_count, unsigned int instance_count)
+{
+    render::context()->RenderShaderInstanced(program_.get(), index_count, instance_count);
     return true;
 }
 } // namespace blons
