@@ -464,9 +464,6 @@
     <None Include="shaders\debug-shprobe.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\probe-env-map.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
     <None Include="shaders\composite.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
@@ -489,6 +486,12 @@
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\types.lib.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\probe-env-map.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\probe-env-map.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>

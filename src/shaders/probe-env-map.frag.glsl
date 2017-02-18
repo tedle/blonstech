@@ -29,6 +29,7 @@
 // Ins n outs
 in vec2 tex_coord;
 in mat3 norm;
+in vec2 scissor_coord;
 
 out vec4 frag_colour;
 out vec4 norm_colour;
@@ -36,9 +37,17 @@ out vec4 norm_colour;
 // Globals
 uniform sampler2D albedo;
 uniform sampler2D normal;
+uniform int scissor_w;
+uniform int scissor_h;
 
 void main(void)
 {
+    // Manual viewport clipping since we have hundreds of them
+    if (gl_FragCoord.x < scissor_coord.x || gl_FragCoord.x > scissor_coord.x + float(scissor_w) ||
+        gl_FragCoord.y < scissor_coord.y || gl_FragCoord.y > scissor_coord.y + float(scissor_h))
+    {
+        discard;
+    }
     // Albedo
     frag_colour = vec4(GammaDecode(texture(albedo, tex_coord).rgb), 0.0);
 

@@ -80,6 +80,9 @@ public:
     const ShaderDataResource* probe_shader_data() const;
 
 private:
+    void MakeEnvironmentMaps(const Scene& scene);
+    void MakeSkyCoefficients();
+
     std::vector<Probe> probes_;
     std::unique_ptr<Framebuffer> environment_maps_;
     std::unique_ptr<Shader> environment_map_shader_;

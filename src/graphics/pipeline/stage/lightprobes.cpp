@@ -35,6 +35,7 @@ namespace stage
 {
 namespace
 {
+const std::vector<AxisAlignedNormal> kFaceOrder = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
 Vector3 FaceRotation(AxisAlignedNormal face)
 {
     units::world pitch = 0.0f;
@@ -98,7 +99,7 @@ LightProbes::LightProbes()
     env_map_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
     env_map_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
     env_map_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
-    environment_map_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/probe-env-map.frag.glsl", env_map_inputs));
+    environment_map_shader_.reset(new Shader("shaders/probe-env-map.vert.glsl", "shaders/probe-env-map.frag.glsl", env_map_inputs));
 
     environment_maps_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<units::pixel>(probes_.size()),
                                             { { TextureType::R8G8B8A8, TextureType::RAW, TextureType::NEAREST, TextureType::CLAMP },   // albedo + sky vis
@@ -124,56 +125,117 @@ bool LightProbes::Relight(const Scene& scene)
 
 void LightProbes::BakeRadianceTransfer(const Scene& scene)
 {
-    // Hard coded distance clipping as graphics option values are tuned for performance
-    Matrix cube_face_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 10000.0f);
-    Camera cube_view;
-    std::vector<AxisAlignedNormal> faces = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
-    auto context = render::context();
+    // G-Buffer env map generation
+    log::Debug("Baking environment maps... ");
+    Timer env_bake_stats;
+    MakeEnvironmentMaps(scene);
+    log::Debug("[%ims]\n", env_bake_stats.ms());
+    // Compute SH coefficients for sky visibility
+    log::Debug("Baking sky visibility... ");
+    Timer sky_bake_stats;
+    MakeSkyCoefficients();
+    log::Debug("[%ims]\n", sky_bake_stats.ms());
+    // Update shader buffer with generated probe data
+    probe_shader_data_->set_value(probes_.data());
+}
 
+const TextureResource* LightProbes::output(Output buffer) const
+{
+    switch (buffer)
+    {
+    case ENV_MAPS:
+        return environment_maps_->textures()[0];
+        break;
+    default:
+        return nullptr;
+    }
+}
+
+const std::vector<LightProbes::Probe>& LightProbes::probes() const
+{
+    return probes_;
+}
+
+const ShaderDataResource* LightProbes::probe_shader_data() const
+{
+    return probe_shader_data_->data();
+}
+
+// This function only exists to help compartmentalize the long process of PRT baking
+void LightProbes::MakeEnvironmentMaps(const Scene& scene)
+{
+    // Shader data delivery struct
+    struct PerFaceData
+    {
+        Matrix vp_matrix;
+        int scissor_x;
+        int scissor_y;
+    };
+    std::vector<PerFaceData> per_face_data;
+
+    auto context = render::context();
     environment_maps_->Bind(Vector4(0, 1, 0, 1));
     context->SetDepthTesting(true);
     context->SetBlendMode(BlendMode::OVERWRITE);
 
-    log::Debug("Baking environment maps... ");
-    Timer bake_stats;
-    // G-Buffer env map generation
+    // Hard coded distance clipping as graphics option values are tuned for performance
+    Matrix cube_face_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 10000.0f);
+    Camera cube_view;
+
+    // Build up a buffer of unique face data used for instanced rendering
     for (const auto& probe : probes_)
     {
         cube_view.set_pos(probe.pos.x, probe.pos.y, probe.pos.z);
         int face_index = 0;
-        for (const auto& face : faces)
+        for (const auto& face : kFaceOrder)
         {
+            PerFaceData face_data;
             Vector3 rot = FaceRotation(face);
             cube_view.set_rot(rot.x, rot.y, rot.z);
-            context->SetViewport(face_index * kProbeMapSize, static_cast<units::pixel>(probe.id) * kProbeMapSize, kProbeMapSize, kProbeMapSize);
-            for (const auto& m : scene.models)
-            {
-                m->Render();
-                environment_map_shader_->SetInput("mvp_matrix", m->world_matrix() * cube_view.view_matrix() * cube_face_projection);
-                environment_map_shader_->SetInput("normal_matrix", MatrixTranspose(MatrixInverse(m->world_matrix())));
-                environment_map_shader_->SetInput("albedo", m->albedo(), 0);
-                environment_map_shader_->SetInput("normal", m->normal(), 1);
-                environment_map_shader_->Render(m->index_count());
-            }
+            face_data.vp_matrix = cube_view.view_matrix() * cube_face_projection;
+            face_data.scissor_x = face_index * kProbeMapSize;
+            face_data.scissor_y = static_cast<units::pixel>(probe.id) * kProbeMapSize;
+            per_face_data.push_back(face_data);
             face_index++;
         }
     }
-    log::Debug("[%ims]\n", bake_stats.ms());
-    log::Debug("Baking sky visibility... ");
-    bake_stats.start();
+    // Setup any non-varying shader inputs
+    ShaderData<PerFaceData> per_face_shaderdata(per_face_data.data(), per_face_data.size());
+    environment_map_shader_->SetInput("per_face_data_buffer", per_face_shaderdata.data());
+    environment_map_shader_->SetInput("scissor_w", kProbeMapSize);
+    environment_map_shader_->SetInput("scissor_h", kProbeMapSize);
+    environment_map_shader_->SetInput("map_width", kProbeMapSize * 6);
+    environment_map_shader_->SetInput("map_height", kProbeMapSize * static_cast<units::pixel>(probes_.size()));
+    // Render each model a total of (number of probes) * (6 faces) times
+    for (const auto& m : scene.models)
+    {
+        m->Render();
+        environment_map_shader_->SetInput("m_matrix", m->world_matrix());
+        environment_map_shader_->SetInput("normal_matrix", MatrixTranspose(MatrixInverse(m->world_matrix())));
+        environment_map_shader_->SetInput("albedo", m->albedo(), 0);
+        environment_map_shader_->SetInput("normal", m->normal(), 1);
+        environment_map_shader_->RenderInstanced(m->index_count(), static_cast<unsigned int>(per_face_data.size()));
+    }
 
+    environment_maps_->Unbind();
+}
+
+// This function only exists to help compartmentalize the long process of PRT baking
+void LightProbes::MakeSkyCoefficients()
+{
     // TODO: Move this to a compute shader
     // Sky visibility SH
-    auto tex = context->GetTextureData(environment_maps_->textures()[0]);
+    auto tex = render::context()->GetTextureData(environment_maps_->textures()[0]);
     std::size_t pixel_size = tex.bits_per_pixel() / 8;
     for (const auto& probe : probes_)
     {
         SHCoeffs3 sh_sky_visibility;
         float sh_total_weight = 0.0f;
         int face_index = 0;
-        for (const auto& face : faces)
+        for (const auto& face : kFaceOrder)
         {
             Vector3 rot = FaceRotation(face);
+            Camera cube_view;
             cube_view.set_pos(0, 0, 0);
             // Since a view matrix rotates things in the opposite of the direction given
             // We reverse the pitch and yaw values
@@ -212,32 +274,6 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
         sh_sky_visibility *= 4.0f * kPi / sh_total_weight;
         probes_[probe.id].sh_sky_visibility = sh_sky_visibility;
     }
-    log::Debug("[%ims]\n", bake_stats.ms());
-    environment_maps_->Unbind();
-    // Update shader buffer with generated probe data
-    probe_shader_data_->set_value(probes_.data());
-}
-
-const TextureResource* LightProbes::output(Output buffer) const
-{
-    switch (buffer)
-    {
-    case ENV_MAPS:
-        return environment_maps_->textures()[0];
-        break;
-    default:
-        return nullptr;
-    }
-}
-
-const std::vector<LightProbes::Probe>& LightProbes::probes() const
-{
-    return probes_;
-}
-
-const ShaderDataResource* LightProbes::probe_shader_data() const
-{
-    return probe_shader_data_->data();
 }
 } // namespace stage
 } // namespace pipeline
