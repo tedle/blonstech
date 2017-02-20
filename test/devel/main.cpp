@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     std::vector<std::unique_ptr<blons::Model>> models;
 
     // Big scene
-    models = blons::temp::load_codmap("crytek_sponza_2", std::move(models), graphics.get());
+    models = blons::temp::load_codmap("old_sponza_2uv", std::move(models), graphics.get());
 
     // Model 1
     models.push_back(graphics->MakeModel("teapot_highpoly.bms"));
@@ -49,14 +49,10 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models.back()->set_pos(10.0, 0.0, 20.0);
 
     // Model 3
-    models.push_back(graphics->MakeModel("bumpy_cube/mesh/bumpy_cube.bms"));
-    models.back()->set_pos(20.0, 0.0, 20.0);
-
-    // Model 4
     models.push_back(graphics->MakeModel("plane.bms"));
     models.back()->set_pos(30.0, 0.0, 20.0);
 
-    // Model 5
+    // Model 4
     models.push_back(graphics->MakeModel("blons:sphere"));
     models.back()->set_pos(0.0, 5.0, 0.0);
     models.back()->set_scale(0.5, 0.5, 0.5);

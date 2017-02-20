@@ -66,18 +66,55 @@ Vector3 FaceRotation(AxisAlignedNormal face)
 }
 } // namespace
 
-LightProbes::LightProbes()
+namespace
+{
+void GenerateCrytekSponzaProbes(std::vector<LightProbes::Probe>* probes)
+{
+    for (int x = 0; x < 16; x++)
+    {
+        for (int y = 0; y < 2; y++)
+        {
+            for (int z = 0; z < 2; z++)
+            {
+                LightProbes::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 10.0f - 5.0f) };
+                probes->push_back(probe);
+            }
+        }
+    }
+    for (int x = 0; x < 16; x++)
+    {
+        for (int y = 0; y < 2; y++)
+        {
+            for (int z = 0; z < 2; z++)
+            {
+                LightProbes::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 2.4f - 1.2f) };
+                probes->push_back(probe);
+            }
+        }
+    }
+    for (int x = 0; x < 12; x++)
+    {
+        for (int y = 0; y < 3; y++)
+        {
+            for (int z = 0; z < 2; z++)
+            {
+                LightProbes::Probe probe{ static_cast<int>(probes->size()), Vector3(-10.0f + x * 1.727f, y * 2.0f + 10.0f, z * 2.4f - 1.2f) };
+                probes->push_back(probe);
+            }
+        }
+    }
+}
+void GenerateOldSponzaProbes(std::vector<LightProbes::Probe>* probes)
 {
     // TODO: Higher light probe density. Will stall load times so should optimize baking in tandem (compute shader? instancing?)
-    // Generate sponza probes, ofc we have to make this scene independant at some point...
     for (int x = 0; x < 8; x++)
     {
         for (int y = 0; y < 2; y++)
         {
             for (int z = 0; z < 3; z++)
             {
-                Probe probe { static_cast<int>(probes_.size()), Vector3(-14.0f + x * 4.0f, y * 5.0f + 2.0f, z * 5.0f - 5.0f) };
-                probes_.push_back(probe);
+                LightProbes::Probe probe { static_cast<int>(probes->size()), Vector3(-14.0f + x * 4.0f, y * 5.0f + 2.0f, z * 5.0f - 5.0f) };
+                probes->push_back(probe);
             }
         }
     }
@@ -85,10 +122,15 @@ LightProbes::LightProbes()
     {
         for (int y = 0; y < 2; y++)
         {
-            Probe probe { static_cast<int>(probes_.size()), Vector3(-10.0f + x * 4.0f, y * 3.0f + 11.0f, 0) };
-            probes_.push_back(probe);
+            LightProbes::Probe probe { static_cast<int>(probes->size()), Vector3(-10.0f + x * 4.0f, y * 3.0f + 11.0f, 0) };
+            probes->push_back(probe);
         }
     }
+}
+}
+LightProbes::LightProbes()
+{
+    GenerateOldSponzaProbes(&probes_);
     // Initialize shader buffer to fit all probes in
     probe_shader_data_.reset(new ShaderData<LightProbes::Probe>(nullptr, probes_.size()));
 
