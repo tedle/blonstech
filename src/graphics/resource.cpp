@@ -143,7 +143,7 @@ TextureBuffer LoadTexture(const std::string& filename, TextureType::Options opti
             tex.pixels = std::move(pixels);
 
             // Currently options can only be applied to non-engine made textures, in the future let it apply to both with options cache
-            if (options.compression != TextureType::AUTO)
+            if (options.compression != TextureType::AUTO && tex.pixels->type.compression != TextureType::DDS)
             {
                 tex.pixels->type.compression = options.compression;
             }

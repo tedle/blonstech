@@ -258,7 +258,7 @@ void LightProbes::MakeSkyCoefficients()
                     int py = y + probe.id * kProbeMapSize;
 
                     // Retrieve sky alpha value from texture and normalize
-                    auto sky_visibility = static_cast<units::world>(tex.pixels.get()[(px + py * tex.width) * pixel_size + 3]) / 255.0f;
+                    auto sky_visibility = static_cast<units::world>(tex.pixels.data()[(px + py * tex.width) * pixel_size + 3]) / 255.0f;
                     // Weight texels contribution by its solid angle on the sphere
                     units::world sh_weight_intermediate = 1.0f + uv.x * uv.x + uv.y * uv.y;
                     units::world sh_texel_weight = 4.0f / (sqrt(sh_weight_intermediate) * sh_weight_intermediate);

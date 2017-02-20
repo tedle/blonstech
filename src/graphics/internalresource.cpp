@@ -280,15 +280,15 @@ std::unordered_map<std::string, std::function<PixelData(const std::vector<std::s
             none.type.wrap = TextureType::REPEAT;
             none.width = 16;
             none.height = 16;
-            none.pixels.reset(new unsigned char[none.width * none.height * 3]);
+            none.pixels.resize(none.width * none.height * 3);
             for (int x = 0; x < none.width; x++)
             {
                 for (int y = 0; y < none.height; y++)
                 {
                     auto offset = y * none.width + x;
-                    none.pixels.get()[offset * 3 + 0] = 100 * ((y + x) % 2);
-                    none.pixels.get()[offset * 3 + 1] = 200 * ((y + x) % 2);
-                    none.pixels.get()[offset * 3 + 2] = 100 * ((y + x) % 2);
+                    none.pixels.data()[offset * 3 + 0] = 100 * ((y + x) % 2);
+                    none.pixels.data()[offset * 3 + 1] = 200 * ((y + x) % 2);
+                    none.pixels.data()[offset * 3 + 2] = 100 * ((y + x) % 2);
                 }
             }
             return none;
@@ -309,10 +309,10 @@ std::unordered_map<std::string, std::function<PixelData(const std::vector<std::s
             normal.type.wrap = TextureType::REPEAT;
             normal.width = 1;
             normal.height = 1;
-            normal.pixels.reset(new unsigned char[normal.width * normal.height * 3]);
-            normal.pixels.get()[0] = 128;
-            normal.pixels.get()[1] = 128;
-            normal.pixels.get()[2] = 255;
+            normal.pixels.resize(normal.width * normal.height * 3);
+            normal.pixels.data()[0] = 128;
+            normal.pixels.data()[1] = 128;
+            normal.pixels.data()[2] = 255;
             return normal;
         }
     }

@@ -141,10 +141,11 @@ Font::Font(std::string font_filename, units::pixel pixel_size)
         }
     }
 
+    // Converge all our pixel data into a handy dandy struct
+    PixelData font;
     // Generate a single texture containing every character
-    std::unique_ptr<unsigned char> tex(new unsigned char[tex_width*tex_height]);
     // Zero the memory since not all glyphs have the same height
-    std::fill(tex.get(), tex.get()+(tex_width*tex_height), 0);
+    font.pixels.resize(tex_width * tex_height, 0);
     // We have to do this as a second pass because we dont know the fontsheet width until
     // all of the glyphs have been rendered and stored
     for (const auto& glyph : charset_)
@@ -153,13 +154,10 @@ Font::Font(std::string font_filename, units::pixel pixel_size)
         {
             units::pixel x = glyph.tex_offset + i % glyph.width;
             units::pixel y = i / glyph.width;
-            tex.get()[x + y * tex_width] = glyph.pixels[i];
+            font.pixels.data()[x + y * tex_width] = glyph.pixels[i];
         }
     }
 
-    // Converge all our pixel data into a handy dandy struct
-    PixelData font;
-    font.pixels = std::move(tex);
     font.width = tex_width;
     font.height = tex_height;
     // Single channel monochrome

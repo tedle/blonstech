@@ -191,14 +191,16 @@ struct MeshData
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Holds raw pixel data and format info of a texture
+/// \brief Holds raw pixel data and format info of a texture. Can also hold
+/// compressed pixel data for direct uploads, in which case width and height are
+/// ignored during GPU upload and bits_per_pixel() becomes non-functional.
 ////////////////////////////////////////////////////////////////////////////////
 struct PixelData
 {
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Raw pixel data
     ////////////////////////////////////////////////////////////////////////////////
-    std::unique_ptr<unsigned char> pixels;
+    std::vector<unsigned char> pixels;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Width of the texture in pixels
     ////////////////////////////////////////////////////////////////////////////////
@@ -222,12 +224,7 @@ struct PixelData
         this->width = p.width;
         this->height = p.height;
         this->type = p.type;
-        if (p.pixels != nullptr)
-        {
-            auto texture_size = width * height * (bits_per_pixel() / 8);
-            pixels.reset(new unsigned char[texture_size]);
-            memcpy(this->pixels.get(), p.pixels.get(), texture_size);
-        }
+        this->pixels = p.pixels;
     }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Move constructor that takes pixel buffer without copying
@@ -240,14 +237,19 @@ struct PixelData
         this->pixels = std::move(p.pixels);
     }
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calculates the amount of bits per pixel
+    /// \brief Calculates the amount of bits per pixel. Non-functional if pixel data
+    /// is compressed
     ///
     /// \return Bits per pixel
     ////////////////////////////////////////////////////////////////////////////////
     std::size_t bits_per_pixel() const
     {
+        if (type.compression == TextureType::DDS)
+        {
+            throw "Bits per pixel cannot be calculated on compressed pixel data";
+        }
         int bits;
-        switch (this->type.format)
+        switch (type.format)
         {
         case TextureType::A8:
             bits = 8;
@@ -302,12 +304,7 @@ struct PixelData3D : public PixelData
         this->height = p.height;
         this->depth = p.depth;
         this->type = p.type;
-        if (p.pixels != nullptr)
-        {
-            std::size_t texture_size = p.width * p.height * p.depth * (bits_per_pixel() / 8);
-            this->pixels.reset(new unsigned char[texture_size]);
-            memcpy(this->pixels.get(), p.pixels.get(), texture_size);
-        }
+        this->pixels = p.pixels;
     }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Move constructor that takes pixel buffer without copying
@@ -792,7 +789,9 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Decodes an image into raw pixel data and format information. This is
     /// only **temporarily** handled by the render class because the image decoding
-    /// library also handles API specific functions
+    /// library also handles API specific functions. When loading compressed images
+    /// a raw buffer of the compressed data is instead stored, as well width and
+    /// height are set to 0.
     ///
     /// \param filename Name of the image file to load
     /// \param[out] pixel_data Stores decoded pixel data and format information

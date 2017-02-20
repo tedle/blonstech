@@ -27,6 +27,7 @@
 // Includes
 #include <unordered_map>
 #include <memory>
+#include <fstream>
 // OpenGL image loader
 #include <SOIL2/SOIL2.h>
 // Public Includes
@@ -663,7 +664,6 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
         pixels.type = type;
         pixels.width = width;
         pixels.height = height;
-        pixels.pixels = nullptr;
         SetTextureData(tex.get(), &pixels);
 
         return tex;
@@ -1050,20 +1050,12 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
         GLint input_format;
         GLenum input_type;
         TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
-        glTexImage2D(tex->type_, 0, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels.get());
+        glTexImage2D(tex->type_, 0, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels.data());
     }
     // Upload compressed textures thru SOIL because its way easier
     else
     {
         unsigned int soil_flags = SOIL_FLAG_TEXTURE_REPEATS;
-        if (pixels->type.compression == TextureType::DDS)
-        {
-            soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
-        }
-        else if (pixels->type.compression == TextureType::AUTO)
-        {
-            soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT | SOIL_FLAG_GL_MIPMAPS;
-        }
         int channels = 0;
         switch (pixels->type.format)
         {
@@ -1080,8 +1072,19 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
             throw "Compressed texture using wrong format";
             break;
         }
-        tex->texture_ = SOIL_create_OGL_texture(pixels->pixels.get(), &pixels->width, &pixels->height,
-            channels, tex->texture_, soil_flags);
+        if (pixels->type.compression == TextureType::DDS)
+        {
+            soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
+            tex->texture_ = SOIL_direct_load_DDS_from_memory(pixels->pixels.data(), static_cast<int>(pixels->pixels.size()), tex->texture_, soil_flags, 0);
+        }
+        else if (pixels->type.compression == TextureType::AUTO)
+        {
+            // DXT compression disabled because it adds a lot to load times
+            soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT;
+            soil_flags |= SOIL_FLAG_GL_MIPMAPS;
+            tex->texture_ = SOIL_create_OGL_texture(pixels->pixels.data(), &pixels->width, &pixels->height,
+                channels, tex->texture_, soil_flags);
+        }
         if (tex->texture_ == 0)
         {
             throw "Failed to update compressed texture";
@@ -1144,7 +1147,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
     GLint input_format;
     GLenum input_type;
     TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
-    glTexImage3D(tex->type_, 0, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.get());
+    glTexImage3D(tex->type_, 0, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.data());
 
     // Apply our texture settings (we do this after to override SOIL settings)
     if (pixels->type.wrap == TextureType::CLAMP)
@@ -1178,6 +1181,10 @@ PixelData RendererGL43::GetTextureData(const TextureResource* texture)
     {
         throw "Attemped to retrieve mismatched texture type";
     }
+    if (tex->options_.compression == TextureType::DDS)
+    {
+        throw "Attemped to retrieve compressed texture type";
+    }
     GLint width, height;
     GLint internal_format, input_format;
     GLenum input_type;
@@ -1190,8 +1197,8 @@ PixelData RendererGL43::GetTextureData(const TextureResource* texture)
     pixels.width = width;
     pixels.height = height;
     pixels.type = tex->options_;
-    pixels.pixels.reset(new unsigned char[width * height * (pixels.bits_per_pixel() / 8)]);
-    glGetTexImage(tex->type_, 0, input_format, input_type, pixels.pixels.get());
+    pixels.pixels.resize(width * height * (pixels.bits_per_pixel() / 8));
+    glGetTexImage(tex->type_, 0, input_format, input_type, pixels.pixels.data());
     return pixels;
 }
 
@@ -1201,6 +1208,10 @@ PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
     if (tex->type_ != GL_TEXTURE_3D)
     {
         throw "Attemped to retrieve mismatched texture type";
+    }
+    if (tex->options_.compression == TextureType::DDS)
+    {
+        throw "Attemped to retrieve compressed texture type";
     }
     GLint width, height, depth;
     GLint internal_format, input_format;
@@ -1216,8 +1227,8 @@ PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
     pixels.height = height;
     pixels.depth = depth;
     pixels.type = tex->options_;
-    pixels.pixels.reset(new unsigned char[width * height * depth * (pixels.bits_per_pixel() / 8)]);
-    glGetTexImage(tex->type_, 0, input_format, input_type, pixels.pixels.get());
+    pixels.pixels.resize(width * height * depth * (pixels.bits_per_pixel() / 8));
+    glGetTexImage(tex->type_, 0, input_format, input_type, pixels.pixels.data());
     return pixels;
 }
 
@@ -1453,23 +1464,44 @@ bool RendererGL43::LoadPixelData(std::string filename, PixelData* data)
 {
     std::string filetype(filename);
     int channels = 0;
-    unsigned char* pixel_data = SOIL_load_image(filename.c_str(), &data->width, &data->height,
-                                                &channels, SOIL_LOAD_AUTO);
-    if (pixel_data == nullptr)
-    {
-        return false;
-    }
-    data->pixels.reset(pixel_data);
-
     filetype = filetype.substr(filetype.size() - 4);
 
     if (filetype == ".dds")
     {
         data->type.compression = TextureType::DDS;
+        std::ifstream file(filename, std::ios::binary | std::ios::ate);
+        if (!file.is_open())
+        {
+            throw "DDS texture file not found";
+        }
+        auto image_size = file.tellg();
+        file.seekg(0, std::ios::beg);
+
+        data->pixels.resize(image_size);
+        // 88 bytes is the size of a standard DDS texture header
+        if (image_size < 88)
+        {
+            throw "Invalid .dds texture found";
+        }
+        file.read(reinterpret_cast<char*>(data->pixels.data()), image_size);
+        // The width and height come at the 16th and 12th byte of a DDS header respectively
+        // Enjoy this ugly pointer casting dereferencing party for sad variables
+        data->width = *reinterpret_cast<unsigned int*>(&data->pixels[16]);
+        data->height = *reinterpret_cast<unsigned int*>(&data->pixels[12]);
     }
     else
     {
         data->type.compression = TextureType::AUTO;
+        unsigned char* pixel_data = SOIL_load_image(filename.c_str(), &data->width, &data->height,
+                                                    &channels, SOIL_LOAD_AUTO);
+        if (pixel_data == nullptr)
+        {
+            return false;
+        }
+        auto pixel_data_length = data->width * data->height * channels;
+        // Copy pixel buffer into our byte vector
+        data->pixels.resize(pixel_data_length);
+        memcpy(data->pixels.data(), pixel_data, pixel_data_length);
     }
 
     switch (channels)
@@ -1487,6 +1519,7 @@ bool RendererGL43::LoadPixelData(std::string filename, PixelData* data)
         data->type.format = TextureType::R8G8B8A8;
         break;
     }
+
     return true;
 }
 
