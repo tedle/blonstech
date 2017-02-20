@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     std::vector<std::unique_ptr<blons::Model>> models;
 
     // Big scene
-    models = blons::temp::load_codmap("bms_test2uv", std::move(models), graphics.get());
+    models = blons::temp::load_codmap("crytek_sponza_2", std::move(models), graphics.get());
 
     // Model 1
     models.push_back(graphics->MakeModel("teapot_highpoly.bms"));
