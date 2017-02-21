@@ -37,6 +37,13 @@
 
 namespace blons
 {
+namespace
+{
+auto const cvar_exposure = console::RegisterVariable("light:exposure", 0.8e-4f);
+auto const cvar_sun_luminance = console::RegisterVariable("light:sun-luminance", 1e4f);
+auto const cvar_sky_luminance = console::RegisterVariable("light:sky-luminance", 6e3f);
+} // namespace
+
 // Managed assets that allows the blons::Graphics class to track and render anything it creates
 class ManagedModel : public Model
 {
@@ -91,7 +98,8 @@ Graphics::Graphics(Client::Info screen)
                          //Vector3(1.0f, 0.75, 0.4f))); // colour
                          // Noon
                          Vector3(-2.0f, -5.0f, -0.5f),
-                         Vector3(1.0f, 0.95f, 0.8f))); // colour
+                         Vector3(1.0f, 0.95f, 0.8f), // colour
+                         cvar_sun_luminance->to<float>())); // intensity in candela/meters^2
     // Sunny day
     Vector3 sky_colour(0.3f, 0.6f, 1.0f);
     // Midnight
@@ -107,6 +115,7 @@ Graphics::Graphics(Client::Info screen)
         sky_box_.g.coeffs[i] = uniform_function.coeffs[i] * sky_colour.g;
         sky_box_.b.coeffs[i] = uniform_function.coeffs[i] * sky_colour.b;
     }
+    sky_luminance_ = cvar_sky_luminance->to<float>();
 }
 
 Graphics::~Graphics()
@@ -135,6 +144,7 @@ void Graphics::BakeRadianceTransfer()
     scene.lights = { sun_.get() };
     scene.models.assign(models_.begin(), models_.end());
     scene.sky_box = sky_box_;
+    scene.sky_luminance = sky_luminance_;
     scene.view = *camera_;
 
     pipeline_->BakeRadianceTransfer(scene);
@@ -184,11 +194,17 @@ std::unique_ptr<Sprite> Graphics::MakeSprite(const PixelData& pixel_data)
 
 bool Graphics::Render()
 {
+    // Update graphics settings from cvars
+    camera_->set_exposure(cvar_exposure->to<float>());
+    sun_->set_luminance(cvar_sun_luminance->to<float>());
+    sky_luminance_ = cvar_sky_luminance->to<float>();
+
     auto context = render::context();
     pipeline::Scene scene;
     scene.lights = { sun_.get() };
     scene.models.assign(models_.begin(), models_.end());
     scene.sky_box = sky_box_;
+    scene.sky_luminance = sky_luminance_;
     scene.view = *camera_;
 
     // Clear buffers

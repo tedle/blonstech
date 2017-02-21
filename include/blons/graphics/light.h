@@ -34,6 +34,10 @@ namespace blons
 // Forward declarations
 class Camera;
 
+// TODO: Separate classes for different light types
+// Sun should be measured in illuminance (lux)
+// Punctual lights in lumens
+// IBLs in luminance (candela/m^2)
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Represents lights in a scene
 ////////////////////////////////////////////////////////////////////////////////
@@ -58,14 +62,15 @@ public:
     /// \param pos Position of the light. Irrelevant for directional lights
     /// \param dir Direction the light is pointed. Irrelevant for point lights
     /// \param colour Colour of light emitted
+    /// \param luminance Intensity of the light in candela/meters^2
     ////////////////////////////////////////////////////////////////////////////////
-    Light(Type type, Vector3 pos, Vector3 dir, Vector3 colour);
+    Light(Type type, Vector3 pos, Vector3 dir, Vector3 colour, units::luminance luminance);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Light(Type, Vector3, Vector3, Vector3) with a default direction
     /// of straight down and a colour of white
     ////////////////////////////////////////////////////////////////////////////////
     Light(Type type)
-        : Light(type, Vector3(), Vector3(0.0, -1.0, 0.0), Vector3(1.0, 1.0, 1.0)) {}
+        : Light(type, Vector3(), Vector3(0.0, -1.0, 0.0), Vector3(1.0, 1.0, 1.0), 1.0) {}
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Light(Type, Vector3, Vector3, Vector3) with a default type of
     /// Type::POINT and a colour of white
@@ -96,6 +101,12 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     const Vector3& direction() const;
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the light's emitted intensity in candela/meters^2
+    ///
+    /// \return Luminance in candela/meters^2
+    ////////////////////////////////////////////////////////////////////////////////
+    const units::luminance& luminance() const;
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the light's position in space
     ///
     /// \return Vector3 containing position
@@ -121,6 +132,12 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     void set_direction(const Vector3& dir);
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets the light's emitted luminance
+    ///
+    /// \param luminance Luminance in candela/meters^2
+    ////////////////////////////////////////////////////////////////////////////////
+    void set_luminance(const units::luminance& luminance);
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the light's position in space
     ///
     /// \param pos Vector3 containing position
@@ -132,7 +149,7 @@ private:
     Vector3 pos_;
     Vector3 direction_;
     Vector3 colour_;
-    float intensity_;
+    float luminance_;
     // Used for shadow maps
     std::unique_ptr<Camera> view_;
 };

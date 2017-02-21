@@ -24,6 +24,7 @@
 #version 430
 
 // Includes
+#include <shaders/colour.lib.glsl>
 #include <shaders/math.lib.glsl>
 
 // Ins n outs
@@ -39,6 +40,7 @@ uniform sampler3D irradiance_volume_py;
 uniform sampler3D irradiance_volume_ny;
 uniform sampler3D irradiance_volume_pz;
 uniform sampler3D irradiance_volume_nz;
+uniform float exposure;
 
 void main(void)
 {
@@ -54,5 +56,6 @@ void main(void)
     vec3 ambient_light = SampleAmbientCube(ambient_cube, norm);
     // Visualize as exit irradiance, divide by pi
     ambient_light /= kPi;
+    ambient_light = FilmicTonemap(ambient_light * exposure);
     frag_colour = vec4(ambient_light, 1.0f);
 }

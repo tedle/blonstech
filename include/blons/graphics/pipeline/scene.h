@@ -38,10 +38,11 @@ namespace pipeline
 ////////////////////////////////////////////////////////////////////////////////
 struct Scene
 {
-    Camera view;                ///< Camera the scene is viewed from
-    std::vector<Model*> models; ///< List of models to be rendered on screen
-    std::vector<Light*> lights; ///< List of lights to be used in the scene
-    SHColourCoeffs3 sky_box;    ///< Sky box mapped to spherical harmonics
+    Camera view;                    ///< Camera the scene is viewed from
+    std::vector<Model*> models;     ///< List of models to be rendered on screen
+    std::vector<Light*> lights;     ///< List of lights to be used in the scene
+    SHColourCoeffs3 sky_box;        ///< Sky box mapped to spherical harmonics
+    units::luminance sky_luminance; ///< Luminance emitted by sky
 };
 
 ////////////////////////////////////////////////////////////////////////////////

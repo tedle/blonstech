@@ -40,6 +40,14 @@ public:
     Camera();
     ~Camera() {}
 
+    // TODO: Base this on real metrics (aperture/shutter/ISO -> EV100)
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets the exposure of the camera in the scene. Currently a flat
+    /// multiplier on exit radiance
+    ///
+    /// \param exposure The exposure of the camera
+    ////////////////////////////////////////////////////////////////////////////////
+    void set_exposure(float exposure);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the position of the camera in the scene
     ///
@@ -67,6 +75,12 @@ public:
     void LookAt(units::world x, units::world y, units::world z);
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the exposure of the camera in the scene
+    ///
+    /// \return The exposure of the camera
+    ////////////////////////////////////////////////////////////////////////////////
+    float exposure() const;
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the position of the camera in the scene
     ///
     /// \return The XYZ coordinates of the camera
@@ -89,6 +103,7 @@ public:
 private:
     Vector3 pos_;
     Vector3 rot_;
+    float exposure_;
 };
 } // namespace blons
 

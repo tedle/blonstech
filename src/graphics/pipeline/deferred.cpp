@@ -132,7 +132,7 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!debug_output_->Render(geometry_->output(stage::Geometry::DEPTH), *light_probes_, *irradiance_volume_, view_matrix, proj_matrix_))
+    if (!debug_output_->Render(geometry_->output(stage::Geometry::DEPTH), scene, *light_probes_, *irradiance_volume_, view_matrix, proj_matrix_))
     {
         return false;
     }

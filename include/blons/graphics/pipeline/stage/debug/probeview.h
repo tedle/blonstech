@@ -45,7 +45,7 @@ public:
     ProbeView();
     ~ProbeView() {}
 
-    bool Render(Framebuffer* target, const TextureResource* depth, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix);
+    bool Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix);
 
 private:
     std::unique_ptr<DrawBatcher> probe_meshes_;

@@ -24,7 +24,7 @@
 #version 430
 
 // Includes
-#include <shaders/gamma.lib.glsl>
+#include <shaders/colour.lib.glsl>
 #include <shaders/types.lib.glsl>
 #include <shaders/math.lib.glsl>
 
@@ -42,6 +42,8 @@ uniform sampler2D depth;
 uniform sampler2D direct_light;
 uniform DirectionalLight sun;
 uniform SHColourCoeffs sh_sky_colour;
+uniform float sky_luminance;
+uniform float exposure;
 uniform sampler3D irradiance_volume_px;
 uniform sampler3D irradiance_volume_nx;
 uniform sampler3D irradiance_volume_py;
@@ -81,6 +83,8 @@ void main(void)
         vec3 sky_colour = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
                                SHDot3(direction_coeffs, sh_sky_colour.g),
                                SHDot3(direction_coeffs, sh_sky_colour.b));
+        sky_colour *= sky_luminance;
+        sky_colour = FilmicTonemap(sky_colour * exposure);
         frag_colour = vec4(sky_colour, 1.0);
         return;
     }
@@ -91,12 +95,7 @@ void main(void)
     // Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
     vec3 specular = vec3(pow(clamp(dot(halfway, surface_normal), 0.0, 1.0), gloss));
 
-    float light_angle = dot(surface_normal, -sun.dir);
-    // Black out surfaces not facing a light
-    if (light_angle < 0.0)
-    {
-        specular = vec3(0.0);
-    }
+    float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
 
     // Get the direct lighting value
     vec3 direct = texture(direct_light, tex_coord).rgb;
@@ -108,7 +107,9 @@ void main(void)
     float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, halfway), 5.0);
     specular *= fresnel;
     specular *= specular_normalization;
-    // This has the N.L pre-applied
+    specular *= sun.luminance;
+    specular *= sun.colour;
+    specular *= NdotL;
     specular *= direct;
 
     // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
@@ -134,11 +135,17 @@ void main(void)
     // This pi divide should actually be done during surface colour calculation but the whole BRDF is a mess right now
     // Will be fixed during proper PBR pass
     ambient /= kPi;
-    vec3 diffuse = (direct * sun.colour) + ambient;
+    vec3 diffuse = (direct * sun.luminance * sun.colour * NdotL) + ambient;
 
     vec3 surface_colour = texture(albedo, tex_coord).rgb;
     surface_colour *= diffuse;
     surface_colour += specular;
+
+    surface_colour = FilmicTonemap(surface_colour * exposure);
+
+    // Uncomment to see direct light only
+    //surface_colour *= 0.000001;
+    //surface_colour += vec3(direct * NdotL);
 
     // Uncomment to see ambient light only
     //surface_colour *= 0.000001;

@@ -52,7 +52,7 @@ public:
     DebugOutput(Perspective perspective);
     ~DebugOutput() {}
 
-    bool Render(const TextureResource* depth, const LightProbes& probes, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
+    bool Render(const TextureResource* depth, const Scene& scene, const LightProbes& probes, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
 
     const TextureResource* output(Output buffer) const;
 

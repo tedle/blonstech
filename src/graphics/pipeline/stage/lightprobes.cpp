@@ -35,6 +35,8 @@ namespace stage
 {
 namespace
 {
+auto cvar_constant_ambient = console::RegisterVariable("light:constant-ambient", 800.0f);
+
 const std::vector<AxisAlignedNormal> kFaceOrder = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
 Vector3 FaceRotation(AxisAlignedNormal face)
 {
@@ -155,6 +157,8 @@ LightProbes::LightProbes()
 bool LightProbes::Relight(const Scene& scene)
 {
     if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()) ||
+        !probe_relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
+        !probe_relight_shader_->SetInput("temp_ambient", cvar_constant_ambient->to<float>()) ||
         !probe_relight_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
         !probe_relight_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
         !probe_relight_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9))

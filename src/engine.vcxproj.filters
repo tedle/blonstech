@@ -458,9 +458,6 @@
     <None Include="shaders\ui-blur.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\gamma.lib.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
     <None Include="shaders\debug-shprobe.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
@@ -492,6 +489,9 @@
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\probe-env-map.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\colour.lib.glsl">
       <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>

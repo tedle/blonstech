@@ -45,7 +45,7 @@ public:
     IrradianceView();
     ~IrradianceView() {}
 
-    bool Render(Framebuffer* target, const TextureResource* depth, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
+    bool Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
 
 private:
     // Full init is deferred until first Render() because it's optional and adds significant startup time

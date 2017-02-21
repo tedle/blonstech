@@ -30,12 +30,13 @@
 
 namespace blons
 {
-Light::Light(Type type, Vector3 pos, Vector3 dir, Vector3 colour)
+Light::Light(Type type, Vector3 pos, Vector3 dir, Vector3 colour, units::luminance luminance)
 {
     view_.reset(new Camera);
     type_ = type;
     set_colour(colour);
     set_direction(dir);
+    set_luminance(luminance);
     if (type_ != DIRECTIONAL)
     {
         set_pos(pos);
@@ -121,6 +122,11 @@ const Vector3& Light::direction() const
     return direction_;
 }
 
+const units::luminance& Light::luminance() const
+{
+    return luminance_;
+}
+
 const Vector3& Light::pos() const
 {
     return pos_;
@@ -152,6 +158,11 @@ void Light::set_direction(const Vector3& dir)
     view_->set_pos(0, 0, 0);
     view_->LookAt(dir.x, dir.y, dir.z);
     view_->set_pos(pos_.x, pos_.y, pos_.z);
+}
+
+void Light::set_luminance(const units::luminance& luminance)
+{
+    luminance_ = luminance;
 }
 
 void Light::set_pos(const Vector3& pos)

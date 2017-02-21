@@ -158,9 +158,7 @@ bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_ma
         !direct_light_shader_->SetInput("inv_vp_matrix", inv_proj_view) ||
         !direct_light_shader_->SetInput("light_vp_matrix", light_vp_matrix) ||
         !direct_light_shader_->SetInput("view_depth", g_buffer.output(Geometry::DEPTH), 0) ||
-        !direct_light_shader_->SetInput("light_depth", output(LIGHT_DEPTH), 1) ||
-        !direct_light_shader_->SetInput("normal", g_buffer.output(Geometry::NORMAL), 2) ||
-        !direct_light_shader_->SetInput("sun.dir", sun->direction()))
+        !direct_light_shader_->SetInput("light_depth", output(LIGHT_DEPTH), 1))
     {
         return false;
     }

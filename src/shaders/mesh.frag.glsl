@@ -24,7 +24,7 @@
 #version 430
 
 // Includes
-#include <shaders/gamma.lib.glsl>
+#include <shaders/colour.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;

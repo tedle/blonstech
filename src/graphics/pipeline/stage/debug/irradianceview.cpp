@@ -62,7 +62,7 @@ IrradianceView::IrradianceView()
     }
 }
 
-bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)
+bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)
 {
     auto debug_mode = cvar_debug_mode->to<int>();
     if (!debug_mode)
@@ -109,7 +109,8 @@ bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, c
         !volume_shader_->SetInput("irradiance_volume_py", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PY), 2) ||
         !volume_shader_->SetInput("irradiance_volume_ny", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NY), 3) ||
         !volume_shader_->SetInput("irradiance_volume_pz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ), 4) ||
-        !volume_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 5))
+        !volume_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 5) ||
+        !volume_shader_->SetInput("exposure", scene.view.exposure()))
     {
         target->BindDepthTexture(target->depth());
         return false;

@@ -24,6 +24,7 @@
 #version 430
 
 // Includes
+#include <shaders/colour.lib.glsl>
 #include <shaders/math.lib.glsl>
 #include <shaders/types.lib.glsl>
 
@@ -38,6 +39,7 @@ uniform sampler2D probe_env_maps;
 uniform mat4 env_proj_matrix;
 uniform int env_tex_size;
 uniform int probe_id;
+uniform float exposure;
 uniform int debug_mode;
 
 layout(std430) buffer probe_buffer
@@ -120,6 +122,7 @@ void main(void)
     vec3 ambient_light = SampleAmbientCube(ambient_cube, surface_normal);
     // Ambient cubes store irradiance data, view as exit irradiance with pi division
     ambient_light /= kPi;
+    ambient_light = FilmicTonemap(ambient_light * exposure);
 
     // Calculate direct sky vis data
     float sh_normal[9];

@@ -23,9 +23,6 @@
 
 #version 430
 
-// Includes
-#include <shaders/gamma.lib.glsl>
-
 // Ins n outs
 in vec2 tex_coord;
 in mat3 norm;

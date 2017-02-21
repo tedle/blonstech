@@ -127,9 +127,9 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
 {
     blons::console::out("Welcome, gamer -- to the blonstech universe!\n");
 
-    blons::console::RegisterFunction("dbg:testo", [](int i){ blons::console::out("%i gamers in the house!\n", i); });
-    blons::console::RegisterFunction("dbg:testo", [](const char* i){ blons::console::out("%s stringers in the house!\n", i); });
-    blons::console::RegisterFunction("dbg:testo", [](int i, int j){ blons::console::out("%i, %i double inters in the house!\n", i, j); });
+    blons::console::RegisterFunction("main:testo", [](int i){ blons::console::out("%i gamers in the house!\n", i); });
+    blons::console::RegisterFunction("main:testo", [](const char* i){ blons::console::out("%s stringers in the house!\n", i); });
+    blons::console::RegisterFunction("main:testo", [](int i, int j){ blons::console::out("%i, %i double inters in the house!\n", i, j); });
 
     blons::console::RegisterVariable("sv:cool", 5);
     blons::console::RegisterVariable("math:pi", 3.14f);
@@ -142,12 +142,12 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
     auto v_c = blons::console::var<std::string>("sv:greeting");
 
     blons::console::RegisterFunction("gfx:reload", [=](){ graphics->Reload(info); });
-    blons::console::RegisterVariable("gfx:target", 0);
-    blons::console::RegisterVariable("gfx:alt-target", 1);
+    blons::console::RegisterVariable("dbg:target", 0);
+    blons::console::RegisterVariable("dbg:alt-target", 1);
 
-    blons::console::RegisterFunction("dbg:test-ui", std::bind(InitTestUI, graphics->gui()));
+    blons::console::RegisterFunction("main:test-ui", std::bind(InitTestUI, graphics->gui()));
 
-    blons::console::RegisterFunction("dbg:console-history", [&]()
+    blons::console::RegisterFunction("con:history", [&]()
     {
         for (const auto& line : blons::console::history())
         {
@@ -158,8 +158,8 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
 
 void SetRenderingOutput(blons::Graphics* graphics)
 {
-    static const blons::console::Variable* target = blons::console::var("gfx:target");
-    static const blons::console::Variable* alt_target = blons::console::var("gfx:alt-target");
+    static const blons::console::Variable* target = blons::console::var("dbg:target");
+    static const blons::console::Variable* alt_target = blons::console::var("dbg:alt-target");
     auto get_target = [](int target)
     {
         switch (target)

@@ -318,7 +318,7 @@
     <None Include="shaders\debug-irradiance-volume.frag.glsl" />
     <None Include="shaders\debug-irradiance-volume.vert.glsl" />
     <None Include="shaders\debug-shprobe.frag.glsl" />
-    <None Include="shaders\gamma.lib.glsl" />
+    <None Include="shaders\colour.lib.glsl" />
     <None Include="shaders\irradiance-volume.comp.glsl" />
     <None Include="shaders\light.frag.glsl" />
     <None Include="shaders\math.lib.glsl" />

@@ -3,6 +3,7 @@ struct DirectionalLight
     // Used as uniforms for currently so vec3 is fine
     vec3 dir;
     vec3 colour;
+    float luminance;
 };
 
 struct Probe

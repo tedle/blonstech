@@ -170,6 +170,7 @@ private:
     // TODO: Make this user customizable
     std::unique_ptr<Light> sun_;
     SHColourCoeffs3 sky_box_;
+    units::luminance sky_luminance_;
 
     std::set<class ManagedModel*> models_;
     std::set<class ManagedSprite*> sprites_;

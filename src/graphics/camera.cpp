@@ -29,6 +29,11 @@ Camera::Camera()
 {
 }
 
+void Camera::set_exposure(float exposure)
+{
+    exposure_ = exposure;
+}
+
 void Camera::set_pos(units::world x, units::world y, units::world z)
 {
     pos_ = Vector3(x, y, z);
@@ -57,6 +62,11 @@ void Camera::LookAt(units::world x, units::world y, units::world z)
     rotation = VectorPitchYawRoll(MatrixLookAt(pos_, look, up));
     
     set_rot(rotation.x, rotation.y, rotation.z);
+}
+
+float Camera::exposure() const
+{
+    return exposure_;
 }
 
 Vector3 Camera::pos() const
