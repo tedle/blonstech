@@ -50,9 +50,10 @@ void ComputeAmbientCubeDirection(const uint probe_id, const int cube_face, const
                            SHDot3(direction_coeffs, sh_sky_colour.b));
     // Scale sky irradiance by visibility function
     sky_colour *= sky_vis;
-    probes[probe_id].cube_coeffs[cube_face][0] = sky_colour.r;
-    probes[probe_id].cube_coeffs[cube_face][1] = sky_colour.g;
-    probes[probe_id].cube_coeffs[cube_face][2] = sky_colour.b;
+    vec3 ambient_colour = vec3(0.01f) + sky_colour;
+    probes[probe_id].cube_coeffs[cube_face][0] = ambient_colour.r;
+    probes[probe_id].cube_coeffs[cube_face][1] = ambient_colour.g;
+    probes[probe_id].cube_coeffs[cube_face][2] = ambient_colour.b;
 }
 
 void main(void)

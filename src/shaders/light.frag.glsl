@@ -130,20 +130,19 @@ void main(void)
     ambient_cube[cube_indices.z] = is_positive.z ?
                                        vec3(texture(irradiance_volume_pz, irradiance_sample_pos.xyz).rgb) :
                                        vec3(texture(irradiance_volume_nz, irradiance_sample_pos.xyz).rgb);
-    vec3 sky_light = SampleAmbientCube(ambient_cube, surface_normal);
+    vec3 ambient = SampleAmbientCube(ambient_cube, surface_normal);
     // This pi divide should actually be done during surface colour calculation but the whole BRDF is a mess right now
     // Will be fixed during proper PBR pass
-    sky_light /= kPi;
-    vec3 ambient = vec3(0.01f) + sky_light;
+    ambient /= kPi;
     vec3 diffuse = (direct * sun.colour) + ambient;
 
     vec3 surface_colour = texture(albedo, tex_coord).rgb;
     surface_colour *= diffuse;
     surface_colour += specular;
 
-    // Uncomment to see sky light only
+    // Uncomment to see ambient light only
     //surface_colour *= 0.000001;
-    //surface_colour += vec3(sky_light);
+    //surface_colour += vec3(ambient);
 
     // Uncomment to see specular only
     //surface_colour *= 0.000001;
