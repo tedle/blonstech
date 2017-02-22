@@ -60,6 +60,72 @@ const float fresnel_coef = (pow(refraction_index - 1, 2) + pow(extinction_coef, 
 // Pop this somewhere between 0.1-100,000 idk
 const float gloss = 20.0;
 
+vec3 DirectSpecular(vec3 view_dir, vec3 surface_normal, vec3 light_visibility)
+{
+    float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
+    vec3 halfway = normalize(-sun.dir + view_dir);
+    // Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
+    vec3 specular = vec3(pow(clamp(dot(halfway, surface_normal), 0.0, 1.0), gloss));
+
+    // Helps ensure outgoing light is never greater than incoming (real!)
+    float specular_normalization = ((gloss + 2) / 8);
+
+    // Linear blend specular with camera angle, based on fresnel coefficient
+    float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, halfway), 5.0);
+    specular *= fresnel;
+    specular *= specular_normalization;
+    specular *= sun.luminance;
+    specular *= sun.colour;
+    specular *= NdotL;
+    specular *= light_visibility;
+    return specular;
+}
+
+vec3 AmbientDiffuse(vec4 pos, vec3 normal)
+{
+    // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
+    vec4 irradiance_sample_pos = inv_irradiance_matrix * pos;
+    irradiance_sample_pos /= irradiance_sample_pos.w;
+    vec3 ambient_cube[6];
+    // We do a lot of ugly busywork to cut texture fetches down in half because these are dependent texture fetches and wow those are expensive!!!
+    // TODO: Shove indirect lighting computation into a half-res bilaterally-upsampled buffer? This currently adds 0.6ms
+    bvec3 is_positive = bvec3(normal.x > 0.0, normal.y > 0.0, normal.z > 0.0);
+    ivec3 cube_indices = ivec3(is_positive.x ? kPositiveX : kNegativeX,
+                               is_positive.y ? kPositiveY : kNegativeY,
+                               is_positive.z ? kPositiveZ : kNegativeZ);
+    ambient_cube[cube_indices.x] = is_positive.x ?
+                                       vec3(texture(irradiance_volume_px, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_nx, irradiance_sample_pos.xyz).rgb);
+    ambient_cube[cube_indices.y] = is_positive.y ?
+                                       vec3(texture(irradiance_volume_py, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_ny, irradiance_sample_pos.xyz).rgb);
+    ambient_cube[cube_indices.z] = is_positive.z ?
+                                       vec3(texture(irradiance_volume_pz, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_nz, irradiance_sample_pos.xyz).rgb);
+    return SampleAmbientCube(ambient_cube, normal);
+}
+
+vec3 Diffuse(vec4 pos, vec3 surface_normal, vec3 light_visibility)
+{
+    vec3 ambient = AmbientDiffuse(pos, surface_normal);
+    // This pi divide should actually be done during surface colour calculation but the whole BRDF is a mess right now
+    // Will be fixed during proper PBR pass
+    ambient /= kPi;
+    float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
+    return vec3(light_visibility * sun.luminance * sun.colour * NdotL) + ambient;
+}
+
+vec3 SkyColour(vec3 view_dir)
+{
+    float direction_coeffs[9];
+    SHProjectDirection3(-view_dir, direction_coeffs);
+    vec3 sky_colour = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
+                           SHDot3(direction_coeffs, sh_sky_colour.g),
+                           SHDot3(direction_coeffs, sh_sky_colour.b));
+    sky_colour *= sky_luminance;
+    return FilmicTonemap(sky_colour * exposure);
+}
+
 void main(void)
 {
     float depth_sample = texture(depth, tex_coord).r;
@@ -78,64 +144,17 @@ void main(void)
 
     if (depth_sample == 1.0)
     {
-        float direction_coeffs[9];
-        SHProjectDirection3(-view_dir, direction_coeffs);
-        vec3 sky_colour = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
-                               SHDot3(direction_coeffs, sh_sky_colour.g),
-                               SHDot3(direction_coeffs, sh_sky_colour.b));
-        sky_colour *= sky_luminance;
-        sky_colour = FilmicTonemap(sky_colour * exposure);
-        frag_colour = vec4(sky_colour, 1.0);
+        frag_colour = vec4(SkyColour(view_dir), 1.0);
         return;
     }
 
-    vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
-    vec3 halfway = normalize(-sun.dir + view_dir);
-
-    // Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
-    vec3 specular = vec3(pow(clamp(dot(halfway, surface_normal), 0.0, 1.0), gloss));
-
-    float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
-
     // Get the direct lighting value
     vec3 direct = texture(direct_light, tex_coord).rgb;
+    // Get the surface normal
+    vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
 
-    // Helps ensure outgoing light is never greater than incoming (real!)
-    float specular_normalization = ((gloss + 2) / 8);
-
-    // Linear blend specular with camera angle, based on fresnel coefficient
-    float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, halfway), 5.0);
-    specular *= fresnel;
-    specular *= specular_normalization;
-    specular *= sun.luminance;
-    specular *= sun.colour;
-    specular *= NdotL;
-    specular *= direct;
-
-    // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
-    vec4 irradiance_sample_pos = inv_irradiance_matrix * pos;
-    irradiance_sample_pos /= irradiance_sample_pos.w;
-    vec3 ambient_cube[6];
-    // We do a lot of ugly busywork to cut texture fetches down in half because these are dependent texture fetches and wow those are expensive!!!
-    // TODO: Shove indirect lighting computation into a half-res bilaterally-upsampled buffer? This currently adds 0.6ms
-    bvec3 is_positive = bvec3(surface_normal.x > 0.0, surface_normal.y > 0.0, surface_normal.z > 0.0);
-    ivec3 cube_indices = ivec3(is_positive.x ? kPositiveX : kNegativeX,
-                               is_positive.y ? kPositiveY : kNegativeY,
-                               is_positive.z ? kPositiveZ : kNegativeZ);
-    ambient_cube[cube_indices.x] = is_positive.x ?
-                                       vec3(texture(irradiance_volume_px, irradiance_sample_pos.xyz).rgb) :
-                                       vec3(texture(irradiance_volume_nx, irradiance_sample_pos.xyz).rgb);
-    ambient_cube[cube_indices.y] = is_positive.y ?
-                                       vec3(texture(irradiance_volume_py, irradiance_sample_pos.xyz).rgb) :
-                                       vec3(texture(irradiance_volume_ny, irradiance_sample_pos.xyz).rgb);
-    ambient_cube[cube_indices.z] = is_positive.z ?
-                                       vec3(texture(irradiance_volume_pz, irradiance_sample_pos.xyz).rgb) :
-                                       vec3(texture(irradiance_volume_nz, irradiance_sample_pos.xyz).rgb);
-    vec3 ambient = SampleAmbientCube(ambient_cube, surface_normal);
-    // This pi divide should actually be done during surface colour calculation but the whole BRDF is a mess right now
-    // Will be fixed during proper PBR pass
-    ambient /= kPi;
-    vec3 diffuse = (direct * sun.luminance * sun.colour * NdotL) + ambient;
+    vec3 diffuse = Diffuse(pos, surface_normal, direct);
+    vec3 specular = DirectSpecular(view_dir, surface_normal, direct);
 
     vec3 surface_colour = texture(albedo, tex_coord).rgb;
     surface_colour *= diffuse;
