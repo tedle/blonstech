@@ -58,7 +58,6 @@ public:
         FINAL,                   ///< The final composited image
         ALBEDO,                  ///< Fullbright geometry
         NORMAL,                  ///< Worldspace normals of the geometry
-        DEBUG,                   ///< Various debug information
         G_DEPTH,                 ///< Depth buffer of the geometry
         LIGHT_DEPTH,             ///< Depth buffer from the light's point of view
         DIRECT_LIGHT,            ///< Direct lighting pass

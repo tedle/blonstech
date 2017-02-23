@@ -53,6 +53,7 @@ struct TextureType
         R8G8B8A8_UINT,///< 4-channel, 8-bit per channel
         R8G8B8,       ///< 3-channel, 8-bit per channel
         R16G16,       ///< 2-channel, 16-bit per channel
+        R16G16B16,    ///< 3-channel, 16-bit per channel
         R8G8B8A8,     ///< 3-channel, 8-bit per channel
         A32,          ///< 1-channel, 32-bit per channel
         R32G32,       ///< 2-channel, 32-bit per channel

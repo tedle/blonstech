@@ -171,21 +171,18 @@ void SetRenderingOutput(blons::Graphics* graphics)
             return blons::pipeline::Deferred::NORMAL;
             break;
         case 3:
-            return blons::pipeline::Deferred::DEBUG;
-            break;
-        case 4:
             return blons::pipeline::Deferred::G_DEPTH;
             break;
-        case 5:
+        case 4:
             return blons::pipeline::Deferred::LIGHT_DEPTH;
             break;
-        case 6:
+        case 5:
             return blons::pipeline::Deferred::DIRECT_LIGHT;
             break;
-        case 7:
+        case 6:
             return blons::pipeline::Deferred::PROBE_ENV_MAPS;
             break;
-        case 8:
+        case 7:
             return blons::pipeline::Deferred::LIGHT;
             break;
         case 0:

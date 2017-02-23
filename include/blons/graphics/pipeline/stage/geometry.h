@@ -50,7 +50,6 @@ public:
         ALBEDO, ///< Albedo colour
         NORMAL, ///< World space normals
         DEPTH,  ///< 24-bit depth in the red channel
-        DEBUG   ///< Various debug information
     };
 
 public:

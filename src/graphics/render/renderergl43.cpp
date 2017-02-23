@@ -84,6 +84,11 @@ void TranslateTextureFormat(TextureType::Format format, GLint* internal_format, 
         *input_format = GL_RG;
         *input_type = GL_FLOAT;
         break;
+    case TextureType::R16G16B16:
+        *internal_format = GL_RGB16;
+        *input_format = GL_RGB;
+        *input_type = GL_FLOAT;
+        break;
     case TextureType::A32:
         *internal_format = GL_R32F;
         *input_format = GL_RED;

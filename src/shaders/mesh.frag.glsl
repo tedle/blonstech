@@ -32,7 +32,6 @@ in mat3 norm;
 
 out vec4 frag_colour;
 out vec4 norm_colour;
-out vec4 debug_colour;
 
 // Globals
 uniform sampler2D albedo;
@@ -46,7 +45,4 @@ void main(void)
     // Normal
     vec3 norm_map = texture(normal, tex_coord).rgb * 2 - 1;
     norm_colour = vec4((normalize(norm_map * norm) + 1) / 2, 1.0);
-
-    // Debug out (UV coords)
-    debug_colour = vec4(tex_coord.xy, 0.0, 1.0);
 }

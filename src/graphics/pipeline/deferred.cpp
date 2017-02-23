@@ -189,9 +189,6 @@ bool Deferred::RenderOutput()
         case NORMAL:
             return geometry_->output(stage::Geometry::NORMAL);
             break;
-        case DEBUG:
-            return geometry_->output(stage::Geometry::DEBUG);
-            break;
         case G_DEPTH:
             return geometry_->output(stage::Geometry::DEPTH);
             break;

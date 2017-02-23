@@ -50,10 +50,9 @@ Geometry::Geometry(Perspective perspective)
     }
 
     // Framebuffers
-    // 3 outputs -> diffuse, normal, debug
-    // TODO: Remove debug when no longer needed
-    TextureType options(TextureType::R32G32B32, TextureType::LINEAR, TextureType::CLAMP);
-    geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { options, options, options }));
+    TextureType albedo_options(TextureType::R8G8B8, TextureType::LINEAR, TextureType::CLAMP);
+    TextureType normal_options(TextureType::R16G16B16, TextureType::LINEAR, TextureType::CLAMP);
+    geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { albedo_options, normal_options }));
 }
 
 bool Geometry::Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix)
@@ -104,9 +103,6 @@ const TextureResource* Geometry::output(Output buffer) const
         break;
     case DEPTH:
         return geometry_buffer_->depth();
-        break;
-    case DEBUG:
-        return geometry_buffer_->textures()[2];
         break;
     default:
         return nullptr;
