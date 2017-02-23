@@ -324,6 +324,7 @@
     <None Include="shaders\math.lib.glsl" />
     <None Include="shaders\mesh.frag.glsl" />
     <None Include="shaders\mesh.vert.glsl" />
+    <None Include="shaders\pbr.lib.glsl" />
     <None Include="shaders\probe-relight.comp.glsl" />
     <None Include="shaders\probe-env-map.frag.glsl" />
     <None Include="shaders\probe-env-map.vert.glsl" />

@@ -141,7 +141,7 @@ void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
     auto v_b = blons::console::var<float>("math:pi");
     auto v_c = blons::console::var<std::string>("sv:greeting");
 
-    blons::console::RegisterFunction("gfx:reload", [=](){ graphics->Reload(info); });
+    blons::console::RegisterFunction("gfx:reload", [=](){ graphics->Reload(info); graphics->BakeRadianceTransfer(); });
     blons::console::RegisterVariable("dbg:target", 0);
     blons::console::RegisterVariable("dbg:alt-target", 1);
 

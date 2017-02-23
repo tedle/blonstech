@@ -35,6 +35,13 @@ namespace pipeline
 {
 namespace stage
 {
+namespace
+{
+// TODO: Replace with proper material system
+auto cvar_roughness = console::RegisterVariable("mtl:roughness", 0.4f);
+auto cvar_metalness = console::RegisterVariable("mtl:metalness", 0.0f);
+} // namespace
+
 Lighting::Lighting(Perspective perspective)
 {
     // Shaders
@@ -80,6 +87,8 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
         !light_shader_->SetInput("sun.luminance", sun->luminance()) ||
         !light_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
         !light_shader_->SetInput("exposure", scene.view.exposure()) ||
+        !light_shader_->SetInput("roughness", cvar_roughness->to<float>()) ||
+        !light_shader_->SetInput("metalness", Vector3(cvar_metalness->to<float>())) ||
         !light_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
         !light_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
         !light_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9) ||

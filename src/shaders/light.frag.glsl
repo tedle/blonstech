@@ -27,6 +27,7 @@
 #include <shaders/colour.lib.glsl>
 #include <shaders/types.lib.glsl>
 #include <shaders/math.lib.glsl>
+#include <shaders/pbr.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;
@@ -50,36 +51,8 @@ uniform sampler3D irradiance_volume_py;
 uniform sampler3D irradiance_volume_ny;
 uniform sampler3D irradiance_volume_pz;
 uniform sampler3D irradiance_volume_nz;
-
-// Used to give stronger specular when light bounces at shallower angles
-// refraction_index of 1.0 gives a fresnel of about 0.058~ and 0.1 gives a coef of about 0.72
-// Dielectrics are usually 0.02-0.05 fresnel, so a refraction index of 1 is about good for that
-const float refraction_index = 1.0;
-const float extinction_coef = 0.5;
-const float fresnel_coef = (pow(refraction_index - 1, 2) + pow(extinction_coef, 2)) / (pow(refraction_index + 1, 2) + pow(extinction_coef, 2));
-// Pop this somewhere between 0.1-100,000 idk
-const float gloss = 20.0;
-
-vec3 DirectSpecular(vec3 view_dir, vec3 surface_normal, vec3 light_visibility)
-{
-    float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
-    vec3 halfway = normalize(-sun.dir + view_dir);
-    // Higher exponent used because this is blinn-phong (blinn-phong * 4 ~= phong)
-    vec3 specular = vec3(pow(clamp(dot(halfway, surface_normal), 0.0, 1.0), gloss));
-
-    // Helps ensure outgoing light is never greater than incoming (real!)
-    float specular_normalization = ((gloss + 2) / 8);
-
-    // Linear blend specular with camera angle, based on fresnel coefficient
-    float fresnel = fresnel_coef + (1 - fresnel_coef) * pow(1.0 - dot(view_dir, halfway), 5.0);
-    specular *= fresnel;
-    specular *= specular_normalization;
-    specular *= sun.luminance;
-    specular *= sun.colour;
-    specular *= NdotL;
-    specular *= light_visibility;
-    return specular;
-}
+uniform float roughness;
+uniform vec3 metalness;
 
 vec3 AmbientDiffuse(vec4 pos, vec3 normal)
 {
@@ -105,14 +78,29 @@ vec3 AmbientDiffuse(vec4 pos, vec3 normal)
     return SampleAmbientCube(ambient_cube, normal);
 }
 
-vec3 Diffuse(vec4 pos, vec3 surface_normal, vec3 light_visibility)
+vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 light_visibility, float NdotV, float NdotL, float LdotH, float roughness)
 {
+    // For the one light we currently have
+    vec3 diffuse = vec3(DiffuseTerm(albedo, metalness, NdotV, NdotL, LdotH, roughness));
+    diffuse = diffuse * light_visibility * sun.luminance * sun.colour * NdotL;
+    // After all other lights are applied
     vec3 ambient = AmbientDiffuse(pos, surface_normal);
-    // This pi divide should actually be done during surface colour calculation but the whole BRDF is a mess right now
-    // Will be fixed during proper PBR pass
-    ambient /= kPi;
-    float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
-    return vec3(light_visibility * sun.luminance * sun.colour * NdotL) + ambient;
+    diffuse += ambient;
+    // Modulate by surface colour
+    diffuse *= albedo;
+    // Metals dont have diffuse light
+    diffuse *= 1.0 - metalness;
+    // Account for conversion from irradiance to radiant exitance
+    return diffuse / kPi;
+}
+
+vec3 Specular(vec3 metalness, vec3 albedo, vec3 direct, float NdotH, float NdotV, float NdotL, float LdotH, float roughness)
+{
+    // Determine specular term
+    vec3 specular = SpecularTerm(roughness, metalness, albedo, NdotH, NdotL, NdotV, LdotH);
+    specular = specular * sun.luminance * sun.colour * direct * NdotL;
+    // Division by pi already accounted for in BRDF
+    return specular;
 }
 
 vec3 SkyColour(vec3 view_dir)
@@ -148,17 +136,24 @@ void main(void)
         return;
     }
 
+    // Get the albedo
+    vec3 albedo = texture(albedo, tex_coord).rgb;
     // Get the direct lighting value
     vec3 direct = texture(direct_light, tex_coord).rgb;
     // Get the surface normal
     vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
 
-    vec3 diffuse = Diffuse(pos, surface_normal, direct);
-    vec3 specular = DirectSpecular(view_dir, surface_normal, direct);
+    // Pre-computed and re-used in various lighting calculations
+    vec3 halfway = normalize(-sun.dir + view_dir);
+    float NdotH = max(dot(surface_normal, halfway), 0.0);
+    float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
+    float NdotV = max(dot(surface_normal, view_dir), 0.0);
+    float LdotH = max(dot(-sun.dir, halfway), 0.0);
 
-    vec3 surface_colour = texture(albedo, tex_coord).rgb;
-    surface_colour *= diffuse;
-    surface_colour += specular;
+    vec3 diffuse = Diffuse(pos, albedo, metalness, surface_normal, direct, NdotV, NdotL, LdotH, roughness);
+    vec3 specular = Specular(metalness, albedo, direct, NdotH, NdotV, NdotL, LdotH, roughness);
+
+    vec3 surface_colour = diffuse + specular;
 
     surface_colour = FilmicTonemap(surface_colour * exposure);
 
@@ -172,7 +167,7 @@ void main(void)
 
     // Uncomment to see specular only
     //surface_colour *= 0.000001;
-    //surface_colour += vec3(specular);
+    //surface_colour += FilmicTonemap(vec3(specular) * exposure);
 
     // Final composite
     surface_colour = GammaEncode(surface_colour);

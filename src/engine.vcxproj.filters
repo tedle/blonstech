@@ -494,5 +494,8 @@
     <None Include="shaders\colour.lib.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\pbr.lib.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
