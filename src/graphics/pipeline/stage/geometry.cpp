@@ -52,7 +52,8 @@ Geometry::Geometry(Perspective perspective)
     // Framebuffers
     // 3 outputs -> diffuse, normal, debug
     // TODO: Remove debug when no longer needed
-    geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 3));
+    TextureType options(TextureType::R32G32B32, TextureType::LINEAR, TextureType::CLAMP);
+    geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { options, options, options }));
 }
 
 bool Geometry::Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix)
