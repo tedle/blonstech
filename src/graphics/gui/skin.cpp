@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 // blonstech
-// Copyright(c) 2014 Dominic Bowden
+// Copyright(c) 2017 Dominic Bowden
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files(the "Software"), to deal
