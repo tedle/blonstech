@@ -1473,7 +1473,6 @@ bool RendererGL43::LoadPixelData(std::string filename, PixelData* data)
 
     if (filetype == ".dds")
     {
-        data->type.compression = TextureType::DDS;
         std::ifstream file(filename, std::ios::binary | std::ios::ate);
         if (!file.is_open())
         {
@@ -1482,13 +1481,14 @@ bool RendererGL43::LoadPixelData(std::string filename, PixelData* data)
         auto image_size = file.tellg();
         file.seekg(0, std::ios::beg);
 
-        data->pixels.resize(image_size);
         // 88 bytes is the size of a standard DDS texture header
         if (image_size < 88)
         {
             throw "Invalid .dds texture found";
         }
+        data->pixels.resize(image_size);
         file.read(reinterpret_cast<char*>(data->pixels.data()), image_size);
+        data->type.compression = TextureType::DDS;
         // The width and height come at the 16th and 12th byte of a DDS header respectively
         // Enjoy this ugly pointer casting dereferencing party for sad variables
         data->width = *reinterpret_cast<unsigned int*>(&data->pixels[16]);
