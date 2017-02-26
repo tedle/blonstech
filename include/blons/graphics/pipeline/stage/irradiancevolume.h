@@ -26,7 +26,7 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/lightsector.h>
 #include <blons/graphics/texture3d.h>
 #include <blons/graphics/render/computeshader.h>
 
@@ -63,9 +63,9 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Injects supplied light probe data and fills volume grid
     ///
-    /// \param probes Handle to lightprobe data
+    /// \param sector Handle to sector data
     ////////////////////////////////////////////////////////////////////////////////
-    bool Relight(const LightProbes& probes);
+    bool Relight(const LightSector& sector);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage

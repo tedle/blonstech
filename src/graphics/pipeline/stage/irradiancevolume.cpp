@@ -62,10 +62,10 @@ IrradianceVolume::IrradianceVolume()
     irradiance_volume_shader_.reset(new ComputeShader("shaders/irradiance-volume.comp.glsl"));
 }
 
-bool IrradianceVolume::Relight(const LightProbes& probes)
+bool IrradianceVolume::Relight(const LightSector& sector)
 {
     if (!irradiance_volume_shader_->SetInput("world_matrix", world_matrix_) ||
-        !irradiance_volume_shader_->SetInput("probe_buffer", probes.probe_shader_data()) ||
+        !irradiance_volume_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
         !irradiance_volume_shader_->SetOutput("irradiance_volume_px_out", irradiance_volume_px_->texture(), 0) ||
         !irradiance_volume_shader_->SetOutput("irradiance_volume_nx_out", irradiance_volume_nx_->texture(), 1) ||
         !irradiance_volume_shader_->SetOutput("irradiance_volume_py_out", irradiance_volume_py_->texture(), 2) ||

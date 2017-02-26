@@ -26,7 +26,7 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/lightsector.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/render/shader.h>
@@ -45,7 +45,7 @@ public:
     ProbeView();
     ~ProbeView() {}
 
-    bool Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix);
+    bool Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const LightSector& sector, Matrix view_matrix, Matrix proj_matrix);
 
 private:
     std::unique_ptr<DrawBatcher> probe_meshes_;

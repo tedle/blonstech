@@ -54,7 +54,7 @@ bool Deferred::Init()
     // Pipeline setup
     geometry_.reset(new stage::Geometry(perspective_));
     shadow_.reset(new stage::Shadow(perspective_));
-    light_probes_.reset(new stage::LightProbes());
+    light_sector_.reset(new stage::LightSector());
     irradiance_volume_.reset(new stage::IrradianceVolume());
     lighting_.reset(new stage::Lighting(perspective_));
     debug_output_.reset(new stage::debug::DebugOutput(perspective_));
@@ -117,12 +117,12 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!light_probes_->Relight(scene))
+    if (!light_sector_->Relight(scene))
     {
         return false;
     }
 
-    if (!irradiance_volume_->Relight(*light_probes_))
+    if (!irradiance_volume_->Relight(*light_sector_))
     {
         return false;
     }
@@ -132,7 +132,7 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!debug_output_->Render(geometry_->output(stage::Geometry::DEPTH), scene, *light_probes_, *irradiance_volume_, view_matrix, proj_matrix_))
+    if (!debug_output_->Render(geometry_->output(stage::Geometry::DEPTH), scene, *light_sector_, *irradiance_volume_, view_matrix, proj_matrix_))
     {
         return false;
     }
@@ -169,7 +169,7 @@ void Deferred::set_output(Output output, Output alt_output)
 
 void Deferred::BakeRadianceTransfer(const Scene& scene)
 {
-    light_probes_->BakeRadianceTransfer(scene);
+    light_sector_->BakeRadianceTransfer(scene);
 }
 
 bool Deferred::RenderOutput()
@@ -200,7 +200,7 @@ bool Deferred::RenderOutput()
             break;
         case PROBE_ENV_MAPS:
             output_sprite->set_pos(output_sprite->pos().x, output_sprite->pos().y, output_sprite->dimensions().x / 8.0f, output_sprite->dimensions().y);
-            return light_probes_->output(stage::LightProbes::ENV_MAPS);
+            return light_sector_->output(stage::LightSector::ENV_MAPS);
             break;
         case LIGHT:
             return lighting_->output(stage::Lighting::LIGHT);

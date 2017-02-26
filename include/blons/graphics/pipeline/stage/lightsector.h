@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTSECTOR_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTSECTOR_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
@@ -41,7 +41,7 @@ namespace stage
 /// \brief Manages light probes used to calculate indirect illumination at
 /// runtime with the use of precomputed radiance transfer
 ////////////////////////////////////////////////////////////////////////////////
-class LightProbes
+class LightSector
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
@@ -61,8 +61,8 @@ public:
     };
 
 public:
-    LightProbes();
-    ~LightProbes() {}
+    LightSector();
+    ~LightSector() {}
 
     void BakeRadianceTransfer(const Scene& scene);
 
@@ -95,7 +95,7 @@ private:
 
 /// \NEEDS_DOCUMENTATION
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::pipeline::stage::LightProbes
+/// \class blons::pipeline::stage::LightSector
 /// \ingroup pipeline
 ///
 /// ### Example:
@@ -103,4 +103,4 @@ private:
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTPROBES_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTSECTOR_H_

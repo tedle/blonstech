@@ -21,7 +21,7 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/lightsector.h>
 
 // Public Includes
 #include <blons/graphics/framebuffer.h>
@@ -70,7 +70,7 @@ Vector3 FaceRotation(AxisAlignedNormal face)
 
 namespace
 {
-void GenerateCrytekSponzaProbes(std::vector<LightProbes::Probe>* probes)
+void GenerateCrytekSponzaProbes(std::vector<LightSector::Probe>* probes)
 {
     for (int x = 0; x < 16; x++)
     {
@@ -78,7 +78,7 @@ void GenerateCrytekSponzaProbes(std::vector<LightProbes::Probe>* probes)
         {
             for (int z = 0; z < 2; z++)
             {
-                LightProbes::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 10.0f - 5.0f) };
+                LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 10.0f - 5.0f) };
                 probes->push_back(probe);
             }
         }
@@ -89,7 +89,7 @@ void GenerateCrytekSponzaProbes(std::vector<LightProbes::Probe>* probes)
         {
             for (int z = 0; z < 2; z++)
             {
-                LightProbes::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 2.4f - 1.2f) };
+                LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 2.4f - 1.2f) };
                 probes->push_back(probe);
             }
         }
@@ -100,13 +100,13 @@ void GenerateCrytekSponzaProbes(std::vector<LightProbes::Probe>* probes)
         {
             for (int z = 0; z < 2; z++)
             {
-                LightProbes::Probe probe{ static_cast<int>(probes->size()), Vector3(-10.0f + x * 1.727f, y * 2.0f + 10.0f, z * 2.4f - 1.2f) };
+                LightSector::Probe probe{ static_cast<int>(probes->size()), Vector3(-10.0f + x * 1.727f, y * 2.0f + 10.0f, z * 2.4f - 1.2f) };
                 probes->push_back(probe);
             }
         }
     }
 }
-void GenerateOldSponzaProbes(std::vector<LightProbes::Probe>* probes)
+void GenerateOldSponzaProbes(std::vector<LightSector::Probe>* probes)
 {
     // TODO: Higher light probe density. Will stall load times so should optimize baking in tandem (compute shader? instancing?)
     for (int x = 0; x < 8; x++)
@@ -115,7 +115,7 @@ void GenerateOldSponzaProbes(std::vector<LightProbes::Probe>* probes)
         {
             for (int z = 0; z < 3; z++)
             {
-                LightProbes::Probe probe { static_cast<int>(probes->size()), Vector3(-14.0f + x * 4.0f, y * 5.0f + 2.0f, z * 5.0f - 5.0f) };
+                LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-14.0f + x * 4.0f, y * 5.0f + 2.0f, z * 5.0f - 5.0f) };
                 probes->push_back(probe);
             }
         }
@@ -124,17 +124,17 @@ void GenerateOldSponzaProbes(std::vector<LightProbes::Probe>* probes)
     {
         for (int y = 0; y < 2; y++)
         {
-            LightProbes::Probe probe { static_cast<int>(probes->size()), Vector3(-10.0f + x * 4.0f, y * 3.0f + 11.0f, 0) };
+            LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-10.0f + x * 4.0f, y * 3.0f + 11.0f, 0) };
             probes->push_back(probe);
         }
     }
 }
 }
-LightProbes::LightProbes()
+LightSector::LightSector()
 {
     GenerateOldSponzaProbes(&probes_);
     // Initialize shader buffer to fit all probes in
-    probe_shader_data_.reset(new ShaderData<LightProbes::Probe>(nullptr, probes_.size()));
+    probe_shader_data_.reset(new ShaderData<LightSector::Probe>(nullptr, probes_.size()));
 
     // Setup shader for generating environment maps to build surfel and sky visibility data
     ShaderAttributeList env_map_inputs;
@@ -154,7 +154,7 @@ LightProbes::LightProbes()
     probe_relight_shader_.reset(new ComputeShader("shaders/probe-relight.comp.glsl"));
 }
 
-bool LightProbes::Relight(const Scene& scene)
+bool LightSector::Relight(const Scene& scene)
 {
     if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()) ||
         !probe_relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
@@ -169,7 +169,7 @@ bool LightProbes::Relight(const Scene& scene)
     return true;
 }
 
-void LightProbes::BakeRadianceTransfer(const Scene& scene)
+void LightSector::BakeRadianceTransfer(const Scene& scene)
 {
     // G-Buffer env map generation
     log::Debug("Baking environment maps... ");
@@ -185,7 +185,7 @@ void LightProbes::BakeRadianceTransfer(const Scene& scene)
     probe_shader_data_->set_value(probes_.data());
 }
 
-const TextureResource* LightProbes::output(Output buffer) const
+const TextureResource* LightSector::output(Output buffer) const
 {
     switch (buffer)
     {
@@ -197,18 +197,18 @@ const TextureResource* LightProbes::output(Output buffer) const
     }
 }
 
-const std::vector<LightProbes::Probe>& LightProbes::probes() const
+const std::vector<LightSector::Probe>& LightSector::probes() const
 {
     return probes_;
 }
 
-const ShaderDataResource* LightProbes::probe_shader_data() const
+const ShaderDataResource* LightSector::probe_shader_data() const
 {
     return probe_shader_data_->data();
 }
 
 // This function only exists to help compartmentalize the long process of PRT baking
-void LightProbes::MakeEnvironmentMaps(const Scene& scene)
+void LightSector::MakeEnvironmentMaps(const Scene& scene)
 {
     // Shader data delivery struct
     struct PerFaceData
@@ -267,7 +267,7 @@ void LightProbes::MakeEnvironmentMaps(const Scene& scene)
 }
 
 // This function only exists to help compartmentalize the long process of PRT baking
-void LightProbes::MakeSkyCoefficients()
+void LightSector::MakeSkyCoefficients()
 {
     // TODO: Move this to a compute shader
     // Sky visibility SH

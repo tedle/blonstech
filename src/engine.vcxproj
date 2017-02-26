@@ -221,7 +221,7 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\irradiancevolume.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h" />
-    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightprobes.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightsector.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\shadow.h" />
     <ClInclude Include="..\include\blons\graphics\render\commonshader.h" />
     <ClInclude Include="..\include\blons\graphics\render\computeshader.h" />
@@ -288,7 +288,7 @@
     <ClCompile Include="graphics\pipeline\stage\geometry.cpp" />
     <ClCompile Include="graphics\pipeline\stage\irradiancevolume.cpp" />
     <ClCompile Include="graphics\pipeline\stage\lighting.cpp" />
-    <ClCompile Include="graphics\pipeline\stage\lightprobes.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\lightsector.cpp" />
     <ClCompile Include="graphics\pipeline\stage\shadow.cpp" />
     <ClCompile Include="graphics\render\commonshader.cpp" />
     <ClCompile Include="graphics\render\computeshader.cpp" />

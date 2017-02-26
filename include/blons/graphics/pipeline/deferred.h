@@ -28,7 +28,7 @@
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/lightsector.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
 #include <blons/graphics/pipeline/stage/composite.h>
@@ -133,7 +133,7 @@ private:
     // TODO: Document the pipeline
     std::unique_ptr<stage::Geometry> geometry_;
     std::unique_ptr<stage::Shadow> shadow_;
-    std::unique_ptr<stage::LightProbes> light_probes_;
+    std::unique_ptr<stage::LightSector> light_sector_;
     std::unique_ptr<stage::IrradianceVolume> irradiance_volume_;
     std::unique_ptr<stage::Lighting> lighting_;
     std::unique_ptr<stage::Composite> composite_;

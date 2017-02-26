@@ -57,7 +57,7 @@ ProbeView::ProbeView()
     probe_meshes_->Append(probe_mesh_data, MatrixScale(0.5f, 0.5f, 0.5f));
 }
 
-bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const LightProbes& probes, Matrix view_matrix, Matrix proj_matrix)
+bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const LightSector& sector, Matrix view_matrix, Matrix proj_matrix)
 {
     auto debug_mode = cvar_debug_mode->to<int>();
     if (!debug_mode)
@@ -65,7 +65,7 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         return true;
     }
 
-    auto light_probes = probes.probes();
+    auto light_probes = sector.probes();
     auto context = render::context();
     // Bind the buffer to render the probes on top of
     target->Bind(false);
@@ -77,8 +77,8 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
     // Set the probe-independent inputs
     if (!probe_shader_->SetInput("env_proj_matrix", cube_face_projection) ||
         !probe_shader_->SetInput("env_tex_size", kProbeMapSize) ||
-        !probe_shader_->SetInput("probe_buffer", probes.probe_shader_data()) ||
-        !probe_shader_->SetInput("probe_env_maps", probes.output(LightProbes::ENV_MAPS), 0) ||
+        !probe_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
+        !probe_shader_->SetInput("probe_env_maps", sector.output(LightSector::ENV_MAPS), 0) ||
         !probe_shader_->SetInput("exposure", scene.view.exposure()) ||
         !probe_shader_->SetInput("debug_mode", debug_mode))
     {

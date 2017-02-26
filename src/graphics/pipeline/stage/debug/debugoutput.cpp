@@ -38,10 +38,10 @@ DebugOutput::DebugOutput(Perspective perspective)
     irradianceview_.reset(new IrradianceView());
 }
 
-bool DebugOutput::Render(const TextureResource* depth, const Scene& scene, const LightProbes& probes, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)
+bool DebugOutput::Render(const TextureResource* depth, const Scene& scene, const LightSector& sector, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)
 {
     debug_output_buffer_->Bind(Vector4(0, 0, 0, 0));
-    if (!probeview_->Render(debug_output_buffer_.get(), depth, scene, probes, view_matrix, proj_matrix))
+    if (!probeview_->Render(debug_output_buffer_.get(), depth, scene, sector, view_matrix, proj_matrix))
     {
         return false;
     }

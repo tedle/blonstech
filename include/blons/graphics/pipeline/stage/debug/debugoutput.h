@@ -26,7 +26,7 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/lightprobes.h>
+#include <blons/graphics/pipeline/stage/lightsector.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/pipeline/stage/debug/probeview.h>
 #include <blons/graphics/pipeline/stage/debug/irradianceview.h>
@@ -52,7 +52,7 @@ public:
     DebugOutput(Perspective perspective);
     ~DebugOutput() {}
 
-    bool Render(const TextureResource* depth, const Scene& scene, const LightProbes& probes, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
+    bool Render(const TextureResource* depth, const Scene& scene, const LightSector& sector, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
 
     const TextureResource* output(Output buffer) const;
 
