@@ -24,6 +24,8 @@
 #ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVOLUME_H_
 #define BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVOLUME_H_
 
+// Includes
+#include <array>
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/lightsector.h>
@@ -77,12 +79,7 @@ public:
     Matrix world_matrix() const;
 
 private:
-    std::unique_ptr<Texture3D> irradiance_volume_px_; // Stores ambient cube coefficient for +X
-    std::unique_ptr<Texture3D> irradiance_volume_nx_; // Stores ambient cube coefficient for -X
-    std::unique_ptr<Texture3D> irradiance_volume_py_; // Stores ambient cube coefficient for +Y
-    std::unique_ptr<Texture3D> irradiance_volume_ny_; // Stores ambient cube coefficient for -Y
-    std::unique_ptr<Texture3D> irradiance_volume_pz_; // Stores ambient cube coefficient for +Z
-    std::unique_ptr<Texture3D> irradiance_volume_nz_; // Stores ambient cube coefficient for -Z
+    std::array<std::unique_ptr<Texture3D>, 6> irradiance_volume_; // Stores all 6 ambient cube coefficients
     std::unique_ptr<ComputeShader> irradiance_volume_shader_;
     Matrix world_matrix_;
 };

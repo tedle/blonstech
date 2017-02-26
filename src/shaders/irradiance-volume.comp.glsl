@@ -31,12 +31,12 @@
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 
 // Globals
-layout(rgba32f, binding = 0) writeonly uniform image3D irradiance_volume_px_out;
-layout(rgba32f, binding = 1) writeonly uniform image3D irradiance_volume_nx_out;
-layout(rgba32f, binding = 2) writeonly uniform image3D irradiance_volume_py_out;
-layout(rgba32f, binding = 3) writeonly uniform image3D irradiance_volume_ny_out;
-layout(rgba32f, binding = 4) writeonly uniform image3D irradiance_volume_pz_out;
-layout(rgba32f, binding = 5) writeonly uniform image3D irradiance_volume_nz_out;
+layout(rgba16f, binding = 0) writeonly uniform image3D irradiance_volume_px_out;
+layout(rgba16f, binding = 1) writeonly uniform image3D irradiance_volume_nx_out;
+layout(rgba16f, binding = 2) writeonly uniform image3D irradiance_volume_py_out;
+layout(rgba16f, binding = 3) writeonly uniform image3D irradiance_volume_ny_out;
+layout(rgba16f, binding = 4) writeonly uniform image3D irradiance_volume_pz_out;
+layout(rgba16f, binding = 5) writeonly uniform image3D irradiance_volume_nz_out;
 uniform mat4 world_matrix;
 
 layout(std430) buffer probe_buffer

@@ -89,6 +89,11 @@ void TranslateTextureFormat(TextureType::Format format, GLint* internal_format, 
         *input_format = GL_RGB;
         *input_type = GL_FLOAT;
         break;
+    case TextureType::R16G16B16A16:
+        *internal_format = GL_RGBA16;
+        *input_format = GL_RGBA;
+        *input_type = GL_FLOAT;
+        break;
     case TextureType::A32:
         *internal_format = GL_R32F;
         *input_format = GL_RED;
@@ -1358,6 +1363,9 @@ bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, co
         break;
     case TextureType::R16G16:
         format = GL_RG16;
+        break;
+    case TextureType::R16G16B16A16:
+        format = GL_RGBA16;
         break;
     case TextureType::A32:
         format = GL_R32F;
