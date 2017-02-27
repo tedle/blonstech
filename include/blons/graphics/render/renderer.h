@@ -239,7 +239,9 @@ struct PixelData
         this->pixels = std::move(p.pixels);
     }
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calculates the amount of bits per pixel. Non-functional if pixel data
+    /// \brief Calculates the amount of bits per pixel. For 8-bit/channel formats
+    /// data is stored as one unsigned char per channel. Anything greater is stored
+    /// one float per channel. Non-functional if pixel data
     /// is compressed
     ///
     /// \return Bits per pixel
@@ -260,14 +262,14 @@ struct PixelData
             bits = 16;
             break;
         case TextureType::R8G8B8:
-        case TextureType::DEPTH:
             bits = 24;
             break;
         case TextureType::A32:
-        case TextureType::R16G16:
         case TextureType::R8G8B8A8:
+        case TextureType::DEPTH:
             bits = 32;
             break;
+        case TextureType::R16G16:
         case TextureType::R32G32:
             bits = 64;
             break;
