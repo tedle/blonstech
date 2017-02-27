@@ -23,6 +23,9 @@
 
 #include <blons/math/math.h>
 
+// Includes
+#include <cmath>
+
 namespace blons
 {
 ////////////////////////////////////////////////////////////////////////////////
@@ -313,6 +316,11 @@ Matrix MatrixView(Vector3 pos, Vector3 rot)
     return view_matrix;
 }
 
+Vector3 VectorAbsolute(Vector3 v)
+{
+    return Vector3(std::abs(v.x), std::abs(v.y), std::abs(v.z));
+}
+
 Vector3 VectorCross(Vector3 a, Vector3 b)
 {
     Vector3 product;
@@ -484,6 +492,28 @@ Vector3 SampleAmbientCube(const AmbientCube& cube, Vector3 direction)
     return cube.coeffs[normal_sign[0]] * direction_sq.x +
            cube.coeffs[normal_sign[1]] * direction_sq.y +
            cube.coeffs[normal_sign[2]] * direction_sq.z;
+}
+
+AxisAlignedNormal FindGreatestAxis(Vector3 n)
+{
+        AxisAlignedNormal direction;
+        Vector3 abs_n = VectorAbsolute(n);
+        if (abs_n.x > abs_n.y && abs_n.x > abs_n.z)
+        {
+            if (n.x > 0.0f) { direction = POSITIVE_X; }
+            else { direction = NEGATIVE_X; }
+        }
+        else if (abs_n.y > abs_n.z)
+        {
+            if (n.y > 0.0f) { direction = POSITIVE_Y; }
+            else { direction = NEGATIVE_Y; }
+        }
+        else
+        {
+            if (n.z > 0.0f) { direction = POSITIVE_Z; }
+            else { direction = NEGATIVE_Z; }
+        }
+        return direction;
 }
 
 unsigned int FastHash(const void* data, std::size_t size)

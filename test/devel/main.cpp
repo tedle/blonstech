@@ -180,9 +180,12 @@ void SetRenderingOutput(blons::Graphics* graphics)
             return blons::pipeline::Deferred::DIRECT_LIGHT;
             break;
         case 6:
-            return blons::pipeline::Deferred::PROBE_ENV_MAPS;
+            return blons::pipeline::Deferred::PROBE_ENV_MAPS_ALBEDO;
             break;
         case 7:
+            return blons::pipeline::Deferred::PROBE_ENV_MAPS_NORMAL;
+            break;
+        case 8:
             return blons::pipeline::Deferred::LIGHT;
             break;
         case 0:

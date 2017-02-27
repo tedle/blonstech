@@ -61,7 +61,8 @@ public:
         G_DEPTH,                 ///< Depth buffer of the geometry
         LIGHT_DEPTH,             ///< Depth buffer from the light's point of view
         DIRECT_LIGHT,            ///< Direct lighting pass
-        PROBE_ENV_MAPS,
+        PROBE_ENV_MAPS_ALBEDO,
+        PROBE_ENV_MAPS_NORMAL,
         LIGHT,
         NONE                     ///< Results in nullptr
     };

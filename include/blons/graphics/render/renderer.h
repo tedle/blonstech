@@ -60,7 +60,7 @@ struct TextureType
         R32G32,       ///< 2-channel, 32-bit per channel
         R32G32B32,    ///< 3-channel, 32-bit per channel
         R32G32B32A32, ///< 4-channel, 32-bit per channel
-        DEPTH         ///< Depth information
+        DEPTH         ///< 24-bit Depth information
     } format; ///< \copybrief Format
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -260,6 +260,7 @@ struct PixelData
             bits = 16;
             break;
         case TextureType::R8G8B8:
+        case TextureType::DEPTH:
             bits = 24;
             break;
         case TextureType::A32:

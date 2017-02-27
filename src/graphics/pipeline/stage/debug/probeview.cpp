@@ -78,7 +78,8 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
     if (!probe_shader_->SetInput("env_proj_matrix", cube_face_projection) ||
         !probe_shader_->SetInput("env_tex_size", kProbeMapSize) ||
         !probe_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
-        !probe_shader_->SetInput("probe_env_maps", sector.output(LightSector::ENV_MAPS), 0) ||
+        !probe_shader_->SetInput("probe_env_maps_albedo", sector.output(LightSector::ENV_MAPS_ALBEDO), 0) ||
+        !probe_shader_->SetInput("probe_env_maps_normal", sector.output(LightSector::ENV_MAPS_NORMAL), 1) ||
         !probe_shader_->SetInput("exposure", scene.view.exposure()) ||
         !probe_shader_->SetInput("debug_mode", debug_mode))
     {

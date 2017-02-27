@@ -35,7 +35,8 @@ in mat3 norm;
 out vec4 frag_colour;
 
 // Globals
-uniform sampler2D probe_env_maps;
+uniform sampler2D probe_env_maps_albedo;
+uniform sampler2D probe_env_maps_normal;
 uniform mat4 env_proj_matrix;
 uniform int env_tex_size;
 uniform int probe_id;
@@ -140,10 +141,11 @@ void main(void)
     id_colour.b = float((probe_id & 0xFF0000) >> 16) / 255.0f;
 
     frag_colour = vec4(0.0f, 0.0f, 0.0f, 1.0f);
-    frag_colour.rgb += texture(probe_env_maps, texel_pos.xy).rgb * (debug_mode == 1 ? 1.0f : 0.0f);
-    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f            * (debug_mode == 2 ? 1.0f : 0.0f);
-    frag_colour.rgb += ambient_light                             * (debug_mode == 3 ? 1.0f : 0.0f);
-    frag_colour.rgb += sky_vis                                   * (debug_mode == 4 ? 1.0f : 0.0f);
-    frag_colour.rgb += sky_vis_diffuse                           * (debug_mode == 5 ? 1.0f : 0.0f);
-    frag_colour.rgb += id_colour                                 * (debug_mode == 6 ? 1.0f : 0.0f);
+    frag_colour.rgb += texture(probe_env_maps_albedo, texel_pos.xy).rgb * (debug_mode == 1 ? 1.0f : 0.0f);
+    frag_colour.rgb += texture(probe_env_maps_normal, texel_pos.xy).rgb * (debug_mode == 2 ? 1.0f : 0.0f);
+    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f                   * (debug_mode == 3 ? 1.0f : 0.0f);
+    frag_colour.rgb += ambient_light                                    * (debug_mode == 4 ? 1.0f : 0.0f);
+    frag_colour.rgb += sky_vis                                          * (debug_mode == 5 ? 1.0f : 0.0f);
+    frag_colour.rgb += sky_vis_diffuse                                  * (debug_mode == 6 ? 1.0f : 0.0f);
+    frag_colour.rgb += id_colour                                        * (debug_mode == 7 ? 1.0f : 0.0f);
 }

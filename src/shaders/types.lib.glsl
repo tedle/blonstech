@@ -36,6 +36,8 @@ struct Probe
     float pos[3];
     float cube_coeffs[6][3]; // 6 directions, 3 colour channels
     float sh_coeffs[9];
+    int brickfactor_range_start;
+    int brickfactor_range_end;
 };
 
 struct SHColourCoeffs
