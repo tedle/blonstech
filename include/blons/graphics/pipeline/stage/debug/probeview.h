@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_PROBEVIEW_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_PROBEVIEW_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
@@ -56,4 +56,4 @@ private:
 } // namespace pipeline
 } // namespace blons
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_PROBEVIEW_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_PROBEVIEW_H_

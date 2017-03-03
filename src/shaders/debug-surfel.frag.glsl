@@ -21,44 +21,14 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_IRRADIANCEVIEW_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_IRRADIANCEVIEW_H_
+#version 430
 
-// Public Includes
-#include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/irradiancevolume.h>
-#include <blons/graphics/framebuffer.h>
-#include <blons/graphics/render/drawbatcher.h>
-#include <blons/graphics/render/shader.h>
+// Ins n outs
+in vec3 albedo;
 
-namespace blons
+out vec4 frag_colour;
+
+void main(void)
 {
-namespace pipeline
-{
-namespace stage
-{
-namespace debug
-{
-class IrradianceView
-{
-public:
-    IrradianceView();
-    ~IrradianceView() {}
-
-    bool Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
-
-private:
-    // Full init is deferred until first Render() because it's optional and adds significant startup time
-    void InitMeshBuffers(const IrradianceVolume& irradiance);
-
-    std::unique_ptr<DrawBatcher> grid_mesh_;
-    std::unique_ptr<DrawBatcher> voxel_meshes_;
-    std::unique_ptr<Shader> grid_shader_;
-    std::unique_ptr<Shader> volume_shader_;
-};
-} // namespace debug
-} // namespace stage
-} // namespace pipeline
-} // namespace blons
-
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_IRRADIANCEVIEW_H_
+    frag_colour = vec4(albedo, 1.0);
+}

@@ -21,44 +21,42 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_IRRADIANCEVIEW_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_IRRADIANCEVIEW_H_
+#version 430
 
-// Public Includes
-#include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/irradiancevolume.h>
-#include <blons/graphics/framebuffer.h>
-#include <blons/graphics/render/drawbatcher.h>
-#include <blons/graphics/render/shader.h>
+// Includes
+#include <shaders/types.lib.glsl>
 
-namespace blons
-{
-namespace pipeline
-{
-namespace stage
-{
-namespace debug
-{
-class IrradianceView
-{
-public:
-    IrradianceView();
-    ~IrradianceView() {}
+// Ins n outs
+in vec3 input_pos;
 
-    bool Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
+out vec3 albedo;
 
-private:
-    // Full init is deferred until first Render() because it's optional and adds significant startup time
-    void InitMeshBuffers(const IrradianceVolume& irradiance);
+// Globals
+uniform mat4 world_matrix;
+uniform mat4 vp_matrix;
 
-    std::unique_ptr<DrawBatcher> grid_mesh_;
-    std::unique_ptr<DrawBatcher> voxel_meshes_;
-    std::unique_ptr<Shader> grid_shader_;
-    std::unique_ptr<Shader> volume_shader_;
+layout(std430) buffer surfel_buffer
+{
+    Surfel surfels[];
 };
-} // namespace debug
-} // namespace stage
-} // namespace pipeline
-} // namespace blons
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_IRRADIANCEVIEW_H_
+void main(void)
+{
+    Surfel s = surfels[gl_InstanceID];
+
+    // Invert Z to build for RH coordinates
+    vec3 z_basis = normalize(vec3(-s.normal[0], -s.normal[1], -s.normal[2]));
+    vec3 x_basis = normalize(cross(vec3(0.0, 1.0, 0.0), z_basis));
+    vec3 y_basis = cross(x_basis, z_basis);
+    mat4 rotation_matrix = mat4(
+        x_basis.x, x_basis.y, x_basis.z, 0,
+        y_basis.x, y_basis.y, y_basis.z, 0,
+        z_basis.x, z_basis.y, z_basis.z, 0,
+        0,         0,         0,         1
+    );
+    // Rotate quad to face normal -> resize to surfel width -> offset by surfel pos
+    gl_Position = rotation_matrix * world_matrix * vec4(input_pos, 1.0) + vec4(s.pos[0], s.pos[1], s.pos[2], 0.0);
+    gl_Position = vp_matrix * gl_Position;
+
+    albedo = vec3(s.albedo[0], s.albedo[1], s.albedo[2]);
+}

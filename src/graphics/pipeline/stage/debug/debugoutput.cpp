@@ -34,6 +34,7 @@ namespace debug
 DebugOutput::DebugOutput(Perspective perspective)
 {
     debug_output_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }));
+    surfelview_.reset(new SurfelView());
     probeview_.reset(new ProbeView());
     irradianceview_.reset(new IrradianceView());
 }
@@ -41,6 +42,10 @@ DebugOutput::DebugOutput(Perspective perspective)
 bool DebugOutput::Render(const TextureResource* depth, const Scene& scene, const LightSector& sector, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix)
 {
     debug_output_buffer_->Bind(Vector4(0, 0, 0, 0));
+    if (!surfelview_->Render(debug_output_buffer_.get(), depth, scene, sector, view_matrix, proj_matrix))
+    {
+        return false;
+    }
     if (!probeview_->Render(debug_output_buffer_.get(), depth, scene, sector, view_matrix, proj_matrix))
     {
         return false;

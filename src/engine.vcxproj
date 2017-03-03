@@ -218,6 +218,7 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\debugoutput.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\irradianceview.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\probeview.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\surfelview.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\irradiancevolume.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h" />
@@ -285,6 +286,7 @@
     <ClCompile Include="graphics\pipeline\stage\debug\debugoutput.cpp" />
     <ClCompile Include="graphics\pipeline\stage\debug\irradianceview.cpp" />
     <ClCompile Include="graphics\pipeline\stage\debug\probeview.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\debug\surfelview.cpp" />
     <ClCompile Include="graphics\pipeline\stage\geometry.cpp" />
     <ClCompile Include="graphics\pipeline\stage\irradiancevolume.cpp" />
     <ClCompile Include="graphics\pipeline\stage\lighting.cpp" />
@@ -319,6 +321,8 @@
     <None Include="shaders\debug-irradiance-volume.vert.glsl" />
     <None Include="shaders\debug-shprobe.frag.glsl" />
     <None Include="shaders\colour.lib.glsl" />
+    <None Include="shaders\debug-surfel.frag.glsl" />
+    <None Include="shaders\debug-surfel.vert.glsl" />
     <None Include="shaders\irradiance-volume.comp.glsl" />
     <None Include="shaders\light.frag.glsl" />
     <None Include="shaders\math.lib.glsl" />

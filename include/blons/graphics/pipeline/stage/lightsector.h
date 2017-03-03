@@ -68,11 +68,12 @@ public:
     // Uniformly sized voxel face
     struct Surfel
     {
+        // TODO: Add nearest probe for bounce lighting
+        int nearest_probe;
         Vector3 pos;
         Vector3 normal;
         Vector3 albedo;
         Vector3 radiance;
-        // TODO: Add nearest probe for bounce lighting
     };
 
     struct SurfelBrick
@@ -106,6 +107,8 @@ public:
 
     const std::vector<Probe>& probes() const;
     const ShaderDataResource* probe_shader_data() const;
+    const std::vector<Surfel>& surfels() const;
+    const ShaderDataResource* surfel_shader_data() const;
 
 private:
     // Used in PRT baking
@@ -170,6 +173,7 @@ private:
     std::unique_ptr<Shader> environment_map_shader_;
     std::unique_ptr<ComputeShader> probe_relight_shader_;
     std::unique_ptr<ShaderData<Probe>> probe_shader_data_;
+    std::unique_ptr<ShaderData<Surfel>> surfel_shader_data_;
 };
 } // namespace stage
 } // namespace pipeline

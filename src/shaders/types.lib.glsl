@@ -40,6 +40,15 @@ struct Probe
     int brickfactor_range_end;
 };
 
+struct Surfel
+{
+    int nearest_probe;
+    float pos[3];
+    float normal[3];
+    float albedo[3];
+    float radiance[3];
+};
+
 struct SHColourCoeffs
 {
     float r[9];

@@ -21,13 +21,14 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUGOUTPUT_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUGOUTPUT_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_DEBUGOUTPUT_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_DEBUGOUTPUT_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/lightsector.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
+#include <blons/graphics/pipeline/stage/debug/surfelview.h>
 #include <blons/graphics/pipeline/stage/debug/probeview.h>
 #include <blons/graphics/pipeline/stage/debug/irradianceview.h>
 #include <blons/graphics/framebuffer.h>
@@ -58,6 +59,7 @@ public:
 
 private:
     std::unique_ptr<Framebuffer> debug_output_buffer_;
+    std::unique_ptr<SurfelView> surfelview_;
     std::unique_ptr<ProbeView> probeview_;
     std::unique_ptr<IrradianceView> irradianceview_;
 };
@@ -66,4 +68,4 @@ private:
 } // namespace pipeline
 } // namespace blons
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUGOUTPUT_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_DEBUGOUTPUT_H_

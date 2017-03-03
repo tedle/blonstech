@@ -232,8 +232,9 @@ void LightSector::BakeRadianceTransfer(const Scene& scene)
     Timer sky_bake_stats;
     BakeSkyCoefficients(sky_samples);
     log::Debug("[%ims]\n", sky_bake_stats.ms());
-    // Update shader buffer with generated probe data
+    // Update shader buffer with generated radiance data
     probe_shader_data_->set_value(probes_.data());
+    surfel_shader_data_.reset(new ShaderData<LightSector::Surfel>(surfels_.data(), surfels_.size()));
 }
 
 const TextureResource* LightSector::output(Output buffer) const
@@ -259,6 +260,21 @@ const std::vector<LightSector::Probe>& LightSector::probes() const
 const ShaderDataResource* LightSector::probe_shader_data() const
 {
     return probe_shader_data_->data();
+}
+
+const std::vector<LightSector::Surfel>& LightSector::surfels() const
+{
+    return surfels_;
+}
+
+const ShaderDataResource* LightSector::surfel_shader_data() const
+{
+    // TODO: Remove this when light sector streaming is implemented and we can get PRT data in constructor
+    if (surfel_shader_data_ == nullptr)
+    {
+        throw "Attempted to access surfel shader data before light bake";
+    }
+    return surfel_shader_data_->data();
 }
 
 // This function only exists to help compartmentalize the long process of PRT baking
