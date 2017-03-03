@@ -23,14 +23,39 @@
 
 #version 430
 
-// Ins n outs
-in vec3 input_pos;
-in vec2 input_uv;
+// Includes
+#include <shaders/lib/colour.lib.glsl>
+#include <shaders/lib/math.lib.glsl>
 
-out vec2 tex_coord;
+// Ins n outs
+in vec3 norm;
+in vec3 sample_pos;
+
+out vec4 frag_colour;
+
+// Globals
+uniform sampler3D irradiance_volume_px;
+uniform sampler3D irradiance_volume_nx;
+uniform sampler3D irradiance_volume_py;
+uniform sampler3D irradiance_volume_ny;
+uniform sampler3D irradiance_volume_pz;
+uniform sampler3D irradiance_volume_nz;
+uniform float exposure;
 
 void main(void)
 {
-    gl_Position = vec4(input_pos, 1.0);
-    tex_coord = input_uv;
+    // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
+    vec3 ambient_cube[6] = vec3[6](
+        vec3(texture(irradiance_volume_px, sample_pos).rgb),
+        vec3(texture(irradiance_volume_nx, sample_pos).rgb),
+        vec3(texture(irradiance_volume_py, sample_pos).rgb),
+        vec3(texture(irradiance_volume_ny, sample_pos).rgb),
+        vec3(texture(irradiance_volume_pz, sample_pos).rgb),
+        vec3(texture(irradiance_volume_nz, sample_pos).rgb)
+    );
+    vec3 ambient_light = SampleAmbientCube(ambient_cube, norm);
+    // Visualize as exit irradiance, divide by pi
+    ambient_light /= kPi;
+    ambient_light = FilmicTonemap(ambient_light * exposure);
+    frag_colour = vec4(ambient_light, 1.0f);
 }

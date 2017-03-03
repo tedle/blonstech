@@ -43,7 +43,7 @@ Shadow::Shadow(Perspective perspective)
     ShaderAttributeList blur_inputs;
     blur_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     blur_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/blur.frag.glsl", blur_inputs));
+    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/shadow-blur.frag.glsl", blur_inputs));
 
     ShaderAttributeList direct_light_inputs;
     direct_light_inputs.push_back(ShaderAttribute(POS, "input_pos"));

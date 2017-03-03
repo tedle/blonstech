@@ -45,7 +45,7 @@ ProbeView::ProbeView()
     probe_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
     probe_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
     probe_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
-    probe_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug-shprobe.frag.glsl", probe_inputs));
+    probe_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug/probe.frag.glsl", probe_inputs));
 
     if (probe_shader_ == nullptr)
     {

@@ -24,8 +24,8 @@
 #version 430
 
 // Includes
-#include <shaders/types.lib.glsl>
-#include <shaders/math.lib.glsl>
+#include <shaders/lib/types.lib.glsl>
+#include <shaders/lib/math.lib.glsl>
 
 // Workgroup size
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;

@@ -23,6 +23,9 @@
 
 #version 430
 
+// Includes
+#include <shaders/lib/shadow.lib.glsl>
+
 // Ins n outs
 in vec2 tex_coord;
 
@@ -33,43 +36,6 @@ uniform mat4 inv_vp_matrix;
 uniform mat4 light_vp_matrix;
 uniform sampler2D view_depth;
 uniform sampler2D light_depth;
-
-float PercentageList(vec4 pos)
-{
-    vec4 light_pos = light_vp_matrix * pos;
-
-    // Shouldn't need this I think? Cus orthographic matrix...
-    // Maybe spot lights use perspective tho?? duno!
-    // TODO: Check if this is needed
-    light_pos /= light_pos.w;
-
-    // Adjust for [0,1] space
-    light_pos = (light_pos + 1.0) / 2.0;
-
-    // Variance shadow maping
-    vec2 moments = texture(light_depth, light_pos.xy).rg;
-
-    // (local_depth - mean_depth)
-    float local_delta = light_pos.z - moments.r;
-
-    // o^2 = M2 - M1^2
-    float variance = moments.g - (moments.r * moments.r);
-    float bias = 0.00001;
-    variance = max(variance, bias);
-
-    // P = o^2 / (o^2 + (local_depth - mean_depth)^2) = probability of surface being lit
-    float p_max = variance / (variance + (local_delta * local_delta));
-
-    // p_max is invalid if the measured depth is greater than the local depth
-    // Use a smoothstep function to blend to 1 as we approach this
-    // Increases light bleeding, but looks way less gritty
-    float p = smoothstep(light_pos.z - 0.005, light_pos.z - 0.0025, moments.x);
-    // Use a smoothstep on pmax to decrease lightbleeding, both mitigating the bleed
-    // incurred by the p smoothing as well as the natural bleed induced by VSM
-    p_max = smoothstep(0.4, 1.0, p_max);
-    // The actual percent amount that the fragment is affected by the light source
-    return max(p, p_max);
-}
 
 void main(void)
 {
@@ -85,7 +51,7 @@ void main(void)
     pos = inv_vp_matrix * (pos * 2.0 - 1.0);
     pos /= pos.w;
 
-    float lit = PercentageList(pos);
+    float lit = ShadowTest(pos, light_vp_matrix, light_depth);
 
     frag_colour = vec4(vec3(lit), 1.0f);
 }

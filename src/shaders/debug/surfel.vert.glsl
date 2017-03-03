@@ -24,38 +24,39 @@
 #version 430
 
 // Includes
-#include <shaders/colour.lib.glsl>
-#include <shaders/math.lib.glsl>
+#include <shaders/lib/types.lib.glsl>
 
 // Ins n outs
-in vec3 norm;
-in vec3 sample_pos;
+in vec3 input_pos;
 
-out vec4 frag_colour;
+out vec3 albedo;
 
 // Globals
-uniform sampler3D irradiance_volume_px;
-uniform sampler3D irradiance_volume_nx;
-uniform sampler3D irradiance_volume_py;
-uniform sampler3D irradiance_volume_ny;
-uniform sampler3D irradiance_volume_pz;
-uniform sampler3D irradiance_volume_nz;
-uniform float exposure;
+uniform mat4 world_matrix;
+uniform mat4 vp_matrix;
+
+layout(std430) buffer surfel_buffer
+{
+    Surfel surfels[];
+};
 
 void main(void)
 {
-    // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
-    vec3 ambient_cube[6] = vec3[6](
-        vec3(texture(irradiance_volume_px, sample_pos).rgb),
-        vec3(texture(irradiance_volume_nx, sample_pos).rgb),
-        vec3(texture(irradiance_volume_py, sample_pos).rgb),
-        vec3(texture(irradiance_volume_ny, sample_pos).rgb),
-        vec3(texture(irradiance_volume_pz, sample_pos).rgb),
-        vec3(texture(irradiance_volume_nz, sample_pos).rgb)
+    Surfel s = surfels[gl_InstanceID];
+
+    // Invert Z to build for RH coordinates
+    vec3 z_basis = normalize(vec3(-s.normal[0], -s.normal[1], -s.normal[2]));
+    vec3 x_basis = normalize(cross(vec3(0.0, 1.0, 0.0), z_basis));
+    vec3 y_basis = cross(x_basis, z_basis);
+    mat4 rotation_matrix = mat4(
+        x_basis.x, x_basis.y, x_basis.z, 0,
+        y_basis.x, y_basis.y, y_basis.z, 0,
+        z_basis.x, z_basis.y, z_basis.z, 0,
+        0,         0,         0,         1
     );
-    vec3 ambient_light = SampleAmbientCube(ambient_cube, norm);
-    // Visualize as exit irradiance, divide by pi
-    ambient_light /= kPi;
-    ambient_light = FilmicTonemap(ambient_light * exposure);
-    frag_colour = vec4(ambient_light, 1.0f);
+    // Rotate quad to face normal -> resize to surfel width -> offset by surfel pos
+    gl_Position = rotation_matrix * world_matrix * vec4(input_pos, 1.0) + vec4(s.pos[0], s.pos[1], s.pos[2], 0.0);
+    gl_Position = vp_matrix * gl_Position;
+
+    albedo = vec3(s.albedo[0], s.albedo[1], s.albedo[2]);
 }

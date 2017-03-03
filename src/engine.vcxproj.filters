@@ -38,6 +38,12 @@
     <Filter Include="src\graphics\pipeline\stage\debug">
       <UniqueIdentifier>{eefe16aa-86d1-4c76-9b36-507eacca362a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\shaders\debug">
+      <UniqueIdentifier>{ce009e9b-ca08-4243-9b02-80b74dc48019}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\shaders\lib">
+      <UniqueIdentifier>{1981cc51-54ed-4701-bf21-45a0474b2a72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons\debug\console.h">
@@ -425,10 +431,49 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\composite.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\direct-light.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\direct-light-map.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\direct-light-map.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\irradiance-volume.comp.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\light.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
     <None Include="shaders\mesh.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\mesh.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\probe-env-map.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\probe-env-map.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\probe-relight.comp.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\shadow.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\shadow.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\shadow-blur.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\shadow-blur.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\sprite.frag.glsl">
@@ -440,74 +485,44 @@
     <None Include="shaders\ui.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\light.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\direct-light.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\shadow.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\shadow.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\blur.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\blur.vert.glsl">
+    <None Include="shaders\ui-blur.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\ui-composite.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\ui-blur.frag.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\debug\irradiance-grid.frag.glsl">
+      <Filter>src\shaders\debug</Filter>
     </None>
-    <None Include="shaders\debug-shprobe.frag.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\debug\irradiance-volume.frag.glsl">
+      <Filter>src\shaders\debug</Filter>
     </None>
-    <None Include="shaders\composite.frag.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\debug\irradiance-volume.vert.glsl">
+      <Filter>src\shaders\debug</Filter>
     </None>
-    <None Include="shaders\debug-irradiance-volume.frag.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\debug\probe.frag.glsl">
+      <Filter>src\shaders\debug</Filter>
     </None>
-    <None Include="shaders\debug-irradiance-grid.frag.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\debug\surfel.frag.glsl">
+      <Filter>src\shaders\debug</Filter>
     </None>
-    <None Include="shaders\debug-irradiance-volume.vert.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\debug\surfel.vert.glsl">
+      <Filter>src\shaders\debug</Filter>
     </None>
-    <None Include="shaders\irradiance-volume.comp.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\lib\colour.lib.glsl">
+      <Filter>src\shaders\lib</Filter>
     </None>
-    <None Include="shaders\math.lib.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\lib\math.lib.glsl">
+      <Filter>src\shaders\lib</Filter>
     </None>
-    <None Include="shaders\probe-relight.comp.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\lib\pbr.lib.glsl">
+      <Filter>src\shaders\lib</Filter>
     </None>
-    <None Include="shaders\types.lib.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\lib\shadow.lib.glsl">
+      <Filter>src\shaders\lib</Filter>
     </None>
-    <None Include="shaders\probe-env-map.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\probe-env-map.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\colour.lib.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\pbr.lib.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\debug-surfel.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\debug-surfel.frag.glsl">
-      <Filter>src\shaders</Filter>
+    <None Include="shaders\lib\types.lib.glsl">
+      <Filter>src\shaders\lib</Filter>
     </None>
   </ItemGroup>
 </Project>
