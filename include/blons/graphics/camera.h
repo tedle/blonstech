@@ -42,8 +42,8 @@ public:
 
     // TODO: Base this on real metrics (aperture/shutter/ISO -> EV100)
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Sets the exposure of the camera in the scene. Currently a flat
-    /// multiplier on exit radiance
+    /// \brief Sets the exposure of the camera in the scene. Currently expressed as
+    /// a log2 exponent on exit radiance
     ///
     /// \param exposure The exposure of the camera
     ////////////////////////////////////////////////////////////////////////////////

@@ -31,7 +31,7 @@ Camera::Camera()
 
 void Camera::set_exposure(float exposure)
 {
-    exposure_ = exposure;
+    exposure_ = powf(2.0f, exposure);
 }
 
 void Camera::set_pos(units::world x, units::world y, units::world z)

@@ -39,7 +39,7 @@ namespace stage
 {
 namespace
 {
-auto cvar_constant_ambient = console::RegisterVariable("light:constant-ambient", 800.0f);
+auto cvar_constant_ambient = console::RegisterVariable("light:constant-ambient", 1500.0f);
 
 // Hard coded distance clipping as graphics option values are tuned for performance
 const Matrix kCubeFaceProjection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 100.0f);

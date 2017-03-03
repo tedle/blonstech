@@ -39,9 +39,9 @@ namespace blons
 {
 namespace
 {
-auto const cvar_exposure = console::RegisterVariable("light:exposure", 1.4e-4f);
-auto const cvar_sun_luminance = console::RegisterVariable("light:sun-luminance", 1e4f);
-auto const cvar_sky_luminance = console::RegisterVariable("light:sky-luminance", 6e3f);
+auto const cvar_exposure = console::RegisterVariable("light:exposure", -15.0f);
+auto const cvar_sun_luminance = console::RegisterVariable("light:sun-luminance", 1e5f);
+auto const cvar_sky_luminance = console::RegisterVariable("light:sky-luminance", 2e4f);
 } // namespace
 
 // Managed assets that allows the blons::Graphics class to track and render anything it creates
