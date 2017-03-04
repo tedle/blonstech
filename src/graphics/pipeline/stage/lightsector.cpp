@@ -553,11 +553,11 @@ LightSector::BrickCluster LightSector::ClusterBrickData(SurfelCluster* surfel_da
         s.sample_count = 1;
 
         SurfelIndex search_index;
-        // Offset negative values by a whole step to deal with naive truncations resulting
+        // Offset negative values by a whole step and 1 to deal with naive truncations resulting
         // in too many bricks located at index 0
-        search_index.x = surfel_it.first.x / kSurfelsPerBrick + (surfel_it.first.x >= 0 ? 0 : -1);
-        search_index.y = surfel_it.first.y / kSurfelsPerBrick + (surfel_it.first.y >= 0 ? 0 : -1);
-        search_index.z = surfel_it.first.z / kSurfelsPerBrick + (surfel_it.first.z >= 0 ? 0 : -1);
+        search_index.x = (surfel_it.first.x + (surfel_it.first.x >= 0 ? 0 : -kSurfelsPerBrick + 1)) / kSurfelsPerBrick;
+        search_index.y = (surfel_it.first.y + (surfel_it.first.y >= 0 ? 0 : -kSurfelsPerBrick + 1)) / kSurfelsPerBrick;
+        search_index.z = (surfel_it.first.z + (surfel_it.first.z >= 0 ? 0 : -kSurfelsPerBrick + 1)) / kSurfelsPerBrick;
         search_index.direction = surfel_it.first.direction;
 
         auto brick_it = brick_data.find(search_index);
