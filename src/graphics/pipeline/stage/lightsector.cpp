@@ -39,7 +39,7 @@ namespace stage
 {
 namespace
 {
-auto cvar_constant_ambient = console::RegisterVariable("light:constant-ambient", 1500.0f);
+auto cvar_gi_boost = console::RegisterVariable("light:gi-boost", 1.0f);
 
 // Hard coded distance clipping as graphics option values are tuned for performance
 const Matrix kCubeFaceProjection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 100.0f);
@@ -94,8 +94,8 @@ namespace temp
 void GenerateTestProbe(std::vector<LightSector::Probe>* probes)
 {
     LightSector::Probe probe{ static_cast<int>(probes->size()), Vector3(0.0f, 3.0f, 0.0f) };
-    probe.brickfactor_range_start = 0;
-    probe.brickfactor_count = 0;
+    probe.brick_factor_range_start = 0;
+    probe.brick_factor_count = 0;
     probes->push_back(probe);
 }
 void GenerateCrytekSponzaProbes(std::vector<LightSector::Probe>* probes)
@@ -107,8 +107,8 @@ void GenerateCrytekSponzaProbes(std::vector<LightSector::Probe>* probes)
             for (int z = 0; z < 2; z++)
             {
                 LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 10.0f - 5.0f) };
-                probe.brickfactor_range_start = 0;
-                probe.brickfactor_count = 0;
+                probe.brick_factor_range_start = 0;
+                probe.brick_factor_count = 0;
                 probes->push_back(probe);
             }
         }
@@ -120,8 +120,8 @@ void GenerateCrytekSponzaProbes(std::vector<LightSector::Probe>* probes)
             for (int z = 0; z < 2; z++)
             {
                 LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 2.4f - 1.2f) };
-                probe.brickfactor_range_start = 0;
-                probe.brickfactor_count = 0;
+                probe.brick_factor_range_start = 0;
+                probe.brick_factor_count = 0;
                 probes->push_back(probe);
             }
         }
@@ -133,8 +133,8 @@ void GenerateCrytekSponzaProbes(std::vector<LightSector::Probe>* probes)
             for (int z = 0; z < 2; z++)
             {
                 LightSector::Probe probe{ static_cast<int>(probes->size()), Vector3(-10.0f + x * 1.727f, y * 2.0f + 10.0f, z * 2.4f - 1.2f) };
-                probe.brickfactor_range_start = 0;
-                probe.brickfactor_count = 0;
+                probe.brick_factor_range_start = 0;
+                probe.brick_factor_count = 0;
                 probes->push_back(probe);
             }
         }
@@ -150,8 +150,8 @@ void GenerateOldSponzaProbes(std::vector<LightSector::Probe>* probes)
             for (int z = 0; z < 3; z++)
             {
                 LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-14.0f + x * 4.0f, y * 5.0f + 2.0f, z * 5.0f - 5.0f) };
-                probe.brickfactor_range_start = 0;
-                probe.brickfactor_count = 0;
+                probe.brick_factor_range_start = 0;
+                probe.brick_factor_count = 0;
                 probes->push_back(probe);
             }
         }
@@ -161,8 +161,8 @@ void GenerateOldSponzaProbes(std::vector<LightSector::Probe>* probes)
         for (int y = 0; y < 2; y++)
         {
             LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-10.0f + x * 4.0f, y * 3.0f + 11.0f, 0) };
-            probe.brickfactor_range_start = 0;
-            probe.brickfactor_count = 0;
+            probe.brick_factor_range_start = 0;
+            probe.brick_factor_count = 0;
             probes->push_back(probe);
         }
     }
@@ -207,6 +207,7 @@ bool LightSector::Relight(const Scene& scene, const Shadow& shadow, Matrix light
         !surfel_brick_relight_shader_->SetInput("sun.colour", sun->colour()) ||
         !surfel_brick_relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
         !surfel_brick_relight_shader_->SetInput("metalness", Vector3(console::var<float>("mtl:metalness"))) ||
+        !surfel_brick_relight_shader_->SetInput("gi_boost", cvar_gi_boost->to<float>()) ||
         !surfel_brick_relight_shader_->SetInput("surfel_buffer", surfel_shader_data()) ||
         !surfel_brick_relight_shader_->SetInput("surfel_brick_buffer", surfel_brick_shader_data()) ||
         !surfel_brick_relight_shader_->SetInput("probe_buffer", probe_shader_data()))
@@ -217,8 +218,9 @@ bool LightSector::Relight(const Scene& scene, const Shadow& shadow, Matrix light
 
     // Iterate over every probe, building an irradiance term from sky light and any visible surfel bricks
     if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()) ||
+        !probe_relight_shader_->SetInput("brick_buffer", surfel_brick_shader_data()) ||
+        !probe_relight_shader_->SetInput("brick_factor_buffer", surfel_brick_factor_shader_data()) ||
         !probe_relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
-        !probe_relight_shader_->SetInput("temp_ambient", cvar_constant_ambient->to<float>()) ||
         !probe_relight_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
         !probe_relight_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
         !probe_relight_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9))
@@ -682,7 +684,7 @@ void LightSector::GenerateBrickWeights(const std::vector<BakeBrick>& bricks)
             BakeBrickFactor f;
             f.factor.brick_id = i;
             // Copy basis weights
-            std::copy(std::begin(probe.second), std::end(probe.second), std::begin(f.factor.brick_weight));
+            std::copy(std::begin(probe.second), std::end(probe.second), std::begin(f.factor.brick_weights));
             f.parent_probe = probe.first;
             brick_factor_data.push_back(f);
         }
@@ -696,11 +698,11 @@ void LightSector::GenerateBrickWeights(const std::vector<BakeBrick>& bricks)
     {
         const auto& factor = brick_factor_data[i];
         auto& probe = probes_[factor.parent_probe];
-        if (probe.brickfactor_count == 0)
+        if (probe.brick_factor_count == 0)
         {
-            probe.brickfactor_range_start = i;
+            probe.brick_factor_range_start = i;
         }
-        probe.brickfactor_count++;
+        probe.brick_factor_count++;
         // Transfer to contiguous memory
         surfel_brick_factors_.push_back(factor.factor);
     }
@@ -723,15 +725,15 @@ void LightSector::NormalizeBrickWeights()
     // Normalize brick weights to pi
     for (const auto& probe : probes_)
     {
-        auto start = surfel_brick_factors_.begin() + probe.brickfactor_range_start;
-        auto end = start + probe.brickfactor_count;
+        auto start = surfel_brick_factors_.begin() + probe.brick_factor_range_start;
+        auto end = start + probe.brick_factor_count;
         // Apply normalization factor
         std::transform(start, end, start,
         [&](auto bf)
         {
             for (int face = 0; face < 6; face++)
             {
-                bf.brick_weight[face] /= normalization_factor;
+                bf.brick_weights[face] /= normalization_factor;
             }
             return bf;
         });

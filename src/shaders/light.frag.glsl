@@ -90,7 +90,7 @@ vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 li
     diffuse *= albedo;
     // Metals dont have diffuse light
     diffuse *= 1.0 - metalness;
-    // Account for conversion from irradiance to radiant exitance
+    // Account for conversion from irradiance to radiance
     return diffuse / kPi;
 }
 

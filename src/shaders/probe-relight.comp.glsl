@@ -33,48 +33,94 @@ layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 // Globals
 uniform SHColourCoeffs sh_sky_colour;
 uniform float sky_luminance;
-uniform float temp_ambient;
 
 layout(std430) buffer probe_buffer
 {
     Probe probes[];
 };
 
-void ComputeAmbientCubeDirection(const uint probe_id, const int cube_face, const vec3 direction)
+layout(std430) buffer brick_buffer
 {
-    float direction_coeffs[9];
-    SHProjectCosineLobe3(direction, direction_coeffs);
-    // Divide by pi because sky_vis is merely a visibility function and is not meant to be scaled for irradiance
-    // The irradiance scaling is applied on the sky_light itself
-    float sky_vis = max(SHDot3(probes[probe_id].sh_coeffs, direction_coeffs), 0.0f) / kPi;
-    vec3 sky_light = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
-                          SHDot3(direction_coeffs, sh_sky_colour.g),
-                          SHDot3(direction_coeffs, sh_sky_colour.b));
-    // Scale sky irradiance by visibility function
-    sky_light *= sky_vis;
-    sky_light *= sky_luminance;
-    vec3 ambient_light = vec3(temp_ambient) + sky_light;
-    probes[probe_id].cube_coeffs[cube_face][0] = ambient_light.r;
-    probes[probe_id].cube_coeffs[cube_face][1] = ambient_light.g;
-    probes[probe_id].cube_coeffs[cube_face][2] = ambient_light.b;
+    SurfelBrick surfel_bricks[];
+};
+
+layout(std430) buffer brick_factor_buffer
+{
+    SurfelBrickFactor surfel_brick_factors[];
+};
+
+struct AmbientCubeDirection
+{
+    int face;
+    vec3 direction;
+};
+
+const AmbientCubeDirection kBasisDirections[6] = AmbientCubeDirection[6](
+    AmbientCubeDirection(kPositiveX, vec3( 1.0,  0.0,  0.0)),
+    AmbientCubeDirection(kNegativeX, vec3(-1.0,  0.0,  0.0)),
+    AmbientCubeDirection(kPositiveY, vec3( 0.0,  1.0,  0.0)),
+    AmbientCubeDirection(kNegativeY, vec3( 0.0, -1.0,  0.0)),
+    AmbientCubeDirection(kPositiveZ, vec3( 0.0,  0.0,  1.0)),
+    AmbientCubeDirection(kNegativeZ, vec3( 0.0,  0.0, -1.0))
+);
+
+void ComputeAmbientCube(const uint probe_id)
+{
+    Probe probe = probes[probe_id];
+    // Calculate sky lighting in all 6 basis directions
+    for (int dir = 0; dir < 6; dir++)
+    {
+        const int cube_face = kBasisDirections[dir].face;
+        const vec3 direction = kBasisDirections[dir].direction;
+
+        float direction_coeffs[9];
+        SHProjectCosineLobe3(direction, direction_coeffs);
+        // Divide by pi because sky_vis is merely a visibility function and is not meant to be scaled for irradiance
+        // The irradiance scaling is applied on the sky_light itself
+        float sky_vis = max(SHDot3(probe.sh_coeffs, direction_coeffs), 0.0f) / kPi;
+        vec3 sky_light = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
+            SHDot3(direction_coeffs, sh_sky_colour.g),
+            SHDot3(direction_coeffs, sh_sky_colour.b));
+        // Scale sky irradiance by visibility function
+        sky_light *= sky_vis;
+        sky_light *= sky_luminance;
+        vec3 ambient_light = sky_light;
+
+        // Store as ambient cube coefficients
+        probe.cube_coeffs[cube_face][0] = ambient_light.r;
+        probe.cube_coeffs[cube_face][1] = ambient_light.g;
+        probe.cube_coeffs[cube_face][2] = ambient_light.b;
+    }
+
+    // Iterate over brick factors to sum up bounce irradiance
+    // Separate loop to cut down on global memory reads
+    for (int factor_id = probe.brick_factor_range_start;
+        factor_id < probe.brick_factor_range_start + probe.brick_factor_count;
+        factor_id++)
+    {
+        SurfelBrickFactor factor = surfel_brick_factors[factor_id];
+        SurfelBrick brick = surfel_bricks[factor.brick_id];
+        vec3 radiance = vec3(brick.radiance[0], brick.radiance[1], brick.radiance[2]);
+        for (int dir = 0; dir < 6; dir++)
+        {
+            const int cube_face = kBasisDirections[dir].face;
+            // Brick weights sum up to pi over the set of factors
+            vec3 weighted_radiance = radiance * factor.brick_weights[cube_face];
+            // Add to ambient cube coefficients as we go
+            probe.cube_coeffs[cube_face][0] += weighted_radiance.r;
+            probe.cube_coeffs[cube_face][1] += weighted_radiance.g;
+            probe.cube_coeffs[cube_face][2] += weighted_radiance.b;
+        }
+    }
+    probes[probe_id].cube_coeffs = probe.cube_coeffs;
 }
 
 void main(void)
 {
     uint probe_id = gl_GlobalInvocationID.x;
 
-    // Sample the probe's sky vis coefficients in each principle normal direction
+    // Sample the probe's sky vis coefficients
+    // Sample brick radiance
     // Store as an ambient cube
-    // +X
-    ComputeAmbientCubeDirection(probe_id, kPositiveX, vec3(1.0, 0.0, 0.0));
-    // -X
-    ComputeAmbientCubeDirection(probe_id, kNegativeX, vec3(-1.0, 0.0, 0.0));
-    // +Y
-    ComputeAmbientCubeDirection(probe_id, kPositiveY, vec3(0.0, 1.0, 0.0));
-    // -Y
-    ComputeAmbientCubeDirection(probe_id, kNegativeY, vec3(0.0, -1.0, 0.0));
-    // +Z
-    ComputeAmbientCubeDirection(probe_id, kPositiveZ, vec3(0.0, 0.0, 1.0));
-    // -Z
-    ComputeAmbientCubeDirection(probe_id, kNegativeZ, vec3(0.0, 0.0, -1.0));
+    ComputeAmbientCube(probe_id);
 }

@@ -52,6 +52,7 @@ void main(void)
     vec3 sample_pos = (vec3(gl_GlobalInvocationID) + vec3(0.5f)) / texels;
     vec4 world_pos = world_matrix * vec4(sample_pos, 1.0);
 
+    // TODO: Optimize this naive search, it actually hurts performance massively
     // Find the probe nearest to this sample
     Probe nearest_probe = probes[0];
     float nearest_length = distance(world_pos.xyz, vec3(nearest_probe.pos[0], nearest_probe.pos[1], nearest_probe.pos[2]));

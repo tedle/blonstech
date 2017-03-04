@@ -36,8 +36,8 @@ struct Probe
     float pos[3];
     float cube_coeffs[6][3]; // 6 directions, 3 colour channels
     float sh_coeffs[9];
-    int brickfactor_range_start;
-    int brickfactor_range_end;
+    int brick_factor_range_start;
+    int brick_factor_count;
 };
 
 struct Surfel
@@ -59,7 +59,7 @@ struct SurfelBrick
 struct SurfelBrickFactor
 {
     int brick_id;
-    float brick_weight[6];
+    float brick_weights[6];
 };
 
 struct SHColourCoeffs

@@ -62,8 +62,8 @@ public:
         Vector3 pos;
         AmbientCube irradiance;
         SHCoeffs3 sh_sky_visibility;
-        int brickfactor_range_start;
-        int brickfactor_count;
+        int brick_factor_range_start;
+        int brick_factor_count;
     };
 
     // Uniformly sized voxel face
@@ -86,7 +86,7 @@ public:
     struct SurfelBrickFactor
     {
         int brick_id;
-        float brick_weight[6];
+        float brick_weights[6];
     };
 
 public:

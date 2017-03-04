@@ -36,6 +36,7 @@ uniform mat4 light_vp_matrix;
 uniform sampler2D light_depth;
 uniform DirectionalLight sun;
 uniform vec3 metalness;
+uniform float gi_boost;
 
 layout(std430) buffer surfel_buffer
 {
@@ -64,7 +65,7 @@ vec3 ComputeSurfelLighting(inout Surfel surfel)
         float light_visibility = ShadowTest(pos, light_vp_matrix, light_depth);
 
         // We don't use a PBR diffuse term since those require a view vector which does not exist here
-        radiance = light_visibility * sun.luminance * sun.colour * NdotL;
+        radiance = light_visibility * sun.luminance * sun.colour * NdotL * gi_boost;
         // Use previous frame's ambient term of nearest probe to approximate infinite bounce lighting
         Probe nearest_probe = probes[surfel.nearest_probe_id];
         vec3 ambient_cube[6] = vec3[6](
