@@ -462,6 +462,7 @@ void LightSector::GatherProbeSamples(std::vector<SurfelSample>* surfel_samples, 
 
                         SurfelSample surfel_sample;
                         Surfel surfel;
+                        surfel.nearest_probe_id = probe.id;
                         surfel.pos = Vector3(world_pos.x, world_pos.y, world_pos.z);
                         surfel.normal = surface_normal;
                         surfel.albedo = albedo;
@@ -602,6 +603,19 @@ LightSector::BrickCluster LightSector::ClusterBrickData(SurfelCluster* surfel_da
         s.surfel.normal = VectorNormalize(s.surfel.normal);
         s.surfel.albedo /= static_cast<units::world>(s.sample_count);
         s.sample_count = 1;
+        // Also an efficient time to solve for nearest probe
+        for (const auto& parent_probe : s.parent_probes)
+        {
+            if (s.surfel.nearest_probe_id != parent_probe.id)
+            {
+                auto dist_old = VectorLength(probes_[s.surfel.nearest_probe_id].pos - s.surfel.pos);
+                auto dist_new = VectorLength(probes_[parent_probe.id].pos - s.surfel.pos);
+                if (dist_new < dist_old)
+                {
+                    s.surfel.nearest_probe_id = parent_probe.id;
+                }
+            }
+        }
 
         SurfelIndex search_index;
         // Offset negative values by a whole step and 1 to deal with naive truncations resulting

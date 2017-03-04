@@ -69,8 +69,7 @@ public:
     // Uniformly sized voxel face
     struct Surfel
     {
-        // TODO: Add nearest probe for bounce lighting
-        int nearest_probe;
+        int nearest_probe_id;
         Vector3 pos;
         Vector3 normal;
         Vector3 albedo;

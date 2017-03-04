@@ -42,7 +42,7 @@ struct Probe
 
 struct Surfel
 {
-    int nearest_probe;
+    int nearest_probe_id;
     float pos[3];
     float normal[3];
     float albedo[3];
