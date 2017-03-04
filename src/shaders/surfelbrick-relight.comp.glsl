@@ -35,6 +35,7 @@ layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 uniform mat4 light_vp_matrix;
 uniform sampler2D light_depth;
 uniform DirectionalLight sun;
+uniform vec3 metalness;
 
 layout(std430) buffer surfel_buffer
 {
@@ -78,6 +79,8 @@ vec3 ComputeSurfelLighting(inout Surfel surfel)
         radiance += ambient_light;
         // Attenuate by surface colour
         radiance *= albedo;
+        // Metals dont have diffuse light
+        radiance *= 1.0 - metalness;
         // We also divide by pi now since we are storing radiance, not irradiance
         radiance /= kPi;
         surfel.radiance[0] = radiance.r;
