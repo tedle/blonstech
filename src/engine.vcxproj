@@ -320,8 +320,6 @@
     <None Include="shaders\debug\probe.frag.glsl" />
     <None Include="shaders\debug\surfel.frag.glsl" />
     <None Include="shaders\debug\surfel.vert.glsl" />
-    <None Include="shaders\direct-light-map.frag.glsl" />
-    <None Include="shaders\direct-light-map.vert.glsl" />
     <None Include="shaders\direct-light.frag.glsl" />
     <None Include="shaders\irradiance-volume.comp.glsl" />
     <None Include="shaders\lib\colour.lib.glsl" />
@@ -336,7 +334,6 @@
     <None Include="shaders\probe-env-map.vert.glsl" />
     <None Include="shaders\probe-relight.comp.glsl" />
     <None Include="shaders\shadow-blur.frag.glsl" />
-    <None Include="shaders\shadow-blur.vert.glsl" />
     <None Include="shaders\shadow.frag.glsl" />
     <None Include="shaders\shadow.vert.glsl" />
     <None Include="shaders\sprite.frag.glsl" />

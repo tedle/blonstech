@@ -437,12 +437,6 @@
     <None Include="shaders\direct-light.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\direct-light-map.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\direct-light-map.vert.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
     <None Include="shaders\irradiance-volume.comp.glsl">
       <Filter>src\shaders</Filter>
     </None>
@@ -471,9 +465,6 @@
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\shadow-blur.frag.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
-    <None Include="shaders\shadow-blur.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
     <None Include="shaders\sprite.frag.glsl">
