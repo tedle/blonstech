@@ -123,7 +123,7 @@ void main(void)
     vec3 ambient_light = SampleAmbientCube(ambient_cube, surface_normal);
     // Ambient cubes store irradiance data, view as exit irradiance with pi division
     ambient_light /= kPi;
-    ambient_light = FilmicTonemap(ambient_light * exposure);
+    ambient_light = GammaEncode(FilmicTonemap(ambient_light * exposure));
 
     // Calculate direct sky vis data
     float sh_normal[9];

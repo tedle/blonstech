@@ -56,6 +56,6 @@ void main(void)
     vec3 ambient_light = SampleAmbientCube(ambient_cube, norm);
     // Visualize as exit irradiance, divide by pi
     ambient_light /= kPi;
-    ambient_light = FilmicTonemap(ambient_light * exposure);
+    ambient_light = GammaEncode(FilmicTonemap(ambient_light * exposure));
     frag_colour = vec4(ambient_light, 1.0f);
 }
