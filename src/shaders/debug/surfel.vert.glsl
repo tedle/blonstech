@@ -29,7 +29,7 @@
 // Ins n outs
 in vec3 input_pos;
 
-out vec3 albedo;
+out vec3 radiance;
 
 // Globals
 uniform mat4 world_matrix;
@@ -58,5 +58,5 @@ void main(void)
     gl_Position = rotation_matrix * world_matrix * vec4(input_pos, 1.0) + vec4(s.pos[0], s.pos[1], s.pos[2], 0.0);
     gl_Position = vp_matrix * gl_Position;
 
-    albedo = vec3(s.albedo[0], s.albedo[1], s.albedo[2]);
+    radiance = vec3(s.radiance[0], s.radiance[1], s.radiance[2]);
 }

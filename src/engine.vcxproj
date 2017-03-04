@@ -341,6 +341,7 @@
     <None Include="shaders\shadow.vert.glsl" />
     <None Include="shaders\sprite.frag.glsl" />
     <None Include="shaders\sprite.vert.glsl" />
+    <None Include="shaders\surfelbrick-relight.comp.glsl" />
     <None Include="shaders\ui-blur.frag.glsl" />
     <None Include="shaders\ui-composite.frag.glsl" />
     <None Include="shaders\ui.frag.glsl" />

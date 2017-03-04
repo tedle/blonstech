@@ -23,12 +23,18 @@
 
 #version 430
 
+// Includes
+#include <shaders/lib/colour.lib.glsl>
+
 // Ins n outs
-in vec3 albedo;
+in vec3 radiance;
 
 out vec4 frag_colour;
 
+// Globals
+uniform float exposure;
+
 void main(void)
 {
-    frag_colour = vec4(albedo, 1.0);
+    frag_colour = vec4(GammaEncode(FilmicTonemap(radiance * exposure)), 1.0);
 }

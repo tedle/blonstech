@@ -74,6 +74,7 @@ bool SurfelView::Render(Framebuffer* target, const TextureResource* depth, const
     // Set the inputs
     if (!surfel_shader_->SetInput("world_matrix", world_matrix) ||
         !surfel_shader_->SetInput("vp_matrix", vp_matrix) ||
+        !surfel_shader_->SetInput("exposure", scene.view.exposure()) ||
         !surfel_shader_->SetInput("surfel_buffer", sector.surfel_shader_data()))
     {
         target->BindDepthTexture(target->depth());

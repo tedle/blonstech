@@ -189,12 +189,31 @@ LightSector::LightSector()
                                               { TextureType::R8G8B8,   TextureType::RAW, TextureType::NEAREST, TextureType::CLAMP } }, // normal
                                             true));
 
-    // Relight compute shader to be run every frame
+    // Relight compute shaders to be run every frame
+    surfel_brick_relight_shader_.reset(new ComputeShader("shaders/surfelbrick-relight.comp.glsl"));
     probe_relight_shader_.reset(new ComputeShader("shaders/probe-relight.comp.glsl"));
 }
 
-bool LightSector::Relight(const Scene& scene)
+bool LightSector::Relight(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix)
 {
+    // Can be removed when we support more lights
+    assert(scene.lights.size() == 1);
+    Light* sun = scene.lights[0];
+
+    // Iterate over every brick, relighting their surfels and building a radiance term
+    if (!surfel_brick_relight_shader_->SetInput("light_vp_matrix", light_vp_matrix) ||
+        !surfel_brick_relight_shader_->SetInput("light_depth", shadow.output(Shadow::LIGHT_DEPTH)) ||
+        !surfel_brick_relight_shader_->SetInput("sun.dir", sun->direction()) ||
+        !surfel_brick_relight_shader_->SetInput("sun.colour", sun->colour()) ||
+        !surfel_brick_relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
+        !surfel_brick_relight_shader_->SetInput("surfel_buffer", surfel_shader_data()) ||
+        !surfel_brick_relight_shader_->SetInput("surfel_brick_buffer", surfel_brick_shader_data()))
+    {
+        return false;
+    }
+    surfel_brick_relight_shader_->Run(static_cast<unsigned int>(surfel_bricks_.size()), 1, 1);
+
+    // Iterate over every probe, building an irradiance term from sky light and any visible surfel bricks
     if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()) ||
         !probe_relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
         !probe_relight_shader_->SetInput("temp_ambient", cvar_constant_ambient->to<float>()) ||
@@ -235,6 +254,8 @@ void LightSector::BakeRadianceTransfer(const Scene& scene)
     // Update shader buffer with generated radiance data
     probe_shader_data_->set_value(probes_.data());
     surfel_shader_data_.reset(new ShaderData<LightSector::Surfel>(surfels_.data(), surfels_.size()));
+    surfel_brick_shader_data_.reset(new ShaderData<LightSector::SurfelBrick>(surfel_bricks_.data(), surfel_bricks_.size()));
+    surfel_brick_factor_shader_data_.reset(new ShaderData<LightSector::SurfelBrickFactor>(surfel_brick_factors_.data(), surfel_brick_factors_.size()));
 }
 
 const TextureResource* LightSector::output(Output buffer) const
@@ -275,6 +296,36 @@ const ShaderDataResource* LightSector::surfel_shader_data() const
         throw "Attempted to access surfel shader data before light bake";
     }
     return surfel_shader_data_->data();
+}
+
+const std::vector<LightSector::SurfelBrick>& LightSector::surfel_bricks() const
+{
+    return surfel_bricks_;
+}
+
+const ShaderDataResource* LightSector::surfel_brick_shader_data() const
+{
+    // TODO: Remove this when light sector streaming is implemented and we can get PRT data in constructor
+    if (surfel_brick_shader_data_ == nullptr)
+    {
+        throw "Attempted to access surfel brick shader data before light bake";
+    }
+    return surfel_brick_shader_data_->data();
+}
+
+const std::vector<LightSector::SurfelBrickFactor>& LightSector::surfel_brick_factors() const
+{
+    return surfel_brick_factors_;
+}
+
+const ShaderDataResource* LightSector::surfel_brick_factor_shader_data() const
+{
+    // TODO: Remove this when light sector streaming is implemented and we can get PRT data in constructor
+    if (surfel_brick_factor_shader_data_ == nullptr)
+    {
+        throw "Attempted to access surfel brick shader data before light bake";
+    }
+    return surfel_brick_factor_shader_data_->data();
 }
 
 // This function only exists to help compartmentalize the long process of PRT baking

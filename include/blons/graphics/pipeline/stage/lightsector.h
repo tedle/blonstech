@@ -28,6 +28,7 @@
 #include <unordered_map>
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/shader.h>
 #include <blons/graphics/render/computeshader.h>
@@ -95,7 +96,7 @@ public:
 
     void BakeRadianceTransfer(const Scene& scene);
 
-    bool Relight(const Scene& scene);
+    bool Relight(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage
@@ -109,6 +110,10 @@ public:
     const ShaderDataResource* probe_shader_data() const;
     const std::vector<Surfel>& surfels() const;
     const ShaderDataResource* surfel_shader_data() const;
+    const std::vector<SurfelBrick>& surfel_bricks() const;
+    const ShaderDataResource* surfel_brick_shader_data() const;
+    const std::vector<SurfelBrickFactor>& surfel_brick_factors() const;
+    const ShaderDataResource* surfel_brick_factor_shader_data() const;
 
 private:
     // Used in PRT baking
@@ -172,8 +177,11 @@ private:
     std::unique_ptr<Framebuffer> environment_maps_;
     std::unique_ptr<Shader> environment_map_shader_;
     std::unique_ptr<ComputeShader> probe_relight_shader_;
+    std::unique_ptr<ComputeShader> surfel_brick_relight_shader_;
     std::unique_ptr<ShaderData<Probe>> probe_shader_data_;
     std::unique_ptr<ShaderData<Surfel>> surfel_shader_data_;
+    std::unique_ptr<ShaderData<SurfelBrick>> surfel_brick_shader_data_;
+    std::unique_ptr<ShaderData<SurfelBrickFactor>> surfel_brick_factor_shader_data_;
 };
 } // namespace stage
 } // namespace pipeline

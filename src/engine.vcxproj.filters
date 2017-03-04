@@ -524,5 +524,8 @@
     <None Include="shaders\lib\types.lib.glsl">
       <Filter>src\shaders\lib</Filter>
     </None>
+    <None Include="shaders\surfelbrick-relight.comp.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

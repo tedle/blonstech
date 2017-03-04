@@ -49,6 +49,19 @@ struct Surfel
     float radiance[3];
 };
 
+struct SurfelBrick
+{
+    int surfel_range_start;
+    int surfel_count;
+    float radiance[3];
+};
+
+struct SurfelBrickFactor
+{
+    int brick_id;
+    float brick_weight[6];
+};
+
 struct SHColourCoeffs
 {
     float r[9];

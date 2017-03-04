@@ -58,3 +58,11 @@ float ShadowTest(vec4 world_pos, mat4 light_matrix, sampler2D depth)
     // The actual percent amount that the fragment is affected by the light source
     return max(p, p_max);
 }
+
+bool IsValidShadowSample(vec4 world_pos, mat4 light_matrix)
+{
+    vec4 light_pos = light_matrix * world_pos;
+    light_pos /= light_pos.w;
+
+    return !(light_pos.x < -1.0 || light_pos.x > 1.0 || light_pos.y < -1.0 || light_pos.y > 1.0);
+}

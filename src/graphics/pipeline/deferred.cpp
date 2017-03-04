@@ -117,7 +117,7 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!light_sector_->Relight(scene))
+    if (!light_sector_->Relight(scene, *shadow_, light_vp_matrix))
     {
         return false;
     }
