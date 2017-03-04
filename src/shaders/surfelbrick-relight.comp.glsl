@@ -44,6 +44,10 @@ layout(std430) buffer surfel_brick_buffer
 {
     SurfelBrick surfel_bricks[];
 };
+layout(std430) buffer probe_buffer
+{
+    Probe probes[];
+};
 
 vec3 ComputeSurfelLighting(inout Surfel surfel)
 {
@@ -59,9 +63,21 @@ vec3 ComputeSurfelLighting(inout Surfel surfel)
         float light_visibility = ShadowTest(pos, light_vp_matrix, light_depth);
 
         // We don't use a PBR diffuse term since those require a view vector which does not exist here
-        radiance = albedo * light_visibility * sun.luminance * sun.colour * NdotL;
-        // TODO: Multiple bounce lighting
-        // radiance += sample probe ambient cube
+        radiance = light_visibility * sun.luminance * sun.colour * NdotL;
+        // Use previous frame's ambient term of nearest probe to approximate infinite bounce lighting
+        Probe nearest_probe = probes[surfel.nearest_probe_id];
+        vec3 ambient_cube[6] = vec3[6](
+            vec3(nearest_probe.cube_coeffs[kPositiveX][0], nearest_probe.cube_coeffs[kPositiveX][1], nearest_probe.cube_coeffs[kPositiveX][2]),
+            vec3(nearest_probe.cube_coeffs[kNegativeX][0], nearest_probe.cube_coeffs[kNegativeX][1], nearest_probe.cube_coeffs[kNegativeX][2]),
+            vec3(nearest_probe.cube_coeffs[kPositiveY][0], nearest_probe.cube_coeffs[kPositiveY][1], nearest_probe.cube_coeffs[kPositiveY][2]),
+            vec3(nearest_probe.cube_coeffs[kNegativeY][0], nearest_probe.cube_coeffs[kNegativeY][1], nearest_probe.cube_coeffs[kNegativeY][2]),
+            vec3(nearest_probe.cube_coeffs[kPositiveZ][0], nearest_probe.cube_coeffs[kPositiveZ][1], nearest_probe.cube_coeffs[kPositiveZ][2]),
+            vec3(nearest_probe.cube_coeffs[kNegativeZ][0], nearest_probe.cube_coeffs[kNegativeZ][1], nearest_probe.cube_coeffs[kNegativeZ][2])
+        );
+        vec3 ambient_light = SampleAmbientCube(ambient_cube, normal);
+        radiance += ambient_light;
+        // Attenuate by surface colour
+        radiance *= albedo;
         // We also divide by pi now since we are storing radiance, not irradiance
         radiance /= kPi;
         surfel.radiance[0] = radiance.r;

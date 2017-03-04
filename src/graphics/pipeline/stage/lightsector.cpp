@@ -207,7 +207,8 @@ bool LightSector::Relight(const Scene& scene, const Shadow& shadow, Matrix light
         !surfel_brick_relight_shader_->SetInput("sun.colour", sun->colour()) ||
         !surfel_brick_relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
         !surfel_brick_relight_shader_->SetInput("surfel_buffer", surfel_shader_data()) ||
-        !surfel_brick_relight_shader_->SetInput("surfel_brick_buffer", surfel_brick_shader_data()))
+        !surfel_brick_relight_shader_->SetInput("surfel_brick_buffer", surfel_brick_shader_data()) ||
+        !surfel_brick_relight_shader_->SetInput("probe_buffer", probe_shader_data()))
     {
         return false;
     }
