@@ -324,9 +324,6 @@ GLint ShaderResourceGL43::UniformLocation(const char* name)
 template <typename T>
 bool ShaderResourceGL43::SetUniform(const char* name, T* value, GLsizei elements)
 {
-    // Clear errors so we know problems are isolated to this function
-    glGetError();
-
     auto context = static_cast<RendererGL43*>(render::context());
     context->BindShader(program_);
 
@@ -351,9 +348,6 @@ bool ShaderResourceGL43::SetUniform(const char* name, T value)
 
 bool ShaderResourceGL43::BindSSBO(const char* name, const ShaderDataResourceGL43* ssbo)
 {
-    // Clear errors so we know problems are isolated to this function
-    glGetError();
-
     auto context = static_cast<RendererGL43*>(render::context());
     context->BindShader(program_);
 
@@ -838,7 +832,6 @@ bool RendererGL43::RegisterShaderData(ShaderDataResource* data_handle, const voi
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, data_buffer->buffer_);
     glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_COPY);
     data_buffer->size_ = size;
-    // TODO: Could erroneously trigger on previously made errors, do smarter checking here?
     if (glGetError() != GL_NO_ERROR)
     {
         return false;
