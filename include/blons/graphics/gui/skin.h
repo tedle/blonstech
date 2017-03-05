@@ -334,7 +334,7 @@ public:
                 Vector4(0.9f, 0.9f, 0.9f, 1.0f) // text colour
             };
             Vector4 completion_colour = Vector4(0.9f, 0.9f, 1.0f, 0.6f); ///< Colour for tab completion hinting text
-            Box cursor = Box(25, 92, 1, 1); ///< Texture coordinates for the text cursor region
+            Box cursor = Box(105, 55, 1, 1); ///< Texture coordinates for the text cursor region
         } console; ///< Layout for console controls
     };
 
