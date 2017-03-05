@@ -88,9 +88,9 @@ void Texture::Reload()
     }
 }
 
-Texture::Info Texture::info() const
+const Texture::Info* Texture::info() const
 {
-    return info_;
+    return &info_;
 }
 
 const PixelData* Texture::pixels(bool force_gpu_sync)

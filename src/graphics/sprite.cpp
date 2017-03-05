@@ -47,9 +47,9 @@ void Sprite::Init()
     auto context = render::context();
     vertex_buffer_.reset(context->MakeBufferResource());
     index_buffer_.reset(context->MakeBufferResource());
-    Texture::Info dimensions = texture_->info();
-    set_pos(0, 0, dimensions.width, dimensions.height);
-    set_subtexture(0, 0, dimensions.width, dimensions.height);
+    auto dimensions = texture_->info();
+    set_pos(0, 0, dimensions->width, dimensions->height);
+    set_subtexture(0, 0, dimensions->width, dimensions->height);
 
     mesh_.indices.resize(6);
     // Order to render the quad's vertices in
@@ -201,15 +201,10 @@ void Sprite::BuildQuad()
     vs[3].pos.x = pos_.x + pos_.w; vs[3].pos.y = pos_.y;
 
     // Texture region is stored in pixels, but graphics API needs it normalized as [0,1]
-    Texture::Info info = texture_->info();
-    Box normal_tex(tex_map_.x / info.width,
-                   tex_map_.y / info.height,
-                   tex_map_.w / info.width,
-                   tex_map_.h / info.height);
-
-    vs[0].tex.x = normal_tex.x;                vs[0].tex.y = normal_tex.y;
-    vs[1].tex.x = normal_tex.x;                vs[1].tex.y = normal_tex.y + normal_tex.h;
-    vs[2].tex.x = normal_tex.x + normal_tex.w; vs[2].tex.y = normal_tex.y + normal_tex.h;
-    vs[3].tex.x = normal_tex.x + normal_tex.w; vs[3].tex.y = normal_tex.y;
+    auto info = texture_->info();
+    vs[0].tex.x = tex_map_.x                / info->width; vs[0].tex.y = tex_map_.y                / info->height;
+    vs[1].tex.x = tex_map_.x                / info->width; vs[1].tex.y = (tex_map_.y + tex_map_.h) / info->height;
+    vs[2].tex.x = (tex_map_.x + tex_map_.w) / info->width; vs[2].tex.y = (tex_map_.y + tex_map_.h) / info->height;
+    vs[3].tex.x = (tex_map_.x + tex_map_.w) / info->width; vs[3].tex.y = tex_map_.y                / info->height;
 }
 } // namespace blons

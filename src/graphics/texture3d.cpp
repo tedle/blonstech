@@ -61,9 +61,9 @@ void Texture3D::Reload()
     Init(*pixel_data_);
 }
 
-Texture3D::Info Texture3D::info() const
+const Texture3D::Info* Texture3D::info() const
 {
-    return info_;
+    return &info_;
 }
 
 const TextureResource* Texture3D::texture() const
