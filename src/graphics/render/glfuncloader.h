@@ -62,6 +62,8 @@ extern PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 extern PFNGLCOMPILESHADERPROC glCompileShader;
 extern PFNGLCREATEPROGRAMPROC glCreateProgram;
 extern PFNGLCREATESHADERPROC glCreateShader;
+extern PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback;
+extern PFNGLDEBUGMESSAGECONTROLPROC glDebugMessageControl;
 extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 extern PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 extern PFNGLDELETEPROGRAMPROC glDeleteProgram;

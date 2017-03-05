@@ -123,6 +123,7 @@ public:
 private:
     Client::Info screen_;
     void LogCompileErrors(GLuint resource, bool is_shader);
+    void InitializeDebugOutput();
     bool vsync_;
     int video_card_memory_;
     std::string video_card_desc_;

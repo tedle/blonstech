@@ -507,6 +507,9 @@ RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen
         throw "Failed to load OpenGL proc addresses";
     }
 
+    // Initialize debug output
+    InitializeDebugOutput();
+
     // Grab video card info
     video_card_desc_ = (char*)glGetString(GL_VENDOR);
     video_card_desc_ += " ";
@@ -1586,5 +1589,52 @@ void RendererGL43::LogCompileErrors(GLuint resource, bool is_shader)
     log::Debug("------------------------------------------------------\n");
 
     return;
+}
+
+void RendererGL43::InitializeDebugOutput()
+{
+    // Debug output is disabled by default
+    glEnable(GL_DEBUG_OUTPUT);
+    // Debug output is delivered in an asynchronous thread
+    // Gives better performance but we can't use GL functions in our callback and have to be careful with thread safety
+    glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    // Filters out really common and generally useless info messages
+    glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
+    // Debug output callback
+    GLDEBUGPROC debug_out = [](GLenum source, GLenum type, GLuint id, GLenum severity,
+                               GLsizei length, const GLchar* message, const void* user_param) {
+        // Used for translating between enums and human readable strings
+        std::unordered_map<GLenum, std::string> source_translations = {
+            { GL_DEBUG_SOURCE_API, "API" },
+            { GL_DEBUG_SOURCE_WINDOW_SYSTEM, "WINDOW_SYSTEM" },
+            { GL_DEBUG_SOURCE_SHADER_COMPILER, "SHADER_COMPILER" },
+            { GL_DEBUG_SOURCE_THIRD_PARTY, "THIRD_PARTY" },
+            { GL_DEBUG_SOURCE_APPLICATION, "APPLICATION" },
+            { GL_DEBUG_SOURCE_OTHER, "OTHER" }
+        };
+        std::unordered_map<GLenum, std::string> type_translations = {
+            { GL_DEBUG_TYPE_ERROR, "ERROR" },
+            { GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR, "DEPRECATED_BEHAVIOUR" },
+            { GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR, "UNDEFINED_BEHAVIOUR" },
+            { GL_DEBUG_TYPE_PORTABILITY, "PORTABILITY" },
+            { GL_DEBUG_TYPE_PERFORMANCE, "PERFORMANCE" },
+            { GL_DEBUG_TYPE_MARKER, "MARKER" },
+            { GL_DEBUG_TYPE_PUSH_GROUP, "PUSH_GROUP" },
+            { GL_DEBUG_TYPE_POP_GROUP, "POP_GROUP" },
+            { GL_DEBUG_TYPE_OTHER, "OTHER" }
+        };
+        std::unordered_map<GLenum, std::string> severity_translations = {
+            { GL_DEBUG_SEVERITY_HIGH, "HIGH" },
+            { GL_DEBUG_SEVERITY_MEDIUM, "MEDIUM" },
+            { GL_DEBUG_SEVERITY_LOW, "LOW" },
+            { GL_DEBUG_SEVERITY_NOTIFICATION, "NOTIFICATION" }
+        };
+        log::Debug("[OpenGL:%s,%s,%s,ID_%i]%s\n", severity_translations[severity].c_str(),
+                                                  source_translations[source].c_str(),
+                                                  type_translations[type].c_str(),
+                                                  id, message);
+    };
+    // Set the callback
+    glDebugMessageCallback(debug_out, nullptr);
 }
 } // namespace blons

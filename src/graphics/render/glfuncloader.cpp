@@ -143,6 +143,18 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glCreateShader");
     }
 
+    glDebugMessageCallback = (PFNGLDEBUGMESSAGECALLBACKPROC)glGetProcAddress("glDebugMessageCallback");
+    if (glDebugMessageCallback == nullptr)
+    {
+        failed.push_back("glDebugMessageCallback");
+    }
+
+    glDebugMessageControl = (PFNGLDEBUGMESSAGECONTROLPROC)glGetProcAddress("glDebugMessageControl");
+    if (glDebugMessageControl == nullptr)
+    {
+        failed.push_back("glDebugMessageControl");
+    }
+
     glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)glGetProcAddress("glDeleteBuffers");
     if (glDeleteBuffers == nullptr)
     {
@@ -447,6 +459,8 @@ PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 PFNGLCOMPILESHADERPROC glCompileShader;
 PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLCREATESHADERPROC glCreateShader;
+PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback;
+PFNGLDEBUGMESSAGECONTROLPROC glDebugMessageControl;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 PFNGLDELETEPROGRAMPROC glDeleteProgram;
