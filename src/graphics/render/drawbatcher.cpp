@@ -69,25 +69,38 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
             buffer_size_ = static_cast<unsigned int>(buffer_size_ * pow(1.05f, static_cast<float>(allocation_count_) / 10.0f));
         }
 
-        //blons::log::Debug("old size %i / new size %i\n", old_buffer_size, buffer_size_);
+        // Defined as a lambda since it's used from 2 competing branches
+        auto resize_buffers = [&]()
+        {
+            vertex_buffer_.reset(context->MakeBufferResource());
+            index_buffer_.reset(context->MakeBufferResource());
+            context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_);
+        };
+
         // Make a backup copy of mesh data we've already pushed to render API
-        Vertex* vptr = nullptr;
-        unsigned int* iptr = nullptr;
-        context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vptr, &iptr);
-        auto old_vertices = std::unique_ptr<Vertex>(new Vertex[vertex_idx_]);
-        auto old_indices = std::unique_ptr<unsigned int>(new unsigned int[index_idx_]);
-        memcpy(old_vertices.get(), vptr, vertex_idx_ * sizeof(Vertex));
-        memcpy(old_indices.get(), iptr, index_idx_ * sizeof(unsigned int));
+        if (vertex_idx_ != 0 && index_idx_ != 0)
+        {
+            Vertex* vptr = nullptr;
+            unsigned int* iptr = nullptr;
+            context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vptr, &iptr);
+            auto old_vertices = std::unique_ptr<Vertex>(new Vertex[vertex_idx_]);
+            auto old_indices = std::unique_ptr<unsigned int>(new unsigned int[index_idx_]);
+            memcpy(old_vertices.get(), vptr, vertex_idx_ * sizeof(Vertex));
+            memcpy(old_indices.get(), iptr, index_idx_ * sizeof(unsigned int));
 
-        // Make the new, larger buffers
-        vertex_buffer_.reset(context->MakeBufferResource());
-        index_buffer_.reset(context->MakeBufferResource());
-        context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_);
+            // Make the new, larger buffers
+            resize_buffers();
 
-        // Move our backup copy of mesh data into the new buffer
-        context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
-                                old_vertices.get(), 0, vertex_idx_,
-                                old_indices.get(), 0, index_idx_);
+            // Move our backup copy of mesh data into the new buffer
+            context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
+                                    old_vertices.get(), 0, vertex_idx_,
+                                    old_indices.get(), 0, index_idx_);
+        }
+        else
+        {
+            // Make the new, larger buffers
+            resize_buffers();
+        }
     }
     Vertex* vertices;
     unsigned int* indices;
