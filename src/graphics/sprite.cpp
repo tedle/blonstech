@@ -122,6 +122,11 @@ const TextureResource* Sprite::texture() const
     return texture_->texture();
 }
 
+const Texture::Info* Sprite::texture_info() const
+{
+    return texture_->info();
+}
+
 Vector2 Sprite::pos() const
 {
     return Vector2(pos_.x, pos_.y);

@@ -1238,11 +1238,11 @@ PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
     return pixels;
 }
 
-void RendererGL43::SetShaderData(ShaderDataResource* data_handle, const void* data)
+void RendererGL43::SetShaderData(ShaderDataResource* data_handle, std::size_t offset, std::size_t length, const void* data)
 {
     auto data_buffer = resource_cast<ShaderDataResourceGL43*>(data_handle, id());
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, data_buffer->buffer_);
-    glBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, data_buffer->size_, data);
+    glBufferSubData(GL_SHADER_STORAGE_BUFFER, offset, length, data);
 }
 
 void RendererGL43::GetShaderData(ShaderDataResource* data_handle, void* data)
@@ -1595,9 +1595,8 @@ void RendererGL43::InitializeDebugOutput()
 {
     // Debug output is disabled by default
     glEnable(GL_DEBUG_OUTPUT);
-    // Debug output is delivered in an asynchronous thread
-    // Gives better performance but we can't use GL functions in our callback and have to be careful with thread safety
-    glDisable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    // Debug output is delivered in the main thread
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     // Filters out really common and generally useless info messages
     glDebugMessageControl(GL_DEBUG_SOURCE_API, GL_DEBUG_TYPE_OTHER, GL_DEBUG_SEVERITY_NOTIFICATION, 0, nullptr, GL_FALSE);
     // Debug output callback

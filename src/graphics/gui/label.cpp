@@ -49,8 +49,6 @@ void Label::Render()
     {
         for (const auto& frag : text_.fragments())
         {
-            // One draw call per (colour,font) used across all labels combined
-            auto batcher = gui_->font_batch(font_style_, frag.colour, crop_, feather_);
             for (const auto& c : frag.text)
             {
                 if (c == '\n')
@@ -59,10 +57,10 @@ void Label::Render()
                     y += font->line_height();
                     continue;
                 }
-                auto mesh = font->BuildMesh(c, x, y, crop_);
-                if (mesh != nullptr)
+                auto batch = font->BuildBatchInstance(c, x, y, crop_);
+                if (batch != nullptr)
                 {
-                    batcher->Append(*mesh);
+                    gui_->SubmitFontBatch(batch->pos, batch->uv, font_style_, frag.colour, crop_, feather_);
                 }
                 x += font->advance();
             }
@@ -70,7 +68,6 @@ void Label::Render()
     }
     else
     {
-        auto batcher = gui_->font_batch(font_style_, text_.base_colour(), crop_, feather_);
         for (const auto& c : text_.raw_str())
         {
             if (c == '\n')
@@ -79,10 +76,10 @@ void Label::Render()
                 y += font->line_height();
                 continue;
             }
-            auto mesh = font->BuildMesh(c, x, y, crop_);
-            if (mesh != nullptr)
+            auto batch = font->BuildBatchInstance(c, x, y, crop_);
+            if (batch != nullptr)
             {
-                batcher->Append(*mesh);
+                gui_->SubmitFontBatch(batch->pos, batch->uv, font_style_, text_.base_colour(), crop_, feather_);
             }
             x += font->advance();
         }

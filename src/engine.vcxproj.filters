@@ -518,5 +518,8 @@
     <None Include="shaders\surfelbrick-relight.comp.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\ui.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

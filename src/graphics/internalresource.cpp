@@ -42,7 +42,7 @@ std::unordered_map<std::string, std::function<MeshData(const std::vector<std::st
         {
             if (args.size() != 0)
             {
-                throw "Incorrect arguments supplied for blons:quad mesh (expected 0)";
+                throw "Incorrect arguments supplied for blons:cube mesh (expected 0)";
             }
 
             MeshData quad = MakeEngineMesh("blons:quad");

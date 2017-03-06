@@ -68,11 +68,18 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     std::size_t length() { return length_; }
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Sets the value of memory on GPU
+    /// \brief Sets the value of a range of memory on GPU
     ///
     /// \param val Value to set shader memory to
+    /// \param offset Element offset at which to begin data copy
+    /// \param length Length of data copy to be made in elements
     ////////////////////////////////////////////////////////////////////////////////
-    void set_value(const T* val) { render::context()->SetShaderData(data_.get(), val); }
+    void set_value(const T* val, std::size_t offset, std::size_t length) { render::context()->SetShaderData(data_.get(), offset * sizeof(T), length * sizeof(T), val); }
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls ShaderData::set_value(const T*,std::size_t,std::size_t) with
+    /// an offset of 0 and a length of ShaderData::length()
+    ////////////////////////////////////////////////////////////////////////////////
+    void set_value(const T* val) { set_value(val, 0, length_); }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves an array pointer to the shader data copied from GPU memory
     ///

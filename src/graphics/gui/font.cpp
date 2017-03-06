@@ -96,6 +96,7 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, units::pixel texture
 Font::Font(std::string font_filename, units::pixel pixel_size)
 {
     fontsheet_ = nullptr;
+    current_batch_.reset(new BatchInstance);
     letter_height_ = 0;
     pixel_size_ = pixel_size;
     // std::map would be a lot cleaner than a vector, but we need very fast access :)
@@ -181,7 +182,7 @@ Font::~Font()
 {
 }
 
-const MeshData* Font::BuildMesh(unsigned char letter, units::subpixel x, units::subpixel y, Box crop)
+const Font::BatchInstance* Font::BuildBatchInstance(unsigned char letter, units::subpixel x, units::subpixel y, Box crop)
 {
     // Pointer to avoid expensive copying
     const Glyph* g;
@@ -198,7 +199,7 @@ const MeshData* Font::BuildMesh(unsigned char letter, units::subpixel x, units::
     // How far to advance cursor for next letter
     advance_ = g->x_advance;
 
-    // Sprite dimensions
+    // Quad dimensions
     Box s(x + units::pixel_to_subpixel(g->x_offset),
           y - units::pixel_to_subpixel(g->y_offset + g->height),
           units::pixel_to_subpixel(g->width),
@@ -239,9 +240,24 @@ const MeshData* Font::BuildMesh(unsigned char letter, units::subpixel x, units::
         t.h = s.h;
     }
 
+    // Build batch instance and return
+    current_batch_->pos = s;
+    current_batch_->uv = t;
+    return current_batch_.get();
+}
+
+const Font::BatchInstance* Font::BuildBatchInstance(unsigned char letter, units::subpixel x, units::subpixel y)
+{
+    static const Box no_crop = Box(0, 0, 0, 0);
+    return BuildBatchInstance(letter, x, y, no_crop);
+}
+
+const MeshData* Font::BuildMesh(unsigned char letter, units::subpixel x, units::subpixel y, Box crop)
+{
+    auto batch = BuildBatchInstance(letter, x, y, crop);
     // Setup the character sprites position and texture
-    fontsheet_->set_pos(s);
-    fontsheet_->set_subtexture(t);
+    fontsheet_->set_pos(batch->pos);
+    fontsheet_->set_subtexture(batch->uv);
 
     return &fontsheet_.get()->mesh();
 }
@@ -451,6 +467,11 @@ units::pixel Font::pixel_size() const
 const TextureResource* Font::texture() const
 {
     return fontsheet_->texture();
+}
+
+const Texture::Info* Font::texture_info() const
+{
+    return fontsheet_->texture_info();
 }
 } // namespace gui
 } // namespace blons

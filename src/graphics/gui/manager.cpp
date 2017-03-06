@@ -23,6 +23,8 @@
 
 #include <blons/graphics/gui/manager.h>
 
+// Includes
+#include <numeric>
 // Public Includes
 #include <blons/graphics/graphics.h>
 #include <blons/graphics/render/drawbatcher.h>
@@ -61,14 +63,15 @@ void Manager::Init(units::pixel width, units::pixel height)
     ShaderAttributeList ui_inputs;
     ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    ui_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui.frag.glsl", ui_inputs));
+    ui_shader_.reset(new Shader("shaders/ui.vert.glsl", "shaders/ui.frag.glsl", ui_inputs));
     blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-blur.frag.glsl", ui_inputs));
     composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-composite.frag.glsl", ui_inputs));
 
-    ui_buffer_.reset(new Framebuffer(width, height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));
+    ui_buffer_.reset(new Framebuffer(width, height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, true));
     blur_buffer_a_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));
     blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));
-    //blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR } }, false, context));
+
+    batch_shader_data_ = nullptr;
 
     skin_.reset(new Skin());
 
@@ -78,8 +81,13 @@ void Manager::Init(units::pixel width, units::pixel height)
     LoadFont("font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL);
     LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE);
 
+    // For batch rendering
+    quad_mesh_.reset(new Mesh("blons:quad"));
+
+    // Reset batch markers
     draw_batches_.clear();
     batch_index_ = 0;
+    z_index_ = 0;
 }
 
 Manager::~Manager()
@@ -161,30 +169,43 @@ void Manager::Render(Framebuffer* output_buffer)
     {
         console_window_->Render();
     }
-    // Draw pass
-    ui_shader_->SetInput("proj_matrix", ortho_matrix_);
-    for (int i = 0; i < batch_index_; i++)
-    {
-        auto& batch = draw_batches_[i];
-        if (batch.first.is_text)
-        {
-            auto font = skin_->font(batch.first.font_style);
-            ui_shader_->SetInput("skin", font->texture());
-            ui_shader_->SetInput("is_text", true);
-            ui_shader_->SetInput("text_colour", batch.first.colour);
-        }
-        else
-        {
-            ui_shader_->SetInput("is_text", false);
-            ui_shader_->SetInput("skin", skin_->sprite()->texture());
-        }
-        ui_shader_->SetInput("crop", batch.first.crop);
-        ui_shader_->SetInput("feather", batch.first.crop_feather);
 
-        batch.second->Render();
-        ui_shader_->Render(batch.second->index_count());
+    // Only bother drawing if there's things to draw
+    if (batch_index_ > 0)
+    {
+        context->SetDepthTesting(true);
+        // Resize shader data if necessary
+        if (batch_shader_data_ == nullptr || batch_shader_data_->length() < batch_index_)
+        {
+            batch_shader_data_.reset(new ShaderData<InternalDrawCallInputs>(nullptr, batch_index_));
+        }
+        // Upload to GPU
+        batch_shader_data_->set_value(draw_batches_.data(), 0, batch_index_);
+
+        // Bind the quad mesh for instanced rendering
+        context->BindMeshBuffer(quad_mesh_->vertex_buffer(), quad_mesh_->index_buffer());
+
+        // Draw pass
+        if (!ui_shader_->SetInput("proj_matrix", ortho_matrix_) ||
+            !ui_shader_->SetInput("drawcall_buffer", batch_shader_data_->data()) ||
+            !ui_shader_->SetInput("skin[0]", TextureFromID(0), 0) ||
+            !ui_shader_->SetInput("skin[1]", TextureFromID(1), 1) ||
+            !ui_shader_->SetInput("skin[2]", TextureFromID(2), 2) ||
+            !ui_shader_->SetInput("skin[3]", TextureFromID(3), 3) ||
+            !ui_shader_->SetInput("skin[4]", TextureFromID(4), 4))
+        {
+            throw "Failed to set UI shader inputs";
+        }
+        // Run the shader
+        if (!ui_shader_->RenderInstanced(quad_mesh_->index_count(), static_cast<unsigned int>(batch_index_)))
+        {
+            throw "UI shader failed to render";
+        }
     }
+    // Reset batch markers to 0
     batch_index_ = 0;
+    z_index_ = 0;
+
     // Cannot apply UI styles when rendering to backbuffer
     if (output_buffer == nullptr)
     {
@@ -291,35 +312,90 @@ Window* Manager::window(std::string id)
 // This is setup to recycle memory as much as we can. Used like a C array
 // that is only resized when the total batches for a frame is greater
 // than any previous frame. Can only be reset manually by calling ClearBatches().
-DrawBatcher* Manager::batch(DrawCallInputs inputs)
+void Manager::SubmitBatch(const Box& pos, const Box& uv, const DrawCallInputs& inputs)
 {
-    DrawBatcher* batch;
+    InternalDrawCallInputs gpu_inputs;
+    gpu_inputs.is_text = inputs.is_text;
+    gpu_inputs.depth = -static_cast<units::world>(z_index_) / 1e5f;
+    gpu_inputs.crop_feather = inputs.crop_feather;
+    gpu_inputs.colour = inputs.colour;
+    gpu_inputs.pos = pos;
+    gpu_inputs.uv = uv;
+    gpu_inputs.crop = inputs.crop;
+    gpu_inputs.texture_id = TranslateToTextureID(inputs.font_style, inputs.is_text);
+    // Normalize uv to [0,1]
+    auto font = skin_->font(inputs.font_style);
+    Vector2 skin_dimensions(units::pixel_to_subpixel(skin_->texture()->info()->width), units::pixel_to_subpixel(skin_->texture()->info()->height));
+    Vector2 font_dimensions(units::pixel_to_subpixel(font->texture_info()->width), units::pixel_to_subpixel(font->texture_info()->height));
+    Vector2 texture_dimensions = (inputs.is_text ? font_dimensions : skin_dimensions);
+    gpu_inputs.uv.x /= texture_dimensions.x;
+    gpu_inputs.uv.y /= texture_dimensions.y;
+    gpu_inputs.uv.w /= texture_dimensions.x;
+    gpu_inputs.uv.h /= texture_dimensions.y;
+
     if (batch_index_ < draw_batches_.size())
     {
-        draw_batches_[batch_index_].first = inputs;
-        batch = draw_batches_[batch_index_].second.get();
+        draw_batches_[batch_index_] = gpu_inputs;
     }
     else
     {
-        auto batcher = std::unique_ptr<DrawBatcher>(new DrawBatcher());
-        draw_batches_.push_back(std::make_pair(inputs, std::move(batcher)));
-        batch = draw_batches_.back().second.get();
+        draw_batches_.push_back(gpu_inputs);
     }
 
     batch_index_++;
-    return batch;
+    z_index_++;
 }
 
-DrawBatcher* Manager::font_batch(Skin::FontStyle style, Vector4 colour, Box crop, units::pixel crop_feather)
+void Manager::SubmitControlBatch(const Box& pos, const Box& uv, const Box& crop, const units::pixel& feather)
 {
-    DrawCallInputs inputs = { true, style, colour, crop, crop_feather };
-    return batch(inputs);
+    DrawCallInputs inputs = { false, Skin::FontStyle::DEFAULT, Vector4(), crop, feather };
+    SubmitBatch(pos, uv, inputs);
 }
 
-DrawBatcher* Manager::control_batch(Box crop, units::pixel crop_feather)
+void Manager::SubmitFontBatch(const Box& pos, const Box& uv, const Skin::FontStyle& style, const Vector4& colour, const Box& crop, const units::pixel& feather)
 {
-    DrawCallInputs inputs = { false, Skin::FontStyle::DEFAULT, Vector4(0), crop, crop_feather };
-    return batch(inputs);
+    DrawCallInputs inputs = { true, style, colour, crop, feather };
+    SubmitBatch(pos, uv, inputs);
+}
+
+int Manager::TranslateToTextureID(const Skin::FontStyle& style, bool is_text)
+{
+    if (!is_text)
+    {
+        return 0;
+    }
+    switch (style)
+    {
+    case Skin::FontStyle::DEFAULT:
+        return 1;
+    case Skin::FontStyle::HEADING:
+        return 2;
+    case Skin::FontStyle::LABEL:
+        return 3;
+    case Skin::FontStyle::CONSOLE:
+        return 4;
+    default:
+        throw "Unknown font style in UI batch id";
+    }
+}
+
+const TextureResource* Manager::TextureFromID(int texture_id)
+{
+    switch (texture_id)
+    {
+    case 0:
+        return skin_->texture()->texture();
+    case 1:
+        return skin_->font(Skin::FontStyle::DEFAULT)->texture();
+    case 2:
+        return skin_->font(Skin::FontStyle::HEADING)->texture();
+    case 3:
+        return skin_->font(Skin::FontStyle::LABEL)->texture();
+    case 4:
+        return skin_->font(Skin::FontStyle::CONSOLE)->texture();
+    default:
+        throw "Unknown batch id in UI rendering";
+    }
 }
 
 Skin* Manager::skin() const

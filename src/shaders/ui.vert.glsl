@@ -21,62 +21,50 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-struct DirectionalLight
+#version 430
+
+// Includes
+#include <shaders/lib/types.lib.glsl>
+
+// Ins n outs
+in vec2 input_pos;
+in vec2 input_uv;
+
+out vec2 tex_coord;
+flat out vec4 text_colour;
+flat out int is_text;
+flat out vec4 crop;
+flat out int feather;
+flat out int texture_id;
+
+// Globals
+uniform mat4 proj_matrix;
+
+layout(std430) buffer drawcall_buffer
 {
-    // Used as uniforms for currently so vec3 is fine
-    vec3 dir;
-    vec3 colour;
-    float luminance;
+    UIDrawCallInputs drawcalls[];
 };
 
-struct Probe
+void main(void)
 {
-    int id;
-    // vec3 is secretly the size of vec4 in std430, don't use it!!!!!!!!!!!
-    float pos[3];
-    float cube_coeffs[6][3]; // 6 directions, 3 colour channels
-    float sh_coeffs[9];
-    int brick_factor_range_start;
-    int brick_factor_count;
-};
+    UIDrawCallInputs drawcall = drawcalls[gl_InstanceID];
+    text_colour = vec4(drawcall.colour[0], drawcall.colour[1], drawcall.colour[2], drawcall.colour[3]);
+    is_text = drawcall.is_text;
+    crop = vec4(drawcall.crop[0], drawcall.crop[1], drawcall.crop[2], drawcall.crop[3]);
+    feather = drawcall.crop_feather;
+    texture_id = drawcall.texture_id;
 
-struct Surfel
-{
-    int nearest_probe_id;
-    float pos[3];
-    float normal[3];
-    float albedo[3];
-    float radiance[3];
-};
+    // Convert to [0,1]
+    vec2 pos = (input_pos + 1.0) / 2.0;
+    pos.y = 1.0 - pos.y;
+    // Translate to draw call coords
+    pos *= vec2(drawcall.pos[2], drawcall.pos[3]); // .w,h
+    pos += vec2(drawcall.pos[0], drawcall.pos[1]); // .x,y
+    gl_Position = proj_matrix * vec4(pos, 0.0, 1.0);
+    gl_Position.z = drawcall.depth;
 
-struct SurfelBrick
-{
-    int surfel_range_start;
-    int surfel_count;
-    float radiance[3];
-};
-
-struct SurfelBrickFactor
-{
-    int brick_id;
-    float brick_weights[6];
-};
-
-struct SHColourCoeffs
-{
-    float r[9];
-    float g[9];
-    float b[9];
-};
-
-struct UIDrawCallInputs
-{
-    float colour[4];
-    float pos[4];
-    float uv[4];
-    float crop[4];
-    int is_text;
-    float depth;
-    int crop_feather;
-    int texture_id;
-};
+    tex_coord = input_uv;
+    tex_coord.y = 1.0 - tex_coord.y;
+    tex_coord *= vec2(drawcall.uv[2], drawcall.uv[3]); // .w,h
+    tex_coord += vec2(drawcall.uv[0], drawcall.uv[1]); // .x,y
+}

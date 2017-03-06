@@ -43,6 +43,15 @@ class Font
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Describes a pair of boxes that can be used for instanced rendering
+    ////////////////////////////////////////////////////////////////////////////////
+    struct BatchInstance
+    {
+        Box pos; ///< Describes the quad to render in screen space
+        Box uv;  ///< Describes the uv box for texture sampling
+    };
+public:
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Loads the supplied font file into a spritesheet, marking the position
     /// of each character. Will throw a const char* (**temporary**) on failure.
     ///
@@ -61,6 +70,28 @@ public:
                                              " ,./<>?;':\"[]\\{}|-=_+";
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a supplied letter and position, returning a batch instance that
+    /// contains the position and UV coordinates to render this letter from the
+    /// internal spritesheet (retrieved using Font::texture()). The returned mesh
+    /// data is volatile and will likely change on subsequent calls to BuildMesh,
+    /// so make a copy if persistant storage is needed.
+    ///
+    /// \param letter ASCII value of character to render
+    /// \param x Horizontal position in subpixel resolution to render character at
+    /// \param y Vertical position in subpixel resolution to render character at
+    /// \param crop Boundaries within which the character must render. A width 0
+    /// prevents horizontal cropping. A height of 0 prevents vertical cropping.
+    /// \return Returns instance data for rendering, or nullptr for completely
+    /// cropped letters. The returned data is only valid for the lifetime of the
+    /// owning Font object, or until the next call to BuildBatchInstance
+    ////////////////////////////////////////////////////////////////////////////////
+    const BatchInstance* BuildBatchInstance(unsigned char letter, units::subpixel x, units::subpixel y, Box crop);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Calls BuildBatchInstance(unsigned char, units::subpixel, units::subpixel, Box)
+    /// with a default crop value of 0, resulting in no crop.
+    ////////////////////////////////////////////////////////////////////////////////
+    const BatchInstance* BuildBatchInstance(unsigned char letter, units::subpixel x, units::subpixel y);
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a supplied letter and position, returning a mesh that
     /// contains the position and UV coordinates to render this letter from the
     /// internal spritesheet (retrieved using Font::texture()). The returned mesh
@@ -72,8 +103,9 @@ public:
     /// \param y Vertical position in subpixel resolution to render character at
     /// \param crop Boundaries within which the character must render. A width 0
     /// prevents horizontal cropping. A height of 0 prevents vertical cropping.
-    /// \return Returns mesh data for rendering, or nullptr for completely cropped
-    /// letters
+    /// \return Returns mesh data for rendering, or nullptr for completely
+    /// cropped letters. The returned data is only valid for the lifetime of the
+    /// owning Font object, or until the next call to BuildMesh
     ////////////////////////////////////////////////////////////////////////////////
     const MeshData* BuildMesh(unsigned char letter, units::subpixel x, units::subpixel y, Box crop);
     ////////////////////////////////////////////////////////////////////////////////
@@ -164,11 +196,18 @@ public:
     /// \return Reference to the font texture
     ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* texture() const;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves information of the font's texture sheet
+    ///
+    /// \return Font texture info
+    ////////////////////////////////////////////////////////////////////////////////
+    const Texture::Info* texture_info() const;
 
 private:
     struct Glyph;
     std::vector<Glyph> charset_;
     std::unique_ptr<class Sprite> fontsheet_;
+    std::unique_ptr<BatchInstance> current_batch_;
     units::pixel pixel_size_;
     units::pixel letter_height_;
     units::pixel line_height_;

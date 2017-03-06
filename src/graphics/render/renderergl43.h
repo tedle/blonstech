@@ -87,7 +87,7 @@ public:
     void SetTextureData(TextureResource* texture, PixelData3D* pixels) override;
     PixelData GetTextureData(const TextureResource* texture) override;
     PixelData3D GetTextureData3D(const TextureResource* texture) override;
-    void SetShaderData(ShaderDataResource* data_handle, const void* data) override;
+    void SetShaderData(ShaderDataResource* data_handle, std::size_t offset, std::size_t length, const void* data) override;
     void GetShaderData(ShaderDataResource* data_handle, void* data) override;
 
     bool SetShaderInput(ShaderResource* program, const char* name, const float value) override;

@@ -77,83 +77,82 @@ void Button::Render()
 
 void Button::RenderBody(const Skin::Layout::Button& b)
 {
-    auto sprite = gui_->skin()->sprite();
-    auto batch = gui_->control_batch(crop_, feather_);
+    Box pos, uv;
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
     // Top left corner
-    sprite->set_pos(x,
-                    y,
-                    b.top_left.w,
-                    b.top_left.h);
-    sprite->set_subtexture(b.top_left);
-    batch->Append(sprite->mesh());
+    pos.x = x;
+    pos.y = y;
+    pos.w = b.top_left.w;
+    pos.h = b.top_left.h;
+    uv = b.top_left;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Top edge
-    sprite->set_pos(x + b.top_left.w,
-                    y,
-                    pos_.w - (b.top_left.w + b.top_right.w),
-                    b.top.h);
-    sprite->set_subtexture(b.top);
-    batch->Append(sprite->mesh());
+    pos.x = x + b.top_left.w;
+    pos.y = y;
+    pos.w = pos_.w - (b.top_left.w + b.top_right.w);
+    pos.h = b.top.h;
+    uv = b.top;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Top right corner
-    sprite->set_pos(x + pos_.w - b.top_right.w,
-                    y,
-                    b.top_right.w,
-                    b.top_right.h);
-    sprite->set_subtexture(b.top_right);
-    batch->Append(sprite->mesh());
+    pos.x = x + pos_.w - b.top_right.w;
+    pos.y = y;
+    pos.w = b.top_right.w;
+    pos.h = b.top_right.h;
+    uv = b.top_right;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Left edge
-    sprite->set_pos(x,
-                    y + b.top_left.h,
-                    b.left.w,
-                    pos_.h - (b.top_left.h + b.bottom_right.h));
-    sprite->set_subtexture(b.left);
-    batch->Append(sprite->mesh());
+    pos.x = x;
+    pos.y = y + b.top_left.h;
+    pos.w = b.left.w;
+    pos.h = pos_.h - (b.top_left.h + b.bottom_right.h);
+    uv = b.left;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Body
-    sprite->set_pos(x + b.left.w,
-                    y + b.top.h,
-                    pos_.w - (b.left.w + b.right.w),
-                    pos_.h - (b.top.h + b.bottom.h));
-    sprite->set_subtexture(b.body);
-    batch->Append(sprite->mesh());
+    pos.x = x + b.left.w;
+    pos.y = y + b.top.h;
+    pos.w = pos_.w - (b.left.w + b.right.w);
+    pos.h = pos_.h - (b.top.h + b.bottom.h);
+    uv = b.body;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Right edge
-    sprite->set_pos(x + pos_.w - b.right.w,
-                    y + b.top_right.h,
-                    b.right.w,
-                    pos_.h - (b.top_right.h + b.bottom_right.h));
-    sprite->set_subtexture(b.right);
-    batch->Append(sprite->mesh());
+    pos.x = x + pos_.w - b.right.w;
+    pos.y = y + b.top_right.h;
+    pos.w = b.right.w;
+    pos.h = pos_.h - (b.top_right.h + b.bottom_right.h);
+    uv = b.right;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Bottom left corner
-    sprite->set_pos(x,
-                    y + pos_.h - b.bottom_left.h,
-                    b.bottom_left.w,
-                    b.bottom_left.h);
-    sprite->set_subtexture(b.bottom_left);
-    batch->Append(sprite->mesh());
+    pos.x = x;
+    pos.y = y + pos_.h - b.bottom_left.h;
+    pos.w = b.bottom_left.w;
+    pos.h = b.bottom_left.h;
+    uv = b.bottom_left;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Bottom edge
-    sprite->set_pos(x + b.bottom_left.w,
-                    y + pos_.h - b.bottom.h,
-                    pos_.w - (b.bottom_left.w + b.bottom_right.w),
-                    b.bottom.h);
-    sprite->set_subtexture(b.bottom);
-    batch->Append(sprite->mesh());
+    pos.x = x + b.bottom_left.w;
+    pos.y = y + pos_.h - b.bottom.h;
+    pos.w = pos_.w - (b.bottom_left.w + b.bottom_right.w);
+    pos.h = b.bottom.h;
+    uv = b.bottom;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Bottom right corner
-    sprite->set_pos(x + pos_.w - b.bottom_right.w,
-                    y + pos_.h - b.bottom_right.h,
-                    b.bottom_right.w,
-                    b.bottom_right.h);
-    sprite->set_subtexture(b.bottom_right);
-    batch->Append(sprite->mesh());
+    pos.x = x + pos_.w - b.bottom_right.w;
+    pos.y = y + pos_.h - b.bottom_right.h;
+    pos.w = b.bottom_right.w;
+    pos.h = b.bottom_right.h;
+    uv = b.bottom_right;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Label base colour
     label_->set_text_colour(b.colour);

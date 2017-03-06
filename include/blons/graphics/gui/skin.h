@@ -25,8 +25,8 @@
 #define BLONSTECH_GRAPHICS_GUI_SKIN_H_
 
 // Includes
-#include <unordered_map>
 #include <memory>
+#include <vector>
 // Public Includes
 #include <blons/graphics/gui/font.h>
 #include <blons/graphics/render/renderer.h>
@@ -48,11 +48,15 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum FontStyle
     {
-        DEFAULT, ///< Used when style is unspecified or if a specific style is not loaded in the Skin
-        HEADING, ///< Used for title text and Window captions
-        LABEL,   ///< Used for general text, Button captions, Textbox text, etc
-        CONSOLE  ///< Used by the game console
+        DEFAULT = 0, ///< Used when style is unspecified or if a specific style is not loaded in the Skin
+        HEADING = 1, ///< Used for title text and Window captions
+        LABEL   = 2, ///< Used for general text, Button captions, Textbox text, etc
+        CONSOLE = 3  ///< Used by the game console
     };
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to allow storage of fonts in contiguous memory
+    ////////////////////////////////////////////////////////////////////////////////
+    static const int kMaxFonts = FontStyle::CONSOLE + 1;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Maps the GUI's skin texture pixel coordinates to conveniently named
@@ -364,11 +368,11 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Font* font(FontStyle style);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves the Sprite with the current skin texture loaded into it
+    /// \brief Retrieves the current skin texture
     ///
-    /// \return %Skin texture Sprite
+    /// \return %Skin texture
     ////////////////////////////////////////////////////////////////////////////////
-    Sprite* sprite() const;
+    const Texture* texture() const;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the skin layout for locating which part of the skin texture
     /// a UI element should render to represent itself
@@ -385,11 +389,11 @@ protected:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Stores the current skin texture
     ////////////////////////////////////////////////////////////////////////////////
-    std::unique_ptr<Sprite> skin_;
+    std::unique_ptr<Texture> skin_;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Stores any fonts used by the current skin
     ////////////////////////////////////////////////////////////////////////////////
-    std::unordered_map<FontStyle, std::unique_ptr<Font>> font_list_;
+    std::vector<std::unique_ptr<Font>> font_list_;
 };
 } // namespace gui
 } // namespace blons

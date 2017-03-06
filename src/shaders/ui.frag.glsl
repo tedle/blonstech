@@ -25,27 +25,28 @@
 
 // Ins n outs
 in vec2 tex_coord;
+flat in vec4 text_colour;
+flat in int is_text;
+flat in vec4 crop;
+flat in int feather;
+flat in int texture_id;
 layout(origin_upper_left) in vec4 gl_FragCoord;
 
 out vec4 frag_colour;
 
 // Globals
-uniform sampler2D skin;
-uniform vec4 text_colour;
-uniform int is_text;
-uniform vec4 crop;
-uniform int feather;
+uniform sampler2D skin[5];
 
 void main(void)
 {
     if (is_text == 1)
     {
-        float alpha = texture(skin, tex_coord).r;
+        float alpha = texture(skin[texture_id], tex_coord).r;
         frag_colour = vec4(text_colour.rgb, text_colour.a * alpha);
     }
     else
     {
-        frag_colour = texture(skin, tex_coord);
+        frag_colour = texture(skin[texture_id], tex_coord);
     }
     // Cropping!
     if (crop.z != 0)

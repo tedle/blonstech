@@ -24,10 +24,12 @@
 #ifndef BLONSTECH_GRAPHICS_GUI_MANAGER_H_
 #define BLONSTECH_GRAPHICS_GUI_MANAGER_H_
 
+// Includes
+#include <array>
 // Public Includes
 #include <blons/math/animation.h>
 #include <blons/input/inputtemp.h>
-#include <blons/graphics/render/drawbatcher.h>
+#include <blons/graphics/render/shaderdata.h>
 #include <blons/graphics/gui/skin.h>
 #include <blons/graphics/gui/font.h>
 #include <blons/graphics/gui/window.h>
@@ -190,40 +192,41 @@ private:
     friend ConsoleWindow;
     void Init(units::pixel width, units::pixel height);
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves an unnused Drawbatcher with the specific shader inputs
-    /// for a Control to render to.
-    ///
-    /// \param inputs The shader settings that will be applied to this Drawbatcher
-    /// during the render cycle
-    /// \return The Drawbatcher for rendering
-    ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* batch(DrawCallInputs inputs);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
-    /// towards font rendering.
-    ///
-    /// \param style gui::Skin::FontStyle to be drawn
-    /// \param colour Colour of the text with values ranging from 0.0 to 1.0
-    /// \return The Drawbatcher for rendering
-    ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* font_batch(Skin::FontStyle style, Vector4 colour, Box crop, units::pixel crop_feather);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves an unnused Drawbatcher with shader inputs tailored
-    /// towards element body rendering.
-    ///
-    /// \return The Drawbatcher for rendering
-    ////////////////////////////////////////////////////////////////////////////////
-    DrawBatcher* control_batch(Box crop, units::pixel crop_feather);
+    void SubmitBatch(const Box& pos, const Box& uv, const DrawCallInputs& inputs);
+    void SubmitControlBatch(const Box& pos, const Box& uv, const Box& crop, const units::pixel& feather);
+    void SubmitFontBatch(const Box& pos, const Box& uv, const Skin::FontStyle& style, const Vector4& colour, const Box& crop, const units::pixel& feather);
 
     Skin* skin() const;
     Window* active_window() const;
     void set_active_window(Window* window);
     Box screen_dimensions();
 
+    // Restructured for GPU readability
+    struct InternalDrawCallInputs
+    {
+        Vector4 colour;
+        Box pos;
+        Box uv;
+        Box crop;
+        int is_text;
+        units::world depth;
+        units::pixel crop_feather;
+        int texture_id;
+    };
+    // Batches are indexed by texture id and avoid costly lookups like with hash tables
+    int TranslateToTextureID(const Skin::FontStyle& style, bool is_text);
+    const TextureResource* TextureFromID(int texture_id);
     // Vector + batch index stored to recycle as much memory as we can
-    std::vector<std::pair<DrawCallInputs, std::unique_ptr<DrawBatcher>>> draw_batches_;
+    // Stores draw batches, indexed by texture id
+    std::vector<InternalDrawCallInputs> draw_batches_;
+    // Stores number of draw batches for each texture id
     std::size_t batch_index_ = 0;
+    // Stores batches on GPU for instanced rendering
+    std::unique_ptr<ShaderData<InternalDrawCallInputs>> batch_shader_data_;
+    // The prim of the hour, gets instance rendered a billion times
+    std::unique_ptr<Mesh> quad_mesh_;
+    // For depth testing
+    std::size_t z_index_ = 0;
 
     Box screen_dimensions_;
     Matrix ortho_matrix_;

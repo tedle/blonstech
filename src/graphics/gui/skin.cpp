@@ -33,8 +33,9 @@ namespace gui
 Skin::Skin()
 {
     // TODO: Load from user supplied image
-    skin_.reset(new Sprite("skin.png", { TextureType::RAW, TextureType::LINEAR, TextureType::CLAMP }));
+    skin_.reset(new Texture("skin.png", { TextureType::RAW, TextureType::LINEAR, TextureType::CLAMP }));
 
+    font_list_.resize(kMaxFonts);
     // TODO: Ensure DEFAULT font is somehow not nullptr before being handed over to user
     font_list_[DEFAULT] = nullptr;
     font_list_[HEADING] = nullptr;
@@ -58,7 +59,7 @@ Font* Skin::font(FontStyle style)
     return font_list_[DEFAULT].get();
 }
 
-Sprite* Skin::sprite() const
+const Texture* Skin::texture() const
 {
     return skin_.get();
 }

@@ -57,83 +57,82 @@ void Textarea::Render()
 
 void Textarea::RenderBody(const Skin::Layout::Textarea& t)
 {
-    auto sprite = gui_->skin()->sprite();
-    auto batch = gui_->control_batch(crop_, feather_);
+    Box pos, uv;
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
 
     // Top left corner
-    sprite->set_pos(x,
-                    y,
-                    t.top_left.w,
-                    t.top_left.h);
-    sprite->set_subtexture(t.top_left);
-    batch->Append(sprite->mesh());
+    pos.x = x;
+    pos.y = y;
+    pos.w = t.top_left.w;
+    pos.h = t.top_left.h;
+    uv = t.top_left;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Top edge
-    sprite->set_pos(x + t.top_left.w,
-                    y,
-                    pos_.w - (t.top_left.w + t.top_right.w),
-                    t.top.h);
-    sprite->set_subtexture(t.top);
-    batch->Append(sprite->mesh());
+    pos.x = x + t.top_left.w;
+    pos.y = y;
+    pos.w = pos_.w - (t.top_left.w + t.top_right.w);
+    pos.h = t.top.h;
+    uv = t.top;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Top right corner
-    sprite->set_pos(x + pos_.w - t.top_right.w,
-                    y,
-                    t.top_right.w,
-                    t.top_right.h);
-    sprite->set_subtexture(t.top_right);
-    batch->Append(sprite->mesh());
+    pos.x = x + pos_.w - t.top_right.w;
+    pos.y = y;
+    pos.w = t.top_right.w;
+    pos.h = t.top_right.h;
+    uv = t.top_right;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Left edge
-    sprite->set_pos(x,
-                    y + t.top_left.h,
-                    t.left.w,
-                    pos_.h - (t.top_left.h + t.bottom_right.h));
-    sprite->set_subtexture(t.left);
-    batch->Append(sprite->mesh());
+    pos.x = x;
+    pos.y = y + t.top_left.h;
+    pos.w = t.left.w;
+    pos.h = pos_.h - (t.top_left.h + t.bottom_right.h);
+    uv = t.left;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Body
-    sprite->set_pos(x + t.left.w,
-                    y + t.top.h,
-                    pos_.w - (t.left.w + t.right.w),
-                    pos_.h - (t.top.h + t.bottom.h));
-    sprite->set_subtexture(t.body);
-    batch->Append(sprite->mesh());
+    pos.x = x + t.left.w;
+    pos.y = y + t.top.h;
+    pos.w = pos_.w - (t.left.w + t.right.w);
+    pos.h = pos_.h - (t.top.h + t.bottom.h);
+    uv = t.body;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Right edge
-    sprite->set_pos(x + pos_.w - t.right.w,
-                    y + t.top_right.h,
-                    t.right.w,
-                    pos_.h - (t.top_right.h + t.bottom_right.h));
-    sprite->set_subtexture(t.right);
-    batch->Append(sprite->mesh());
+    pos.x = x + pos_.w - t.right.w;
+    pos.y = y + t.top_right.h;
+    pos.w = t.right.w;
+    pos.h = pos_.h - (t.top_right.h + t.bottom_right.h);
+    uv = t.right;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Bottom left corner
-    sprite->set_pos(x,
-                    y + pos_.h - t.bottom_left.h,
-                    t.bottom_left.w,
-                    t.bottom_left.h);
-    sprite->set_subtexture(t.bottom_left);
-    batch->Append(sprite->mesh());
+    pos.x = x;
+    pos.y = y + pos_.h - t.bottom_left.h;
+    pos.w = t.bottom_left.w;
+    pos.h = t.bottom_left.h;
+    uv = t.bottom_left;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Bottom edge
-    sprite->set_pos(x + t.bottom_left.w,
-                    y + pos_.h - t.bottom.h,
-                    pos_.w - (t.bottom_left.w + t.bottom_right.w),
-                    t.bottom.h);
-    sprite->set_subtexture(t.bottom);
-    batch->Append(sprite->mesh());
+    pos.x = x + t.bottom_left.w;
+    pos.y = y + pos_.h - t.bottom.h;
+    pos.w = pos_.w - (t.bottom_left.w + t.bottom_right.w);
+    pos.h = t.bottom.h;
+    uv = t.bottom;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
     // Bottom right corner
-    sprite->set_pos(x + pos_.w - t.bottom_right.w,
-                    y + pos_.h - t.bottom_right.h,
-                    t.bottom_right.w,
-                    t.bottom_right.h);
-    sprite->set_subtexture(t.bottom_right);
-    batch->Append(sprite->mesh());
+    pos.x = x + pos_.w - t.bottom_right.w;
+    pos.y = y + pos_.h - t.bottom_right.h;
+    pos.w = t.bottom_right.w;
+    pos.h = t.bottom_right.h;
+    uv = t.bottom_right;
+    gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 }
 
 void Textarea::RenderText(const Skin::Layout::Textarea& t)

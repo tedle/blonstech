@@ -66,8 +66,7 @@ void DebugSliderTextbox::Render()
 void DebugSliderTextbox::RenderProgress()
 {
     auto t = gui_->skin()->layout()->textbox.progress;
-    auto sprite = gui_->skin()->sprite();
-    auto batch = gui_->control_batch(crop_, feather_);
+    Box pos, uv;
     auto parent_pos = parent_->pos();
     auto x = pos_.x + parent_pos.x;
     auto y = pos_.y + parent_pos.y;
@@ -76,112 +75,112 @@ void DebugSliderTextbox::RenderProgress()
     if (pixel_width > 0.0)
     {
         // Top left corner
-        sprite->set_pos(x,
-                        y,
-                        std::min(pixel_width, t.top_left.w),
-                        t.top_left.h);
-        sprite->set_subtexture(t.top_left.x,
-                               t.top_left.y,
-                               std::min(pixel_width, t.top_left.w),
-                               t.top_left.h);
-        batch->Append(sprite->mesh());
+        pos.x = x;
+        pos.y = y;
+        pos.w = std::min(pixel_width, t.top_left.w);
+        pos.h = t.top_left.h;
+        uv.x = t.top_left.x;
+        uv.y = t.top_left.y;
+        uv.w = std::min(pixel_width, t.top_left.w);
+        uv.h = t.top_left.h;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
         // Left edge
-        sprite->set_pos(x,
-                        y + t.top_left.h,
-                        std::min(pixel_width, t.left.w),
-                        pos_.h - (t.top_left.h + t.bottom_right.h));
-        sprite->set_subtexture(t.left.x,
-                               t.left.y,
-                               std::min(pixel_width, t.left.w),
-                               t.left.h);
-        batch->Append(sprite->mesh());
+        pos.x = x;
+        pos.y = y + t.top_left.h;
+        pos.w = std::min(pixel_width, t.left.w);
+        pos.h = pos_.h - (t.top_left.h + t.bottom_right.h);
+        uv.x = t.left.x;
+        uv.y = t.left.y;
+        uv.w = std::min(pixel_width, t.left.w);
+        uv.h = t.left.h;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
 
         // Bottom left corner
-        sprite->set_pos(x,
-                        y + pos_.h - t.bottom_left.h,
-                        std::min(pixel_width, t.bottom_left.w),
-                        t.bottom_left.h);
-        sprite->set_subtexture(t.bottom_left.x,
-                               t.bottom_left.y,
-                               std::min(pixel_width, t.bottom_left.w),
-                               t.bottom_left.h);
-        batch->Append(sprite->mesh());
+        pos.x = x;
+        pos.y = y + pos_.h - t.bottom_left.h;
+        pos.w = std::min(pixel_width, t.bottom_left.w);
+        pos.h = t.bottom_left.h;
+        uv.x = t.bottom_left.x;
+        uv.y = t.bottom_left.y;
+        uv.w = std::min(pixel_width, t.bottom_left.w);
+        uv.h = t.bottom_left.h;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
     }
 
     if (pixel_width > t.top_left.w)
     {
         // Top edge
-        sprite->set_pos(x + t.top_left.w,
-                        y,
-                        std::min(pixel_width - t.top_left.w, pos_.w - (t.top_left.w + t.top_right.w)),
-                        t.top.h);
-        sprite->set_subtexture(t.top);
-        batch->Append(sprite->mesh());
+        pos.x = x + t.top_left.w;
+        pos.y = y;
+        pos.w = std::min(pixel_width - t.top_left.w, pos_.w - (t.top_left.w + t.top_right.w));
+        pos.h = t.top.h;
+        uv = t.top;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
     }
 
     if (pixel_width > t.left.w)
     {
         // Body
-        sprite->set_pos(x + t.left.w,
-                        y + t.top.h,
-                        std::min(pixel_width - t.left.w, pos_.w - (t.left.w + t.right.w)),
-                        pos_.h - (t.top.h + t.bottom.h));
-        sprite->set_subtexture(t.body);
-        batch->Append(sprite->mesh());
+        pos.x = x + t.left.w;
+        pos.y = y + t.top.h;
+        pos.w = std::min(pixel_width - t.left.w, pos_.w - (t.left.w + t.right.w));
+        pos.h = pos_.h - (t.top.h + t.bottom.h);
+        uv = t.body;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
     }
 
     if (pixel_width > t.bottom_left.w)
     {
         // Bottom edge
-        sprite->set_pos(x + t.bottom_left.w,
-                        y + pos_.h - t.bottom.h,
-                        std::min(pixel_width - t.bottom_left.w, pos_.w - (t.bottom_left.w + t.bottom_right.w)),
-                        t.bottom.h);
-        sprite->set_subtexture(t.bottom);
-        batch->Append(sprite->mesh());
+        pos.x = x + t.bottom_left.w;
+        pos.y = y + pos_.h - t.bottom.h;
+        pos.w = std::min(pixel_width - t.bottom_left.w, pos_.w - (t.bottom_left.w + t.bottom_right.w));
+        pos.h = t.bottom.h;
+        uv = t.bottom;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
     }
 
     if (pixel_width > pos_.w - t.top_right.w)
     {
         // Top right corner
-        sprite->set_pos(x + pos_.w - t.top_right.w,
-                        y,
-                        std::min(pixel_width - (pos_.w - t.top_right.w), t.top_right.w),
-                        t.top_right.h);
-        sprite->set_subtexture(t.top_right.x,
-                               t.top_right.y,
-                               std::min(pixel_width - (pos_.w - t.top_right.w), t.top_right.w),
-                               t.top_right.h);
-        batch->Append(sprite->mesh());
+        pos.x = x + pos_.w - t.top_right.w;
+        pos.y = y;
+        pos.w = std::min(pixel_width - (pos_.w - t.top_right.w), t.top_right.w);
+        pos.h = t.top_right.h;
+        uv.x = t.top_right.x;
+        uv.y = t.top_right.y;
+        uv.w = std::min(pixel_width - (pos_.w - t.top_right.w), t.top_right.w);
+        uv.h = t.top_right.h;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
     }
 
     if (pixel_width > pos_.w - t.right.w)
     {
         // Right edge
-        sprite->set_pos(x + pos_.w - t.right.w,
-                        y + t.top_right.h,
-                        std::min(pixel_width - (pos_.w - t.right.w), t.right.w),
-                        pos_.h - (t.top_right.h + t.bottom_right.h));
-        sprite->set_subtexture(t.right.x,
-                               t.right.y,
-                               std::min(pixel_width - (pos_.w - t.right.w), t.right.w),
-                               t.right.h);
-        batch->Append(sprite->mesh());
+        pos.x = x + pos_.w - t.right.w;
+        pos.y = y + t.top_right.h;
+        pos.w = std::min(pixel_width - (pos_.w - t.right.w), t.right.w);
+        pos.h = pos_.h - (t.top_right.h + t.bottom_right.h);
+        uv.x = t.right.x;
+        uv.y = t.right.y;
+        uv.w = std::min(pixel_width - (pos_.w - t.right.w), t.right.w);
+        uv.h = t.right.h;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
     }
 
     if (pixel_width > pos_.w - t.bottom_right.w)
     {
         // Bottom right corner
-        sprite->set_pos(x + pos_.w - t.bottom_right.w,
-                        y + pos_.h - t.bottom_right.h,
-                        std::min(pixel_width - (pos_.w - t.bottom_right.w), t.bottom_right.w),
-                        t.bottom_right.h);
-        sprite->set_subtexture(t.bottom_right.x,
-                               t.bottom_right.y,
-                               std::min(pixel_width - (pos_.w - t.bottom_right.w), t.bottom_right.w),
-                               t.bottom_right.h);
-        batch->Append(sprite->mesh());
+        pos.x = x + pos_.w - t.bottom_right.w;
+        pos.y = y + pos_.h - t.bottom_right.h;
+        pos.w = std::min(pixel_width - (pos_.w - t.bottom_right.w), t.bottom_right.w);
+        pos.h = t.bottom_right.h;
+        uv.x = t.bottom_right.x;
+        uv.y = t.bottom_right.y;
+        uv.w = std::min(pixel_width - (pos_.w - t.bottom_right.w), t.bottom_right.w);
+        uv.h = t.bottom_right.h;
+        gui_->SubmitControlBatch(pos, uv, crop_, feather_);
     }
 }
 
