@@ -37,9 +37,9 @@ namespace
 {
     // Blur is rendered at screen_res / kBlurFactor
     // Saves cycles & strengthens blur
-    static const float kBlurFactor = 2.0f;
+    static const float kBlurFactor = 3.0f;
     static const int kBlurFactori = static_cast<int>(kBlurFactor);
-    static const int kBlurIterations = 5;
+    static const int kBlurIterations = 2;
 }
 
 Manager::Manager(units::pixel width, units::pixel height)
