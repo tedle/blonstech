@@ -505,7 +505,7 @@ public:
     /// \param size Size of memory block to allocate. Immutable
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size)=0;
+    virtual void RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds the supplied ShaderResource and renders a number of vertices

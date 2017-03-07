@@ -333,10 +333,6 @@ bool ShaderResourceGL43::SetUniform(const char* name, T* value, GLsizei elements
         return false;
     }
     Uniform(location, value, elements);
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return false;
-    }
     return true;
 }
 
@@ -356,6 +352,10 @@ bool ShaderResourceGL43::BindSSBO(const char* name, const ShaderDataResourceGL43
     if (it == ssbo_binding_point_cache_.end())
     {
         auto index = glGetProgramResourceIndex(program_, GL_SHADER_STORAGE_BLOCK, name);
+        if (index == GL_INVALID_INDEX)
+        {
+            return false;
+        }
         binding_point = static_cast<GLint>(ssbo_binding_point_cache_.size());
         glShaderStorageBlockBinding(program_, index, binding_point);
         ssbo_binding_point_cache_[_strdup(name)] = binding_point;
@@ -366,11 +366,6 @@ bool ShaderResourceGL43::BindSSBO(const char* name, const ShaderDataResourceGL43
     }
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding_point, ssbo->buffer_);
-
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return false;
-    }
     return true;
 }
 
@@ -828,18 +823,13 @@ bool RendererGL43::RegisterComputeShader(ShaderResource* program, std::string so
     return true;
 }
 
-bool RendererGL43::RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size)
+void RendererGL43::RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size)
 {
     auto data_buffer = resource_cast<ShaderDataResourceGL43*>(data_handle, id());
     glGenBuffers(1, &data_buffer->buffer_);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, data_buffer->buffer_);
     glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_COPY);
     data_buffer->size_ = size;
-    if (glGetError() != GL_NO_ERROR)
-    {
-        return false;
-    }
-    return true;
 }
 
 void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_count)

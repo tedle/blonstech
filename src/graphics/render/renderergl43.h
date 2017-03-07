@@ -63,7 +63,7 @@ public:
                         std::string vertex_source, std::string pixel_source,
                         ShaderAttributeList inputs) override;
     bool RegisterComputeShader(ShaderResource* program, std::string source) override;
-    bool RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size) override;
+    void RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size) override;
 
     void RenderShader(ShaderResource* program, unsigned int index_count) override;
     void RenderShaderInstanced(ShaderResource* program, unsigned int index_count, unsigned int instance_count) override;
