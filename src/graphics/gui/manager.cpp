@@ -153,22 +153,9 @@ void Manager::Render(Framebuffer* output_buffer)
     {
         context->BindFramebuffer(nullptr);
     }
-    // TODO: Remove concept of a main window. That's dumb!
-    // Main window always renders at the bottom
-    main_window_->Render();
-    // User made windows
-    for (const auto& w : windows_)
-    {
-        if (!w->hidden())
-        {
-            w->Render();
-        }
-    }
-    // Console window always renders on top
-    if (!console_window_->hidden())
-    {
-        console_window_->Render();
-    }
+
+    // Generate draw calls if not already done so
+    BuildDrawCalls();
 
     // Only bother drawing if there's things to draw
     if (batch_index_ > 0)
@@ -255,6 +242,32 @@ void Manager::Render(Framebuffer* output_buffer)
 void Manager::Render()
 {
     Render(nullptr);
+}
+
+void Manager::BuildDrawCalls()
+{
+    // Draw calls have already been made
+    if (batch_index_ > 0)
+    {
+        return;
+    }
+
+    // TODO: Remove concept of a main window. That's dumb!
+    // Main window always renders at the bottom
+    main_window_->Render();
+    // User made windows
+    for (const auto& w : windows_)
+    {
+        if (!w->hidden())
+        {
+            w->Render();
+        }
+    }
+    // Console window always renders on top
+    if (!console_window_->hidden())
+    {
+        console_window_->Render();
+    }
 }
 
 void Manager::Reload(units::pixel screen_width, units::pixel screen_height)

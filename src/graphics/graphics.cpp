@@ -29,6 +29,7 @@
 #include <blons/graphics/pipeline/pipeline.h>
 #include <blons/graphics/render/shader.h>
 #include <blons/math/math.h>
+#include <blons/system/job.h>
 #include <blons/temphelpers.h>
 // Local Includes
 #include "render/rendererd3d11.h"
@@ -207,6 +208,10 @@ bool Graphics::Render()
     scene.sky_luminance = sky_luminance_;
     scene.view = *camera_;
 
+    // Buld up the UI's draw batches while we do all of the scene rendering
+    Job gui_batch_job([&](){ gui_->BuildDrawCalls(); });
+    gui_batch_job.Enqueue();
+
     // Clear buffers
     context->BeginScene(Vector4(0, 0, 0, 1));
 
@@ -225,6 +230,7 @@ bool Graphics::Render()
     }
 
     // Render the GUI
+    gui_batch_job.Wait();
     gui_->Render(output_buffer_.get());
 
     // Output the main FBO to the backbuffer

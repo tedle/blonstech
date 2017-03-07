@@ -151,6 +151,14 @@ public:
     void Render();
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Builds a list of draw calls to be consumed by the Render() function.
+    /// Can be run in a separate thread so long as the gui::Manager class is not
+    /// accessed until the completion of this function. Will return instantly if
+    /// already called since the previous use Render()
+    ////////////////////////////////////////////////////////////////////////////////
+    void BuildDrawCalls();
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Reloads GUI to be bound to the active rendering context
     ///
     /// \param screen_width Maximum width of the view screen in pixels
