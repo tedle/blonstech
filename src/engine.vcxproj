@@ -242,6 +242,7 @@
     <ClInclude Include="..\include\blons\math\units.h" />
     <ClInclude Include="..\include\blons\system.h" />
     <ClInclude Include="..\include\blons\system\client.h" />
+    <ClInclude Include="..\include\blons\system\job.h" />
     <ClInclude Include="..\include\blons\system\timer.h" />
     <ClInclude Include="..\include\blons\temphelpers.h" />
     <ClInclude Include="debug\consoleparser.h" />
@@ -309,6 +310,7 @@
     <ClCompile Include="math\animation.cpp" />
     <ClCompile Include="math\math.cpp" />
     <ClCompile Include="system\client.cpp" />
+    <ClCompile Include="system\job.cpp" />
     <ClCompile Include="system\timer.cpp" />
     <ClCompile Include="temphelpers.cpp" />
   </ItemGroup>

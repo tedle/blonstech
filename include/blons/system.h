@@ -26,6 +26,7 @@
 
 // Public Includes
 #include <blons/system/client.h>
+#include <blons/system/job.h>
 #include <blons/system/timer.h>
 
 ////////////////////////////////////////////////////////////////////////////////

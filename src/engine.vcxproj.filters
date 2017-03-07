@@ -256,6 +256,9 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\surfelview.h">
       <Filter>src\graphics\pipeline\stage\debug</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\system\job.h">
+      <Filter>src\system</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -428,6 +431,9 @@
     </ClCompile>
     <ClCompile Include="graphics\pipeline\stage\debug\surfelview.cpp">
       <Filter>src\graphics\pipeline\stage\debug</Filter>
+    </ClCompile>
+    <ClCompile Include="system\job.cpp">
+      <Filter>src\system</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
