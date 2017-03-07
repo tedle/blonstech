@@ -217,7 +217,6 @@ private:
         Box uv;
         Box crop;
         int is_text;
-        units::world depth;
         units::pixel crop_feather;
         int texture_id;
     };
@@ -233,8 +232,6 @@ private:
     std::unique_ptr<ShaderData<InternalDrawCallInputs>> batch_shader_data_;
     // The prim of the hour, gets instance rendered a billion times
     std::unique_ptr<Mesh> quad_mesh_;
-    // For depth testing
-    std::size_t z_index_ = 0;
 
     Box screen_dimensions_;
     Matrix ortho_matrix_;

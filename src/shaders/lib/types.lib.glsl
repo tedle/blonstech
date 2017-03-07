@@ -76,7 +76,6 @@ struct UIDrawCallInputs
     float uv[4];
     float crop[4];
     int is_text;
-    float depth;
     int crop_feather;
     int texture_id;
 };

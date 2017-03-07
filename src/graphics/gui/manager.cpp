@@ -84,10 +84,9 @@ void Manager::Init(units::pixel width, units::pixel height)
     // For batch rendering
     quad_mesh_.reset(new Mesh("blons:quad"));
 
-    // Reset batch markers
+    // Reset batches
     draw_batches_.clear();
     batch_index_ = 0;
-    z_index_ = 0;
 }
 
 Manager::~Manager()
@@ -160,7 +159,7 @@ void Manager::Render(Framebuffer* output_buffer)
     // Only bother drawing if there's things to draw
     if (batch_index_ > 0)
     {
-        context->SetDepthTesting(true);
+        context->SetDepthTesting(false);
         // Resize shader data if necessary
         if (batch_shader_data_ == nullptr || batch_shader_data_->length() < batch_index_)
         {
@@ -189,9 +188,8 @@ void Manager::Render(Framebuffer* output_buffer)
             throw "UI shader failed to render";
         }
     }
-    // Reset batch markers to 0
+    // Reset batch marker to 0
     batch_index_ = 0;
-    z_index_ = 0;
 
     // Cannot apply UI styles when rendering to backbuffer
     if (output_buffer == nullptr)
@@ -329,7 +327,6 @@ void Manager::SubmitBatch(const Box& pos, const Box& uv, const DrawCallInputs& i
 {
     InternalDrawCallInputs gpu_inputs;
     gpu_inputs.is_text = inputs.is_text;
-    gpu_inputs.depth = -static_cast<units::world>(z_index_) / 1e5f;
     gpu_inputs.crop_feather = inputs.crop_feather;
     gpu_inputs.colour = inputs.colour;
     gpu_inputs.pos = pos;
@@ -356,7 +353,6 @@ void Manager::SubmitBatch(const Box& pos, const Box& uv, const DrawCallInputs& i
     }
 
     batch_index_++;
-    z_index_++;
 }
 
 void Manager::SubmitControlBatch(const Box& pos, const Box& uv, const Box& crop, const units::pixel& feather)

@@ -61,7 +61,6 @@ void main(void)
     pos *= vec2(drawcall.pos[2], drawcall.pos[3]); // .w,h
     pos += vec2(drawcall.pos[0], drawcall.pos[1]); // .x,y
     gl_Position = proj_matrix * vec4(pos, 0.0, 1.0);
-    gl_Position.z = drawcall.depth;
 
     tex_coord = input_uv;
     tex_coord.y = 1.0 - tex_coord.y;
