@@ -488,9 +488,6 @@
     <None Include="shaders\ui-composite.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\debug\irradiance-grid.frag.glsl">
-      <Filter>src\shaders\debug</Filter>
-    </None>
     <None Include="shaders\debug\irradiance-volume.frag.glsl">
       <Filter>src\shaders\debug</Filter>
     </None>
@@ -526,6 +523,9 @@
     </None>
     <None Include="shaders\ui.vert.glsl">
       <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\debug\line-grid.frag.glsl">
+      <Filter>src\shaders\debug</Filter>
     </None>
   </ItemGroup>
 </Project>

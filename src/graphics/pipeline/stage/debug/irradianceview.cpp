@@ -45,11 +45,7 @@ IrradianceView::IrradianceView()
     // Shaders
     ShaderAttributeList grid_shader_inputs;
     grid_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    grid_shader_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    grid_shader_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
-    grid_shader_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
-    grid_shader_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
-    grid_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug/irradiance-grid.frag.glsl", grid_shader_inputs));
+    grid_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug/line-grid.frag.glsl", grid_shader_inputs));
     ShaderAttributeList volume_shader_inputs;
     volume_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     volume_shader_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));

@@ -66,6 +66,26 @@ public:
         int brick_factor_count;
     };
 
+    // Uses Delaunay Triangulation for finding and interpolating probes
+    // Tetrahedron with ID of neighbouring tetrahedrons indexed
+    struct ProbeSearchCell
+    {
+        std::array<int, 4> probe_vertices; // List of probe IDs
+        std::array<int, 4> neighbours; // Neighbouring tetrahedrons by face
+        Matrix barycentric_converter; // Converts world coords to barycentric with (wpos - vertex[0].pos) * mat
+    };
+    enum ProbeSearchValue
+    {
+        INVALID_ID = -1
+    };
+    enum ProbeSearchFaceIndex
+    {
+        FACE_012,
+        FACE_013,
+        FACE_023,
+        FACE_123
+    };
+
     // Uniformly sized voxel face
     struct Surfel
     {
@@ -107,6 +127,7 @@ public:
 
     const std::vector<Probe>& probes() const;
     const ShaderDataResource* probe_shader_data() const;
+    const std::vector<ProbeSearchCell>& probe_network() const;
     const std::vector<Surfel>& surfels() const;
     const ShaderDataResource* surfel_shader_data() const;
     const std::vector<SurfelBrick>& surfel_bricks() const;
@@ -160,6 +181,7 @@ private:
     using SurfelCluster = std::unordered_map<SurfelIndex, BakeSurfel, SurfelIndex::HashFunc, SurfelIndex::CompFunc>;
     using BrickCluster = std::unordered_map<SurfelIndex, BakeBrick, SurfelIndex::HashFunc, SurfelIndex::CompFunc>;
 
+    // These functions only exists to help compartmentalize the long process of PRT baking
     void BakeEnvironmentMaps(const Scene& scene);
     void GatherProbeSamples(std::vector<SurfelSample>* surfel_samples, std::vector<SkyVisSample>* sky_samples);
     void BakeSurfelClusters(const std::vector<SurfelSample>& samples);
@@ -168,8 +190,14 @@ private:
         void GenerateBrickWeights(const std::vector<BakeBrick>& bricks);
         void NormalizeBrickWeights();
     void BakeSkyCoefficients(const std::vector<SkyVisSample>& samples);
+    void BakeProbeNetwork();
+        std::vector<Tetrahedron> TriangulateProbeNetwork();
+        void BakeProbeNetworkCells(const std::vector<Tetrahedron>& tetrahedrons);
+        void BakeProbeNetworkNeighbours();
+        void BakeProbeNetworkConvererters();
 
     std::vector<Probe> probes_;
+    std::vector<ProbeSearchCell> probe_network_;
     std::vector<Surfel> surfels_;
     std::vector<SurfelBrick> surfel_bricks_;
     std::vector<SurfelBrickFactor> surfel_brick_factors_;

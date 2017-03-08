@@ -490,6 +490,39 @@ SHCoeffs3 SHProjectDirection3(Vector3 direction)
     return result;
 }
 
+Sphere TetrahedronCircumsphere(const Tetrahedron& tetrahedron)
+{
+    Sphere circumsphere;
+    // Circumsphere formula shamelessly stolen from:
+    // https://www2.mps.mpg.de/homes/daly/CSDS/t4h/tetra.htm#Q1-1-7
+    // Define a tetrahedron where the 1st point lies on the origin
+    // d[1,3] being the points that don't lie on the origin
+    Vector3 d1 = tetrahedron.vertices[1] - tetrahedron.vertices[0];
+    Vector3 d2 = tetrahedron.vertices[2] - tetrahedron.vertices[0];
+    Vector3 d3 = tetrahedron.vertices[3] - tetrahedron.vertices[0];
+    // Solve for a point (p) that is the center of the new tetrahedron's
+    // circumsphere. It can be combined with the original 4th vertex to
+    // produce the center
+    //     [d1.x d1.y d1.z] [p.x]   [||d1||^2]
+    // 2 * [d2.x d2.y d2.z] [p.y] = [||d2||^2]
+    //     [d3.x d3.y d3.z] [p.z]   [||d3||^2]
+    // Note this is mathematical notation, but our engine uses row-major
+    // matrices so we need the transpose instead
+    Matrix mat;
+    mat.m[0][0] = d1.x; mat.m[0][1] = d2.x; mat.m[0][2] = d3.x; mat.m[0][3] = 0;
+    mat.m[1][0] = d1.y; mat.m[1][1] = d2.y; mat.m[1][2] = d3.y; mat.m[1][3] = 0;
+    mat.m[2][0] = d1.z; mat.m[2][1] = d2.z; mat.m[2][2] = d3.z; mat.m[2][3] = 0;
+    mat.m[3][0] = 0;    mat.m[3][1] = 0;    mat.m[3][2] = 0;    mat.m[3][3] = 1;
+    // Solve by multiplying both sides with the inverse of the matrix and 1/2
+    Vector3 origin_center(Vector4(VectorDot(d1, d1), VectorDot(d2, d2), VectorDot(d3, d3), 1.0f) * MatrixInverse(mat) * 0.5f);
+    // Since one of the vertices is on the origin, taking the length of the center gives us the radius
+    circumsphere.radius = VectorLength(origin_center);
+    // Combining with the original offset vertex gives us the true center of the circumsphere
+    circumsphere.center = tetrahedron.vertices[0] + origin_center;
+
+    return circumsphere;
+}
+
 Vector3 SampleAmbientCube(const AmbientCube& cube, Vector3 direction)
 {
     AxisAlignedNormal normal_sign[3] = { direction.x > 0.0 ? POSITIVE_X : NEGATIVE_X,

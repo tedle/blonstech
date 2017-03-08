@@ -46,15 +46,14 @@ ProbeView::ProbeView()
     probe_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
     probe_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
     probe_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug/probe.frag.glsl", probe_inputs));
+    ShaderAttributeList grid_shader_inputs;
+    grid_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    grid_shader_.reset(new Shader("shaders/mesh.vert.glsl", "shaders/debug/line-grid.frag.glsl", grid_shader_inputs));
 
-    if (probe_shader_ == nullptr)
+    if (probe_shader_ == nullptr || grid_shader_ == nullptr)
     {
-        throw "Failed to initialize debug SH Probe shaders";
+        throw "Failed to initialize debug Probe shaders";
     }
-    probe_meshes_.reset(new DrawBatcher());
-    std::unique_ptr<Mesh> probe_mesh(new Mesh("blons:sphere"));
-    MeshData probe_mesh_data = probe_mesh->mesh();
-    probe_meshes_->Append(probe_mesh_data, MatrixScale(0.5f, 0.5f, 0.5f));
 }
 
 bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const LightSector& sector, Matrix view_matrix, Matrix proj_matrix)
@@ -65,11 +64,18 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         return true;
     }
 
+    // Mesh initialization is deferred because probe network is not available during startup
+    if (probe_meshes_ == nullptr || probe_network_mesh_ == nullptr)
+    {
+        InitMeshBuffers(sector);
+    }
+
     auto light_probes = sector.probes();
     auto context = render::context();
     // Bind the buffer to render the probes on top of
     target->Bind(false);
     context->SetDepthTesting(true);
+    target->BindDepthTexture(depth);
 
     Matrix vp_matrix = view_matrix * proj_matrix;
     Matrix cube_face_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 10000.0f);
@@ -101,15 +107,62 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         }
 
         // Finally do the render
-        target->BindDepthTexture(depth);
         if (!probe_shader_->Render(probe_meshes_->index_count()))
         {
             target->BindDepthTexture(target->depth());
             return false;
         }
     }
+
+    // Rendering the search network's lines
+    probe_network_mesh_->Render(false);
+    // Set the inputs
+    if (!grid_shader_->SetInput("mvp_matrix", view_matrix * proj_matrix))
+    {
+        target->BindDepthTexture(target->depth());
+        return false;
+    }
+    // Run the shader
+    if (!grid_shader_->Render(probe_network_mesh_->index_count()))
+    {
+        target->BindDepthTexture(target->depth());
+        return false;
+    }
+
     target->BindDepthTexture(target->depth());
     return true;
+}
+
+void ProbeView::InitMeshBuffers(const LightSector& sector)
+{
+    // Sphere used for rendering probes
+    probe_meshes_.reset(new DrawBatcher());
+    std::unique_ptr<Mesh> probe_mesh(new Mesh("blons:sphere"));
+    MeshData probe_mesh_data = probe_mesh->mesh();
+    probe_meshes_->Append(probe_mesh_data, MatrixScale(0.5f, 0.5f, 0.5f));
+
+    // Lines used for rendering probe search network
+    probe_network_mesh_.reset(new DrawBatcher(DrawMode::LINES));
+    auto network = sector.probe_network();
+    auto probes = sector.probes();
+    MeshData lines;
+    lines.draw_mode = DrawMode::LINES;
+    // So we don't waste time re-allocating while building this mesh
+    lines.vertices.reserve(network.size() * 4);
+    lines.indices.reserve(network.size() * 12);
+    for (const auto& cell : network)
+    {
+        auto offset = static_cast<unsigned int>(lines.vertices.size());
+        // Copy over the 4 vertices needed to draw this tetrahedron
+        lines.vertices.push_back({ probes[cell.probe_vertices[0]].pos });
+        lines.vertices.push_back({ probes[cell.probe_vertices[1]].pos });
+        lines.vertices.push_back({ probes[cell.probe_vertices[2]].pos });
+        lines.vertices.push_back({ probes[cell.probe_vertices[3]].pos });
+        // Generate the indices needed to draw the 6 edges
+        std::vector<unsigned int> indices = { 0, 1, 0, 2, 0, 3, 1, 2, 1, 3, 2, 3 };
+        std::transform(indices.begin(), indices.end(), std::back_inserter(lines.indices), [&](const auto& index) { return index + offset; });
+    }
+    probe_network_mesh_->Append(lines);
 }
 } // namespace debug
 } // namespace stage

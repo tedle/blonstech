@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <array>
 #include <numeric>
+#include <random>
 // Public Includes
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/shader.h>
@@ -44,6 +45,7 @@ auto cvar_gi_boost = console::RegisterVariable("light:gi-boost", 1.0f);
 // Hard coded distance clipping as graphics option values are tuned for performance
 const Matrix kCubeFaceProjection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 100.0f);
 const std::vector<AxisAlignedNormal> kFaceOrder = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
+const int kProbeNetworkFaces = 4;
 Vector3 FaceRotation(AxisAlignedNormal face)
 {
     units::world pitch = 0.0f;
@@ -167,6 +169,21 @@ void GenerateOldSponzaProbes(std::vector<LightSector::Probe>* probes)
         }
     }
 }
+void GenerateRandomProbes(std::vector<LightSector::Probe>* probes, int num_probes, float scale)
+{
+    std::mt19937 random_algorithm;
+    random_algorithm.seed(1);
+    std::uniform_real<float> random_distribution(-scale, scale);
+    for (int i = 0; i < num_probes; i++)
+    {
+        LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(random_distribution(random_algorithm),
+                                                                             random_distribution(random_algorithm),
+                                                                             random_distribution(random_algorithm)) };
+        probe.brick_factor_range_start = 0;
+        probe.brick_factor_count = 0;
+        probes->push_back(probe);
+    }
+}
 } // namespace temp
 
 LightSector::LightSector()
@@ -255,6 +272,11 @@ void LightSector::BakeRadianceTransfer(const Scene& scene)
     Timer sky_bake_stats;
     BakeSkyCoefficients(sky_samples);
     log::Debug("[%ims]\n", sky_bake_stats.ms());
+    // Create a Delaunay Triangulation for probe interpolation
+    log::Debug("Baking probe network...");
+    Timer bake_network_stats;
+    BakeProbeNetwork();
+    log::Debug("[%ims]\n", bake_network_stats.ms());
     // Update shader buffer with generated radiance data
     probe_shader_data_->set_value(probes_.data());
     surfel_shader_data_.reset(new ShaderData<LightSector::Surfel>(surfels_.data(), surfels_.size()));
@@ -285,6 +307,11 @@ const std::vector<LightSector::Probe>& LightSector::probes() const
 const ShaderDataResource* LightSector::probe_shader_data() const
 {
     return probe_shader_data_->data();
+}
+
+const std::vector<LightSector::ProbeSearchCell>& LightSector::probe_network() const
+{
+    return probe_network_;
 }
 
 const std::vector<LightSector::Surfel>& LightSector::surfels() const
@@ -332,7 +359,6 @@ const ShaderDataResource* LightSector::surfel_brick_factor_shader_data() const
     return surfel_brick_factor_shader_data_->data();
 }
 
-// This function only exists to help compartmentalize the long process of PRT baking
 void LightSector::BakeEnvironmentMaps(const Scene& scene)
 {
     // Shader data delivery struct
@@ -758,6 +784,296 @@ void LightSector::BakeSkyCoefficients(const std::vector<SkyVisSample>& samples)
     for (auto& probe : probes_)
     {
         probe.sh_sky_visibility *= 4.0f * kPi / probe_weights[probe.id];
+    }
+}
+
+void LightSector::BakeProbeNetwork()
+{
+    auto triangulation = TriangulateProbeNetwork();
+    BakeProbeNetworkCells(triangulation);
+    BakeProbeNetworkNeighbours();
+    BakeProbeNetworkConvererters();
+}
+
+std::vector<Tetrahedron> LightSector::TriangulateProbeNetwork()
+{
+    // Bowyer-Watson algorithm for calculating Delaunay triangulations
+    std::vector<Tetrahedron> tetrahedrons;
+    // Create 5 bounding tetrahedrons that encase all probe positions
+    // Start by making an AABB
+    Vector3 min(std::numeric_limits<units::world>::max());
+    Vector3 max(-std::numeric_limits<units::world>::max());
+    for (const auto& probe : probes_)
+    {
+        min.x = std::min(min.x, probe.pos.x);
+        max.x = std::max(max.x, probe.pos.x);
+        min.y = std::min(min.y, probe.pos.y);
+        max.y = std::max(max.y, probe.pos.y);
+        min.z = std::min(min.z, probe.pos.z);
+        max.z = std::max(max.z, probe.pos.z);
+    }
+    // Add a margin because of floating point precision
+    min -= 5.0f;
+    max += 5.0f;
+    // Build a bounding box volume out of 5 tetrahedrons
+    const std::vector<Tetrahedron> kBoundingTetrahedrons = {
+        { Vector3(max.x, min.y, min.z), Vector3(min.x, max.y, min.z), Vector3(min.x, min.y, max.z), min },
+        { Vector3(min.x, max.y, min.z), Vector3(max.x, min.y, min.z), Vector3(max.x, max.y, min.z), max },
+        { Vector3(min.x, max.y, min.z), Vector3(min.x, min.y, max.z), Vector3(min.x, max.y, max.z), max },
+        { Vector3(min.x, min.y, max.z), Vector3(max.x, min.y, min.z), Vector3(max.x, min.y, max.z), max },
+        { Vector3(min.x, max.y, min.z), Vector3(max.x, min.y, min.z), Vector3(min.x, min.y, max.z), max }
+    };
+    // Inject them into our solver as a starting point
+    tetrahedrons.insert(tetrahedrons.begin(), kBoundingTetrahedrons.begin(), kBoundingTetrahedrons.end());
+    for (const auto& probe : probes_)
+    {
+        Vector3 point = probe.pos;
+        // Partition the tetrahedrons so that circumspheres containing point are in the latter half (returns false)
+        auto partition_point = std::partition(tetrahedrons.begin(), tetrahedrons.end(), [&](const auto& tetrahedron)
+        {
+            Sphere circumsphere = TetrahedronCircumsphere(tetrahedron);
+            // 1e-3 is a magic number. I hope you never have to deal with it.
+            // This implementation gets messed up on heavily co-planar point sets.
+            // I have spent a lot of time messing with this and I'm not sure why. I even had
+            // an infinite precision float library hooked up at one point to make sure it wasn't
+            // caused by rounding errors (didn't seem to be). I found 1e-3 just by exasperatedly
+            // tweaking numbers. Making this number smaller or larger seems to ruin its mysterious
+            // properties. There is a throwable exception lying in wait should this ever run into
+            // a dataset that causes it to fail.
+            return !(VectorDistance(circumsphere.center, point) <= circumsphere.radius - 1e-3);
+        });
+        // Move the marked tetrahedrons to a new list
+        std::vector<Tetrahedron> subdividable_tetrahedrons(std::make_move_iterator(partition_point),
+                                                           std::make_move_iterator(tetrahedrons.end()));
+        // And remove them from the old one
+        tetrahedrons.erase(partition_point, tetrahedrons.end());
+
+        // Define a triangle type as 3 points
+        using Triangle = std::array<Vector3, 3>;
+
+        // Build a list of every face within the list of subdividable tetrahedrons
+        std::vector<Triangle> triangle_list;
+        for (const auto& tetrahedron : subdividable_tetrahedrons)
+        {
+            triangle_list.push_back({ tetrahedron.vertices[0], tetrahedron.vertices[1], tetrahedron.vertices[2] }); // Skip 3
+            triangle_list.push_back({ tetrahedron.vertices[0], tetrahedron.vertices[1], tetrahedron.vertices[3] }); // Skip 2
+            triangle_list.push_back({ tetrahedron.vertices[0], tetrahedron.vertices[2], tetrahedron.vertices[3] }); // Skip 1
+            triangle_list.push_back({ tetrahedron.vertices[1], tetrahedron.vertices[2], tetrahedron.vertices[3] }); // Skip 0
+        }
+        // Sort every triangle so they can be compared
+        for (auto& triangle : triangle_list)
+        {
+            std::stable_sort(triangle.begin(), triangle.end(), [](const auto& a, const auto& b) { return a.x < b.x; });
+            std::stable_sort(triangle.begin(), triangle.end(), [](const auto& a, const auto& b) { return a.y < b.y; });
+            std::stable_sort(triangle.begin(), triangle.end(), [](const auto& a, const auto& b) { return a.z < b.z; });
+        }
+        // Remove both instances (yes, both) of every duplicate triangle face
+        std::vector<Triangle> unique_triangle_list;
+        std::copy_if(triangle_list.begin(), triangle_list.end(), std::back_inserter(unique_triangle_list), [&](const auto& triangle)
+        {
+            int match_count = 0;
+            for (const auto& other_triangle : triangle_list)
+            {
+                // If I read the standard right this should be fine since we never did any floating point math with these.
+                // While risky, doing this properly is preferrable over an epsilon since that's a whole can of worms that
+                // could quietly bite you down the road
+                if (triangle[0] == other_triangle[0] && triangle[1] == other_triangle[1] && triangle[2] == other_triangle[2])
+                {
+                    match_count++;
+                }
+            }
+            // This can only be caused by degenerate tetrahedrons
+            if (match_count != 2 && match_count != 1)
+            {
+                // If we're getting this again and have the time to do a full overhaul of the triangulation
+                // here's a method that I think will work better with floating point precision:
+                // Create any triangulation (simple barycentric tests with inclusive error margin to create
+                // cavity, insert point and connect). Then iterate by checking a tetrahedron with all neighbours,
+                // calculate and add the solid angle of their unique vertex and compare with the summed
+                // solid angle of all possible edge flips, take the minimum, if the difference between the
+                // current orientation and minimum is larger than some error margin.
+                // Continue iterating until no flips are made.
+                throw "It is time, John Codeman, to gaze upon the abyss once more";
+            }
+            // This naive test should always come out positive once when comparing to itself
+            // So we only return true for 1 or less
+            return match_count < 2;
+        });
+        // Finally, for every unique triangle construct a tetrahedron
+        // where one vertex lies on the subdividable point
+        for (const auto& triangle : unique_triangle_list)
+        {
+            tetrahedrons.push_back({ { point, triangle[0], triangle[1], triangle[2] } });
+        }
+    }
+    // Prune any tetrahedrons that are attached to the original bounding box
+    // A 4 level deep nested loop looks scary, but it seems to run fine
+    for (int i = 0; i < tetrahedrons.size(); i++)
+    {
+        bool vertex_match = false;
+        for (const auto& vertex : tetrahedrons[i].vertices)
+        {
+            for (const auto& bounding_tetrahedron : kBoundingTetrahedrons)
+            {
+                for (const auto& bounding_vertex : bounding_tetrahedron.vertices)
+                {
+                    if (vertex == bounding_vertex)
+                    {
+                        vertex_match = true;
+                    }
+                }
+            }
+        }
+        if (vertex_match)
+        {
+            tetrahedrons.erase(tetrahedrons.begin() + i);
+            // We just erased, so the next element is actually at i
+            i--;
+        }
+    }
+
+    return tetrahedrons;
+}
+
+void LightSector::BakeProbeNetworkCells(const std::vector<Tetrahedron>& tetrahedrons)
+{
+    // Create a probe search cell for each tetrahedron
+    for (const auto& tetrahedron : tetrahedrons)
+    {
+        ProbeSearchCell cell;
+        cell.probe_vertices = { INVALID_ID, INVALID_ID, INVALID_ID, INVALID_ID };
+        cell.neighbours = { INVALID_ID, INVALID_ID, INVALID_ID, INVALID_ID };
+        // Translate vertex positions to matching probe positions by ID
+        for (int i = 0; i < tetrahedron.vertices.size(); i++)
+        {
+            for (const auto& probe : probes_)
+            {
+                if (probe.pos == tetrahedron.vertices[i])
+                {
+                    cell.probe_vertices[i] = probe.id;
+                    break;
+                }
+            }
+        }
+        // Check to ensure all vertices found their matching probe
+        for (const auto& probe_id : cell.probe_vertices)
+        {
+            if (probe_id == INVALID_ID)
+            {
+                throw "Could not find probe matching triangulated vertex";
+            }
+        }
+        // Sort by ID to make face comparisons easier during neighbour search
+        std::sort(cell.probe_vertices.begin(), cell.probe_vertices.end());
+        probe_network_.push_back(cell);
+    }
+}
+
+void LightSector::BakeProbeNetworkNeighbours()
+{
+    // Find neighbouring indices
+    // For each cell
+    for (int self_id = 0; self_id < probe_network_.size(); self_id++)
+    {
+        auto& self = probe_network_[self_id];
+        // For each face
+        for (int self_face = 0; self_face < kProbeNetworkFaces; self_face++)
+        {
+            std::array<int, 3> self_probes;
+            switch (self_face)
+            {
+            case FACE_012:
+                self_probes = { self.probe_vertices[0], self.probe_vertices[1], self.probe_vertices[2] };
+                break;
+            case FACE_023:
+                self_probes = { self.probe_vertices[0], self.probe_vertices[2], self.probe_vertices[3] };
+                break;
+            case FACE_013:
+                self_probes = { self.probe_vertices[0], self.probe_vertices[1], self.probe_vertices[3] };
+                break;
+            case FACE_123:
+                self_probes = { self.probe_vertices[1], self.probe_vertices[2], self.probe_vertices[3] };
+                break;
+            default:
+                throw "Hit impossible face statement";
+            }
+            // This was already calculated while being determined as an "other" face, skip
+            if (self.neighbours[self_face] != INVALID_ID)
+            {
+                continue;
+            }
+            // Check against every other cell & face
+            for (int other_id = 0; other_id < probe_network_.size(); other_id++)
+            {
+                auto& other = probe_network_[other_id];
+                // Don't compare with self, skip
+                if (self_id == other_id)
+                {
+                    continue;
+                }
+                for (int other_face = 0; other_face < kProbeNetworkFaces; other_face++)
+                {
+                    std::array<int, 3> other_probes;
+                    switch (other_face)
+                    {
+                    case FACE_012:
+                        other_probes = { other.probe_vertices[0], other.probe_vertices[1], other.probe_vertices[2] };
+                        break;
+                    case FACE_023:
+                        other_probes = { other.probe_vertices[0], other.probe_vertices[2], other.probe_vertices[3] };
+                        break;
+                    case FACE_013:
+                        other_probes = { other.probe_vertices[0], other.probe_vertices[1], other.probe_vertices[3] };
+                        break;
+                    case FACE_123:
+                        other_probes = { other.probe_vertices[1], other.probe_vertices[2], other.probe_vertices[3] };
+                        break;
+                    default:
+                        throw "Hit impossible face statement";
+                    }
+                    if (self_probes == other_probes)
+                    {
+                        self.neighbours[self_face] = other_id;
+                        other.neighbours[other_face] = self_id;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void LightSector::BakeProbeNetworkConvererters()
+{
+    // Build barycentric conversion matrices
+    for (auto& cell : probe_network_)
+    {
+        // Formula taken from:
+        // https://en.wikipedia.org/wiki/Barycentric_coordinate_system
+        // Described as:
+        // [b1] = T^(-1) * (p - r0)
+        // [b2]
+        // b3 = 1 - b1 - b2
+        // Where b1, b2, b3 are the barycentric coordinates
+        // p is the point to convert
+        // r0, r1, r2 are the points of a triangle
+        // T = [r1.x - r0.x, r2.x - r0.x]
+        //     [r1.y - r0.y, r2.y - r0.y]
+        // This is meant for triangles, as we use tetrahedrons our matrix is 3x3 instead
+
+        // Matrix that will hold the inverse of our barycentric converter
+        Matrix T;
+        // Create point deltas with the first vertex as the origin
+        Vector3 origin = probes_[cell.probe_vertices[0]].pos;
+        Vector3 d1 =     probes_[cell.probe_vertices[1]].pos - origin;
+        Vector3 d2 =     probes_[cell.probe_vertices[2]].pos - origin;
+        Vector3 d3 =     probes_[cell.probe_vertices[3]].pos - origin;
+        // We are use row-major matrices, so we instead use the transpose
+        T.m[0][0] = d1.x; T.m[0][1] = d1.y; T.m[0][2] = d1.z; T.m[0][3] = 0;
+        T.m[1][0] = d2.x; T.m[1][1] = d2.y; T.m[1][2] = d2.z; T.m[1][3] = 0;
+        T.m[2][0] = d3.x; T.m[2][1] = d3.y; T.m[2][2] = d3.z; T.m[2][3] = 0;
+        T.m[3][0] = 0;    T.m[3][1] = 0;    T.m[3][2] = 0;    T.m[3][3] = 1;
+        // Store the inverse
+        cell.barycentric_converter = MatrixInverse(T);
     }
 }
 } // namespace stage

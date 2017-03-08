@@ -28,6 +28,7 @@
 #include <DirectXMath.h>
 using namespace DirectX;
 // Includes
+#include <array>
 #include <cstddef>
 #include <string.h>
 // Public Includes
@@ -632,6 +633,19 @@ SHCoeffs2 SHProjectDirection2(Vector3 direction);
 /// \copydoc SHProjectDirection2
 ////////////////////////////////////////////////////////////////////////////////
 SHCoeffs3 SHProjectDirection3(Vector3 direction);
+
+struct Sphere
+{
+    Vector3 center;
+    units::world radius;
+};
+
+struct Tetrahedron
+{
+    std::array<Vector3, 4> vertices;
+};
+
+Sphere TetrahedronCircumsphere(const Tetrahedron& tetrahedron);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math

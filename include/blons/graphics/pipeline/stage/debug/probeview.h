@@ -48,8 +48,12 @@ public:
     bool Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const LightSector& sector, Matrix view_matrix, Matrix proj_matrix);
 
 private:
+    void InitMeshBuffers(const LightSector& sector);
+
     std::unique_ptr<DrawBatcher> probe_meshes_;
+    std::unique_ptr<DrawBatcher> probe_network_mesh_;
     std::unique_ptr<Shader> probe_shader_;
+    std::unique_ptr<Shader> grid_shader_;
 };
 } // namespace debug
 } // namespace stage
