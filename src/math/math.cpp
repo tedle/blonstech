@@ -59,6 +59,7 @@ bool Vector2::operator!= (const Vector2& vec) const { return !(*this == vec); }
 ////////////////////////////////////////////////////////////////////////////////
 /// Vector3 Operators
 ////////////////////////////////////////////////////////////////////////////////
+Vector3::Vector3(Vector4 v) : Vector3(v.x / v.w, v.y / v.w, v.z / v.w) {}
 Vector3& Vector3::operator= (const Vector3& vec) { x = vec.x; y = vec.y; z = vec.z; return *this; }
 
 Vector3& Vector3::operator+= (const Vector3& vec) { x += vec.x; y += vec.y; z += vec.z; return *this; }
@@ -88,6 +89,7 @@ bool Vector3::operator!= (const Vector3& vec) const { return !(*this == vec); }
 ////////////////////////////////////////////////////////////////////////////////
 /// Vector4 Operators
 ////////////////////////////////////////////////////////////////////////////////
+Vector4::Vector4(Vector3 v) : Vector4(v.x, v.y, v.z, 1.0f) {}
 Vector4& Vector4::operator= (const Vector4& vec) { x = vec.x; y = vec.y; z = vec.z; w = vec.w; return *this; }
 
 Vector4& Vector4::operator+= (const Vector4& vec) { x += vec.x; y += vec.y; z += vec.z; w = vec.w; return *this; }
