@@ -132,7 +132,7 @@ void main(void)
 
     if (depth_sample == 1.0)
     {
-        frag_colour = vec4(SkyColour(view_dir), 1.0);
+        frag_colour = vec4(GammaEncode(SkyColour(view_dir)), 1.0);
         return;
     }
 
