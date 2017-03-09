@@ -462,6 +462,15 @@ Vector3 VectorAbsolute(Vector3 v);
 Vector3 VectorCross(Vector3 a, Vector3 b);
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
+/// \brief Calculates the distance between 2 given vectors
+///
+/// \param a The first vector
+/// \param b The second vector
+/// \return Calculated distance
+////////////////////////////////////////////////////////////////////////////////
+units::world VectorDistance(const Vector3& a, const Vector3& b);
+////////////////////////////////////////////////////////////////////////////////
+/// \ingroup math
 /// \brief Calculates the dot product of 2 given vectors
 ///
 /// \param a The first vector

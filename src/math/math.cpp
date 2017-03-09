@@ -332,6 +332,11 @@ Vector3 VectorCross(Vector3 a, Vector3 b)
     return product;
 }
 
+units::world VectorDistance(const Vector3& a, const Vector3& b)
+{
+    return VectorLength(a - b);
+}
+
 units::world VectorDot(Vector3 a, Vector3 b)
 {
     units::world product;
