@@ -22,7 +22,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // Determines the intensity of the light on a diffuse surface
-float DiffuseTerm(vec3 albedo, vec3 metalness, float NdotV, float NdotL, float LdotH, float roughness)
+vec3 DiffuseTermDisney(vec3 albedo, float NdotV, float NdotL, float LdotH, float roughness)
 {
     // Disney diffuse term, modified by the Frostbite team for energy conservation
     // This is already normalized for energy conservation which means we don't have to multiply by 1.0 - fresnel
@@ -36,7 +36,21 @@ float DiffuseTerm(vec3 albedo, vec3 metalness, float NdotV, float NdotL, float L
     float light_scatter = 1.0 + (fd90 - 1.0) * pow(1.0 - NdotL, 5.0);
     float view_scatter = 1.0 + (fd90 - 1.0) * pow(1.0 - NdotV, 5.0);
 
-    return light_scatter * view_scatter * energy_factor;
+    return albedo * light_scatter * view_scatter * energy_factor;
+}
+
+// Determines the intensity of the light on a diffuse surface
+vec3 DiffuseTermGGX(vec3 albedo, float NdotV, float NdotL, float LdotH, float LdotV, float roughness)
+{
+    // GGX Diffuse term, derived by Respawn team for Titanfall 2
+    // This is already normalized for energy conservation which means we don't have to multiply by 1.0 - fresnel
+    float facing = 0.5 + 0.5 * LdotV;
+    float smooth_term = 1.05 * (1.0 - pow(1.0 - NdotL, 5.0)) * (1.0 - pow(1.0 - NdotV, 5.0));
+    float rough_term = facing * (0.9 - 0.4 * facing) * ((0.5 + LdotH) / LdotH);
+    float single = 1.0 / 3.141592653589793238 * mix(smooth_term, rough_term, roughness);
+    float multi = 0.1159 * roughness;
+
+    return albedo * (single + albedo * multi) * 3.141592653589793238;
 }
 
 // Determines the probability of incoming rays to be occluded by microfacets during exitance

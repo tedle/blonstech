@@ -78,16 +78,15 @@ vec3 AmbientDiffuse(vec4 pos, vec3 normal)
     return SampleAmbientCube(ambient_cube, normal);
 }
 
-vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 light_visibility, float NdotV, float NdotL, float LdotH, float roughness)
+vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 light_visibility, float NdotV, float NdotL, float LdotH, float LdotV, float roughness)
 {
     // For the one light we currently have
-    vec3 diffuse = vec3(DiffuseTerm(albedo, metalness, NdotV, NdotL, LdotH, roughness));
+    vec3 diffuse = DiffuseTermGGX(albedo, NdotV, NdotL, LdotH, LdotV, roughness);
     diffuse = diffuse * light_visibility * sun.luminance * sun.colour * NdotL;
     // After all other lights are applied
     vec3 ambient = AmbientDiffuse(pos, surface_normal);
-    diffuse += ambient;
     // Modulate by surface colour
-    diffuse *= albedo;
+    diffuse += ambient * albedo;
     // Metals dont have diffuse light
     diffuse *= 1.0 - metalness;
     // Account for conversion from irradiance to radiance
@@ -149,8 +148,9 @@ void main(void)
     float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
     float NdotV = max(dot(surface_normal, view_dir), 0.0);
     float LdotH = max(dot(-sun.dir, halfway), 0.0);
+    float LdotV = max(dot(-sun.dir, view_dir), 0.0);
 
-    vec3 diffuse = Diffuse(pos, albedo, metalness, surface_normal, direct, NdotV, NdotL, LdotH, roughness);
+    vec3 diffuse = Diffuse(pos, albedo, metalness, surface_normal, direct, NdotV, NdotL, LdotH, LdotV, roughness);
     vec3 specular = Specular(metalness, albedo, direct, NdotH, NdotV, NdotL, LdotH, roughness);
 
     vec3 surface_colour = diffuse + specular;
