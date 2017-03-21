@@ -44,6 +44,9 @@
     <Filter Include="src\shaders\lib">
       <UniqueIdentifier>{1981cc51-54ed-4701-bf21-45a0474b2a72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\graphics\pipeline\stage\lightsector">
+      <UniqueIdentifier>{acadafe0-972f-4bc9-8144-091e0628e36e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\blons\debug\console.h">
@@ -250,14 +253,17 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\irradianceview.h">
       <Filter>src\graphics\pipeline\stage\debug</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightsector.h">
-      <Filter>src\graphics\pipeline\stage</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\debug\surfelview.h">
       <Filter>src\graphics\pipeline\stage\debug</Filter>
     </ClInclude>
     <ClInclude Include="..\include\blons\system\job.h">
       <Filter>src\system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightsector\lightsector.h">
+      <Filter>src\graphics\pipeline\stage\lightsector</Filter>
+    </ClInclude>
+    <ClInclude Include="graphics\pipeline\stage\lightsector\radiancetransferbaker.h">
+      <Filter>src\graphics\pipeline\stage\lightsector</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -426,14 +432,17 @@
     <ClCompile Include="graphics\pipeline\stage\debug\irradianceview.cpp">
       <Filter>src\graphics\pipeline\stage\debug</Filter>
     </ClCompile>
-    <ClCompile Include="graphics\pipeline\stage\lightsector.cpp">
-      <Filter>src\graphics\pipeline\stage</Filter>
-    </ClCompile>
     <ClCompile Include="graphics\pipeline\stage\debug\surfelview.cpp">
       <Filter>src\graphics\pipeline\stage\debug</Filter>
     </ClCompile>
     <ClCompile Include="system\job.cpp">
       <Filter>src\system</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\lightsector\lightsector.cpp">
+      <Filter>src\graphics\pipeline\stage\lightsector</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\lightsector\radiancetransferbaker.cpp">
+      <Filter>src\graphics\pipeline\stage\lightsector</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

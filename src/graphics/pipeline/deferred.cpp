@@ -198,14 +198,6 @@ bool Deferred::RenderOutput()
         case DIRECT_LIGHT:
             return shadow_->output(stage::Shadow::DIRECT_LIGHT);
             break;
-        case PROBE_ENV_MAPS_ALBEDO:
-            output_sprite->set_pos(output_sprite->pos().x, output_sprite->pos().y, output_sprite->dimensions().x / 8.0f, output_sprite->dimensions().y);
-            return light_sector_->output(stage::LightSector::ENV_MAPS_ALBEDO);
-            break;
-        case PROBE_ENV_MAPS_NORMAL:
-            output_sprite->set_pos(output_sprite->pos().x, output_sprite->pos().y, output_sprite->dimensions().x / 8.0f, output_sprite->dimensions().y);
-            return light_sector_->output(stage::LightSector::ENV_MAPS_NORMAL);
-            break;
         case LIGHT:
             return lighting_->output(stage::Lighting::LIGHT);
             break;

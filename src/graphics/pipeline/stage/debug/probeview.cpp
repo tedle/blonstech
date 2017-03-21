@@ -78,14 +78,9 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
     target->BindDepthTexture(depth);
 
     Matrix vp_matrix = view_matrix * proj_matrix;
-    Matrix cube_face_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 10000.0f);
 
     // Set the probe-independent inputs
-    if (!probe_shader_->SetInput("env_proj_matrix", cube_face_projection) ||
-        !probe_shader_->SetInput("env_tex_size", kProbeMapSize) ||
-        !probe_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
-        !probe_shader_->SetInput("probe_env_maps_albedo", sector.output(LightSector::ENV_MAPS_ALBEDO), 0) ||
-        !probe_shader_->SetInput("probe_env_maps_normal", sector.output(LightSector::ENV_MAPS_NORMAL), 1) ||
+    if (!probe_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
         !probe_shader_->SetInput("exposure", scene.view.exposure()) ||
         !probe_shader_->SetInput("debug_mode", debug_mode))
     {

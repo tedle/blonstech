@@ -26,7 +26,7 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/lightsector.h>
+#include <blons/graphics/pipeline/stage/lightsector/lightsector.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/pipeline/stage/debug/surfelview.h>
 #include <blons/graphics/pipeline/stage/debug/probeview.h>

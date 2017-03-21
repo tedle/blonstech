@@ -29,7 +29,7 @@
 #include <blons/graphics/framebuffer.h>
 #include <blons/graphics/render/shader.h>
 #include <blons/graphics/render/shaderdata.h>
-#include <blons/graphics/pipeline/stage/lightsector.h>
+#include <blons/graphics/pipeline/stage/lightsector/lightsector.h>
 
 namespace blons
 {

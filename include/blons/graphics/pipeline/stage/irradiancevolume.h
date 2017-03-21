@@ -28,7 +28,7 @@
 #include <array>
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
-#include <blons/graphics/pipeline/stage/lightsector.h>
+#include <blons/graphics/pipeline/stage/lightsector/lightsector.h>
 #include <blons/graphics/texture3d.h>
 #include <blons/graphics/render/computeshader.h>
 

@@ -21,16 +21,12 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/pipeline/stage/lightsector.h>
+#include "radiancetransferbaker.h"
 
 // Includes
 #include <algorithm>
 #include <array>
 #include <numeric>
-#include <random>
-// Public Includes
-#include <blons/graphics/framebuffer.h>
-#include <blons/graphics/render/shader.h>
 
 namespace blons
 {
@@ -40,8 +36,6 @@ namespace stage
 {
 namespace
 {
-auto cvar_gi_boost = console::RegisterVariable("light:gi-boost", 1.0f);
-
 // Hard coded distance clipping as graphics option values are tuned for performance
 const Matrix kCubeFaceProjection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 100.0f);
 const std::vector<AxisAlignedNormal> kFaceOrder = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
@@ -91,107 +85,9 @@ float EnvironmentMapTexelWeight(const Vector2& uv)
 }
 } // namespace
 
-namespace temp
+RadianceTransferBaker::RadianceTransferBaker(const Scene& scene, const std::vector<LightSector::Probe>& probes)
+    : probes_(probes)
 {
-void GenerateTestProbe(std::vector<LightSector::Probe>* probes)
-{
-    LightSector::Probe probe{ static_cast<int>(probes->size()), Vector3(0.0f, 3.0f, 0.0f) };
-    probe.brick_factor_range_start = 0;
-    probe.brick_factor_count = 0;
-    probes->push_back(probe);
-}
-void GenerateCrytekSponzaProbes(std::vector<LightSector::Probe>* probes)
-{
-    for (int x = 0; x < 16; x++)
-    {
-        for (int y = 0; y < 2; y++)
-        {
-            for (int z = 0; z < 2; z++)
-            {
-                LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 10.0f - 5.0f) };
-                probe.brick_factor_range_start = 0;
-                probe.brick_factor_count = 0;
-                probes->push_back(probe);
-            }
-        }
-    }
-    for (int x = 0; x < 16; x++)
-    {
-        for (int y = 0; y < 2; y++)
-        {
-            for (int z = 0; z < 2; z++)
-            {
-                LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-15.0f + x * 1.9f, y * 5.0f + 2.0f, z * 2.4f - 1.2f) };
-                probe.brick_factor_range_start = 0;
-                probe.brick_factor_count = 0;
-                probes->push_back(probe);
-            }
-        }
-    }
-    for (int x = 0; x < 12; x++)
-    {
-        for (int y = 0; y < 3; y++)
-        {
-            for (int z = 0; z < 2; z++)
-            {
-                LightSector::Probe probe{ static_cast<int>(probes->size()), Vector3(-10.0f + x * 1.727f, y * 2.0f + 10.0f, z * 2.4f - 1.2f) };
-                probe.brick_factor_range_start = 0;
-                probe.brick_factor_count = 0;
-                probes->push_back(probe);
-            }
-        }
-    }
-}
-void GenerateOldSponzaProbes(std::vector<LightSector::Probe>* probes)
-{
-    // TODO: Higher light probe density. Will stall load times so should optimize baking in tandem (compute shader? instancing?)
-    for (int x = 0; x < 8; x++)
-    {
-        for (int y = 0; y < 2; y++)
-        {
-            for (int z = 0; z < 3; z++)
-            {
-                LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-14.0f + x * 4.0f, y * 5.0f + 2.0f, z * 5.0f - 5.0f) };
-                probe.brick_factor_range_start = 0;
-                probe.brick_factor_count = 0;
-                probes->push_back(probe);
-            }
-        }
-    }
-    for (int x = 0; x < 6; x++)
-    {
-        for (int y = 0; y < 2; y++)
-        {
-            LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(-10.0f + x * 4.0f, y * 3.0f + 11.0f, 0) };
-            probe.brick_factor_range_start = 0;
-            probe.brick_factor_count = 0;
-            probes->push_back(probe);
-        }
-    }
-}
-void GenerateRandomProbes(std::vector<LightSector::Probe>* probes, int num_probes, float scale)
-{
-    std::mt19937 random_algorithm;
-    random_algorithm.seed(1);
-    std::uniform_real<float> random_distribution(-scale, scale);
-    for (int i = 0; i < num_probes; i++)
-    {
-        LightSector::Probe probe { static_cast<int>(probes->size()), Vector3(random_distribution(random_algorithm),
-                                                                             random_distribution(random_algorithm),
-                                                                             random_distribution(random_algorithm)) };
-        probe.brick_factor_range_start = 0;
-        probe.brick_factor_count = 0;
-        probes->push_back(probe);
-    }
-}
-} // namespace temp
-
-LightSector::LightSector()
-{
-    temp::GenerateOldSponzaProbes(&probes_);
-    // Initialize shader buffer to fit all probes in
-    probe_shader_data_.reset(new ShaderData<LightSector::Probe>(nullptr, probes_.size()));
-
     // Setup shader for generating environment maps to build surfel and sky visibility data
     ShaderAttributeList env_map_inputs;
     env_map_inputs.push_back(ShaderAttribute(POS, "input_pos"));
@@ -200,56 +96,12 @@ LightSector::LightSector()
     env_map_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
     env_map_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
     environment_map_shader_.reset(new Shader("shaders/probe-env-map.vert.glsl", "shaders/probe-env-map.frag.glsl", env_map_inputs));
-
+    // Setup framebuffer for storing environment maps
     environment_maps_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<units::pixel>(probes_.size()),
                                             { { TextureType::R8G8B8A8, TextureType::RAW, TextureType::NEAREST, TextureType::CLAMP },   // albedo + sky vis
                                               { TextureType::R8G8B8,   TextureType::RAW, TextureType::NEAREST, TextureType::CLAMP } }, // normal
                                             true));
 
-    // Relight compute shaders to be run every frame
-    surfel_brick_relight_shader_.reset(new ComputeShader("shaders/surfelbrick-relight.comp.glsl"));
-    probe_relight_shader_.reset(new ComputeShader("shaders/probe-relight.comp.glsl"));
-}
-
-bool LightSector::Relight(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix)
-{
-    // Can be removed when we support more lights
-    assert(scene.lights.size() == 1);
-    Light* sun = scene.lights[0];
-
-    // Iterate over every brick, relighting their surfels and building a radiance term
-    if (!surfel_brick_relight_shader_->SetInput("light_vp_matrix", light_vp_matrix) ||
-        !surfel_brick_relight_shader_->SetInput("light_depth", shadow.output(Shadow::LIGHT_DEPTH)) ||
-        !surfel_brick_relight_shader_->SetInput("sun.dir", sun->direction()) ||
-        !surfel_brick_relight_shader_->SetInput("sun.colour", sun->colour()) ||
-        !surfel_brick_relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
-        !surfel_brick_relight_shader_->SetInput("metalness", Vector3(console::var<float>("mtl:metalness"))) ||
-        !surfel_brick_relight_shader_->SetInput("gi_boost", cvar_gi_boost->to<float>()) ||
-        !surfel_brick_relight_shader_->SetInput("surfel_buffer", surfel_shader_data()) ||
-        !surfel_brick_relight_shader_->SetInput("surfel_brick_buffer", surfel_brick_shader_data()) ||
-        !surfel_brick_relight_shader_->SetInput("probe_buffer", probe_shader_data()))
-    {
-        return false;
-    }
-    surfel_brick_relight_shader_->Run(static_cast<unsigned int>(surfel_bricks_.size()), 1, 1);
-
-    // Iterate over every probe, building an irradiance term from sky light and any visible surfel bricks
-    if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()) ||
-        !probe_relight_shader_->SetInput("brick_buffer", surfel_brick_shader_data()) ||
-        !probe_relight_shader_->SetInput("brick_factor_buffer", surfel_brick_factor_shader_data()) ||
-        !probe_relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
-        !probe_relight_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
-        !probe_relight_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
-        !probe_relight_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9))
-    {
-        return false;
-    }
-    probe_relight_shader_->Run(static_cast<unsigned int>(probes_.size()), 1, 1);
-    return true;
-}
-
-void LightSector::BakeRadianceTransfer(const Scene& scene)
-{
     // G-Buffer env map generation
     log::Debug("Baking environment maps... ");
     Timer env_bake_stats;
@@ -277,89 +129,34 @@ void LightSector::BakeRadianceTransfer(const Scene& scene)
     Timer bake_network_stats;
     BakeProbeNetwork();
     log::Debug("[%ims]\n", bake_network_stats.ms());
-    // Update shader buffer with generated radiance data
-    probe_shader_data_->set_value(probes_.data());
-    surfel_shader_data_.reset(new ShaderData<LightSector::Surfel>(surfels_.data(), surfels_.size()));
-    surfel_brick_shader_data_.reset(new ShaderData<LightSector::SurfelBrick>(surfel_bricks_.data(), surfel_bricks_.size()));
-    surfel_brick_factor_shader_data_.reset(new ShaderData<LightSector::SurfelBrickFactor>(surfel_brick_factors_.data(), surfel_brick_factors_.size()));
 }
 
-const TextureResource* LightSector::output(Output buffer) const
-{
-    switch (buffer)
-    {
-    case ENV_MAPS_ALBEDO:
-        return environment_maps_->textures()[0];
-        break;
-    case ENV_MAPS_NORMAL:
-        return environment_maps_->textures()[1];
-        break;
-    default:
-        return nullptr;
-    }
-}
-
-const std::vector<LightSector::Probe>& LightSector::probes() const
+const std::vector<LightSector::Probe>& RadianceTransferBaker::probes() const
 {
     return probes_;
 }
 
-const ShaderDataResource* LightSector::probe_shader_data() const
-{
-    return probe_shader_data_->data();
-}
-
-const std::vector<LightSector::ProbeSearchCell>& LightSector::probe_network() const
+const std::vector<LightSector::ProbeSearchCell>& RadianceTransferBaker::probe_network() const
 {
     return probe_network_;
 }
 
-const std::vector<LightSector::Surfel>& LightSector::surfels() const
+const std::vector<LightSector::Surfel>& RadianceTransferBaker::surfels() const
 {
     return surfels_;
 }
 
-const ShaderDataResource* LightSector::surfel_shader_data() const
-{
-    // TODO: Remove this when light sector streaming is implemented and we can get PRT data in constructor
-    if (surfel_shader_data_ == nullptr)
-    {
-        throw "Attempted to access surfel shader data before light bake";
-    }
-    return surfel_shader_data_->data();
-}
-
-const std::vector<LightSector::SurfelBrick>& LightSector::surfel_bricks() const
+const std::vector<LightSector::SurfelBrick>& RadianceTransferBaker::surfel_bricks() const
 {
     return surfel_bricks_;
 }
 
-const ShaderDataResource* LightSector::surfel_brick_shader_data() const
-{
-    // TODO: Remove this when light sector streaming is implemented and we can get PRT data in constructor
-    if (surfel_brick_shader_data_ == nullptr)
-    {
-        throw "Attempted to access surfel brick shader data before light bake";
-    }
-    return surfel_brick_shader_data_->data();
-}
-
-const std::vector<LightSector::SurfelBrickFactor>& LightSector::surfel_brick_factors() const
+const std::vector<LightSector::SurfelBrickFactor>& RadianceTransferBaker::surfel_brick_factors() const
 {
     return surfel_brick_factors_;
 }
 
-const ShaderDataResource* LightSector::surfel_brick_factor_shader_data() const
-{
-    // TODO: Remove this when light sector streaming is implemented and we can get PRT data in constructor
-    if (surfel_brick_factor_shader_data_ == nullptr)
-    {
-        throw "Attempted to access surfel brick shader data before light bake";
-    }
-    return surfel_brick_factor_shader_data_->data();
-}
-
-void LightSector::BakeEnvironmentMaps(const Scene& scene)
+void RadianceTransferBaker::BakeEnvironmentMaps(const Scene& scene)
 {
     // Shader data delivery struct
     struct PerFaceData
@@ -415,7 +212,7 @@ void LightSector::BakeEnvironmentMaps(const Scene& scene)
     environment_maps_->Unbind();
 }
 
-void LightSector::GatherProbeSamples(std::vector<SurfelSample>* surfel_samples, std::vector<SkyVisSample>* sky_samples)
+void RadianceTransferBaker::GatherProbeSamples(std::vector<SurfelSample>* surfel_samples, std::vector<SkyVisSample>* sky_samples)
 {
     // Pre-allocate sample containers
     surfel_samples->reserve(kProbeMapSize * kProbeMapSize * 6 * probes_.size());
@@ -491,7 +288,7 @@ void LightSector::GatherProbeSamples(std::vector<SurfelSample>* surfel_samples, 
                         world_pos /= world_pos.w;
 
                         SurfelSample surfel_sample;
-                        Surfel surfel;
+                        LightSector::Surfel surfel;
                         surfel.nearest_probe_id = probe.id;
                         surfel.pos = Vector3(world_pos.x, world_pos.y, world_pos.z);
                         surfel.normal = surface_normal;
@@ -543,7 +340,7 @@ void LightSector::GatherProbeSamples(std::vector<SurfelSample>* surfel_samples, 
     }
 }
 
-void LightSector::BakeSurfelClusters(const std::vector<SurfelSample>& samples)
+void RadianceTransferBaker::BakeSurfelClusters(const std::vector<SurfelSample>& samples)
 {
     // Turn surfel samples into spatially indexed clusters
     auto surfel_data = ClusterSurfelData(samples);
@@ -572,7 +369,7 @@ void LightSector::BakeSurfelClusters(const std::vector<SurfelSample>& samples)
     NormalizeBrickWeights();
 }
 
-LightSector::SurfelCluster LightSector::ClusterSurfelData(const std::vector<SurfelSample>& samples)
+RadianceTransferBaker::SurfelCluster RadianceTransferBaker::ClusterSurfelData(const std::vector<SurfelSample>& samples)
 {
     // Build a spatial, clustered hash grid of all surfels
     SurfelCluster surfel_data;
@@ -617,7 +414,7 @@ LightSector::SurfelCluster LightSector::ClusterSurfelData(const std::vector<Surf
     return surfel_data;
 }
 
-LightSector::BrickCluster LightSector::ClusterBrickData(SurfelCluster* surfel_data)
+RadianceTransferBaker::BrickCluster RadianceTransferBaker::ClusterBrickData(SurfelCluster* surfel_data)
 {
     // Build a spatial, clustered hash grid of all bricks
     BrickCluster brick_data;
@@ -670,7 +467,7 @@ LightSector::BrickCluster LightSector::ClusterBrickData(SurfelCluster* surfel_da
     return brick_data;
 }
 
-void LightSector::GenerateBrickWeights(const std::vector<BakeBrick>& bricks)
+void RadianceTransferBaker::GenerateBrickWeights(const std::vector<BakeBrick>& bricks)
 {
     // Generate brick factors
     std::vector<BakeBrickFactor> brick_factor_data;
@@ -734,7 +531,7 @@ void LightSector::GenerateBrickWeights(const std::vector<BakeBrick>& bricks)
     }
 }
 
-void LightSector::NormalizeBrickWeights()
+void RadianceTransferBaker::NormalizeBrickWeights()
 {
     // Applying this will make brick weights for a given basis sum roughly to pi.
     // It's not exact (within 0.3% at low resolution), but building an exact
@@ -766,7 +563,7 @@ void LightSector::NormalizeBrickWeights()
     }
 }
 
-void LightSector::BakeSkyCoefficients(const std::vector<SkyVisSample>& samples)
+void RadianceTransferBaker::BakeSkyCoefficients(const std::vector<SkyVisSample>& samples)
 {
     // Holds normalization factor for each probe as samples are summed
     std::vector<float> probe_weights(probes_.size(), 0.0f);
@@ -787,7 +584,7 @@ void LightSector::BakeSkyCoefficients(const std::vector<SkyVisSample>& samples)
     }
 }
 
-void LightSector::BakeProbeNetwork()
+void RadianceTransferBaker::BakeProbeNetwork()
 {
     auto triangulation = TriangulateProbeNetwork();
     BakeProbeNetworkCells(triangulation);
@@ -795,7 +592,7 @@ void LightSector::BakeProbeNetwork()
     BakeProbeNetworkConvererters();
 }
 
-std::vector<Tetrahedron> LightSector::TriangulateProbeNetwork()
+std::vector<Tetrahedron> RadianceTransferBaker::TriangulateProbeNetwork()
 {
     // Bowyer-Watson algorithm for calculating Delaunay triangulations
     std::vector<Tetrahedron> tetrahedrons;
@@ -935,14 +732,14 @@ std::vector<Tetrahedron> LightSector::TriangulateProbeNetwork()
     return tetrahedrons;
 }
 
-void LightSector::BakeProbeNetworkCells(const std::vector<Tetrahedron>& tetrahedrons)
+void RadianceTransferBaker::BakeProbeNetworkCells(const std::vector<Tetrahedron>& tetrahedrons)
 {
     // Create a probe search cell for each tetrahedron
     for (const auto& tetrahedron : tetrahedrons)
     {
-        ProbeSearchCell cell;
-        cell.probe_vertices = { INVALID_ID, INVALID_ID, INVALID_ID, INVALID_ID };
-        cell.neighbours = { INVALID_ID, INVALID_ID, INVALID_ID, INVALID_ID };
+        LightSector::ProbeSearchCell cell;
+        cell.probe_vertices = { LightSector::INVALID_ID, LightSector::INVALID_ID, LightSector::INVALID_ID, LightSector::INVALID_ID };
+        cell.neighbours = { LightSector::INVALID_ID, LightSector::INVALID_ID, LightSector::INVALID_ID, LightSector::INVALID_ID };
         // Translate vertex positions to matching probe positions by ID
         for (int i = 0; i < tetrahedron.vertices.size(); i++)
         {
@@ -958,7 +755,7 @@ void LightSector::BakeProbeNetworkCells(const std::vector<Tetrahedron>& tetrahed
         // Check to ensure all vertices found their matching probe
         for (const auto& probe_id : cell.probe_vertices)
         {
-            if (probe_id == INVALID_ID)
+            if (probe_id == LightSector::INVALID_ID)
             {
                 throw "Could not find probe matching triangulated vertex";
             }
@@ -969,7 +766,7 @@ void LightSector::BakeProbeNetworkCells(const std::vector<Tetrahedron>& tetrahed
     }
 }
 
-void LightSector::BakeProbeNetworkNeighbours()
+void RadianceTransferBaker::BakeProbeNetworkNeighbours()
 {
     // Find neighbouring indices
     // For each cell
@@ -982,23 +779,23 @@ void LightSector::BakeProbeNetworkNeighbours()
             std::array<int, 3> self_probes;
             switch (self_face)
             {
-            case FACE_012:
+            case LightSector::FACE_012:
                 self_probes = { self.probe_vertices[0], self.probe_vertices[1], self.probe_vertices[2] };
                 break;
-            case FACE_023:
+            case LightSector::FACE_023:
                 self_probes = { self.probe_vertices[0], self.probe_vertices[2], self.probe_vertices[3] };
                 break;
-            case FACE_013:
+            case LightSector::FACE_013:
                 self_probes = { self.probe_vertices[0], self.probe_vertices[1], self.probe_vertices[3] };
                 break;
-            case FACE_123:
+            case LightSector::FACE_123:
                 self_probes = { self.probe_vertices[1], self.probe_vertices[2], self.probe_vertices[3] };
                 break;
             default:
                 throw "Hit impossible face statement";
             }
             // This was already calculated while being determined as an "other" face, skip
-            if (self.neighbours[self_face] != INVALID_ID)
+            if (self.neighbours[self_face] != LightSector::INVALID_ID)
             {
                 continue;
             }
@@ -1016,16 +813,16 @@ void LightSector::BakeProbeNetworkNeighbours()
                     std::array<int, 3> other_probes;
                     switch (other_face)
                     {
-                    case FACE_012:
+                    case LightSector::FACE_012:
                         other_probes = { other.probe_vertices[0], other.probe_vertices[1], other.probe_vertices[2] };
                         break;
-                    case FACE_023:
+                    case LightSector::FACE_023:
                         other_probes = { other.probe_vertices[0], other.probe_vertices[2], other.probe_vertices[3] };
                         break;
-                    case FACE_013:
+                    case LightSector::FACE_013:
                         other_probes = { other.probe_vertices[0], other.probe_vertices[1], other.probe_vertices[3] };
                         break;
-                    case FACE_123:
+                    case LightSector::FACE_123:
                         other_probes = { other.probe_vertices[1], other.probe_vertices[2], other.probe_vertices[3] };
                         break;
                     default:
@@ -1042,7 +839,7 @@ void LightSector::BakeProbeNetworkNeighbours()
     }
 }
 
-void LightSector::BakeProbeNetworkConvererters()
+void RadianceTransferBaker::BakeProbeNetworkConvererters()
 {
     // Build barycentric conversion matrices
     for (auto& cell : probe_network_)

@@ -222,7 +222,7 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\geometry.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\irradiancevolume.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h" />
-    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightsector.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightsector\lightsector.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\shadow.h" />
     <ClInclude Include="..\include\blons\graphics\render\commonshader.h" />
     <ClInclude Include="..\include\blons\graphics\render\computeshader.h" />
@@ -249,6 +249,7 @@
     <ClInclude Include="graphics\gui\debugsliderbutton.h" />
     <ClInclude Include="graphics\gui\debugslidertextbox.h" />
     <ClInclude Include="graphics\internalresource.h" />
+    <ClInclude Include="graphics\pipeline\stage\lightsector\radiancetransferbaker.h" />
     <ClInclude Include="graphics\render\glfuncloader.h" />
     <ClInclude Include="graphics\render\rendererd3d11.h" />
     <ClInclude Include="graphics\render\renderergl43.h" />
@@ -291,7 +292,8 @@
     <ClCompile Include="graphics\pipeline\stage\geometry.cpp" />
     <ClCompile Include="graphics\pipeline\stage\irradiancevolume.cpp" />
     <ClCompile Include="graphics\pipeline\stage\lighting.cpp" />
-    <ClCompile Include="graphics\pipeline\stage\lightsector.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\lightsector\lightsector.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\lightsector\radiancetransferbaker.cpp" />
     <ClCompile Include="graphics\pipeline\stage\shadow.cpp" />
     <ClCompile Include="graphics\render\commonshader.cpp" />
     <ClCompile Include="graphics\render\computeshader.cpp" />

@@ -28,7 +28,7 @@
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
-#include <blons/graphics/pipeline/stage/lightsector.h>
+#include <blons/graphics/pipeline/stage/lightsector/lightsector.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
 #include <blons/graphics/pipeline/stage/composite.h>
@@ -61,8 +61,6 @@ public:
         G_DEPTH,                 ///< Depth buffer of the geometry
         LIGHT_DEPTH,             ///< Depth buffer from the light's point of view
         DIRECT_LIGHT,            ///< Direct lighting pass
-        PROBE_ENV_MAPS_ALBEDO,
-        PROBE_ENV_MAPS_NORMAL,
         LIGHT,
         NONE                     ///< Results in nullptr
     };
