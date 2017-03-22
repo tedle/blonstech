@@ -34,6 +34,83 @@ namespace debug
 namespace
 {
 auto const cvar_debug_mode = console::RegisterVariable("dbg:probe-view", 0);
+
+struct ProbeWeight
+{
+    int probe_id;
+    float weight;
+};
+
+using CellProbeWeights = std::array<ProbeWeight, 4>;
+
+CellProbeWeights FindProbeWeights(Vector3 world_pos, const LightSector& sector)
+{
+    CellProbeWeights weights = {};
+    const auto& probes = sector.probes();
+    const auto& network = sector.probe_network();
+    const units::world kMinBarycentricMargin = -0.01f;
+    const std::size_t kMaxSteps = network.size();
+    int cell_id = 0;
+    for (int i = 0; i < kMaxSteps; i++)
+    {
+        const auto& cell = network[cell_id];
+
+        Vector4 barycentric_pos(world_pos - probes[cell.probe_vertices[0]].pos);
+        Vector4 barycentric_coords = barycentric_pos * cell.barycentric_converter;
+        barycentric_coords = Vector4(1.0f - barycentric_coords.x - barycentric_coords.y - barycentric_coords.z, barycentric_coords.x, barycentric_coords.y, barycentric_coords.z);
+        if (barycentric_coords.x < kMinBarycentricMargin)
+        {
+            auto next_cell = cell.neighbours[LightSector::FACE_123];
+            if (next_cell != -1)
+            {
+                cell_id = next_cell;
+                continue;
+            }
+            return weights;
+        }
+        if (barycentric_coords.y < kMinBarycentricMargin)
+        {
+            auto next_cell = cell.neighbours[LightSector::FACE_023];
+            if (next_cell != -1)
+            {
+                cell_id = next_cell;
+                continue;
+            }
+            return weights;
+        }
+        if (barycentric_coords.z < kMinBarycentricMargin)
+        {
+            auto next_cell = cell.neighbours[LightSector::FACE_013];
+            if (next_cell != -1)
+            {
+                cell_id = next_cell;
+                continue;
+            }
+            return weights;
+        }
+        if (barycentric_coords.w < kMinBarycentricMargin)
+        {
+            auto next_cell = cell.neighbours[LightSector::FACE_012];
+            if (next_cell != -1)
+            {
+                cell_id = next_cell;
+                continue;
+            }
+            return weights;
+        }
+        weights[0].probe_id = cell.probe_vertices[0];
+        weights[0].weight = std::max(barycentric_coords.x, 0.0f);
+        weights[1].probe_id = cell.probe_vertices[1];
+        weights[1].weight = std::max(barycentric_coords.y, 0.0f);
+        weights[2].probe_id = cell.probe_vertices[2];
+        weights[2].weight = std::max(barycentric_coords.z, 0.0f);
+        weights[3].probe_id = cell.probe_vertices[3];
+        weights[3].weight = std::max(barycentric_coords.w, 0.0f);
+        return weights;
+    }
+    log::Warn("Failed to find probe lighting cell\n");
+    return weights;
+}
 } // namespace
 
 ProbeView::ProbeView()
@@ -70,14 +147,17 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         InitMeshBuffers(sector);
     }
 
-    auto light_probes = sector.probes();
     auto context = render::context();
+    auto light_probes = sector.probes();
+    Matrix vp_matrix = view_matrix * proj_matrix;
+    // Grab camera position from its view matrix. Hacky, lazy, sorry, but not that sorry
+    auto inv_view_matrix = MatrixInverse(view_matrix);
+    Vector3 camera_pos(inv_view_matrix.m[3][0], inv_view_matrix.m[3][1], inv_view_matrix.m[3][2]);
+    auto probe_weights = FindProbeWeights(camera_pos, sector);
     // Bind the buffer to render the probes on top of
     target->Bind(false);
     context->SetDepthTesting(true);
     target->BindDepthTexture(depth);
-
-    Matrix vp_matrix = view_matrix * proj_matrix;
 
     // Set the probe-independent inputs
     if (!probe_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
@@ -89,6 +169,15 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
 
     for (const auto& probe : light_probes)
     {
+        float weight = 0.0f;
+        for (const auto& probe_weight : probe_weights)
+        {
+            if (probe_weight.probe_id == probe.id)
+            {
+                weight = probe_weight.weight;
+                break;
+            }
+        }
         // Bind the vertex data
         probe_meshes_->Render(false);
 
@@ -96,7 +185,8 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         // Set the probe-specific inputs
         if (!probe_shader_->SetInput("mvp_matrix",  world_matrix * vp_matrix) ||
             !probe_shader_->SetInput("normal_matrix", MatrixTranspose(MatrixInverse(world_matrix))) ||
-            !probe_shader_->SetInput("probe_id", static_cast<int>(probe.id)))
+            !probe_shader_->SetInput("probe_id", static_cast<int>(probe.id)) ||
+            !probe_shader_->SetInput("probe_weight", weight))
         {
             return false;
         }

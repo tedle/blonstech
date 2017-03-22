@@ -36,6 +36,7 @@ out vec4 frag_colour;
 
 // Globals
 uniform int probe_id;
+uniform float probe_weight;
 uniform float exposure;
 uniform int debug_mode;
 
@@ -82,6 +83,7 @@ void main(void)
     frag_colour.rgb += ambient_light                  * (debug_mode == 1 ? 1.0f : 0.0f);
     frag_colour.rgb += sky_vis                        * (debug_mode == 2 ? 1.0f : 0.0f);
     frag_colour.rgb += sky_vis_diffuse                * (debug_mode == 3 ? 1.0f : 0.0f);
-    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f * (debug_mode == 4 ? 1.0f : 0.0f);
-    frag_colour.rgb += id_colour                      * (debug_mode == 5 ? 1.0f : 0.0f);
+    frag_colour.rgb += probe_weight                   * (debug_mode == 4 ? 1.0f : 0.0f);
+    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f * (debug_mode == 5 ? 1.0f : 0.0f);
+    frag_colour.rgb += id_colour                      * (debug_mode == 6 ? 1.0f : 0.0f);
 }
