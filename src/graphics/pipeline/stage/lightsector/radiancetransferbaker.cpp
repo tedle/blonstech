@@ -586,6 +586,8 @@ void RadianceTransferBaker::BakeSkyCoefficients(const std::vector<SkyVisSample>&
 
 void RadianceTransferBaker::BakeProbeNetwork()
 {
+    // Probe lookup acceleration and interpolation structure based on:
+    // http://www.gdcvault.com/play/1015312/Light-Probe-Interpolation-Using-Tetrahedral
     auto triangulation = TriangulateProbeNetwork();
     BakeProbeNetworkCells(triangulation);
     BakeProbeNetworkNeighbours();
@@ -871,6 +873,100 @@ void RadianceTransferBaker::BakeProbeNetworkConvererters()
         T.m[3][0] = 0;    T.m[3][1] = 0;    T.m[3][2] = 0;    T.m[3][3] = 1;
         // Store the inverse
         cell.barycentric_converter = MatrixInverse(T);
+    }
+
+    std::array<Vector3, 3> pos;
+    std::array<Vector3, 3> normal;
+    // To solve for the polynomial that creates a triangle coplanar with the input point,
+    // we create an intermediate triangle that assumes the barycentric coordinates [a,b,1] thus meaning
+    // that our point, P, can be equal to C, and the origin can be equal to Cprime
+    // So we subtract our C and Cprime from the A and B values and use P as the third ray vector and origin
+    // as the third vertex
+    // As well we make inverted C and Cprime values to readjust the coefficients after the base
+    // calculations are made by using their values in the full expansion for that polynomial coefficient
+    Vector3 A = pos[0] - pos[2];
+    Vector3 B = pos[1] - pos[2];
+    Vector3 C = pos[2] * -1.0f;
+    Vector3 Ap = normal[0] - normal[2];
+    Vector3 Bp = normal[1] - normal[2];
+    Vector3 Cp = normal[2] * -1.0f;
+    // Taking the full polynomial expansion of the determinant from the matrix T
+    //     [A.x + tA'.x B.x+tB'.x C.x + tC'.x]
+    // T = [A.y + tA'.y B.y+tB'.y C.y + tC'.y]
+    //     [A.z + tA'.z B.z+tB'.z C.z + tC'.z]
+    // Gives us:
+    // det(T) = T.11(T.22*T.33 - T.23*T.32) - T.12(T.21*T.33 - T.23*T.31) + T.13(T.21*T.32 - T.22*T.31)
+    //        = +t^3(A'x*B'y*C'z - A'x*C'y*B'z)
+    //          -t^3(B'x*A'y*C'z - B'x*C'y*A'z)
+    //          +t^3(C'x*A'y*B'z - C'x*B'y*A'z)
+    //
+    //          +t^2(A'x*By*C'z + A'x*B'y*Cz - A'x*Cy*B'z - A'x*C'y*Bz + Ax*B'y*C'z - Ax*C'y*B'z)
+    //          -t^2(B'x*Ay*C'z + B'x*A'y*Cz - B'x*Cy*A'z - B'x*C'y*Az + Bx*A'y*C'z - Bx*C'y*A'z)
+    //          +t^2(C'x*Ay*B'z + C'x*A'y*Bz - C'x*By*A'z - C'x*B'y*Az + Cx*A'y*B'z - Cx*B'y*A'z)
+    //
+    //          +t^1(A'x*By*Cz - A'x*Cy*Bz + Ax*By*C'z + Ax*B'y*Cz - Ax*Cy*B'z - Ax*C'y*Bz)
+    //          -t^1(B'x*Ay*Cz - B'x*Cy*Az + Bx*Ay*C'z + Bx*A'y*Cz - Bx*Cy*A'z - Bx*C'y*Az)
+    //          +t^1(C'x*Ay*Bz - C'x*By*Az + Cx*Ay*B'z + Cx*A'y*Bz - Cx*By*A'z - Cx*B'y*Az)
+    //
+    //          +t^0(Ax*By*Cz - Ax*Cy*Bz)
+    //          -t^0(Bx*Ay*Cz - Bx*Cy*Az)
+    //          +t^0(Cx*Ay*Bz - Cx*By*Az)
+    //
+    // We split each coefficient into a matrix row, excluding the cubic. Since we only need the root of
+    // the polynomial we can easily convert the coefficients to be monic without affecting the results
+    // meaning the cubic coefficient does not need to be stored (it is always 1, or occasionally 0 in degenerate cases).
+    //
+    // Also, since our initial conversion runs the assumption that Cprime is 0, we can exclude any terms that use it
+    // until the inverted adjustment done in the last column
+
+    Matrix converter;
+    // Calculating t^3
+    float t3 = (Ap.x*Bp.y*Cp.z - Ap.x*Cp.y*Bp.z)
+             - (Bp.x*Ap.y*Cp.z - Bp.x*Cp.y*Ap.z)
+             + (Cp.x*Ap.y*Bp.z - Cp.x*Bp.y*Ap.z);
+    // Calculating t^2
+    float t2 = (Ap.x*B.y*Cp.z + Ap.x*Bp.y*C.z - Ap.x*C.y*Bp.z - Ap.x*Cp.y*B.z + A.x*Bp.y*Cp.z - A.x*Cp.y*Bp.z)
+             - (Bp.x*A.y*Cp.z + Bp.x*Ap.y*C.z - Bp.x*C.y*Ap.z - Bp.x*Cp.y*A.z + B.x*Ap.y*Cp.z - B.x*Cp.y*Ap.z)
+             + (Cp.x*A.y*Bp.z + Cp.x*Ap.y*B.z - Cp.x*B.y*Ap.z - Cp.x*Bp.y*A.z + C.x*Ap.y*Bp.z - C.x*Bp.y*Ap.z);
+    // Use all terms where P.* = C.*, excluding C
+    converter.m[0][0] = Ap.y*Bp.z - Bp.y*Ap.z; // P.x
+    converter.m[0][1] = Bp.x*Ap.z - Ap.x*Bp.z; // P.y
+    converter.m[0][2] = Ap.x*Bp.y - Bp.x*Ap.y; // P.z
+    converter.m[0][3] = t2;                    // P.w = 1 (adjustment term)
+    // Calculating t^1
+    float t1 = (Ap.x*B.y*C.z - Ap.x*C.y*B.z + A.x*B.y*Cp.z + A.x*Bp.y*C.z - A.x*C.y*Bp.z - A.x*Cp.y*B.z)
+             - (Bp.x*A.y*C.z - Bp.x*C.y*A.z + B.x*A.y*Cp.z + B.x*Ap.y*C.z - B.x*C.y*Ap.z - B.x*Cp.y*A.z)
+             + (Cp.x*A.y*B.z - Cp.x*B.y*A.z + C.x*A.y*Bp.z + C.x*Ap.y*B.z - C.x*B.y*Ap.z - C.x*Bp.y*A.z);
+    // Use all terms where P.* = C.*, excluding C
+    converter.m[1][0] = A.y*Bp.z + Ap.y*B.z - B.y*Ap.z - Bp.y*A.z; // P.x
+    converter.m[1][1] = Bp.x*A.z + B.x*Ap.z - Ap.z*B.z - A.x*Bp.z; // P.y
+    converter.m[1][2] = Ap.x*B.y + A.x*Bp.y - Bp.x*A.y - B.x*Ap.y; // P.z
+    converter.m[1][3] = t1;                                        // P.w = 1 (adjustment term)
+    // Calculating t^0
+    float t0 = (A.x*B.y*C.z - A.x*C.y*B.z)
+             - (B.x*A.y*C.z - B.x*C.y*A.z)
+             + (C.x*A.y*B.z - C.x*B.y*A.z);
+    // Use all terms where P.* = C.*, excluding C
+    converter.m[2][0] = A.y*B.z - B.y*A.z; // P.x
+    converter.m[2][1] = B.x*A.z - A.x*B.z; // P.y
+    converter.m[2][2] = A.x*B.y - B.x*A.y; // P.z
+    converter.m[2][3] = t0;                // P.w = 1 (adjustment term)
+
+    // Convert to a monic if this is a cubic polynomial
+    if (abs(t3) > std::numeric_limits<float>::epsilon())
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                converter.m[i][j] /= t3;
+            }
+        }
+    }
+    // Otherwise make as a non-cubic polynomial
+    else
+    {
+        throw "whoops implement this please";
     }
 }
 } // namespace stage
