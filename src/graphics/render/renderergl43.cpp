@@ -941,6 +941,7 @@ const TextureResource* RendererGL43::FramebufferDepthTexture(FramebufferResource
     return fbo->depth_.get();
 }
 
+// TODO: Change this to take VAO or some representation thereof instead? Or at least remove need for index buffer
 void RendererGL43::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
 {
     UnmapBuffers();
