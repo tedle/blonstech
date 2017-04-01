@@ -40,6 +40,7 @@ namespace
 const Matrix kCubeFaceProjection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 100.0f);
 const std::vector<AxisAlignedNormal> kFaceOrder = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
 const int kProbeNetworkFaces = 4;
+const int kProbeNetworkEdges = 3;
 Vector3 FaceRotation(AxisAlignedNormal face)
 {
     units::world pitch = 0.0f;
@@ -589,8 +590,11 @@ void RadianceTransferBaker::BakeProbeNetwork()
     // Probe lookup acceleration and interpolation structure based on:
     // http://www.gdcvault.com/play/1015312/Light-Probe-Interpolation-Using-Tetrahedral
     auto triangulation = TriangulateProbeNetwork();
-    BakeProbeNetworkCells(triangulation);
-    BakeProbeNetworkNeighbours();
+    BakeProbeNetworkInnerCells(triangulation);
+    BakeProbeNetworkInnerNeighbours();
+    BakeProbeNetworkOuterCells();
+    BakeProbeNetworkOuterNeighbours();
+    BakeProbeNetworkHullNormals();
     BakeProbeNetworkConvererters();
 }
 
@@ -734,7 +738,7 @@ std::vector<Tetrahedron> RadianceTransferBaker::TriangulateProbeNetwork()
     return tetrahedrons;
 }
 
-void RadianceTransferBaker::BakeProbeNetworkCells(const std::vector<Tetrahedron>& tetrahedrons)
+void RadianceTransferBaker::BakeProbeNetworkInnerCells(const std::vector<Tetrahedron>& tetrahedrons)
 {
     // Create a probe search cell for each tetrahedron
     for (const auto& tetrahedron : tetrahedrons)
@@ -768,7 +772,7 @@ void RadianceTransferBaker::BakeProbeNetworkCells(const std::vector<Tetrahedron>
     }
 }
 
-void RadianceTransferBaker::BakeProbeNetworkNeighbours()
+void RadianceTransferBaker::BakeProbeNetworkInnerNeighbours()
 {
     // Find neighbouring indices
     // For each cell
@@ -778,6 +782,11 @@ void RadianceTransferBaker::BakeProbeNetworkNeighbours()
         // For each face
         for (int self_face = 0; self_face < kProbeNetworkFaces; self_face++)
         {
+            // This was already calculated while being determined as an "other" face, skip
+            if (self.neighbours[self_face] != LightSector::INVALID_ID)
+            {
+                continue;
+            }
             std::array<int, 3> self_probes;
             switch (self_face)
             {
@@ -796,20 +805,15 @@ void RadianceTransferBaker::BakeProbeNetworkNeighbours()
             default:
                 throw "Hit impossible face statement";
             }
-            // This was already calculated while being determined as an "other" face, skip
-            if (self.neighbours[self_face] != LightSector::INVALID_ID)
-            {
-                continue;
-            }
             // Check against every other cell & face
             for (int other_id = 0; other_id < probe_network_.size(); other_id++)
             {
-                auto& other = probe_network_[other_id];
                 // Don't compare with self, skip
                 if (self_id == other_id)
                 {
                     continue;
                 }
+                auto& other = probe_network_[other_id];
                 for (int other_face = 0; other_face < kProbeNetworkFaces; other_face++)
                 {
                     std::array<int, 3> other_probes;
@@ -830,6 +834,7 @@ void RadianceTransferBaker::BakeProbeNetworkNeighbours()
                     default:
                         throw "Hit impossible face statement";
                     }
+                    // Inner cells have sorted probe vertices so a straight comparison works fine
                     if (self_probes == other_probes)
                     {
                         self.neighbours[self_face] = other_id;
@@ -841,132 +846,265 @@ void RadianceTransferBaker::BakeProbeNetworkNeighbours()
     }
 }
 
+void RadianceTransferBaker::BakeProbeNetworkOuterCells()
+{
+    const std::size_t outer_cell_start = probe_network_.size();
+
+    // Use an interator since we are modifying the list as we go
+    for (int i = 0; i < outer_cell_start; i++)
+    {
+        auto& cell = probe_network_[i];
+        for (const auto& face : { LightSector::FACE_123, LightSector::FACE_023, LightSector::FACE_013, LightSector::FACE_012 })
+        {
+            // Neighbour is an outer cell
+            if (cell.neighbours[face] == -1)
+            {
+                LightSector::ProbeSearchCell outer_cell;
+                outer_cell.neighbours[LightSector::FACE] = i;
+                outer_cell.neighbours[LightSector::EDGE_01] = LightSector::INVALID_ID;
+                outer_cell.neighbours[LightSector::EDGE_02] = LightSector::INVALID_ID;
+                outer_cell.neighbours[LightSector::EDGE_12] = LightSector::INVALID_ID;
+                // Used to ensure the winding on the outer cell's triangle is correct
+                int skipped_probe = -1;
+                switch (face)
+                {
+                case LightSector::FACE_123:
+                    outer_cell.probe_vertices = { cell.probe_vertices[1], cell.probe_vertices[2], cell.probe_vertices[3], LightSector::INVALID_ID };
+                    skipped_probe = cell.probe_vertices[0];
+                    break;
+                case LightSector::FACE_023:
+                    outer_cell.probe_vertices = { cell.probe_vertices[0], cell.probe_vertices[2], cell.probe_vertices[3], LightSector::INVALID_ID };
+                    skipped_probe = cell.probe_vertices[1];
+                    break;
+                case LightSector::FACE_013:
+                    outer_cell.probe_vertices = { cell.probe_vertices[0], cell.probe_vertices[1], cell.probe_vertices[3], LightSector::INVALID_ID };
+                    skipped_probe = cell.probe_vertices[2];
+                    break;
+                case LightSector::FACE_012:
+                    outer_cell.probe_vertices = { cell.probe_vertices[0], cell.probe_vertices[1], cell.probe_vertices[2], LightSector::INVALID_ID };
+                    skipped_probe = cell.probe_vertices[3];
+                    break;
+                default:
+                    throw "Impossible case statement during outer cell probe network bake";
+                }
+                // Ensure that the probe vertices are wound such that the cell's normal points outward, away from the tetrahedral mesh
+                std::array<Vector3, 3> pos = { probes_[outer_cell.probe_vertices[0]].pos,
+                                               probes_[outer_cell.probe_vertices[1]].pos,
+                                               probes_[outer_cell.probe_vertices[2]].pos };
+                // Uses the non-copied probe as a reference point as it should always be inside the mesh
+                Vector3 inner_pos = probes_[skipped_probe].pos;
+                Vector3 plane_normal = VectorCross(pos[1] - pos[0], pos[2] - pos[0]);
+                // If the cosine of the normal and inner pointing ray is positive, then the winding is incorrect
+                if (VectorDot(plane_normal, inner_pos - pos[0]) > 0.0f)
+                {
+                    std::iter_swap(outer_cell.probe_vertices.begin() + 1, outer_cell.probe_vertices.begin() + 2);
+                }
+                // Link the inner cell to the new outer cell
+                cell.neighbours[face] = static_cast<int>(probe_network_.size());
+                // Push the outer cell onto the network
+                probe_network_.push_back(outer_cell);
+            }
+        }
+    }
+}
+
+void RadianceTransferBaker::BakeProbeNetworkOuterNeighbours()
+{
+    // Find neighbouring indices
+    // For each cell
+    for (int self_id = 0; self_id < probe_network_.size(); self_id++)
+    {
+        auto& self = probe_network_[self_id];
+        if (!LightSector::IsOuterProbeSearchCell(self))
+        {
+            continue;
+        }
+        // For each edge
+        for (int self_edge = 0; self_edge < kProbeNetworkEdges; self_edge++)
+        {
+            // This was already calculated while being determined as an "other" edge, skip
+            if (self.neighbours[self_edge] != LightSector::INVALID_ID)
+            {
+                continue;
+            }
+            std::array<int, 2> self_probes;
+            switch (self_edge)
+            {
+            case LightSector::EDGE_12:
+                self_probes = { self.probe_vertices[1], self.probe_vertices[2] };
+                break;
+            case LightSector::EDGE_02:
+                self_probes = { self.probe_vertices[0], self.probe_vertices[2] };
+                break;
+            case LightSector::EDGE_01:
+                self_probes = { self.probe_vertices[0], self.probe_vertices[1] };
+                break;
+            default:
+                throw "Hit impossible face statement";
+            }
+            // Check against every other cell & edge
+            for (int other_id = 0; other_id < probe_network_.size(); other_id++)
+            {
+                auto& other = probe_network_[other_id];
+                // Don't compare with self and don't use inner cells, skip
+                if (self_id == other_id || !LightSector::IsOuterProbeSearchCell(other))
+                {
+                    continue;
+                }
+                for (int other_edge = 0; other_edge < kProbeNetworkEdges; other_edge++)
+                {
+                    std::array<int, 2> other_probes;
+                    switch (other_edge)
+                    {
+                    case LightSector::EDGE_12:
+                        other_probes = { other.probe_vertices[1], other.probe_vertices[2] };
+                        break;
+                    case LightSector::EDGE_02:
+                        other_probes = { other.probe_vertices[0], other.probe_vertices[2] };
+                        break;
+                    case LightSector::EDGE_01:
+                        other_probes = { other.probe_vertices[0], other.probe_vertices[1] };
+                        break;
+                    default:
+                        throw "Hit impossible face statement";
+                    }
+                    // Outer cell vertices cannot be sorted so we compare them like this
+                    if (std::min(self_probes[0], self_probes[1]) == std::min(other_probes[0], other_probes[1]) &&
+                        std::max(self_probes[0], self_probes[1]) == std::max(other_probes[0], other_probes[1]))
+                    {
+                        self.neighbours[self_edge] = other_id;
+                        other.neighbours[other_edge] = self_id;
+                    }
+                }
+            }
+        }
+    }
+}
+
+void RadianceTransferBaker::BakeProbeNetworkHullNormals()
+{
+    // We only need to store normals for probes that exist on the network hull.
+    // Meaning this will have many empty values, but it's worth the instant
+    // lookup for the temporary cost of some memory
+    hull_normals_.resize(probes_.size());
+
+    // This is implemented in a way that should hopefully never create a hull_normal
+    // that has an angle between any of its connected face_normals greater than pi/2
+    for (const auto& cell : probe_network_)
+    {
+        // Find every outer cell
+        if (!LightSector::IsOuterProbeSearchCell(cell))
+        {
+            continue;
+        }
+        std::array<Vector3, 3> face = { probes_[cell.probe_vertices[0]].pos, probes_[cell.probe_vertices[1]].pos, probes_[cell.probe_vertices[2]].pos };
+        Vector3 face_normal = VectorNormalize(VectorCross(face[1] - face[0], face[2] - face[0]));
+        // Iterate over every vertex in each outer cell
+        for (const auto& edge : { LightSector::EDGE_12, LightSector::EDGE_02, LightSector::EDGE_01 })
+        {
+            Vector3 edge1, edge2;
+            int probe_id;
+            switch (edge)
+            {
+            case LightSector::EDGE_12:
+                edge1 = face[1] - face[0];
+                edge2 = face[2] - face[0];
+                probe_id = cell.probe_vertices[0];
+                break;
+            case LightSector::EDGE_02:
+                edge1 = face[0] - face[1];
+                edge2 = face[2] - face[1];
+                probe_id = cell.probe_vertices[1];
+                break;
+            case LightSector::EDGE_01:
+                edge1 = face[0] - face[2];
+                edge2 = face[1] - face[2];
+                probe_id = cell.probe_vertices[2];
+                break;
+            }
+            float angle_weight = acos(VectorDot(VectorNormalize(edge1), VectorNormalize(edge2)));
+            // For each vertex, add the cell's normal weighted by the angle of the vertex's 2 connecting edges
+            hull_normals_[probe_id] += face_normal * angle_weight;
+        }
+    }
+    // Afterwards normalize each hull normal
+    for (auto& normal : hull_normals_)
+    {
+        if (VectorLength(normal) > 0.0f)
+        {
+            normal = VectorNormalize(normal);
+        }
+    }
+}
+
 void RadianceTransferBaker::BakeProbeNetworkConvererters()
 {
     // Build barycentric conversion matrices
     for (auto& cell : probe_network_)
     {
-        // Formula taken from:
-        // https://en.wikipedia.org/wiki/Barycentric_coordinate_system
-        // Described as:
-        // [b1] = T^(-1) * (p - r0)
-        // [b2]
-        // b3 = 1 - b1 - b2
-        // Where b1, b2, b3 are the barycentric coordinates
-        // p is the point to convert
-        // r0, r1, r2 are the points of a triangle
-        // T = [r1.x - r0.x, r2.x - r0.x]
-        //     [r1.y - r0.y, r2.y - r0.y]
-        // This is meant for triangles, as we use tetrahedrons our matrix is 3x3 instead
-
-        // Matrix that will hold the inverse of our barycentric converter
-        Matrix T;
-        // Create point deltas with the first vertex as the origin
-        Vector3 origin = probes_[cell.probe_vertices[0]].pos;
-        Vector3 d1 =     probes_[cell.probe_vertices[1]].pos - origin;
-        Vector3 d2 =     probes_[cell.probe_vertices[2]].pos - origin;
-        Vector3 d3 =     probes_[cell.probe_vertices[3]].pos - origin;
-        // We are use row-major matrices, so we instead use the transpose
-        T.m[0][0] = d1.x; T.m[0][1] = d1.y; T.m[0][2] = d1.z; T.m[0][3] = 0;
-        T.m[1][0] = d2.x; T.m[1][1] = d2.y; T.m[1][2] = d2.z; T.m[1][3] = 0;
-        T.m[2][0] = d3.x; T.m[2][1] = d3.y; T.m[2][2] = d3.z; T.m[2][3] = 0;
-        T.m[3][0] = 0;    T.m[3][1] = 0;    T.m[3][2] = 0;    T.m[3][3] = 1;
-        // Store the inverse
-        cell.barycentric_converter = MatrixInverse(T);
-    }
-
-    std::array<Vector3, 3> pos;
-    std::array<Vector3, 3> normal;
-    // To solve for the polynomial that creates a triangle coplanar with the input point,
-    // we create an intermediate triangle that assumes the barycentric coordinates [a,b,1] thus meaning
-    // that our point, P, can be equal to C, and the origin can be equal to Cprime
-    // So we subtract our C and Cprime from the A and B values and use P as the third ray vector and origin
-    // as the third vertex
-    // As well we make inverted C and Cprime values to readjust the coefficients after the base
-    // calculations are made by using their values in the full expansion for that polynomial coefficient
-    Vector3 A = pos[0] - pos[2];
-    Vector3 B = pos[1] - pos[2];
-    Vector3 C = pos[2] * -1.0f;
-    Vector3 Ap = normal[0] - normal[2];
-    Vector3 Bp = normal[1] - normal[2];
-    Vector3 Cp = normal[2] * -1.0f;
-    // Taking the full polynomial expansion of the determinant from the matrix T
-    //     [A.x + tA'.x B.x+tB'.x C.x + tC'.x]
-    // T = [A.y + tA'.y B.y+tB'.y C.y + tC'.y]
-    //     [A.z + tA'.z B.z+tB'.z C.z + tC'.z]
-    // Gives us:
-    // det(T) = T.11(T.22*T.33 - T.23*T.32) - T.12(T.21*T.33 - T.23*T.31) + T.13(T.21*T.32 - T.22*T.31)
-    //        = +t^3(A'x*B'y*C'z - A'x*C'y*B'z)
-    //          -t^3(B'x*A'y*C'z - B'x*C'y*A'z)
-    //          +t^3(C'x*A'y*B'z - C'x*B'y*A'z)
-    //
-    //          +t^2(A'x*By*C'z + A'x*B'y*Cz - A'x*Cy*B'z - A'x*C'y*Bz + Ax*B'y*C'z - Ax*C'y*B'z)
-    //          -t^2(B'x*Ay*C'z + B'x*A'y*Cz - B'x*Cy*A'z - B'x*C'y*Az + Bx*A'y*C'z - Bx*C'y*A'z)
-    //          +t^2(C'x*Ay*B'z + C'x*A'y*Bz - C'x*By*A'z - C'x*B'y*Az + Cx*A'y*B'z - Cx*B'y*A'z)
-    //
-    //          +t^1(A'x*By*Cz - A'x*Cy*Bz + Ax*By*C'z + Ax*B'y*Cz - Ax*Cy*B'z - Ax*C'y*Bz)
-    //          -t^1(B'x*Ay*Cz - B'x*Cy*Az + Bx*Ay*C'z + Bx*A'y*Cz - Bx*Cy*A'z - Bx*C'y*Az)
-    //          +t^1(C'x*Ay*Bz - C'x*By*Az + Cx*Ay*B'z + Cx*A'y*Bz - Cx*By*A'z - Cx*B'y*Az)
-    //
-    //          +t^0(Ax*By*Cz - Ax*Cy*Bz)
-    //          -t^0(Bx*Ay*Cz - Bx*Cy*Az)
-    //          +t^0(Cx*Ay*Bz - Cx*By*Az)
-    //
-    // We split each coefficient into a matrix row, excluding the cubic. Since we only need the root of
-    // the polynomial we can easily convert the coefficients to be monic without affecting the results
-    // meaning the cubic coefficient does not need to be stored (it is always 1, or occasionally 0 in degenerate cases).
-    //
-    // Also, since our initial conversion runs the assumption that Cprime is 0, we can exclude any terms that use it
-    // until the inverted adjustment done in the last column
-
-    Matrix converter;
-    // Calculating t^3
-    float t3 = (Ap.x*Bp.y*Cp.z - Ap.x*Cp.y*Bp.z)
-             - (Bp.x*Ap.y*Cp.z - Bp.x*Cp.y*Ap.z)
-             + (Cp.x*Ap.y*Bp.z - Cp.x*Bp.y*Ap.z);
-    // Calculating t^2
-    float t2 = (Ap.x*B.y*Cp.z + Ap.x*Bp.y*C.z - Ap.x*C.y*Bp.z - Ap.x*Cp.y*B.z + A.x*Bp.y*Cp.z - A.x*Cp.y*Bp.z)
-             - (Bp.x*A.y*Cp.z + Bp.x*Ap.y*C.z - Bp.x*C.y*Ap.z - Bp.x*Cp.y*A.z + B.x*Ap.y*Cp.z - B.x*Cp.y*Ap.z)
-             + (Cp.x*A.y*Bp.z + Cp.x*Ap.y*B.z - Cp.x*B.y*Ap.z - Cp.x*Bp.y*A.z + C.x*Ap.y*Bp.z - C.x*Bp.y*Ap.z);
-    // Use all terms where P.* = C.*, excluding C
-    converter.m[0][0] = Ap.y*Bp.z - Bp.y*Ap.z; // P.x
-    converter.m[0][1] = Bp.x*Ap.z - Ap.x*Bp.z; // P.y
-    converter.m[0][2] = Ap.x*Bp.y - Bp.x*Ap.y; // P.z
-    converter.m[0][3] = t2;                    // P.w = 1 (adjustment term)
-    // Calculating t^1
-    float t1 = (Ap.x*B.y*C.z - Ap.x*C.y*B.z + A.x*B.y*Cp.z + A.x*Bp.y*C.z - A.x*C.y*Bp.z - A.x*Cp.y*B.z)
-             - (Bp.x*A.y*C.z - Bp.x*C.y*A.z + B.x*A.y*Cp.z + B.x*Ap.y*C.z - B.x*C.y*Ap.z - B.x*Cp.y*A.z)
-             + (Cp.x*A.y*B.z - Cp.x*B.y*A.z + C.x*A.y*Bp.z + C.x*Ap.y*B.z - C.x*B.y*Ap.z - C.x*Bp.y*A.z);
-    // Use all terms where P.* = C.*, excluding C
-    converter.m[1][0] = A.y*Bp.z + Ap.y*B.z - B.y*Ap.z - Bp.y*A.z; // P.x
-    converter.m[1][1] = Bp.x*A.z + B.x*Ap.z - Ap.z*B.z - A.x*Bp.z; // P.y
-    converter.m[1][2] = Ap.x*B.y + A.x*Bp.y - Bp.x*A.y - B.x*Ap.y; // P.z
-    converter.m[1][3] = t1;                                        // P.w = 1 (adjustment term)
-    // Calculating t^0
-    float t0 = (A.x*B.y*C.z - A.x*C.y*B.z)
-             - (B.x*A.y*C.z - B.x*C.y*A.z)
-             + (C.x*A.y*B.z - C.x*B.y*A.z);
-    // Use all terms where P.* = C.*, excluding C
-    converter.m[2][0] = A.y*B.z - B.y*A.z; // P.x
-    converter.m[2][1] = B.x*A.z - A.x*B.z; // P.y
-    converter.m[2][2] = A.x*B.y - B.x*A.y; // P.z
-    converter.m[2][3] = t0;                // P.w = 1 (adjustment term)
-
-    // Convert to a monic if this is a cubic polynomial
-    if (abs(t3) > std::numeric_limits<float>::epsilon())
-    {
-        for (int i = 0; i < 4; i++)
+        // For inner cells we can build a matrix that takes as input
+        // the world position to test subtracted by the 0th vertex (world_pos - vertices[0].pos)
+        // and outputs a Vector3 of the barycentric coordinates for the tetrahedron
+        // The last coordinate is found with the calculation 1 - b.x - b.y - b.z
+        if (!LightSector::IsOuterProbeSearchCell(cell))
         {
-            for (int j = 0; j < 4; j++)
-            {
-                converter.m[i][j] /= t3;
-            }
+            // Formula taken from:
+            // https://en.wikipedia.org/wiki/Barycentric_coordinate_system
+            // Described as:
+            // [b1] = T^(-1) * (p - r0)
+            // [b2]
+            // b3 = 1 - b1 - b2
+            // Where b1, b2, b3 are the barycentric coordinates
+            // p is the point to convert
+            // r0, r1, r2 are the points of a triangle
+            // T = [r1.x - r0.x, r2.x - r0.x]
+            //     [r1.y - r0.y, r2.y - r0.y]
+            // This is meant for triangles, as we use tetrahedrons our matrix is 3x3 instead
+
+            // Matrix that will hold the inverse of our barycentric converter
+            Matrix T;
+            // Create point deltas with the first vertex as the origin
+            Vector3 origin = probes_[cell.probe_vertices[0]].pos;
+            Vector3 d1 = probes_[cell.probe_vertices[1]].pos - origin;
+            Vector3 d2 = probes_[cell.probe_vertices[2]].pos - origin;
+            Vector3 d3 = probes_[cell.probe_vertices[3]].pos - origin;
+            // We are use row-major matrices, so we instead use the transpose
+            T.m[0][0] = d1.x; T.m[0][1] = d1.y; T.m[0][2] = d1.z; T.m[0][3] = 0;
+            T.m[1][0] = d2.x; T.m[1][1] = d2.y; T.m[1][2] = d2.z; T.m[1][3] = 0;
+            T.m[2][0] = d3.x; T.m[2][1] = d3.y; T.m[2][2] = d3.z; T.m[2][3] = 0;
+            T.m[3][0] = 0;    T.m[3][1] = 0;    T.m[3][2] = 0;    T.m[3][3] = 1;
+            // Store the inverse
+            cell.barycentric_converter = MatrixInverse(T);
         }
-    }
-    // Otherwise make as a non-cubic polynomial
-    else
-    {
-        throw "whoops implement this please";
+        // For outer cells things are more complicated requiring more calculations
+        // so instead the matrix is used to store necessary data in an arbitrary format.
+        // While messy, and not very safe or clear, things are done this way to allow
+        // cells to share the same data container on the GPU
+        else
+        {
+            // The first 3 rows of the conversion matrix will store the hull normal to the matching vertex
+            // scaled by the inverse of the angle between the hull normal and face normal. This gives the normal
+            // a length such that the vertex + normal would be a position with a distance to the hull plane of 1.
+            // This is useful later when calculating barycentric coordinates by way of extruding a triangle that
+            // has a plane parallel to the hull plane as well as has each vertex lying on the ray of each hull normal
+            Matrix matrix = MatrixIdentity();
+            std::array<Vector3, 3> face = { probes_[cell.probe_vertices[0]].pos, probes_[cell.probe_vertices[1]].pos, probes_[cell.probe_vertices[2]].pos };
+            Vector3 face_normal = VectorNormalize(VectorCross(face[1] - face[0], face[2] - face[0]));
+            for (int i = 0; i < 3; i++)
+            {
+                Vector3 hull_normal = hull_normals_[cell.probe_vertices[i]];
+                float cosine_angle = VectorDot(face_normal, hull_normal);
+                if (cosine_angle < 0.0f)
+                {
+                    throw "Generated probe network hull normal has angle greater than pi/2 with connecting face";
+                }
+                hull_normal *= 1.0f / cosine_angle;
+                matrix.m[i][0] = hull_normal.x;
+                matrix.m[i][1] = hull_normal.y;
+                matrix.m[i][2] = hull_normal.z;
+            }
+            cell.barycentric_converter = matrix;
+        }
     }
 }
 } // namespace stage

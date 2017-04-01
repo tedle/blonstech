@@ -67,12 +67,19 @@ public:
         INVALID_ID = -1
     };
 
-    enum ProbeSearchFaceIndex
+    enum ProbeSearchInnerIndex
     {
-        FACE_012,
-        FACE_013,
+        FACE_123,
         FACE_023,
-        FACE_123
+        FACE_013,
+        FACE_012
+    };
+    enum ProbeSearchOuterIndex
+    {
+        EDGE_12,
+        EDGE_02,
+        EDGE_01,
+        FACE
     };
 
     // Uniformly sized voxel face
@@ -106,6 +113,8 @@ public:
 
     bool Relight(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix);
 
+    static bool IsOuterProbeSearchCell(const ProbeSearchCell& cell);
+
     const std::vector<Probe>& probes() const;
     const ShaderDataResource* probe_shader_data() const;
     const std::vector<ProbeSearchCell>& probe_network() const;
@@ -134,6 +143,7 @@ private:
 } // namespace blons
 
 /// \NEEDS_DOCUMENTATION
+/// \NEEDS_DOCUMENTATION_OF_GPU_FORMAT_VERY_THOROUGH_THANKS
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::pipeline::stage::LightSector
 /// \ingroup pipeline

@@ -145,6 +145,22 @@ LightSector::LightSector()
     probe_relight_shader_.reset(new ComputeShader("shaders/probe-relight.comp.glsl"));
 }
 
+void LightSector::BakeRadianceTransfer(const Scene& scene)
+{
+    // Bake the scene and retrieve the data
+    RadianceTransferBaker bake(scene, probes_);
+    probes_ = std::vector<Probe>(bake.probes().begin(), bake.probes().end());
+    surfels_ = bake.surfels();
+    surfel_bricks_ = bake.surfel_bricks();
+    surfel_brick_factors_ = bake.surfel_brick_factors();
+    probe_network_ = bake.probe_network();
+    // Update shader buffer with generated radiance data
+    probe_shader_data_.reset(new ShaderData<LightSector::Probe>(probes_.data(), probes_.size()));
+    surfel_shader_data_.reset(new ShaderData<LightSector::Surfel>(surfels_.data(), surfels_.size()));
+    surfel_brick_shader_data_.reset(new ShaderData<LightSector::SurfelBrick>(surfel_bricks_.data(), surfel_bricks_.size()));
+    surfel_brick_factor_shader_data_.reset(new ShaderData<LightSector::SurfelBrickFactor>(surfel_brick_factors_.data(), surfel_brick_factors_.size()));
+}
+
 bool LightSector::Relight(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix)
 {
     // Can be removed when we support more lights
@@ -182,20 +198,9 @@ bool LightSector::Relight(const Scene& scene, const Shadow& shadow, Matrix light
     return true;
 }
 
-void LightSector::BakeRadianceTransfer(const Scene& scene)
+bool LightSector::IsOuterProbeSearchCell(const ProbeSearchCell& cell)
 {
-    // Bake the scene and retrieve the data
-    RadianceTransferBaker bake(scene, probes_);
-    probes_ = std::vector<Probe>(bake.probes().begin(), bake.probes().end());
-    surfels_ = bake.surfels();
-    surfel_bricks_ = bake.surfel_bricks();
-    surfel_brick_factors_ = bake.surfel_brick_factors();
-    probe_network_ = bake.probe_network();
-    // Update shader buffer with generated radiance data
-    probe_shader_data_.reset(new ShaderData<LightSector::Probe>(probes_.data(), probes_.size()));
-    surfel_shader_data_.reset(new ShaderData<LightSector::Surfel>(surfels_.data(), surfels_.size()));
-    surfel_brick_shader_data_.reset(new ShaderData<LightSector::SurfelBrick>(surfel_bricks_.data(), surfel_bricks_.size()));
-    surfel_brick_factor_shader_data_.reset(new ShaderData<LightSector::SurfelBrickFactor>(surfel_brick_factors_.data(), surfel_brick_factors_.size()));
+    return cell.probe_vertices[3] == INVALID_ID;
 }
 
 const std::vector<LightSector::Probe>& LightSector::probes() const

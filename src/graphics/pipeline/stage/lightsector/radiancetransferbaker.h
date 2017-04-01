@@ -107,8 +107,11 @@ private:
     void BakeSkyCoefficients(const std::vector<SkyVisSample>& samples);
     void BakeProbeNetwork();
         std::vector<Tetrahedron> TriangulateProbeNetwork();
-        void BakeProbeNetworkCells(const std::vector<Tetrahedron>& tetrahedrons);
-        void BakeProbeNetworkNeighbours();
+        void BakeProbeNetworkInnerCells(const std::vector<Tetrahedron>& tetrahedrons);
+        void BakeProbeNetworkInnerNeighbours();
+        void BakeProbeNetworkOuterCells();
+        void BakeProbeNetworkOuterNeighbours();
+        void BakeProbeNetworkHullNormals();
         void BakeProbeNetworkConvererters();
 
     std::vector<LightSector::Probe> probes_;
@@ -118,6 +121,7 @@ private:
     std::vector<LightSector::SurfelBrickFactor> surfel_brick_factors_;
     std::unique_ptr<Framebuffer> environment_maps_;
     std::unique_ptr<Shader> environment_map_shader_;
+    std::vector<Vector3> hull_normals_;
 };
 } // namespace stage
 } // namespace pipeline
