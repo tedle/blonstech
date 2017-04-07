@@ -490,6 +490,37 @@ SHCoeffs3 SHProjectDirection3(Vector3 direction)
     return result;
 }
 
+Vector3 TriangleBarycentric(const Triangle& triangle, const Vector3& point)
+{
+    // Get barycentric coordinates through use of a modified Moller-Trumbore triangle intersection test:
+    // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
+    // Changes were made to prevent early exit and provide calculation of all barycentric coordinates
+    Vector3 barycentric;
+    const auto& tri = triangle.vertices;
+    Vector3 plane_normal = VectorNormalize(VectorCross(tri[1] - tri[0], tri[2] - tri[0]));
+    // Prevents parallel ray intersections by setting the ray origin to be below the hull plane
+    Vector3 ray_origin = triangle.vertices[0] - plane_normal;
+    Vector3 ray_dir = point - ray_origin;
+    Vector3 edge1 = tri[1] - tri[0];
+    Vector3 edge2 = tri[2] - tri[0];
+
+    // There aren't good names for these variables, sorry. They're just re-usable shorthand calculations
+    Vector3 P = VectorCross(ray_dir, edge2);
+    Vector3 T = ray_origin - tri[0];
+    Vector3 Q = VectorCross(T, edge1);
+    units::world det = VectorDot(edge1, P);
+    if (abs(det) <= std::numeric_limits<units::world>::epsilon())
+    {
+        throw "Provided point for barycentric triangle calculation is not coplanar";
+    }
+    units::world inv_det = 1.0f / det;
+
+    barycentric.y = VectorDot(T, P) * inv_det;
+    barycentric.z = VectorDot(ray_dir, Q) * inv_det;
+    barycentric.x = 1.0f - barycentric.y - barycentric.z;
+    return barycentric;
+}
+
 Sphere TetrahedronCircumsphere(const Tetrahedron& tetrahedron)
 {
     Sphere circumsphere;

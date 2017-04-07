@@ -640,11 +640,17 @@ struct Sphere
     units::world radius;
 };
 
+struct Triangle
+{
+    std::array<Vector3, 3> vertices;
+};
+
 struct Tetrahedron
 {
     std::array<Vector3, 4> vertices;
 };
 
+Vector3 TriangleBarycentric(const Triangle& triangle, const Vector3& point);
 Sphere TetrahedronCircumsphere(const Tetrahedron& tetrahedron);
 
 ////////////////////////////////////////////////////////////////////////////////

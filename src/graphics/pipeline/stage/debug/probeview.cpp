@@ -34,136 +34,6 @@ namespace debug
 namespace
 {
 auto const cvar_debug_mode = console::RegisterVariable("dbg:probe-view", 0);
-
-struct ProbeWeight
-{
-    int probe_id;
-    float weight;
-};
-
-using CellProbeWeights = std::array<ProbeWeight, 4>;
-
-CellProbeWeights FindProbeWeights(Vector3 world_pos, const LightSector& sector)
-{
-    CellProbeWeights weights = {};
-    const auto& probes = sector.probes();
-    const auto& network = sector.probe_network();
-    const units::world kMinBarycentricMargin = -0.01f;
-    const units::world kMinPlaneDistance = abs(kMinBarycentricMargin) / 2.0f;
-    const std::size_t kMaxSteps = network.size();
-    int cell_id = 0;
-    for (int i = 0; i < kMaxSteps; i++)
-    {
-        const auto& cell = network[cell_id];
-        Vector4 barycentric_coords;
-        // Barycentric coordinates are calculated by different means for outer and inner cells
-        if (sector.IsOuterProbeSearchCell(cell))
-        {
-            const auto& m = cell.barycentric_converter.m;
-            // Collect the positions of the 3 probes in this outer cell
-            std::array<Vector3, 3> pos = { probes[cell.probe_vertices[0]].pos,
-                                           probes[cell.probe_vertices[1]].pos,
-                                           probes[cell.probe_vertices[2]].pos };
-            // Collect each vertex normal, pre-scaled during bake to have a distance from the hull plane equal to 1
-            std::array<Vector3, 3> normal = { Vector3(m[0][0], m[0][1], m[0][2]),
-                                              Vector3(m[1][0], m[1][1], m[1][2]),
-                                              Vector3(m[2][0], m[2][1], m[2][2]) };
-            Vector3 plane_normal = VectorNormalize(VectorCross(pos[1] - pos[0], pos[2] - pos[0]));
-            Vector3 ray = world_pos - pos[0];
-            units::world distance_to_plane = VectorDot(plane_normal, ray);
-            if (distance_to_plane < kMinPlaneDistance)
-            {
-                cell_id = cell.neighbours[LightSector::FACE];
-                continue;
-            }
-            // Get barycentric coordinates through use of a modified Moller-Trumbore triangle intersection test:
-            // https://en.wikipedia.org/wiki/M%C3%B6ller%E2%80%93Trumbore_intersection_algorithm
-            // Changes were made to prevent early exit and provide calculation of all barycentric coordinates
-            // Start by extruding the hull face to contain our world position
-            std::array<Vector3, 3> extruded_face = { pos[0] + (normal[0] * distance_to_plane),
-                                                     pos[1] + (normal[1] * distance_to_plane),
-                                                     pos[2] + (normal[2] * distance_to_plane) };
-            // Prevents parallel ray intersections by setting the ray origin to be below the hull plane
-            Vector3 ray_origin = extruded_face[0] - plane_normal;
-            Vector3 ray_dir = world_pos - ray_origin;
-            units::world inv_det;
-            Vector3 edge1 = extruded_face[1] - extruded_face[0];
-            Vector3 edge2 = extruded_face[2] - extruded_face[0];
-
-            // There aren't good names for these variables, sorry. They're just re-usable shorthand calculations
-            Vector3 P = VectorCross(ray_dir, edge2);
-            Vector3 T = ray_origin - extruded_face[0];
-            Vector3 Q = VectorCross(T, edge1);
-            // Since the ray never runs parallel this should never be 0
-            inv_det = 1.0f / VectorDot(edge1, P);
-
-            barycentric_coords.y = VectorDot(T, P) * inv_det;
-            barycentric_coords.z = VectorDot(ray_dir, Q) * inv_det;
-            barycentric_coords.x = 1.0f - barycentric_coords.y - barycentric_coords.z;
-            // There are only 3 probes for an outer cell, the last weight will always be 0
-            barycentric_coords.w = 0.0f;
-            if (barycentric_coords.x < kMinBarycentricMargin)
-            {
-                auto next_cell = cell.neighbours[LightSector::EDGE_12];
-                cell_id = next_cell;
-                continue;
-            }
-            if (barycentric_coords.y < kMinBarycentricMargin)
-            {
-                auto next_cell = cell.neighbours[LightSector::EDGE_02];
-                cell_id = next_cell;
-                continue;
-            }
-            if (barycentric_coords.z < kMinBarycentricMargin)
-            {
-                auto next_cell = cell.neighbours[LightSector::EDGE_01];
-                cell_id = next_cell;
-                continue;
-            }
-        }
-        else
-        {
-            Vector4 barycentric_pos(world_pos - probes[cell.probe_vertices[0]].pos);
-            barycentric_coords = barycentric_pos * cell.barycentric_converter;
-            barycentric_coords = Vector4(1.0f - barycentric_coords.x - barycentric_coords.y - barycentric_coords.z, barycentric_coords.x, barycentric_coords.y, barycentric_coords.z);
-            if (barycentric_coords.x < kMinBarycentricMargin)
-            {
-                auto next_cell = cell.neighbours[LightSector::FACE_123];
-                cell_id = next_cell;
-                continue;
-            }
-            if (barycentric_coords.y < kMinBarycentricMargin)
-            {
-                auto next_cell = cell.neighbours[LightSector::FACE_023];
-                cell_id = next_cell;
-                continue;
-            }
-            if (barycentric_coords.z < kMinBarycentricMargin)
-            {
-                auto next_cell = cell.neighbours[LightSector::FACE_013];
-                cell_id = next_cell;
-                continue;
-            }
-            if (barycentric_coords.w < kMinBarycentricMargin)
-            {
-                auto next_cell = cell.neighbours[LightSector::FACE_012];
-                cell_id = next_cell;
-                continue;
-            }
-        }
-        weights[0].probe_id = cell.probe_vertices[0];
-        weights[0].weight = std::max(barycentric_coords.x, 0.0f);
-        weights[1].probe_id = cell.probe_vertices[1];
-        weights[1].weight = std::max(barycentric_coords.y, 0.0f);
-        weights[2].probe_id = cell.probe_vertices[2];
-        weights[2].weight = std::max(barycentric_coords.z, 0.0f);
-        weights[3].probe_id = cell.probe_vertices[3];
-        weights[3].weight = std::max(barycentric_coords.w, 0.0f);
-        return weights;
-    }
-    log::Warn("Failed to find probe lighting cell\n");
-    return weights;
-}
 } // namespace
 
 ProbeView::ProbeView()
@@ -206,7 +76,7 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
     // Grab camera position from its view matrix. Hacky, lazy, sorry, but not that sorry
     auto inv_view_matrix = MatrixInverse(view_matrix);
     Vector3 camera_pos(inv_view_matrix.m[3][0], inv_view_matrix.m[3][1], inv_view_matrix.m[3][2]);
-    auto probe_weights = FindProbeWeights(camera_pos, sector);
+    auto probe_weights = sector.FindProbeWeights(camera_pos);
     // Bind the buffer to render the probes on top of
     target->Bind(false);
     context->SetDepthTesting(true);
@@ -225,7 +95,7 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         float weight = 0.0f;
         for (const auto& probe_weight : probe_weights)
         {
-            if (probe_weight.probe_id == probe.id)
+            if (probe_weight.id == probe.id)
             {
                 weight = probe_weight.weight;
                 break;

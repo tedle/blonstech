@@ -82,6 +82,14 @@ public:
         FACE
     };
 
+    struct ProbeWeight
+    {
+        int id;
+        float weight;
+    };
+
+    using ProbeSearchWeights = std::array<ProbeWeight, 4>;
+
     // Uniformly sized voxel face
     struct Surfel
     {
@@ -114,6 +122,7 @@ public:
     bool Relight(const Scene& scene, const Shadow& shadow, Matrix light_vp_matrix);
 
     static bool IsOuterProbeSearchCell(const ProbeSearchCell& cell);
+    ProbeSearchWeights FindProbeWeights(const Vector3& point) const;
 
     const std::vector<Probe>& probes() const;
     const ShaderDataResource* probe_shader_data() const;
