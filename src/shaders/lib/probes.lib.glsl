@@ -32,6 +32,21 @@ layout(std430) buffer probe_network_buffer
     ProbeSearchCell _probe_network[];
 };
 
+layout(std430) buffer surfel_buffer
+{
+    Surfel _surfels[];
+};
+
+layout(std430) buffer surfel_brick_buffer
+{
+    SurfelBrick _surfel_bricks[];
+};
+
+layout(std430) buffer surfel_brick_factor_buffer
+{
+    SurfelBrickFactor _surfel_brick_factors[];
+};
+
 // Enums copied from blons::LightSector
 #define PROBE_SEARCH_CELL_INVALID_ID -1
 #define PROBE_SEARCH_CELL_FACE_123 0
@@ -43,25 +58,22 @@ layout(std430) buffer probe_network_buffer
 #define PROBE_SEARCH_CELL_EDGE_01 2
 #define PROBE_SEARCH_CELL_FACE 3
 
-Probe FindProbe(int probe_id)
-{
-    return _probes[probe_id];
-}
-
-int CountProbes()
-{
-    return _probes.length();
-}
-
-ProbeSearchCell FindProbeSearchCell(int cell_id)
-{
-    return _probe_network[cell_id];
-}
-
-int CountProbeSearchCells()
-{
-    return _probe_network.length();
-}
+// Done as defines to allow updating singular methods for smaller copies
+#define FindProbe(id) _probes[id]
+#define SetProbe(id, probe) _probes[id] = probe
+#define CountProbes() _probes.length()
+#define FindProbeSearchCell(id) _probe_network[id]
+#define SetProbeSearchCell(id, cell) _probe_network[id] = cell
+#define CountProbeSearchCells() _probe_network.length()
+#define FindProbeSurfel(id) _surfels[id]
+#define SetProbeSurfel(id, surfel) _surfels[id] = surfel
+#define CountProbeSurfels() _surfels.length()
+#define FindProbeSurfelBrick(id) _surfel_bricks[id]
+#define SetProbeSurfelBrick(id, brick) _surfel_bricks[id] = brick
+#define CountProbeSurfelBricks() _surfel_bricks.length()
+#define FindProbeSurfelBrickFactor(id) _surfel_brick_factors[id]
+#define SetProbeSurfelBrickFactor(id, factor) _surfel_brick_factors[id] = factor
+#define CountProbeSurfelBrickFactors() _surfel_brick_factors.length()
 
 bool IsOuterProbeSearchCell(const ProbeSearchCell cell)
 {

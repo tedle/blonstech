@@ -26,6 +26,7 @@
 // Includes
 #include <shaders/lib/types.lib.glsl>
 #include <shaders/lib/math.lib.glsl>
+#include <shaders/lib/probes.lib.glsl>
 
 // Workgroup size
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
@@ -33,21 +34,6 @@ layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 // Globals
 uniform SHColourCoeffs sh_sky_colour;
 uniform float sky_luminance;
-
-layout(std430) buffer probe_buffer
-{
-    Probe probes[];
-};
-
-layout(std430) buffer brick_buffer
-{
-    SurfelBrick surfel_bricks[];
-};
-
-layout(std430) buffer brick_factor_buffer
-{
-    SurfelBrickFactor surfel_brick_factors[];
-};
 
 struct AmbientCubeDirection
 {
@@ -66,7 +52,7 @@ const AmbientCubeDirection kBasisDirections[6] = AmbientCubeDirection[6](
 
 void ComputeAmbientCube(const uint probe_id)
 {
-    Probe probe = probes[probe_id];
+    Probe probe = FindProbe(probe_id);
     // Calculate sky lighting in all 6 basis directions
     for (int dir = 0; dir < 6; dir++)
     {
@@ -98,8 +84,8 @@ void ComputeAmbientCube(const uint probe_id)
         factor_id < probe.brick_factor_range_start + probe.brick_factor_count;
         factor_id++)
     {
-        SurfelBrickFactor factor = surfel_brick_factors[factor_id];
-        SurfelBrick brick = surfel_bricks[factor.brick_id];
+        SurfelBrickFactor factor = FindProbeSurfelBrickFactor(factor_id);
+        SurfelBrick brick = FindProbeSurfelBrick(factor.brick_id);
         vec3 radiance = vec3(brick.radiance[0], brick.radiance[1], brick.radiance[2]);
         for (int dir = 0; dir < 6; dir++)
         {
@@ -112,7 +98,7 @@ void ComputeAmbientCube(const uint probe_id)
             probe.cube_coeffs[cube_face][2] += weighted_radiance.b;
         }
     }
-    probes[probe_id].cube_coeffs = probe.cube_coeffs;
+    FindProbe(probe_id).cube_coeffs = probe.cube_coeffs;
 }
 
 void main(void)

@@ -26,6 +26,7 @@
 // Includes
 #include <shaders/lib/types.lib.glsl>
 #include <shaders/lib/math.lib.glsl>
+#include <shaders/lib/probes.lib.glsl>
 
 // Workgroup size
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
@@ -39,11 +40,6 @@ layout(rgba16f, binding = 4) writeonly uniform image3D irradiance_volume_pz_out;
 layout(rgba16f, binding = 5) writeonly uniform image3D irradiance_volume_nz_out;
 uniform mat4 world_matrix;
 
-layout(std430) buffer probe_buffer
-{
-    Probe probes[];
-};
-
 void main(void)
 {
     // Figure out the world space coordinates of this irradiance sample
@@ -54,14 +50,14 @@ void main(void)
 
     // TODO: Optimize this naive search, it actually hurts performance massively
     // Find the probe nearest to this sample
-    Probe nearest_probe = probes[0];
+    Probe nearest_probe = FindProbe(0);
     float nearest_length = distance(world_pos.xyz, vec3(nearest_probe.pos[0], nearest_probe.pos[1], nearest_probe.pos[2]));
-    for (int i = 1; i < probes.length(); i++)
+    for (int i = 1; i < CountProbes(); i++)
     {
-        float probe_length = distance(world_pos.xyz, vec3(probes[i].pos[0], probes[i].pos[1], probes[i].pos[2]));
+        float probe_length = distance(world_pos.xyz, vec3(FindProbe(i).pos[0], FindProbe(i).pos[1], FindProbe(i).pos[2]));
         if (probe_length < nearest_length)
         {
-            nearest_probe = probes[i];
+            nearest_probe = FindProbe(i);
             nearest_length = probe_length;
         }
     }

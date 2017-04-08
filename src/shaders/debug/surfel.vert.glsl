@@ -25,6 +25,8 @@
 
 // Includes
 #include <shaders/lib/types.lib.glsl>
+#include <shaders/lib/math.lib.glsl>
+#include <shaders/lib/probes.lib.glsl>
 
 // Ins n outs
 in vec3 input_pos;
@@ -35,14 +37,9 @@ out vec3 radiance;
 uniform mat4 world_matrix;
 uniform mat4 vp_matrix;
 
-layout(std430) buffer surfel_buffer
-{
-    Surfel surfels[];
-};
-
 void main(void)
 {
-    Surfel s = surfels[gl_InstanceID];
+    Surfel s = FindProbeSurfel(gl_InstanceID);
 
     // Invert Z to build for RH coordinates
     vec3 z_basis = normalize(vec3(-s.normal[0], -s.normal[1], -s.normal[2]));

@@ -186,8 +186,8 @@ bool LightSector::Relight(const Scene& scene, const Shadow& shadow, Matrix light
 
     // Iterate over every probe, building an irradiance term from sky light and any visible surfel bricks
     if (!probe_relight_shader_->SetInput("probe_buffer", probe_shader_data()) ||
-        !probe_relight_shader_->SetInput("brick_buffer", surfel_brick_shader_data()) ||
-        !probe_relight_shader_->SetInput("brick_factor_buffer", surfel_brick_factor_shader_data()) ||
+        !probe_relight_shader_->SetInput("surfel_brick_buffer", surfel_brick_shader_data()) ||
+        !probe_relight_shader_->SetInput("surfel_brick_factor_buffer", surfel_brick_factor_shader_data()) ||
         !probe_relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
         !probe_relight_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
         !probe_relight_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||

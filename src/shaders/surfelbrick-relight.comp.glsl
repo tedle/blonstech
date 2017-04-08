@@ -27,6 +27,7 @@
 #include <shaders/lib/types.lib.glsl>
 #include <shaders/lib/math.lib.glsl>
 #include <shaders/lib/shadow.lib.glsl>
+#include <shaders/lib/probes.lib.glsl>
 
 // Workgroup size
 layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
@@ -37,19 +38,6 @@ uniform sampler2D light_depth;
 uniform DirectionalLight sun;
 uniform vec3 metalness;
 uniform float gi_boost;
-
-layout(std430) buffer surfel_buffer
-{
-    Surfel surfels[];
-};
-layout(std430) buffer surfel_brick_buffer
-{
-    SurfelBrick surfel_bricks[];
-};
-layout(std430) buffer probe_buffer
-{
-    Probe probes[];
-};
 
 vec3 ComputeSurfelLighting(inout Surfel surfel)
 {
@@ -67,7 +55,7 @@ vec3 ComputeSurfelLighting(inout Surfel surfel)
         // We don't use a PBR diffuse term since those require a view vector which does not exist here
         radiance = light_visibility * sun.luminance * sun.colour * NdotL * gi_boost;
         // Use previous frame's ambient term of nearest probe to approximate infinite bounce lighting
-        Probe nearest_probe = probes[surfel.nearest_probe_id];
+        Probe nearest_probe = FindProbe(surfel.nearest_probe_id);
         vec3 ambient_cube[6] = vec3[6](
             vec3(nearest_probe.cube_coeffs[kPositiveX][0], nearest_probe.cube_coeffs[kPositiveX][1], nearest_probe.cube_coeffs[kPositiveX][2]),
             vec3(nearest_probe.cube_coeffs[kNegativeX][0], nearest_probe.cube_coeffs[kNegativeX][1], nearest_probe.cube_coeffs[kNegativeX][2]),
@@ -100,18 +88,18 @@ void main(void)
 {
     // Read the entire brick from SSBO
     uint brick_id = gl_GlobalInvocationID.x;
-    SurfelBrick brick = surfel_bricks[brick_id];
+    SurfelBrick brick = FindProbeSurfelBrick(brick_id);
 
     vec3 radiance = vec3(0);
     // Update lighting of every surfel in this brick while building a radiance term
     for (int surfel_id = brick.surfel_range_start; surfel_id < brick.surfel_range_start + brick.surfel_count; surfel_id++)
     {
         // Read surfel
-        Surfel surfel = surfels[surfel_id];
+        Surfel surfel = FindProbeSurfel(surfel_id);
         // Update lighting and build radiance term
         radiance += ComputeSurfelLighting(surfel);
         // Update surfel
-        surfels[surfel_id] = surfel;
+        SetProbeSurfel(surfel_id, surfel);
     }
     // Average radiance
     radiance /= float(brick.surfel_count);
@@ -120,5 +108,5 @@ void main(void)
     brick.radiance[1] = radiance.g;
     brick.radiance[2] = radiance.b;
     // Update brick
-    surfel_bricks[brick_id] = brick;
+    SetProbeSurfelBrick(brick_id, brick);
 }
