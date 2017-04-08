@@ -536,5 +536,8 @@
     <None Include="shaders\debug\line-grid.frag.glsl">
       <Filter>src\shaders\debug</Filter>
     </None>
+    <None Include="shaders\lib\probes.lib.glsl">
+      <Filter>src\shaders\lib</Filter>
+    </None>
   </ItemGroup>
 </Project>

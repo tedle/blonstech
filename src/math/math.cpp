@@ -499,7 +499,7 @@ Vector3 TriangleBarycentric(const Triangle& triangle, const Vector3& point)
     const auto& tri = triangle.vertices;
     Vector3 plane_normal = VectorNormalize(VectorCross(tri[1] - tri[0], tri[2] - tri[0]));
     // Prevents parallel ray intersections by setting the ray origin to be below the hull plane
-    Vector3 ray_origin = triangle.vertices[0] - plane_normal;
+    Vector3 ray_origin = tri[0] - plane_normal;
     Vector3 ray_dir = point - ray_origin;
     Vector3 edge1 = tri[1] - tri[0];
     Vector3 edge2 = tri[2] - tri[0];

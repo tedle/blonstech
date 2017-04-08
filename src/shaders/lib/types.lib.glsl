@@ -29,17 +29,33 @@ struct DirectionalLight
     float luminance;
 };
 
+// Based on LightSector::Probe
 struct Probe
 {
     int id;
-    // vec3 is secretly the size of vec4 in std430, don't use it!!!!!!!!!!!
-    float pos[3];
+    float pos[3]; // vec3 is secretly the size of vec4 in std430, don't use it!!!!!!!!!!!
     float cube_coeffs[6][3]; // 6 directions, 3 colour channels
     float sh_coeffs[9];
     int brick_factor_range_start;
     int brick_factor_count;
 };
 
+// Based on LightSector::ProbeSearchCell
+struct ProbeSearchCell
+{
+    int probe_vertices[4];
+    int neighbours[4];
+    float barycentric_converter[4][4]; // 4x4 matrix
+};
+
+// Based on LightSector::ProbeWeight
+struct ProbeWeight
+{
+    int id;
+    float weight;
+};
+
+// Based on LightSector::Surfel
 struct Surfel
 {
     int nearest_probe_id;
@@ -49,6 +65,7 @@ struct Surfel
     float radiance[3];
 };
 
+// Based on LightSector::SurfelBrick
 struct SurfelBrick
 {
     int surfel_range_start;
@@ -56,6 +73,7 @@ struct SurfelBrick
     float radiance[3];
 };
 
+// Based on LightSector::SurfelBrickFactor
 struct SurfelBrickFactor
 {
     int brick_id;
@@ -69,6 +87,7 @@ struct SHColourCoeffs
     float b[9];
 };
 
+// Based on gui::Manager::InternalDrawCallInputs
 struct UIDrawCallInputs
 {
     float colour[4];

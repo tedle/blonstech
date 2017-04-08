@@ -21,7 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-float kPi = 3.1415926535897932384626433832795f;
+const float kPi = 3.1415926535897932384626433832795f;
+const float kEpsilon = 0.000001f;
 
 // These values should match the AxisAlignedNormal enum in includes/math/math.h
 const int kPositiveX = 0;
@@ -41,6 +42,31 @@ vec3 SampleAmbientCube(const vec3 ambient_cube[6], const vec3 direction)
                   direction_sq.y * ambient_cube[axis_direction.y] +
                   direction_sq.z * ambient_cube[axis_direction.z];
     return colour;
+}
+
+vec3 TriangleBarycentric(const vec3 tri[3], const vec3 plane_normal, const vec3 pos)
+{
+    // Implementation copied from C++ TriangleBarycentric
+    vec3 barycentric;
+    vec3 ray_origin = tri[0] - plane_normal;
+    vec3 ray_dir = pos - ray_origin;
+    vec3 edge1 = tri[1] - tri[0];
+    vec3 edge2 = tri[2] - tri[0];
+
+    vec3 P = cross(ray_dir, edge2);
+    vec3 T = ray_origin - tri[0];
+    vec3 Q = cross(T, edge1);
+    float det = dot(edge1, P);
+    if (abs(det) <= kEpsilon)
+    {
+        return vec3(0);
+    }
+    float inv_det = 1.0f / det;
+
+    barycentric.y = dot(T, P) * inv_det;
+    barycentric.z = dot(ray_dir, Q) * inv_det;
+    barycentric.x = 1.0f - barycentric.y - barycentric.z;
+    return barycentric;
 }
 
 float __sh_l0m0()

@@ -156,6 +156,7 @@ void LightSector::BakeRadianceTransfer(const Scene& scene)
     probe_network_ = bake.probe_network();
     // Update shader buffer with generated radiance data
     probe_shader_data_.reset(new ShaderData<LightSector::Probe>(probes_.data(), probes_.size()));
+    probe_network_shader_data_.reset(new ShaderData<LightSector::ProbeSearchCell>(probe_network_.data(), probe_network_.size()));
     surfel_shader_data_.reset(new ShaderData<LightSector::Surfel>(surfels_.data(), surfels_.size()));
     surfel_brick_shader_data_.reset(new ShaderData<LightSector::SurfelBrick>(surfel_bricks_.data(), surfel_bricks_.size()));
     surfel_brick_factor_shader_data_.reset(new ShaderData<LightSector::SurfelBrickFactor>(surfel_brick_factors_.data(), surfel_brick_factors_.size()));
@@ -244,20 +245,17 @@ LightSector::ProbeSearchWeights LightSector::FindProbeWeights(const Vector3& poi
             barycentric_coords.w = 0.0f;
             if (barycentric_coords.x < kMinBarycentricMargin)
             {
-                auto next_cell = cell.neighbours[LightSector::EDGE_12];
-                cell_id = next_cell;
+                cell_id = cell.neighbours[LightSector::EDGE_12];
                 continue;
             }
             if (barycentric_coords.y < kMinBarycentricMargin)
             {
-                auto next_cell = cell.neighbours[LightSector::EDGE_02];
-                cell_id = next_cell;
+                cell_id = cell.neighbours[LightSector::EDGE_02];
                 continue;
             }
             if (barycentric_coords.z < kMinBarycentricMargin)
             {
-                auto next_cell = cell.neighbours[LightSector::EDGE_01];
-                cell_id = next_cell;
+                cell_id = cell.neighbours[LightSector::EDGE_01];
                 continue;
             }
         }
@@ -268,26 +266,22 @@ LightSector::ProbeSearchWeights LightSector::FindProbeWeights(const Vector3& poi
             barycentric_coords = Vector4(1.0f - barycentric_coords.x - barycentric_coords.y - barycentric_coords.z, barycentric_coords.x, barycentric_coords.y, barycentric_coords.z);
             if (barycentric_coords.x < kMinBarycentricMargin)
             {
-                auto next_cell = cell.neighbours[LightSector::FACE_123];
-                cell_id = next_cell;
+                cell_id = cell.neighbours[LightSector::FACE_123];
                 continue;
             }
             if (barycentric_coords.y < kMinBarycentricMargin)
             {
-                auto next_cell = cell.neighbours[LightSector::FACE_023];
-                cell_id = next_cell;
+                cell_id = cell.neighbours[LightSector::FACE_023];
                 continue;
             }
             if (barycentric_coords.z < kMinBarycentricMargin)
             {
-                auto next_cell = cell.neighbours[LightSector::FACE_013];
-                cell_id = next_cell;
+                cell_id = cell.neighbours[LightSector::FACE_013];
                 continue;
             }
             if (barycentric_coords.w < kMinBarycentricMargin)
             {
-                auto next_cell = cell.neighbours[LightSector::FACE_012];
-                cell_id = next_cell;
+                cell_id = cell.neighbours[LightSector::FACE_012];
                 continue;
             }
         }
@@ -318,6 +312,11 @@ const ShaderDataResource* LightSector::probe_shader_data() const
 const std::vector<LightSector::ProbeSearchCell>& LightSector::probe_network() const
 {
     return probe_network_;
+}
+
+const ShaderDataResource* LightSector::probe_network_shader_data() const
+{
+    return probe_network_shader_data_->data();
 }
 
 const std::vector<LightSector::Surfel>& LightSector::surfels() const

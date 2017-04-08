@@ -84,7 +84,9 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
 
     // Set the probe-independent inputs
     if (!probe_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
+        !probe_shader_->SetInput("probe_network_buffer", sector.probe_network_shader_data()) ||
         !probe_shader_->SetInput("exposure", scene.view.exposure()) ||
+        !probe_shader_->SetInput("camera_position", scene.view.pos()) ||
         !probe_shader_->SetInput("debug_mode", debug_mode))
     {
         return false;

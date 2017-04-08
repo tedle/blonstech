@@ -27,6 +27,7 @@
 #include <shaders/lib/colour.lib.glsl>
 #include <shaders/lib/math.lib.glsl>
 #include <shaders/lib/types.lib.glsl>
+#include <shaders/lib/probes.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;
@@ -39,11 +40,7 @@ uniform int probe_id;
 uniform float probe_weight;
 uniform float exposure;
 uniform int debug_mode;
-
-layout(std430) buffer probe_buffer
-{
-    Probe probes[];
-};
+uniform vec3 camera_position;
 
 void main(void)
 {
@@ -51,13 +48,14 @@ void main(void)
     vec3 surface_normal = normalize(vec3(norm[0].z, norm[1].z, norm[2].z));
 
     // Calculate ambient cube data
+    Probe probe = FindProbe(probe_id);
     vec3 ambient_cube[6] = vec3[6](
-        vec3(probes[probe_id].cube_coeffs[kPositiveX][0], probes[probe_id].cube_coeffs[kPositiveX][1], probes[probe_id].cube_coeffs[kPositiveX][2]),
-        vec3(probes[probe_id].cube_coeffs[kNegativeX][0], probes[probe_id].cube_coeffs[kNegativeX][1], probes[probe_id].cube_coeffs[kNegativeX][2]),
-        vec3(probes[probe_id].cube_coeffs[kPositiveY][0], probes[probe_id].cube_coeffs[kPositiveY][1], probes[probe_id].cube_coeffs[kPositiveY][2]),
-        vec3(probes[probe_id].cube_coeffs[kNegativeY][0], probes[probe_id].cube_coeffs[kNegativeY][1], probes[probe_id].cube_coeffs[kNegativeY][2]),
-        vec3(probes[probe_id].cube_coeffs[kPositiveZ][0], probes[probe_id].cube_coeffs[kPositiveZ][1], probes[probe_id].cube_coeffs[kPositiveZ][2]),
-        vec3(probes[probe_id].cube_coeffs[kNegativeZ][0], probes[probe_id].cube_coeffs[kNegativeZ][1], probes[probe_id].cube_coeffs[kNegativeZ][2])
+        vec3(probe.cube_coeffs[kPositiveX][0], probe.cube_coeffs[kPositiveX][1], probe.cube_coeffs[kPositiveX][2]),
+        vec3(probe.cube_coeffs[kNegativeX][0], probe.cube_coeffs[kNegativeX][1], probe.cube_coeffs[kNegativeX][2]),
+        vec3(probe.cube_coeffs[kPositiveY][0], probe.cube_coeffs[kPositiveY][1], probe.cube_coeffs[kPositiveY][2]),
+        vec3(probe.cube_coeffs[kNegativeY][0], probe.cube_coeffs[kNegativeY][1], probe.cube_coeffs[kNegativeY][2]),
+        vec3(probe.cube_coeffs[kPositiveZ][0], probe.cube_coeffs[kPositiveZ][1], probe.cube_coeffs[kPositiveZ][2]),
+        vec3(probe.cube_coeffs[kNegativeZ][0], probe.cube_coeffs[kNegativeZ][1], probe.cube_coeffs[kNegativeZ][2])
     );
     vec3 ambient_light = SampleAmbientCube(ambient_cube, surface_normal);
     // Ambient cubes store irradiance data, view as exit irradiance with pi division
@@ -67,11 +65,11 @@ void main(void)
     // Calculate direct sky vis data
     float sh_normal[9];
     SHProjectDirection3(surface_normal, sh_normal);
-    float sky_vis = SHDot3(sh_normal, probes[probe_id].sh_coeffs);
+    float sky_vis = SHDot3(sh_normal, probe.sh_coeffs);
     // Calculate sky vis as viewed on a diffuse material
     SHProjectCosineLobe3(surface_normal, sh_normal);
     // Divide by pi to turn irradiance into exit radiance
-    float sky_vis_diffuse = SHDot3(sh_normal, probes[probe_id].sh_coeffs) / kPi;
+    float sky_vis_diffuse = SHDot3(sh_normal, probe.sh_coeffs) / kPi;
 
     // Encode probe id into 3 colour channels
     vec3 id_colour;
@@ -79,11 +77,22 @@ void main(void)
     id_colour.g = float((probe_id & 0xFF00)   >>  8) / 255.0f;
     id_colour.b = float((probe_id & 0xFF0000) >> 16) / 255.0f;
 
+    ProbeWeight[4] weights = FindProbeWeights(camera_position);
+    float probe_weight_shader = 0.0f;
+    for (int i = 0; i < 4; i++)
+    {
+        if (weights[i].id == probe_id)
+        {
+            probe_weight_shader = weights[i].weight;
+        }
+    }
+
     frag_colour = vec4(0.0f, 0.0f, 0.0f, 1.0f);
     frag_colour.rgb += ambient_light                  * (debug_mode == 1 ? 1.0f : 0.0f);
     frag_colour.rgb += sky_vis                        * (debug_mode == 2 ? 1.0f : 0.0f);
     frag_colour.rgb += sky_vis_diffuse                * (debug_mode == 3 ? 1.0f : 0.0f);
     frag_colour.rgb += probe_weight                   * (debug_mode == 4 ? 1.0f : 0.0f);
-    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f * (debug_mode == 5 ? 1.0f : 0.0f);
-    frag_colour.rgb += id_colour                      * (debug_mode == 6 ? 1.0f : 0.0f);
+    frag_colour.rgb += probe_weight_shader            * (debug_mode == 5 ? 1.0f : 0.0f);
+    frag_colour.rgb += (surface_normal + 1.0f) / 2.0f * (debug_mode == 6 ? 1.0f : 0.0f);
+    frag_colour.rgb += id_colour                      * (debug_mode == 7 ? 1.0f : 0.0f);
 }

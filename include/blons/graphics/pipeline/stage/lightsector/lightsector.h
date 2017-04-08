@@ -69,17 +69,17 @@ public:
 
     enum ProbeSearchInnerIndex
     {
-        FACE_123,
-        FACE_023,
-        FACE_013,
-        FACE_012
+        FACE_123 = 0,
+        FACE_023 = 1,
+        FACE_013 = 2,
+        FACE_012 = 3
     };
     enum ProbeSearchOuterIndex
     {
-        EDGE_12,
-        EDGE_02,
-        EDGE_01,
-        FACE
+        EDGE_12 = 0,
+        EDGE_02 = 1,
+        EDGE_01 = 2,
+        FACE    = 3
     };
 
     struct ProbeWeight
@@ -127,6 +127,7 @@ public:
     const std::vector<Probe>& probes() const;
     const ShaderDataResource* probe_shader_data() const;
     const std::vector<ProbeSearchCell>& probe_network() const;
+    const ShaderDataResource* probe_network_shader_data() const;
     const std::vector<Surfel>& surfels() const;
     const ShaderDataResource* surfel_shader_data() const;
     const std::vector<SurfelBrick>& surfel_bricks() const;
@@ -143,6 +144,7 @@ private:
     std::unique_ptr<ComputeShader> probe_relight_shader_;
     std::unique_ptr<ComputeShader> surfel_brick_relight_shader_;
     std::unique_ptr<ShaderData<Probe>> probe_shader_data_;
+    std::unique_ptr<ShaderData<ProbeSearchCell>> probe_network_shader_data_;
     std::unique_ptr<ShaderData<Surfel>> surfel_shader_data_;
     std::unique_ptr<ShaderData<SurfelBrick>> surfel_brick_shader_data_;
     std::unique_ptr<ShaderData<SurfelBrickFactor>> surfel_brick_factor_shader_data_;

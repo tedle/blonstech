@@ -329,6 +329,7 @@
     <None Include="shaders\lib\colour.lib.glsl" />
     <None Include="shaders\lib\math.lib.glsl" />
     <None Include="shaders\lib\pbr.lib.glsl" />
+    <None Include="shaders\lib\probes.lib.glsl" />
     <None Include="shaders\lib\shadow.lib.glsl" />
     <None Include="shaders\lib\types.lib.glsl" />
     <None Include="shaders\light.frag.glsl" />
