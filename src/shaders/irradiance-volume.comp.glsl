@@ -48,42 +48,42 @@ void main(void)
     vec3 sample_pos = (vec3(gl_GlobalInvocationID) + vec3(0.5f)) / texels;
     vec4 world_pos = world_matrix * vec4(sample_pos, 1.0);
 
-    // TODO: Optimize this naive search, it actually hurts performance massively
-    // Find the probe nearest to this sample
-    Probe nearest_probe = FindProbe(0);
-    float nearest_length = distance(world_pos.xyz, vec3(nearest_probe.pos[0], nearest_probe.pos[1], nearest_probe.pos[2]));
-    for (int i = 1; i < CountProbes(); i++)
+    ProbeWeight weights[4] = FindProbeWeights(world_pos.xyz);
+    Probe probes[4] = { FindProbe(weights[0].id), FindProbe(weights[1].id), FindProbe(weights[2].id), FindProbe(weights[3].id) };
+    float cube_coeffs[6][3];
+    for (int face = 0; face < 6; face++)
     {
-        float probe_length = distance(world_pos.xyz, vec3(FindProbe(i).pos[0], FindProbe(i).pos[1], FindProbe(i).pos[2]));
-        if (probe_length < nearest_length)
+        for (int channel = 0; channel < 3; channel++)
         {
-            nearest_probe = FindProbe(i);
-            nearest_length = probe_length;
+            cube_coeffs[face][channel] =  probes[0].cube_coeffs[face][channel] * weights[0].weight;
+            cube_coeffs[face][channel] += probes[1].cube_coeffs[face][channel] * weights[1].weight;
+            cube_coeffs[face][channel] += probes[2].cube_coeffs[face][channel] * weights[2].weight;
+            cube_coeffs[face][channel] += probes[3].cube_coeffs[face][channel] * weights[3].weight;
         }
     }
 
-    imageStore(irradiance_volume_px_out, ivec3(gl_GlobalInvocationID), vec4(nearest_probe.cube_coeffs[kPositiveX][0],
-                                                                            nearest_probe.cube_coeffs[kPositiveX][1],
-                                                                            nearest_probe.cube_coeffs[kPositiveX][2],
+    imageStore(irradiance_volume_px_out, ivec3(gl_GlobalInvocationID), vec4(cube_coeffs[kPositiveX][0],
+                                                                            cube_coeffs[kPositiveX][1],
+                                                                            cube_coeffs[kPositiveX][2],
                                                                             0.0));
-    imageStore(irradiance_volume_nx_out, ivec3(gl_GlobalInvocationID), vec4(nearest_probe.cube_coeffs[kNegativeX][0],
-                                                                            nearest_probe.cube_coeffs[kNegativeX][1],
-                                                                            nearest_probe.cube_coeffs[kNegativeX][2],
+    imageStore(irradiance_volume_nx_out, ivec3(gl_GlobalInvocationID), vec4(cube_coeffs[kNegativeX][0],
+                                                                            cube_coeffs[kNegativeX][1],
+                                                                            cube_coeffs[kNegativeX][2],
                                                                             0.0));
-    imageStore(irradiance_volume_py_out, ivec3(gl_GlobalInvocationID), vec4(nearest_probe.cube_coeffs[kPositiveY][0],
-                                                                            nearest_probe.cube_coeffs[kPositiveY][1],
-                                                                            nearest_probe.cube_coeffs[kPositiveY][2],
+    imageStore(irradiance_volume_py_out, ivec3(gl_GlobalInvocationID), vec4(cube_coeffs[kPositiveY][0],
+                                                                            cube_coeffs[kPositiveY][1],
+                                                                            cube_coeffs[kPositiveY][2],
                                                                             0.0));
-    imageStore(irradiance_volume_ny_out, ivec3(gl_GlobalInvocationID), vec4(nearest_probe.cube_coeffs[kNegativeY][0],
-                                                                            nearest_probe.cube_coeffs[kNegativeY][1],
-                                                                            nearest_probe.cube_coeffs[kNegativeY][2],
+    imageStore(irradiance_volume_ny_out, ivec3(gl_GlobalInvocationID), vec4(cube_coeffs[kNegativeY][0],
+                                                                            cube_coeffs[kNegativeY][1],
+                                                                            cube_coeffs[kNegativeY][2],
                                                                             0.0));
-    imageStore(irradiance_volume_pz_out, ivec3(gl_GlobalInvocationID), vec4(nearest_probe.cube_coeffs[kPositiveZ][0],
-                                                                            nearest_probe.cube_coeffs[kPositiveZ][1],
-                                                                            nearest_probe.cube_coeffs[kPositiveZ][2],
+    imageStore(irradiance_volume_pz_out, ivec3(gl_GlobalInvocationID), vec4(cube_coeffs[kPositiveZ][0],
+                                                                            cube_coeffs[kPositiveZ][1],
+                                                                            cube_coeffs[kPositiveZ][2],
                                                                             0.0));
-    imageStore(irradiance_volume_nz_out, ivec3(gl_GlobalInvocationID), vec4(nearest_probe.cube_coeffs[kNegativeZ][0],
-                                                                            nearest_probe.cube_coeffs[kNegativeZ][1],
-                                                                            nearest_probe.cube_coeffs[kNegativeZ][2],
+    imageStore(irradiance_volume_nz_out, ivec3(gl_GlobalInvocationID), vec4(cube_coeffs[kNegativeZ][0],
+                                                                            cube_coeffs[kNegativeZ][1],
+                                                                            cube_coeffs[kNegativeZ][2],
                                                                             0.0));
 }

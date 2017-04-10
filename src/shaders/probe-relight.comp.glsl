@@ -64,9 +64,11 @@ void ComputeAmbientCube(const uint probe_id)
         // Divide by pi because sky_vis is merely a visibility function and is not meant to be scaled for irradiance
         // The irradiance scaling is applied on the sky_light itself
         float sky_vis = max(SHDot3(probe.sh_coeffs, direction_coeffs), 0.0f) / kPi;
-        vec3 sky_light = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
+        vec3 sky_light = vec3(
+            SHDot3(direction_coeffs, sh_sky_colour.r),
             SHDot3(direction_coeffs, sh_sky_colour.g),
-            SHDot3(direction_coeffs, sh_sky_colour.b));
+            SHDot3(direction_coeffs, sh_sky_colour.b)
+        );
         // Scale sky irradiance by visibility function
         sky_light *= sky_vis;
         sky_light *= sky_luminance;

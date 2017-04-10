@@ -64,6 +64,7 @@ bool IrradianceVolume::Relight(const LightSector& sector)
 {
     if (!irradiance_volume_shader_->SetInput("world_matrix", world_matrix_) ||
         !irradiance_volume_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
+        !irradiance_volume_shader_->SetInput("probe_network_buffer", sector.probe_network_shader_data()) ||
         !irradiance_volume_shader_->SetOutput("irradiance_volume_px_out", irradiance_volume_[POSITIVE_X]->texture(), 0) ||
         !irradiance_volume_shader_->SetOutput("irradiance_volume_nx_out", irradiance_volume_[NEGATIVE_X]->texture(), 1) ||
         !irradiance_volume_shader_->SetOutput("irradiance_volume_py_out", irradiance_volume_[POSITIVE_Y]->texture(), 2) ||

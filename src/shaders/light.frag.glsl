@@ -163,7 +163,7 @@ void main(void)
 
     // Uncomment to see ambient light only
     //surface_colour *= 0.000001;
-    //surface_colour += vec3(ambient);
+    //surface_colour += FilmicTonemap((AmbientDiffuse(pos, surface_normal) / kPi) * exposure);
 
     // Uncomment to see specular only
     //surface_colour *= 0.000001;
