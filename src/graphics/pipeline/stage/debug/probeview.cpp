@@ -124,19 +124,22 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
         }
     }
 
-    // Rendering the search network's lines
-    probe_network_mesh_->Render(false);
-    // Set the inputs
-    if (!grid_shader_->SetInput("mvp_matrix", view_matrix * proj_matrix))
+    // Rendering the search network's lines if relevant to the debug mode
+    if (debug_mode == 4)
     {
-        target->BindDepthTexture(target->depth());
-        return false;
-    }
-    // Run the shader
-    if (!grid_shader_->Render(probe_network_mesh_->index_count()))
-    {
-        target->BindDepthTexture(target->depth());
-        return false;
+        probe_network_mesh_->Render(false);
+        // Set the inputs
+        if (!grid_shader_->SetInput("mvp_matrix", view_matrix * proj_matrix))
+        {
+            target->BindDepthTexture(target->depth());
+            return false;
+        }
+        // Run the shader
+        if (!grid_shader_->Render(probe_network_mesh_->index_count()))
+        {
+            target->BindDepthTexture(target->depth());
+            return false;
+        }
     }
 
     target->BindDepthTexture(target->depth());
