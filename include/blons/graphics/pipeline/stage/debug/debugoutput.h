@@ -41,20 +41,50 @@ namespace stage
 {
 namespace debug
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Composites all active debug information into an alpha blendable
+/// Framebuffer that can be overlaid on top of the scene
+////////////////////////////////////////////////////////////////////////////////
 class DebugOutput
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Used to specify which output of the stage to retrieve
+    ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        DEBUG
+        DEBUG ///< Alpha blendable debug information
     };
 
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes a new DebugOutput stage
+    ///
+    /// \param perspective Screen dimensions and perspective information
+    ////////////////////////////////////////////////////////////////////////////////
     DebugOutput(Perspective perspective);
     ~DebugOutput() {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Renders out the alpha blendable, overlaid debug information
+    ///
+    /// \param depth Contains scene depth texture for depth testing 3D elements
+    /// \param scene Contains scene information for rendering
+    /// \param sector Handle to the light sector pass performed earlier in the
+    /// frame
+    /// \param irradiance Handle to the irradiance volume pass performed earlier in
+    /// the frame
+    /// \param view_matrix View matrix of the camera rendering the scene
+    /// \param proj_matrix Perspective matrix for rendering the scene
+    ////////////////////////////////////////////////////////////////////////////////
     bool Render(const TextureResource* depth, const Scene& scene, const LightSector& sector, const IrradianceVolume& irradiance, Matrix view_matrix, Matrix proj_matrix);
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves the rendering output from the pipeline stage
+    ///
+    /// \param buffer DebugOutput::Output target to retrieve
+    /// \return Handle to the output target texture
+    ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
 
 private:
@@ -67,5 +97,10 @@ private:
 } // namespace stage
 } // namespace pipeline
 } // namespace blons
+
+////////////////////////////////////////////////////////////////////////////////
+/// \class blons::pipeline::stage::debug::DebugOutput
+/// \ingroup pipeline
+////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_DEBUG_DEBUGOUTPUT_H_

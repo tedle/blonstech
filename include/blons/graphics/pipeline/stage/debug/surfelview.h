@@ -39,12 +39,32 @@ namespace stage
 {
 namespace debug
 {
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Generates debug info for LightSector::Surfel%s. Is already contained
+/// within the general purpose DebugOutput class and doesn't require its own
+/// instantiation
+////////////////////////////////////////////////////////////////////////////////
 class SurfelView
 {
 public:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Initializes a new SurfelView stage
+    ////////////////////////////////////////////////////////////////////////////////
     SurfelView();
     ~SurfelView() {}
 
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Renders out the alpha blendable, overlaid debug information to the
+    /// supplied Framebuffer
+    ///
+    /// \param target Framebuffer to render debug information onto
+    /// \param depth Contains scene depth texture for depth testing 3D elements
+    /// \param scene Contains scene information for rendering
+    /// \param sector Handle to the light sector pass performed earlier in the
+    /// frame
+    /// \param view_matrix View matrix of the camera rendering the scene
+    /// \param proj_matrix Perspective matrix for rendering the scene
+    ////////////////////////////////////////////////////////////////////////////////
     bool Render(Framebuffer* target, const TextureResource* depth, const Scene& scene, const LightSector& sector, Matrix view_matrix, Matrix proj_matrix);
 
 private:

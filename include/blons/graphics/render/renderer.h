@@ -656,7 +656,7 @@ public:
     ///
     /// \param data_handle Storage block handle
     /// \param offset The offset at to which data should be copied to in bytes
-    /// \param offset The length of data that should be copied in bytes
+    /// \param length The length of data that should be copied in bytes
     /// \param[in] data Memory block to copy data from
     ////////////////////////////////////////////////////////////////////////////////
     virtual void SetShaderData(ShaderDataResource* data_handle, std::size_t offset, std::size_t length, const void* data)=0;

@@ -48,7 +48,7 @@ public:
     enum Output
     {
         LIGHT_DEPTH, ///< 16-bit depth in the red channel and 16-bit depth squared in the green channel
-        DIRECT_LIGHT ///< R8G8B8 direct lighting. Only provides luminance
+        DIRECT_LIGHT ///< R8G8B8 direct lighting. Only provides light visibility mask
     };
 
 public:
@@ -99,9 +99,6 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::pipeline::stage::Shadow
 /// \ingroup pipeline
-/// 
-/// ### Example:
-/// See the pipeline module page for an example use on pipeline stages
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_SHADOW_H_

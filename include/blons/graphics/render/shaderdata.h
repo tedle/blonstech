@@ -123,17 +123,17 @@ protected:
 /// camera.position = blons::Vector3(5.0f, 5.0f, 3.0f);
 /// camera.view_direction = blons::Vector3(0.0f, 0.0f, 1.0f);
 /// blons::ShaderData<CameraContainer> camera_data(&camera, 1);
-
+///
 /// // Initialize multi-element ShaderData from a vector
 /// std::vector<blons::Vector4> vector_array = { blons::Vector4(5.0f, 5.0f, 5.0f, 3.0f), blons::Vector4(0.0f, 0.0f, 0.0f, 4.0f) };
 /// blons::ShaderData<blons::Vector4> array_data(vector_array.data(), vector_array.size());
-
+///
 /// // Use ShaderData in a ComputeShader
 /// blons::ComputeShader compute("ssbo-test.comp.glsl");
 /// compute.SetInput("camera_data", camera_data.data());
 /// compute.SetInput("array_data", array_data.data());
 /// compute.Run(1, 1, 1);
-
+///
 /// // Retrieve new values from GPU memory
 /// auto transformed_array = array_data.value();
 /// for (int i = 0; i < array_data.length(); i++)
@@ -144,4 +144,12 @@ protected:
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////////////////
+/// \defgroup gpu GPU Compatible Containers
+/// \ingroup graphics
+/// \brief Containers formatted for storage in GPU memory
+///
+/// Compatible as a ShaderData type, can be stored on GPU for easy access
+/// from shaders
+////////////////////////////////////////////////////////////////////////////////
 #endif // BLONSTECH_GRAPHICS_RENDER_SHADERDATA_H_

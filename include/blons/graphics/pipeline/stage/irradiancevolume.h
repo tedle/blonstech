@@ -39,7 +39,7 @@ namespace pipeline
 namespace stage
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Turns blons::pipeline::stage::LightProbe data into a volumetric grid
+/// \brief Turns blons::pipeline::stage::LightSector data into a volumetric grid
 /// of directional light for shading
 ////////////////////////////////////////////////////////////////////////////////
 class IrradianceVolume
@@ -76,6 +76,13 @@ public:
     /// \return Handle to the output target texture
     ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* output(Output buffer) const;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves a world matrix that scales and transforms a cube with
+    /// vertices of [0,1] to a rectangular prism containing this IrradianceVolume.
+    /// Used for transforming UVW space positions to world space positions
+    ///
+    /// \return Irradiance volume world matrix
+    ////////////////////////////////////////////////////////////////////////////////
     Matrix world_matrix() const;
 
 private:
@@ -87,14 +94,9 @@ private:
 } // namespace pipeline
 } // namespace blons
 
-/// \NEEDS_DOCUMENTATION
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::pipeline::stage::IrradianceVolume
 /// \ingroup pipeline
-///
-/// ### Example:
-/// \code
-/// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_IRRADIANCEVOLUME_H_
