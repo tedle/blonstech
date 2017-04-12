@@ -1021,6 +1021,9 @@ void RadianceTransferBaker::BakeProbeNetworkHullNormals()
                 edge2 = face[1] - face[2];
                 probe_id = cell.probe_vertices[2];
                 break;
+            default:
+                throw "Impossible case statement for LightSector edge iteration";
+                break;
             }
             float angle_weight = acos(VectorDot(VectorNormalize(edge1), VectorNormalize(edge2)));
             // For each vertex, add the cell's normal weighted by the angle of the vertex's 2 connecting edges
