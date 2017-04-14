@@ -32,6 +32,16 @@ const int kNegativeY = 3;
 const int kPositiveZ = 4;
 const int kNegativeZ = 5;
 
+// These values must represent the AxisAlignedNormal enum in includes/math/math.h for each index
+const vec3 kBasisDirections[6] = vec3[6](
+    vec3( 1.0,  0.0,  0.0),
+    vec3(-1.0,  0.0,  0.0),
+    vec3( 0.0,  1.0,  0.0),
+    vec3( 0.0, -1.0,  0.0),
+    vec3( 0.0,  0.0,  1.0),
+    vec3( 0.0,  0.0, -1.0)
+);
+
 vec3 SampleAmbientCube(const vec3 ambient_cube[6], const vec3 direction)
 {
     vec3 direction_sq = direction * direction;

@@ -35,29 +35,13 @@ layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
 uniform SHColourCoeffs sh_sky_colour;
 uniform float sky_luminance;
 
-struct AmbientCubeDirection
-{
-    int face;
-    vec3 direction;
-};
-
-const AmbientCubeDirection kBasisDirections[6] = AmbientCubeDirection[6](
-    AmbientCubeDirection(kPositiveX, vec3( 1.0,  0.0,  0.0)),
-    AmbientCubeDirection(kNegativeX, vec3(-1.0,  0.0,  0.0)),
-    AmbientCubeDirection(kPositiveY, vec3( 0.0,  1.0,  0.0)),
-    AmbientCubeDirection(kNegativeY, vec3( 0.0, -1.0,  0.0)),
-    AmbientCubeDirection(kPositiveZ, vec3( 0.0,  0.0,  1.0)),
-    AmbientCubeDirection(kNegativeZ, vec3( 0.0,  0.0, -1.0))
-);
-
 void ComputeAmbientCube(const uint probe_id)
 {
     Probe probe = FindProbe(probe_id);
     // Calculate sky lighting in all 6 basis directions
-    for (int dir = 0; dir < 6; dir++)
+    for (int cube_face = 0; cube_face < 6; cube_face++)
     {
-        const int cube_face = kBasisDirections[dir].face;
-        const vec3 direction = kBasisDirections[dir].direction;
+        const vec3 direction = kBasisDirections[cube_face];
 
         float direction_coeffs[9];
         SHProjectCosineLobe3(direction, direction_coeffs);
@@ -89,9 +73,8 @@ void ComputeAmbientCube(const uint probe_id)
         SurfelBrickFactor factor = FindProbeSurfelBrickFactor(factor_id);
         SurfelBrick brick = FindProbeSurfelBrick(factor.brick_id);
         vec3 radiance = vec3(brick.radiance[0], brick.radiance[1], brick.radiance[2]);
-        for (int dir = 0; dir < 6; dir++)
+        for (int cube_face = 0; cube_face < 6; cube_face++)
         {
-            const int cube_face = kBasisDirections[dir].face;
             // Brick weights sum up to pi over the set of factors
             vec3 weighted_radiance = radiance * factor.brick_weights[cube_face];
             // Add to ambient cube coefficients as we go
