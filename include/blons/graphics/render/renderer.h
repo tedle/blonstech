@@ -631,24 +631,26 @@ public:
     ///
     /// \param texture Texture to be set
     /// \param pixels Pixel data to update texture with
+    /// \param mip_level Mipmap level to set data for, with 0 being the base
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void SetTextureData(TextureResource* texture, PixelData* pixels)=0;
+    virtual void SetTextureData(TextureResource* texture, PixelData* pixels, unsigned int mip_level)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc SetTextureData(TextureResource*, PixelData*)
+    /// \copydoc SetTextureData(TextureResource*, PixelData*, unsigned int)
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void SetTextureData(TextureResource* texture, PixelData3D* pixels)=0;
+    virtual void SetTextureData(TextureResource* texture, PixelData3D* pixels, unsigned int mip_level)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves pixel data and formatting of a supplied texture from the
     /// GPU
     ///
     /// \param texture Texture to fetch
     /// \return Pixel data and information
+    /// \param mip_level Mipmap level to get data of, with 0 being the base
     ////////////////////////////////////////////////////////////////////////////////
-    virtual PixelData GetTextureData(const TextureResource* texture)=0;
+    virtual PixelData GetTextureData(const TextureResource* texture, unsigned int mip_level)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc GetTextureData(const TextureResource*)
+    /// \copydoc GetTextureData(const TextureResource*, unsigned int)
     ////////////////////////////////////////////////////////////////////////////////
-    virtual PixelData3D GetTextureData3D(const TextureResource* texture)=0;
+    virtual PixelData3D GetTextureData3D(const TextureResource* texture, unsigned int mip_level)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets arbitrary data of shader memory blocks. Size is immutable and
@@ -746,9 +748,10 @@ public:
     /// \param name Name of output variable to modify
     /// \param value Value to set output variable to
     /// \param texture_index The slot to bind the texture to
+    /// \param mip_level Mipmap level of the texture to bind
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)=0;
+    virtual bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index, unsigned int mip_level)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the blending mode for overwritten fragments. Defaults to

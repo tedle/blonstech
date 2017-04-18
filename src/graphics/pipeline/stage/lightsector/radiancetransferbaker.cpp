@@ -220,9 +220,9 @@ void RadianceTransferBaker::GatherProbeSamples(std::vector<SurfelSample>* surfel
     sky_samples->reserve(kProbeMapSize * kProbeMapSize * 6 * probes_.size());
 
     // Retrieve textures and pixel spacing in memory
-    auto albedo_tex = render::context()->GetTextureData(environment_maps_->textures()[0]);
-    auto normal_tex = render::context()->GetTextureData(environment_maps_->textures()[1]);
-    auto depth_tex = render::context()->GetTextureData(environment_maps_->depth());
+    auto albedo_tex = render::context()->GetTextureData(environment_maps_->textures()[0], 0);
+    auto normal_tex = render::context()->GetTextureData(environment_maps_->textures()[1], 0);
+    auto depth_tex = render::context()->GetTextureData(environment_maps_->depth(), 0);
     std::size_t albedo_pixel_size = albedo_tex.bits_per_pixel() / 8;
     std::size_t normal_pixel_size = normal_tex.bits_per_pixel() / 8;
     std::size_t depth_pixel_size = depth_tex.bits_per_pixel() / 8;

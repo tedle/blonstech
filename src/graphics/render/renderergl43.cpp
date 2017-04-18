@@ -175,6 +175,7 @@ public:
     GLuint texture_;
     GLint type_; ///< GL_TEXTURE_2D or GL_TEXTURE_3D
     TextureType options_;
+    bool has_mipmaps_;
 };
 
 class FramebufferResourceGL43 : public FramebufferResource
@@ -658,15 +659,11 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
     auto make_texture = [&](TextureType type)
     {
         auto tex = std::make_unique<TextureResourceGL43>(id());
-
-        // Generate an ID for the texture.
-        glGenTextures(1, &tex->texture_);
-
         PixelData pixels;
         pixels.type = type;
         pixels.width = width;
         pixels.height = height;
-        SetTextureData(tex.get(), &pixels);
+        RegisterTexture(tex.get(), &pixels);
 
         return tex;
     };
@@ -700,6 +697,7 @@ bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_da
     TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_2D;
     tex->options_ = pixel_data->type;
+    tex->has_mipmaps_ = false;
 
     // Generate an ID for the texture.
     glGenTextures(1, &tex->texture_);
@@ -708,7 +706,7 @@ bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_da
     glBindTexture(tex->type_, tex->texture_);
 
     // Upload image data to the GPU
-    SetTextureData(tex, pixel_data);
+    SetTextureData(tex, pixel_data, 0);
     return true;
 }
 
@@ -717,6 +715,7 @@ bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData3D* pixel_
     TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, id());
     tex->type_ = GL_TEXTURE_3D;
     tex->options_ = pixel_data->type;
+    tex->has_mipmaps_ = false;
 
     // Generate an ID for the texture.
     glGenTextures(1, &tex->texture_);
@@ -725,7 +724,7 @@ bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData3D* pixel_
     glBindTexture(tex->type_, tex->texture_);
 
     // Upload image data to the GPU
-    SetTextureData(tex, pixel_data);
+    SetTextureData(tex, pixel_data, 0);
     return true;
 }
 
@@ -1032,9 +1031,17 @@ void RendererGL43::MapMeshData(BufferResource* vertex_buffer, BufferResource* in
     mapped_buffers_.index_data = *index_data;
 }
 
-void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
+void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, unsigned int mip_level)
 {
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
+    if (mip_level != 0)
+    {
+        if (pixels->type.compression != TextureType::RAW)
+        {
+            throw "Mipmap level support in 2D textures currently only supported for TextureType::RAW";
+        }
+        tex->has_mipmaps_ = true;
+    }
     tex->type_ = GL_TEXTURE_2D;
     tex->options_ = pixels->type;
 
@@ -1047,7 +1054,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
         GLint input_format;
         GLenum input_type;
         TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
-        glTexImage2D(tex->type_, 0, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels.data());
+        glTexImage2D(tex->type_, mip_level, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels.data());
     }
     // Upload compressed textures thru SOIL because its way easier
     else
@@ -1081,6 +1088,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
             soil_flags |= SOIL_FLAG_GL_MIPMAPS;
             tex->texture_ = SOIL_create_OGL_texture(pixels->pixels.data(), &pixels->width, &pixels->height,
                 channels, tex->texture_, soil_flags);
+            tex->has_mipmaps_ = true;
         }
         if (tex->texture_ == 0)
         {
@@ -1102,7 +1110,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
     if (pixels->type.filter == TextureType::NEAREST)
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        if (pixels->type.compression == TextureType::AUTO)
+        if (tex->has_mipmaps_)
         {
             glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
         }
@@ -1114,7 +1122,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
     else
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        if (pixels->type.compression == TextureType::AUTO)
+        if (tex->has_mipmaps_)
         {
             glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
         }
@@ -1132,9 +1140,13 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels)
     // glGenerateMipmap(tex->type_);
 }
 
-void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
+void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels, unsigned int mip_level)
 {
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
+    if (mip_level != 0)
+    {
+        tex->has_mipmaps_ = true;
+    }
     tex->type_ = GL_TEXTURE_3D;
     tex->options_ = pixels->type;
 
@@ -1144,7 +1156,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
     GLint input_format;
     GLenum input_type;
     TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
-    glTexImage3D(tex->type_, 0, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.data());
+    glTexImage3D(tex->type_, mip_level, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.data());
 
     // Apply our texture settings (we do this after to override SOIL settings)
     if (pixels->type.wrap == TextureType::CLAMP)
@@ -1162,16 +1174,30 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels)
     if (pixels->type.filter == TextureType::NEAREST)
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        if (tex->has_mipmaps_)
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        }
+        else
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        }
     }
     else
     {
         glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        if (tex->has_mipmaps_)
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        }
     }
 }
 
-PixelData RendererGL43::GetTextureData(const TextureResource* texture)
+PixelData RendererGL43::GetTextureData(const TextureResource* texture, unsigned int mip_level)
 {
     auto tex = resource_cast<const TextureResourceGL43*>(texture, id());
     if (tex->type_ != GL_TEXTURE_2D)
@@ -1182,12 +1208,16 @@ PixelData RendererGL43::GetTextureData(const TextureResource* texture)
     {
         throw "Attemped to retrieve compressed texture type";
     }
+    if (mip_level != 0 && tex->has_mipmaps_ == false)
+    {
+        throw "Attempted to retrieve mipmap of single level texture";
+    }
     GLint width, height;
     GLint internal_format, input_format;
     GLenum input_type;
     glBindTexture(tex->type_, tex->texture_);
-    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_WIDTH, &width);
-    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_HEIGHT, &height);
+    glGetTexLevelParameteriv(tex->type_, mip_level, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(tex->type_, mip_level, GL_TEXTURE_HEIGHT, &height);
     TranslateTextureFormat(tex->options_.format, &internal_format, &input_format, &input_type);
 
     PixelData pixels;
@@ -1195,11 +1225,11 @@ PixelData RendererGL43::GetTextureData(const TextureResource* texture)
     pixels.height = height;
     pixels.type = tex->options_;
     pixels.pixels.resize(width * height * (pixels.bits_per_pixel() / 8));
-    glGetTexImage(tex->type_, 0, input_format, input_type, pixels.pixels.data());
+    glGetTexImage(tex->type_, mip_level, input_format, input_type, pixels.pixels.data());
     return pixels;
 }
 
-PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
+PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture, unsigned int mip_level)
 {
     auto tex = resource_cast<const TextureResourceGL43*>(texture, id());
     if (tex->type_ != GL_TEXTURE_3D)
@@ -1210,13 +1240,17 @@ PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
     {
         throw "Attemped to retrieve compressed texture type";
     }
+    if (mip_level != 0 && tex->has_mipmaps_ == false)
+    {
+        throw "Attempted to retrieve mipmap of single level texture";
+    }
     GLint width, height, depth;
     GLint internal_format, input_format;
     GLenum input_type;
     glBindTexture(tex->type_, tex->texture_);
-    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_WIDTH, &width);
-    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_HEIGHT, &height);
-    glGetTexLevelParameteriv(tex->type_, 0, GL_TEXTURE_DEPTH, &depth);
+    glGetTexLevelParameteriv(tex->type_, mip_level, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(tex->type_, mip_level, GL_TEXTURE_HEIGHT, &height);
+    glGetTexLevelParameteriv(tex->type_, mip_level, GL_TEXTURE_DEPTH, &depth);
     TranslateTextureFormat(tex->options_.format, &internal_format, &input_format, &input_type);
 
     PixelData3D pixels;
@@ -1225,7 +1259,7 @@ PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture)
     pixels.depth = depth;
     pixels.type = tex->options_;
     pixels.pixels.resize(width * height * depth * (pixels.bits_per_pixel() / 8));
-    glGetTexImage(tex->type_, 0, input_format, input_type, pixels.pixels.data());
+    glGetTexImage(tex->type_, mip_level, input_format, input_type, pixels.pixels.data());
     return pixels;
 }
 
@@ -1329,7 +1363,7 @@ bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, con
     return prog->SetUniform(name, value, static_cast<GLsizei>(elements));
 }
 
-bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index)
+bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index, unsigned int mip_level)
 {
     const TextureResourceGL43* tex = resource_cast<const TextureResourceGL43*>(value, id());
     GLboolean layered = (tex->type_ == GL_TEXTURE_3D) ? GL_TRUE : GL_FALSE;
@@ -1372,7 +1406,7 @@ bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, co
         throw "Unsupported shader output format";
         break;
     }
-    glBindImageTexture(texture_index, tex->texture_, 0, layered, 0, GL_WRITE_ONLY, format);
+    glBindImageTexture(texture_index, tex->texture_, mip_level, layered, 0, GL_WRITE_ONLY, format);
     return SetShaderInput(program, name, static_cast<int>(texture_index));
 }
 

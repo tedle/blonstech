@@ -124,7 +124,7 @@ bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, c
 void IrradianceView::InitMeshBuffers(const IrradianceVolume& irradiance)
 {
     // Grab the dimensions of the irradiance volume and construct a matching grid mesh
-    auto grid_data = render::context()->GetTextureData3D(irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PX));
+    auto grid_data = render::context()->GetTextureData3D(irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PX), 0);
     std::stringstream dimension_args;
     dimension_args << (grid_data.width) << "," << (grid_data.height) << "," << (grid_data.depth);
     grid_mesh_.reset(new DrawBatcher(DrawMode::LINES));

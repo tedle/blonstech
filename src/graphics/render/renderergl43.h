@@ -83,10 +83,10 @@ public:
                         const unsigned int* indices, unsigned int index_offset, unsigned int index_count) override;
     void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
                      Vertex** vertex_data, unsigned int** index_data) override;
-    void SetTextureData(TextureResource* texture, PixelData* pixels) override;
-    void SetTextureData(TextureResource* texture, PixelData3D* pixels) override;
-    PixelData GetTextureData(const TextureResource* texture) override;
-    PixelData3D GetTextureData3D(const TextureResource* texture) override;
+    void SetTextureData(TextureResource* texture, PixelData* pixels, unsigned int mip_level) override;
+    void SetTextureData(TextureResource* texture, PixelData3D* pixels, unsigned int mip_level) override;
+    PixelData GetTextureData(const TextureResource* texture, unsigned int mip_level) override;
+    PixelData3D GetTextureData3D(const TextureResource* texture, unsigned int mip_level) override;
     void SetShaderData(ShaderDataResource* data_handle, std::size_t offset, std::size_t length, const void* data) override;
     void GetShaderData(ShaderDataResource* data_handle, void* data) override;
 
@@ -104,7 +104,7 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector2* value, std::size_t elements) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector3* value, std::size_t elements) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector4* value, std::size_t elements) override;
-    bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index) override;
+    bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index, unsigned int mip_level) override;
 
     bool SetBlendMode(BlendMode mode) override;
     bool SetCullMode(CullMode mode) override;

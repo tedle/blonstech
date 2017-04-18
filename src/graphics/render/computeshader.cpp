@@ -55,11 +55,11 @@ bool ComputeShader::Run(unsigned int groups_x, unsigned int groups_y, unsigned i
 
 bool ComputeShader::SetOutput(const char* field, const TextureResource* value)
 {
-    return render::context()->SetShaderOutput(program_.get(), field, value, 0);
+    return render::context()->SetShaderOutput(program_.get(), field, value, 0, 0);
 }
 
-bool ComputeShader::SetOutput(const char* field, const TextureResource* value, unsigned int texture_index)
+bool ComputeShader::SetOutput(const char* field, const TextureResource* value, unsigned int texture_index, unsigned int mip_level)
 {
-    return render::context()->SetShaderOutput(program_.get(), field, value, texture_index);
+    return render::context()->SetShaderOutput(program_.get(), field, value, texture_index, mip_level);
 }
 } // namespace blons

@@ -97,7 +97,7 @@ const PixelData* Texture::pixels(bool force_gpu_sync)
 {
     if (force_gpu_sync || pixel_data_ == nullptr)
     {
-        pixel_data_.reset(new PixelData(render::context()->GetTextureData(texture_.get())));
+        pixel_data_.reset(new PixelData(render::context()->GetTextureData(texture_.get(), 0)));
     }
     return pixel_data_.get();
 }
