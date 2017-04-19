@@ -143,10 +143,16 @@ void Framebuffer::Unbind()
     context->BindFramebuffer(nullptr);
 }
 
+void Framebuffer::BindColourTextures(const std::vector<const TextureResource*>& targets)
+{
+    auto context = render::context();
+    context->SetFramebufferColourTextures(fbo_.get(), targets, 0);
+}
+
 void Framebuffer::BindDepthTexture(const TextureResource* depth)
 {
     auto context = render::context();
-    context->SetFramebufferDepthTexture(fbo_.get(), depth);
+    context->SetFramebufferDepthTexture(fbo_.get(), depth, 0);
 }
 
 unsigned int Framebuffer::vertex_count() const

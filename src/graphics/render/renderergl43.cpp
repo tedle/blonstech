@@ -669,24 +669,22 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
     };
 
     // Create and bind all of our render targets
-    std::unique_ptr<GLenum[]> drawbuffers(new GLenum[formats.size()]);
+    std::vector<const TextureResource*> colour_targets;
     for (unsigned int i = 0; i < formats.size(); i++)
     {
         if (formats[i].format != TextureType::NONE)
         {
             fbo->targets_.push_back(make_texture(formats[i]));
-            auto attachment = GL_COLOR_ATTACHMENT0 + i;
-            glFramebufferTexture(GL_FRAMEBUFFER, attachment, fbo->targets_.back()->texture_, 0);
-            drawbuffers[i] = attachment;
+            colour_targets.push_back(fbo->targets_.back().get());
         }
     }
-    glDrawBuffers(static_cast<GLsizei>(formats.size()), drawbuffers.get());
+    SetFramebufferColourTextures(fbo, colour_targets, 0);
 
     if (store_depth)
     {
         // Create and bind the depth target
         fbo->depth_ = make_texture({ TextureType::DEPTH, TextureType::LINEAR, TextureType::CLAMP });
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, fbo->depth_->texture_, 0);
+        SetFramebufferDepthTexture(fbo, fbo->depth_.get(), 0);
     }
 
     return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
@@ -901,7 +899,21 @@ void RendererGL43::BindFramebuffer(FramebufferResource* frame_buffer)
     }
 }
 
-void RendererGL43::SetFramebufferDepthTexture(FramebufferResource* frame_buffer, const TextureResource* depth_texture)
+void RendererGL43::SetFramebufferColourTextures(FramebufferResource* frame_buffer, const std::vector<const TextureResource*>& colour_textures, unsigned int mip_level)
+{
+    BindFramebuffer(frame_buffer);
+    std::unique_ptr<GLenum[]> drawbuffers(new GLenum[colour_textures.size()]);
+    for (unsigned int i = 0; i < colour_textures.size(); i++)
+    {
+        auto attachment = GL_COLOR_ATTACHMENT0 + i;
+        auto tex = resource_cast<const TextureResourceGL43*>(colour_textures[i], id());
+        glFramebufferTexture(GL_FRAMEBUFFER, attachment, tex->texture_, mip_level);
+        drawbuffers[i] = attachment;
+    }
+    glDrawBuffers(static_cast<GLsizei>(colour_textures.size()), drawbuffers.get());
+}
+
+void RendererGL43::SetFramebufferDepthTexture(FramebufferResource* frame_buffer, const TextureResource* depth_texture, unsigned int mip_level)
 {
     if (frame_buffer == nullptr)
     {
@@ -917,7 +929,7 @@ void RendererGL43::SetFramebufferDepthTexture(FramebufferResource* frame_buffer,
         depth = tex->texture_;
     }
     BindFramebuffer(frame_buffer);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth, 0);
+    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth, mip_level);
 }
 
 std::vector<const TextureResource*> RendererGL43::FramebufferTextures(FramebufferResource* frame_buffer)

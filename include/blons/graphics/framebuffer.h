@@ -99,6 +99,14 @@ public:
     void Unbind();
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Binds a list of borrowed textures to be used for rendering output.
+    /// Will ignore, but not overwrite, internally stored colour textures. Can be
+    /// undone with a call such as `fbo->BindColourTextures(fbo->textures())`
+    ///
+    /// \param targets List of textures to be used for rendering output
+    ////////////////////////////////////////////////////////////////////////////////
+    void BindColourTextures(const std::vector<const TextureResource*>& targets);
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds a borrowed texture to be used for depth testing and writing.
     /// Will ignore, but not overwrite, internally stored depth texture. Can be
     /// undone with a call such as `fbo->BindDepthTexture(fbo->depth())`

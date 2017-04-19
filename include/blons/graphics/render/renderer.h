@@ -545,14 +545,26 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     virtual void BindFramebuffer(FramebufferResource* frame_buffer)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a FramebufferResource and binds attaches a provided depth
-    /// texture to it. If `depth_texture` is null, the current depth buffer will be
-    /// unbound from the framebuffer
+    /// \brief Takes a FramebufferResource and attaches a provided list of colour
+    /// textures to it, overriding any previously bound targets.
+    ///
+    /// \param frame_buffer Frame buffer resource
+    /// \param colour_textures List of output texture resources
+    /// \param mip_level Mipmap level of the textures to be bound, with 0 being the
+    /// base
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void SetFramebufferColourTextures(FramebufferResource* frame_buffer, const std::vector<const TextureResource*>& colour_textures, unsigned int mip_level)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a FramebufferResource and attaches a provided depth texture to
+    /// it. If `depth_texture` is null, the current depth buffer will be unbound
+    /// from the framebuffer
     ///
     /// \param frame_buffer Frame buffer resource
     /// \param depth_texture Texture resource of depth texture
+    /// \param mip_level Mipmap level of the texture to be bound, with 0 being the
+    /// base
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void SetFramebufferDepthTexture(FramebufferResource* frame_buffer, const TextureResource* depth_texture)=0;
+    virtual void SetFramebufferDepthTexture(FramebufferResource* frame_buffer, const TextureResource* depth_texture, unsigned int mip_level)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves a list of all the render targets bound to a frame buffer
     ///
