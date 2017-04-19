@@ -59,6 +59,7 @@ public:
                              std::vector<TextureType> formats, bool store_depth) override;
     bool RegisterTexture(TextureResource* texture, PixelData* pixel_data) override;
     bool RegisterTexture(TextureResource* texture, PixelData3D* pixel_data) override;
+    bool RegisterTexture(TextureResource* texture, PixelDataCubemap* pixel_data) override;
     bool RegisterShader(ShaderResource* program,
                         std::string vertex_source, std::string pixel_source,
                         ShaderAttributeList inputs) override;
@@ -86,8 +87,10 @@ public:
                      Vertex** vertex_data, unsigned int** index_data) override;
     void SetTextureData(TextureResource* texture, PixelData* pixels, unsigned int mip_level) override;
     void SetTextureData(TextureResource* texture, PixelData3D* pixels, unsigned int mip_level) override;
+    void SetTextureData(TextureResource* texture, PixelDataCubemap* pixels, unsigned int mip_level) override;
     PixelData GetTextureData(const TextureResource* texture, unsigned int mip_level) override;
     PixelData3D GetTextureData3D(const TextureResource* texture, unsigned int mip_level) override;
+    PixelDataCubemap GetTextureDataCubemap(const TextureResource* texture, unsigned int mip_level) override;
     void SetShaderData(ShaderDataResource* data_handle, std::size_t offset, std::size_t length, const void* data) override;
     void GetShaderData(ShaderDataResource* data_handle, void* data) override;
 

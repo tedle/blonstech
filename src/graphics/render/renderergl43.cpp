@@ -49,6 +49,34 @@ T resource_cast(U value, Renderer::ContextID current_id)
     }
     return static_cast<T>(value);
 }
+// Converts engine axis into OpenGL cube map axis enum
+GLenum TranslateAxisFormat(AxisAlignedNormal axis)
+{
+    switch (axis)
+    {
+    case AxisAlignedNormal::POSITIVE_X: return GL_TEXTURE_CUBE_MAP_POSITIVE_X;
+    case AxisAlignedNormal::NEGATIVE_X: return GL_TEXTURE_CUBE_MAP_NEGATIVE_X;
+    case AxisAlignedNormal::POSITIVE_Y: return GL_TEXTURE_CUBE_MAP_POSITIVE_Y;
+    case AxisAlignedNormal::NEGATIVE_Y: return GL_TEXTURE_CUBE_MAP_NEGATIVE_Y;
+    case AxisAlignedNormal::POSITIVE_Z: return GL_TEXTURE_CUBE_MAP_POSITIVE_Z;
+    case AxisAlignedNormal::NEGATIVE_Z: return GL_TEXTURE_CUBE_MAP_NEGATIVE_Z;
+    default:
+        throw "Unsupported axis in translation layer";
+        break;
+    }
+}
+// Converts PixelData type into OpenGL texture enum
+template <typename T>
+constexpr GLenum TranslatePixelDataType()
+{
+    // TODO: Make this a constexpr-if when we have C++17
+    return (
+        std::is_same<T, PixelData>::value ? GL_TEXTURE_2D :
+        std::is_same<T, PixelData3D>::value ? GL_TEXTURE_3D :
+        std::is_same<T, PixelDataCubemap>::value ? GL_TEXTURE_CUBE_MAP :
+        GL_FALSE
+    );
+}
 // Converts engine texture type into OpenGL texture type
 void TranslateTextureFormat(TextureType::Format format, GLint* internal_format, GLint* input_format, GLenum* input_type)
 {
@@ -690,40 +718,43 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
     return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 }
 
-bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
+namespace
 {
-    TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, id());
-    tex->type_ = GL_TEXTURE_2D;
+template <typename T, GLenum texture_type = TranslatePixelDataType<T>()>
+bool RegisterTextureTemplate(TextureResource* texture, T* pixel_data, RendererGL43* context)
+{
+    static_assert(texture_type != GL_FALSE, "Unsupported PixelData type for texture registration");
+
+    TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, context->id());
+    tex->type_ = texture_type;
     tex->options_ = pixel_data->type;
     tex->has_mipmaps_ = false;
 
     // Generate an ID for the texture.
     glGenTextures(1, &tex->texture_);
 
-    // Bind the texture as a 2D texture.
+    // Bind the texture based on the statically determined type
     glBindTexture(tex->type_, tex->texture_);
 
     // Upload image data to the GPU
-    SetTextureData(tex, pixel_data, 0);
+    context->SetTextureData(tex, pixel_data, 0);
     return true;
+}
+} // namespace
+
+bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
+{
+    return RegisterTextureTemplate(texture, pixel_data, this);
 }
 
 bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)
 {
-    TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, id());
-    tex->type_ = GL_TEXTURE_3D;
-    tex->options_ = pixel_data->type;
-    tex->has_mipmaps_ = false;
+    return RegisterTextureTemplate(texture, pixel_data, this);
+}
 
-    // Generate an ID for the texture.
-    glGenTextures(1, &tex->texture_);
-
-    // Bind the texture as a 2D texture.
-    glBindTexture(tex->type_, tex->texture_);
-
-    // Upload image data to the GPU
-    SetTextureData(tex, pixel_data, 0);
-    return true;
+bool RendererGL43::RegisterTexture(TextureResource* texture, PixelDataCubemap* pixel_data)
+{
+    return RegisterTextureTemplate(texture, pixel_data, this);
 }
 
 bool RendererGL43::RegisterShader(ShaderResource* program,
@@ -1054,7 +1085,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, u
         }
         tex->has_mipmaps_ = true;
     }
-    tex->type_ = GL_TEXTURE_2D;
+    tex->type_ = TranslatePixelDataType<PixelData>();
     tex->options_ = pixels->type;
 
     glBindTexture(tex->type_, tex->texture_);
@@ -1155,11 +1186,15 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, u
 void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels, unsigned int mip_level)
 {
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
+    if (tex->options_.compression != TextureType::RAW)
+    {
+        throw "Only TextureType::RAW supported for 3D textures currently";
+    }
     if (mip_level != 0)
     {
         tex->has_mipmaps_ = true;
     }
-    tex->type_ = GL_TEXTURE_3D;
+    tex->type_ = TranslatePixelDataType<PixelData3D>();
     tex->options_ = pixels->type;
 
     glBindTexture(tex->type_, tex->texture_);
@@ -1209,10 +1244,73 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels,
     }
 }
 
+void RendererGL43::SetTextureData(TextureResource* texture, PixelDataCubemap* pixels, unsigned int mip_level)
+{
+    auto tex = resource_cast<TextureResourceGL43*>(texture, id());
+    if (tex->options_.compression != TextureType::RAW)
+    {
+        throw "Only TextureType::RAW supported for cubemap textures currently";
+    }
+    if (mip_level != 0)
+    {
+        tex->has_mipmaps_ = true;
+    }
+    tex->type_ = TranslatePixelDataType<PixelDataCubemap>();
+    tex->options_ = pixels->type;
+
+    glBindTexture(tex->type_, tex->texture_);
+
+    GLint internal_format;
+    GLint input_format;
+    GLenum input_type;
+    TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
+    for (const auto& axis : { POSITIVE_X, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y, POSITIVE_Z, NEGATIVE_Z })
+    {
+        auto cubeface = TranslateAxisFormat(axis);
+        glTexImage2D(cubeface, mip_level, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels[axis].data());
+    }
+
+    // Apply our texture settings (we do this after to override SOIL settings)
+    if (pixels->type.wrap == TextureType::CLAMP)
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
+    else
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(tex->type_, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    }
+    if (pixels->type.filter == TextureType::NEAREST)
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        if (tex->has_mipmaps_)
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        }
+        else
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        }
+    }
+    else
+    {
+        glTexParameteri(tex->type_, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if (tex->has_mipmaps_)
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        }
+    }
+}
+
 PixelData RendererGL43::GetTextureData(const TextureResource* texture, unsigned int mip_level)
 {
     auto tex = resource_cast<const TextureResourceGL43*>(texture, id());
-    if (tex->type_ != GL_TEXTURE_2D)
+    if (tex->type_ != TranslatePixelDataType<PixelData>())
     {
         throw "Attemped to retrieve mismatched texture type";
     }
@@ -1244,7 +1342,7 @@ PixelData RendererGL43::GetTextureData(const TextureResource* texture, unsigned 
 PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture, unsigned int mip_level)
 {
     auto tex = resource_cast<const TextureResourceGL43*>(texture, id());
-    if (tex->type_ != GL_TEXTURE_3D)
+    if (tex->type_ != TranslatePixelDataType<PixelData3D>())
     {
         throw "Attemped to retrieve mismatched texture type";
     }
@@ -1272,6 +1370,41 @@ PixelData3D RendererGL43::GetTextureData3D(const TextureResource* texture, unsig
     pixels.type = tex->options_;
     pixels.pixels.resize(width * height * depth * (pixels.bits_per_pixel() / 8));
     glGetTexImage(tex->type_, mip_level, input_format, input_type, pixels.pixels.data());
+    return pixels;
+}
+
+PixelDataCubemap RendererGL43::GetTextureDataCubemap(const TextureResource* texture, unsigned int mip_level)
+{
+    auto tex = resource_cast<const TextureResourceGL43*>(texture, id());
+    if (tex->type_ != TranslatePixelDataType<PixelDataCubemap>())
+    {
+        throw "Attemped to retrieve mismatched texture type";
+    }
+    if (tex->options_.compression == TextureType::DDS)
+    {
+        throw "Attemped to retrieve compressed texture type";
+    }
+    if (mip_level != 0 && tex->has_mipmaps_ == false)
+    {
+        throw "Attempted to retrieve mipmap of single level texture";
+    }
+    GLint width, height;
+    GLint internal_format, input_format;
+    GLenum input_type;
+    glBindTexture(tex->type_, tex->texture_);
+    glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, mip_level, GL_TEXTURE_WIDTH, &width);
+    glGetTexLevelParameteriv(GL_TEXTURE_CUBE_MAP_POSITIVE_X, mip_level, GL_TEXTURE_HEIGHT, &height);
+    TranslateTextureFormat(tex->options_.format, &internal_format, &input_format, &input_type);
+
+    PixelDataCubemap pixels;
+    pixels.width = width;
+    pixels.height = height;
+    pixels.type = tex->options_;
+    for (const auto& axis : { POSITIVE_X, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y, POSITIVE_Z, NEGATIVE_Z })
+    {
+        pixels.pixels[axis].resize(width * height * (pixels.bits_per_pixel() / 8));
+        glGetTexImage(TranslateAxisFormat(axis), mip_level, input_format, input_type, pixels.pixels[axis].data());
+    }
     return pixels;
 }
 
