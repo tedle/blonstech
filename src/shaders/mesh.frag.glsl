@@ -43,6 +43,8 @@ void main(void)
     frag_colour = vec4(GammaDecode(texture(albedo, tex_coord).rgb), 1.0);
 
     // Normal
-    vec3 norm_map = texture(normal, tex_coord).rgb * 2 - 1;
+    vec3 norm_map = vec3(texture(normal, tex_coord).rg * 2 - 1, 0.0f);
+    // Reconstruct Z component manually since some compression formats only store XY channels
+    norm_map.b = sqrt(1.0f - norm_map.r * norm_map.r - norm_map.g * norm_map.g);
     norm_colour = vec4((normalize(norm_map * norm) + 1) / 2, 1.0);
 }
