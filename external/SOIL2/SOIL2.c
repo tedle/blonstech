@@ -162,6 +162,7 @@ int query_DXT_capability( void );
 #define SOIL_RGBA_S3TC_DXT1		0x83F1
 #define SOIL_RGBA_S3TC_DXT3		0x83F2
 #define SOIL_RGBA_S3TC_DXT5		0x83F3
+#define SOIL_RG_RGTC2			0x8DBD
 typedef void (APIENTRY * P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid * data);
 static P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC soilGlCompressedTexImage2D = NULL;
 
@@ -2026,7 +2027,8 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 		!(
 		(header.sPixelFormat.dwFourCC == (('D'<<0)|('X'<<8)|('T'<<16)|('1'<<24))) ||
 		(header.sPixelFormat.dwFourCC == (('D'<<0)|('X'<<8)|('T'<<16)|('3'<<24))) ||
-		(header.sPixelFormat.dwFourCC == (('D'<<0)|('X'<<8)|('T'<<16)|('5'<<24)))
+		(header.sPixelFormat.dwFourCC == (('D'<<0)|('X'<<8)|('T'<<16)|('5'<<24))) ||
+		(header.sPixelFormat.dwFourCC == (('A'<<0)|('T'<<8)|('I'<<16)|('2'<<24)))
 		) )
 	{
 		goto quick_exit;
@@ -2059,16 +2061,20 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 		/*	well, we know it is DXT1/3/5, because we checked above	*/
 		switch( (header.sPixelFormat.dwFourCC >> 24) - '0' )
 		{
-		case 1:
+		case 1: /* DXT1 */
 			S3TC_type = SOIL_RGBA_S3TC_DXT1;
 			block_size = 8;
 			break;
-		case 3:
+		case 3: /* DXT3 */
 			S3TC_type = SOIL_RGBA_S3TC_DXT3;
 			block_size = 16;
 			break;
-		case 5:
+		case 5: /* DXT5 */
 			S3TC_type = SOIL_RGBA_S3TC_DXT5;
+			block_size = 16;
+			break;
+		case 2: /* ATI2 */
+			S3TC_type = SOIL_RG_RGTC2;
 			block_size = 16;
 			break;
 		}
