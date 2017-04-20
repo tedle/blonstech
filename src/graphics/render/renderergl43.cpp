@@ -1079,9 +1079,9 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, u
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
     if (mip_level != 0)
     {
-        if (pixels->type.compression != TextureType::RAW)
+        if (pixels->type.compression == TextureType::DDS)
         {
-            throw "Mipmap level support in 2D textures currently only supported for TextureType::RAW";
+            throw "Mipmap level support in 2D textures is not supported for TextureType::DDS";
         }
         tex->has_mipmaps_ = true;
     }
@@ -1091,13 +1091,18 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, u
     glBindTexture(tex->type_, tex->texture_);
 
     // Upload uncompressed textures manually because it allows us way more format options
-    if (pixels->type.compression == TextureType::RAW)
+    if (pixels->type.compression != TextureType::DDS)
     {
         GLint internal_format;
         GLint input_format;
         GLenum input_type;
         TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
         glTexImage2D(tex->type_, mip_level, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels.data());
+        if (pixels->type.compression == TextureType::AUTO && mip_level == 0)
+        {
+            glGenerateMipmap(tex->type_);
+            tex->has_mipmaps_ = true;
+        }
     }
     // Upload compressed textures thru SOIL because its way easier
     else
@@ -1119,23 +1124,11 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, u
             throw "Compressed texture using wrong format";
             break;
         }
-        if (pixels->type.compression == TextureType::DDS)
-        {
-            soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
-            tex->texture_ = SOIL_direct_load_DDS_from_memory(pixels->pixels.data(), static_cast<int>(pixels->pixels.size()), tex->texture_, soil_flags, 0);
-        }
-        else if (pixels->type.compression == TextureType::AUTO)
-        {
-            // DXT compression disabled because it adds a lot to load times
-            soil_flags |= SOIL_FLAG_COMPRESS_TO_DXT;
-            soil_flags |= SOIL_FLAG_GL_MIPMAPS;
-            tex->texture_ = SOIL_create_OGL_texture(pixels->pixels.data(), &pixels->width, &pixels->height,
-                channels, tex->texture_, soil_flags);
-            tex->has_mipmaps_ = true;
-        }
+        soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
+        tex->texture_ = SOIL_direct_load_DDS_from_memory(pixels->pixels.data(), static_cast<int>(pixels->pixels.size()), tex->texture_, soil_flags, 0);
         if (tex->texture_ == 0)
         {
-            throw "Failed to update compressed texture";
+            throw "Failed to upload compressed texture";
         }
     }
 
@@ -1178,17 +1171,14 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, u
     // TODO: attach this to a setting + safety check for max
     // glGetFloatv(GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &float);
     glTexParameteri(tex->type_, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16);
-
-    // TODO: Re enable this for non-dds textures
-    // glGenerateMipmap(tex->type_);
 }
 
 void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels, unsigned int mip_level)
 {
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
-    if (tex->options_.compression != TextureType::RAW)
+    if (tex->options_.compression == TextureType::DDS)
     {
-        throw "Only TextureType::RAW supported for 3D textures currently";
+        throw "TextureType::DDS is not supported for 3D textures";
     }
     if (mip_level != 0)
     {
@@ -1204,6 +1194,11 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels,
     GLenum input_type;
     TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
     glTexImage3D(tex->type_, mip_level, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.data());
+    if (pixels->type.compression == TextureType::AUTO && mip_level == 0)
+    {
+        glGenerateMipmap(tex->type_);
+        tex->has_mipmaps_ = true;
+    }
 
     // Apply our texture settings (we do this after to override SOIL settings)
     if (pixels->type.wrap == TextureType::CLAMP)
@@ -1249,7 +1244,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelDataCubemap* pi
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
     if (tex->options_.compression != TextureType::RAW)
     {
-        throw "Only TextureType::RAW supported for cubemap textures currently";
+        throw "TextureType::DDS is not supported for cubemap textures";
     }
     if (mip_level != 0)
     {
@@ -1268,6 +1263,11 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelDataCubemap* pi
     {
         auto cubeface = TranslateAxisFormat(axis);
         glTexImage2D(cubeface, mip_level, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels[axis].data());
+    }
+    if (pixels->type.compression == TextureType::AUTO && mip_level == 0)
+    {
+        glGenerateMipmap(tex->type_);
+        tex->has_mipmaps_ = true;
     }
 
     // Apply our texture settings (we do this after to override SOIL settings)

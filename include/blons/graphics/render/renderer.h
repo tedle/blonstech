@@ -68,7 +68,7 @@ struct TextureType
     ////////////////////////////////////////////////////////////////////////////////
     enum Compression
     {
-        AUTO,      ///< Compresses to DXT5 & generates mipmaps
+        AUTO,      ///< Generates mipmaps
         DDS,       ///< Uses mipmaps & compression from image file
         RAW        ///< Will not generate mipmaps, will not compress on GPU
     } compression; ///< \copybrief Compression
@@ -655,7 +655,8 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the pixel data and formatting of the supplied texture resource.
     /// Overwrites old texture data completely, including width/height, format
-    /// settings, and compression
+    /// settings, and compression. For TextureType::AUTO textures, mipmaps are
+    /// completely reconstructed for each call that modifies the base level image
     ///
     /// \param texture Texture to be set
     /// \param pixels Pixel data to update texture with
