@@ -129,7 +129,7 @@ protected:
 /// blons::ShaderData<blons::Vector4> array_data(vector_array.data(), vector_array.size());
 ///
 /// // Use ShaderData in a ComputeShader
-/// blons::ComputeShader compute("ssbo-test.comp.glsl");
+/// blons::ComputeShader compute({ { blons::ShaderPipelineStage::COMPUTE, "compute.glsl" } });
 /// compute.SetInput("camera_data", camera_data.data());
 /// compute.SetInput("array_data", array_data.data());
 /// compute.Run(1, 1, 1);

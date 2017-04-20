@@ -328,7 +328,7 @@ bool Graphics::Init(Client::Info screen)
     ShaderAttributeList sprite_inputs;
     sprite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     sprite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    sprite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/sprite.frag.glsl", sprite_inputs));
+    sprite_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/sprite.frag.glsl" } }, sprite_inputs));
 
     if (sprite_shader_ == nullptr)
     {

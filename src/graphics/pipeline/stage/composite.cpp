@@ -39,7 +39,7 @@ Composite::Composite(Perspective perspective)
     ShaderAttributeList composite_inputs;
     composite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     composite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/composite.frag.glsl", composite_inputs));
+    composite_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/composite.frag.glsl" } }, composite_inputs));
 
     if (composite_shader_ == nullptr)
     {

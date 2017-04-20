@@ -356,6 +356,24 @@ using ShaderAttribute = std::pair<ShaderAttributeIndex, std::string>;
 /// \brief Holds a list of shader attributes
 ////////////////////////////////////////////////////////////////////////////////
 using ShaderAttributeList = std::vector<ShaderAttribute>;
+////////////////////////////////////////////////////////////////////////////////
+/// \brief List of valid shader pipeline stages
+////////////////////////////////////////////////////////////////////////////////
+enum ShaderPipelineStage
+{
+    VERTEX,   ///< Vertex shader
+    PIXEL,    ///< Pixel shader
+    GEOMETRY, ///< Geometry shader
+    COMPUTE   ///< Compute shader
+};
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Holds a shader's type and source
+////////////////////////////////////////////////////////////////////////////////
+using ShaderSource = std::pair<ShaderPipelineStage, std::string>;
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Holds a list of shader sources
+////////////////////////////////////////////////////////////////////////////////
+using ShaderSourceList = std::vector<ShaderSource>;
 
 // Forward declarations
 class BufferResource;
@@ -493,15 +511,12 @@ public:
     /// meshes each frame.
     ///
     /// \param program ShaderResource for identifying shader code in future calls
-    /// \param vertex_source Source code for the vertex shader
-    /// \param pixel_source Source code for the pixel (fragment) shader
+    /// \param source Source code for the shaders
     /// \param inputs List of attributes to be passed into the shader on each draw
     /// call. Allows for translation of vertex data to shader data
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterShader(ShaderResource* program,
-                                std::string vertex_source, std::string pixel_source,
-                                ShaderAttributeList inputs)=0;
+    virtual bool RegisterShader(ShaderResource* program, ShaderSourceList source, ShaderAttributeList inputs)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a ShaderResource and source file, compiling them into a compute
     /// shader that can be run at any time.
@@ -510,7 +525,7 @@ public:
     /// \param source Source code for the compute shader
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterComputeShader(ShaderResource* program, std::string source)=0;
+    virtual bool RegisterComputeShader(ShaderResource* program, ShaderSourceList source)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a ShaderDataResource and arbitrary memory creating a bindable
     /// block allowing easy communication between CPU & GPU memory.

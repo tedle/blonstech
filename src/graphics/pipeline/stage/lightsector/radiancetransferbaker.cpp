@@ -96,7 +96,7 @@ RadianceTransferBaker::RadianceTransferBaker(const Scene& scene, const std::vect
     env_map_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
     env_map_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
     env_map_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
-    environment_map_shader_.reset(new Shader("shaders/probe-env-map.vert.glsl", "shaders/probe-env-map.frag.glsl", env_map_inputs));
+    environment_map_shader_.reset(new Shader({ { VERTEX, "shaders/probe-env-map.vert.glsl" }, { PIXEL, "shaders/probe-env-map.frag.glsl" } }, env_map_inputs));
     // Setup framebuffer for storing environment maps
     environment_maps_.reset(new Framebuffer(kProbeMapSize * 6, kProbeMapSize * static_cast<units::pixel>(probes_.size()),
                                             { { TextureType::R8G8B8A8, TextureType::RAW, TextureType::NEAREST, TextureType::CLAMP },   // albedo + sky vis

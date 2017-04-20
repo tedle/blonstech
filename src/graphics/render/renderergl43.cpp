@@ -757,97 +757,76 @@ bool RendererGL43::RegisterTexture(TextureResource* texture, PixelDataCubemap* p
     return RegisterTextureTemplate(texture, pixel_data, this);
 }
 
-bool RendererGL43::RegisterShader(ShaderResource* program,
-                                std::string vertex_source, std::string pixel_source,
-                                ShaderAttributeList inputs)
+bool RendererGL43::RegisterShader(ShaderResource* program, ShaderSourceList source, ShaderAttributeList inputs)
 {
     ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
 
-    // Initialize and compile the shaders
-    GLuint vertex_shader = glCreateShader(GL_VERTEX_SHADER);
-    shader->shaders_.push_back(vertex_shader);
-    GLuint pixel_shader = glCreateShader(GL_FRAGMENT_SHADER);
-    shader->shaders_.push_back(pixel_shader);
-    const char* vs = vertex_source.data();
-    const char* ps = pixel_source.data();
-    glShaderSource(vertex_shader, 1, &vs, nullptr);
-    glShaderSource(pixel_shader, 1, &ps, nullptr);
-    glCompileShader(vertex_shader);
-    glCompileShader(pixel_shader);
-
-    // Check that everything went OK
-    int vert_result, pixel_result;
-    glGetShaderiv(vertex_shader, GL_COMPILE_STATUS, &vert_result);
-    if (!vert_result)
-    {
-        LogCompileErrors(vertex_shader, true);
-        return false;
-    }
-    glGetShaderiv(pixel_shader, GL_COMPILE_STATUS, &pixel_result);
-    if (!pixel_result)
-    {
-        LogCompileErrors(pixel_shader, true);
-        return false;
-    }
-
-    // Take our shaders and turn it into a render pipeline
+    // Compile shaders will be linked to this program
     shader->program_ = glCreateProgram();
-    glAttachShader(shader->program_, vertex_shader);
-    glAttachShader(shader->program_, pixel_shader);
+
+    for (const auto& stage_source : source)
+    {
+        // Translate the shader stage into GL terms
+        GLenum stage_type;
+        switch (stage_source.first)
+        {
+        case ShaderPipelineStage::PIXEL: stage_type = GL_FRAGMENT_SHADER; break;
+        case ShaderPipelineStage::VERTEX: stage_type = GL_VERTEX_SHADER; break;
+        case ShaderPipelineStage::GEOMETRY: stage_type = GL_GEOMETRY_SHADER; break;
+        case ShaderPipelineStage::COMPUTE: stage_type = GL_COMPUTE_SHADER; break;
+        }
+
+        // Create and compile the shader stage
+        GLuint stage_handle = glCreateShader(stage_type);
+        shader->shaders_.push_back(stage_handle);
+        const char* raw_source = stage_source.second.data();
+        glShaderSource(stage_handle, 1, &raw_source, nullptr);
+        glCompileShader(stage_handle);
+
+        // Check that everything went OK
+        int compile_result;
+        glGetShaderiv(stage_handle, GL_COMPILE_STATUS, &compile_result);
+        if (compile_result != GL_TRUE)
+        {
+            LogCompileErrors(stage_handle, true);
+            return false;
+        }
+
+        // Queue it to be linked
+        glAttachShader(shader->program_, stage_handle);
+    }
+
+    // Bind all of the input attributes
     for (const auto& input : inputs)
     {
         glBindAttribLocation(shader->program_, input.first, input.second.c_str());
     }
+
+    // Link all of the attached stage objects
     glLinkProgram(shader->program_);
 
     // Check that everything went OK
     int link_result;
     glGetProgramiv(shader->program_, GL_LINK_STATUS, &link_result);
-    if (!link_result)
+    if (link_result != GL_TRUE)
     {
         LogCompileErrors(shader->program_, false);
         return false;
     }
-    shader->type_ = ShaderResourceGL43::PIPELINE;
 
+    shader->type_ = ShaderResourceGL43::PIPELINE;
     return true;
 }
 
-bool RendererGL43::RegisterComputeShader(ShaderResource* program, std::string source)
+bool RendererGL43::RegisterComputeShader(ShaderResource* program, ShaderSourceList source)
 {
+    if (!RegisterShader(program, source, {}))
+    {
+        return false;
+    }
+    // Hackily correct RegisterShader marking our type as ShaderResourceGL43::PIPELINE
     ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
-
-    // Initialize and compile the shaders
-    GLuint compute_shader = glCreateShader(GL_COMPUTE_SHADER);
-    shader->shaders_.push_back(compute_shader);
-    const char* cs = source.data();
-    glShaderSource(compute_shader, 1, &cs, nullptr);
-    glCompileShader(compute_shader);
-
-    // Check that everything went OK
-    int shader_result;
-    glGetShaderiv(compute_shader, GL_COMPILE_STATUS, &shader_result);
-    if (!shader_result)
-    {
-        LogCompileErrors(compute_shader, true);
-        return false;
-    }
-
-    // Take our shaders and turn it into a render pipeline
-    shader->program_ = glCreateProgram();
-    glAttachShader(shader->program_, compute_shader);
-    glLinkProgram(shader->program_);
-
-    // Check that everything went OK
-    int link_result;
-    glGetProgramiv(shader->program_, GL_LINK_STATUS, &link_result);
-    if (!link_result)
-    {
-        LogCompileErrors(shader->program_, false);
-        return false;
-    }
     shader->type_ = ShaderResourceGL43::COMPUTE;
-
     return true;
 }
 

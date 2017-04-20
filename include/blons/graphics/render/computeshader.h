@@ -39,9 +39,10 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new compute shader using the provided source file
     ///
-    /// \param source_filename Location of the compute shader source on disk
+    /// \param source_files List of source filenames and respective
+    /// blons::ShaderPipelineStage types
     ////////////////////////////////////////////////////////////////////////////////
-    ComputeShader(std::string source_filename);
+    ComputeShader(ShaderSourceList source_files);
     ~ComputeShader();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -76,9 +77,6 @@ public:
     /// \param mip_level Mipmap level of the texture to bind. Defaults to 0
     ////////////////////////////////////////////////////////////////////////////////
     bool SetOutput(const char* field, const TextureResource* value, unsigned int texture_index, unsigned int mip_level);
-
-private:
-    std::string source_filename_;
 };
 } // namespace blons
 
@@ -93,6 +91,23 @@ private:
 ///
 /// ### Example:
 /// \code
+/// // Compile a ComputeShader
+/// blons::ComputeShader compute({ { blons::ShaderPipelineStage::COMPUTE, "compute.glsl" } });
+/// // Initialize ShaderData that will store the ComputeShader's output
+/// std::vector<blons::Vector4> vector_array = { blons::Vector4(5.0f, 5.0f, 5.0f, 3.0f), blons::Vector4(0.0f, 0.0f, 0.0f, 4.0f) };
+/// blons::ShaderData<blons::Vector4> array_data(vector_array.data(), vector_array.size());
+/// // Bind the ShaderData as an input
+/// compute.SetInput("array_data", array_data.data());
+/// // Dispatch the ComputeShader
+/// compute.Run(1, 1, 1);
+///
+/// // Retrieve new values from GPU memory
+/// auto transformed_array = array_data.value();
+/// for (int i = 0; i < array_data.length(); i++)
+/// {
+///     auto v = transformed_array[i];
+///     blons::log::Debug("x:%.2f y:%.2f z:%.2f w:%.2f\n", v.x, v.y, v.z, v.w);
+/// }
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 

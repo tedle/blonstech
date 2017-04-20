@@ -63,9 +63,9 @@ void Manager::Init(units::pixel width, units::pixel height)
     ShaderAttributeList ui_inputs;
     ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
     ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    ui_shader_.reset(new Shader("shaders/ui.vert.glsl", "shaders/ui.frag.glsl", ui_inputs));
-    blur_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-blur.frag.glsl", ui_inputs));
-    composite_shader_.reset(new Shader("shaders/sprite.vert.glsl", "shaders/ui-composite.frag.glsl", ui_inputs));
+    ui_shader_.reset(new Shader({ { VERTEX, "shaders/ui.vert.glsl" }, { PIXEL, "shaders/ui.frag.glsl" } }, ui_inputs));
+    blur_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/ui-blur.frag.glsl" } }, ui_inputs));
+    composite_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/ui-composite.frag.glsl" } }, ui_inputs));
 
     ui_buffer_.reset(new Framebuffer(width, height, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, true));
     blur_buffer_a_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));

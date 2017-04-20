@@ -57,7 +57,7 @@ IrradianceVolume::IrradianceVolume()
     world_matrix_ = MatrixScale(grid_width, grid_height, grid_depth) * MatrixTranslation(x_offset, y_offset, z_offset);
 
     // Compute shader for updating irradiance volume each frame
-    irradiance_volume_shader_.reset(new ComputeShader("shaders/irradiance-volume.comp.glsl"));
+    irradiance_volume_shader_.reset(new ComputeShader({ { COMPUTE, "shaders/irradiance-volume.comp.glsl" } }));
 }
 
 bool IrradianceVolume::Relight(const LightSector& sector)

@@ -23,13 +23,15 @@
 
 #include <blons/graphics/render/shader.h>
 
+// Includes
+#include <algorithm>
+
 namespace blons
 {
-Shader::Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs) :
+Shader::Shader(ShaderSourceList source_files, ShaderAttributeList inputs) :
     CommonShader::CommonShader()
 {
-    vertex_filename_ = vertex_filename;
-    pixel_filename_ = pixel_filename;
+    source_files_ = source_files;
     inputs_ = inputs;
     Reload();
 }
@@ -40,10 +42,16 @@ Shader::~Shader()
 
 void Shader::Reload()
 {
-    std::string vertex_source = ParseFile(vertex_filename_);
-    std::string pixel_source = ParseFile(pixel_filename_);
+    ShaderSourceList parsed_source_list;
+    std::transform(source_files_.begin(), source_files_.end(), std::back_inserter(parsed_source_list),
+    [&](const auto& source_file)
+    {
+        std::string source = ParseFile(source_file.second);
+        ShaderPipelineStage type = source_file.first;
+        return ShaderSource{ type, source };
+    });
 
-    if (!render::context()->RegisterShader(program_.get(), vertex_source, pixel_source, inputs_))
+    if (!render::context()->RegisterShader(program_.get(), parsed_source_list, inputs_))
     {
         log::Fatal("Shaders failed to compile\n");
         throw "Shaders failed to compile";

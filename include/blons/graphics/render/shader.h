@@ -41,11 +41,11 @@ public:
     /// \brief Creates a new rendering pipeline using the provided shader source
     /// files and shader inputs
     ///
-    /// \param vertex_filename Location of the vertex shader source on disk
-    /// \param pixel_filename Location of the pixel (fragment) shader source on disk
+    /// \param source_files List of source filenames and respective
+    /// blons::ShaderPipelineStage types
     /// \param inputs %Vertex layout to be sent to the shader every frame
     ////////////////////////////////////////////////////////////////////////////////
-    Shader(std::string vertex_filename, std::string pixel_filename, ShaderAttributeList inputs);
+    Shader(ShaderSourceList source_files, ShaderAttributeList inputs);
     ~Shader();
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -68,8 +68,6 @@ public:
     bool RenderInstanced(unsigned int index_count, unsigned int instance_count);
 
 private:
-    std::string vertex_filename_;
-    std::string pixel_filename_;
     ShaderAttributeList inputs_;
 };
 } // namespace blons
@@ -92,7 +90,9 @@ private:
 /// inputs.push_back(blons::ShaderAttribute(0, "input_pos"));
 /// inputs.push_back(blons::ShaderAttribute(1, "input_uv"));
 /// inputs.push_back(blons::ShaderAttribute(2, "input_norm"));
-/// auto shader = std::make_unique<blons::Shader>("vertex.glsl", "pixel.glsl", inputs));
+/// auto shader = std::make_unique<blons::Shader>({ { blons::ShaderPipelineStage::VERTEX, "vertex.glsl" },
+///                                                 { blons::ShaderPipelineStage::PIXEL, "pixel.glsl" } },
+///                                                   inputs));
 ///
 /// // Make a quick model to render with the shader
 /// auto model = std::make_unique<blons::Model>("model.bms");

@@ -23,11 +23,15 @@
 
 #include <blons/graphics/render/computeshader.h>
 
+// Includes
+#include <algorithm>
+
 namespace blons
 {
-ComputeShader::ComputeShader(std::string source_filename)
+ComputeShader::ComputeShader(ShaderSourceList source_files) :
+    CommonShader::CommonShader()
 {
-    source_filename_ = source_filename;
+    source_files_ = source_files;
     Reload();
 }
 
@@ -37,9 +41,16 @@ ComputeShader::~ComputeShader()
 
 void ComputeShader::Reload()
 {
-    std::string source = ParseFile(source_filename_);
+    ShaderSourceList parsed_source_list;
+    std::transform(source_files_.begin(), source_files_.end(), std::back_inserter(parsed_source_list),
+    [&](const auto& source_file)
+    {
+        std::string source = ParseFile(source_file.second);
+        ShaderPipelineStage type = source_file.first;
+        return ShaderSource{ type, source };
+    });
 
-    if (!render::context()->RegisterComputeShader(program_.get(), source))
+    if (!render::context()->RegisterComputeShader(program_.get(), parsed_source_list))
     {
         log::Fatal("Shaders failed to compile\n");
         throw "Shaders failed to compile";

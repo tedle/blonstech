@@ -141,8 +141,8 @@ LightSector::LightSector()
     probe_shader_data_.reset(new ShaderData<LightSector::Probe>(nullptr, probes_.size()));
 
     // Relight compute shaders to be run every frame
-    surfel_brick_relight_shader_.reset(new ComputeShader("shaders/surfelbrick-relight.comp.glsl"));
-    probe_relight_shader_.reset(new ComputeShader("shaders/probe-relight.comp.glsl"));
+    surfel_brick_relight_shader_.reset(new ComputeShader({ { COMPUTE, "shaders/surfelbrick-relight.comp.glsl" } }));
+    probe_relight_shader_.reset(new ComputeShader({ { COMPUTE, "shaders/probe-relight.comp.glsl" } }));
 }
 
 void LightSector::BakeRadianceTransfer(const Scene& scene)
