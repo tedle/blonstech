@@ -1126,6 +1126,12 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, u
         }
         soil_flags |= SOIL_FLAG_DDS_LOAD_DIRECT;
         tex->texture_ = SOIL_direct_load_DDS_from_memory(pixels->pixels.data(), static_cast<int>(pixels->pixels.size()), tex->texture_, soil_flags, 0);
+
+        // Ugly header parsing, mipmap count starts at 24th byte of header, header starts after 4 byte magic number
+        // https://msdn.microsoft.com/en-us/library/windows/desktop/bb943991(v=vs.85).aspx
+        unsigned int mipmap_count = *reinterpret_cast<unsigned int*>(&pixels->pixels[4+24]);
+        tex->has_mipmaps_ = mipmap_count > 0;
+
         if (tex->texture_ == 0)
         {
             throw "Failed to upload compressed texture";
@@ -1664,6 +1670,7 @@ bool RendererGL43::LoadPixelData(std::string filename, PixelData* data)
         file.read(reinterpret_cast<char*>(data->pixels.data()), image_size);
         data->type.compression = TextureType::DDS;
         // The width and height come at the 16th and 12th byte of a DDS header respectively
+        // https://msdn.microsoft.com/en-us/library/windows/desktop/bb943991(v=vs.85).aspx
         // Enjoy this ugly pointer casting dereferencing party for sad variables
         data->width = *reinterpret_cast<unsigned int*>(&data->pixels[16]);
         data->height = *reinterpret_cast<unsigned int*>(&data->pixels[12]);
