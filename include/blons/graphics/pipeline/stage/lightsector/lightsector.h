@@ -37,8 +37,8 @@ namespace pipeline
 namespace stage
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Manages light probes used to calculate indirect illumination at
-/// runtime with the use of precomputed radiance transfer
+/// \brief Manages light probes used to calculate indirect diffuse illumination
+/// at runtime through the use of precomputed radiance transfer
 ////////////////////////////////////////////////////////////////////////////////
 class LightSector
 {
