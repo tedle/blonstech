@@ -21,8 +21,8 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_TEXTURE3D_H_
-#define BLONSTECH_GRAPHICS_TEXTURE3D_H_
+#ifndef BLONSTECH_GRAPHICS_TEXTURECUBEMAP_H_
+#define BLONSTECH_GRAPHICS_TEXTURECUBEMAP_H_
 
 // Includes
 #include <memory>
@@ -32,10 +32,10 @@
 namespace blons
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Wraps a 3D texture resource with additional format and usage info for
-/// easy interaction with the graphics API
+/// \brief Wraps a cubemap texture resource with additional format and usage
+/// info for easy interaction with the graphics API
 ////////////////////////////////////////////////////////////////////////////////
-class Texture3D
+class TextureCubemap
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
@@ -45,18 +45,18 @@ public:
     {
         units::pixel width;  ///< Width of the texture in pixels
         units::pixel height; ///< Height of the texture in pixels
-        units::pixel depth;  ///< Depth of the texture in pixels
         TextureType type;    ///< Texture format and behaviour info
     };
 
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes a new 3D texture from raw pixel data. Will throw on failure
+    /// \brief Initializes a new cubemap texture from raw pixel data. Will throw on
+    /// failure
     ///
     /// \param pixels Pixel buffer and format info
     ////////////////////////////////////////////////////////////////////////////////
-    Texture3D(const PixelData3D& pixels);
-    ~Texture3D() {}
+    TextureCubemap(const PixelDataCubemap& pixels);
+    ~TextureCubemap() {}
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc Texture::Reload()
@@ -70,43 +70,47 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc Texture::pixels()
     ////////////////////////////////////////////////////////////////////////////////
-    const PixelData3D* pixels(bool force_gpu_sync);
+    const PixelDataCubemap* pixels(bool force_gpu_sync);
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc Texture::texture()
     ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* texture() const;
 
 private:
-    void Init(const PixelData3D& pixels);
+    void Init(const PixelDataCubemap& pixels);
 
-    std::unique_ptr<PixelData3D> pixel_data_;
+    std::unique_ptr<PixelDataCubemap> pixel_data_;
     std::shared_ptr<TextureResource> texture_;
     Info info_;
 };
 } // namespace blons
 
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::Texture3D
+/// \class blons::TextureCubemap
 /// \ingroup graphics
 ///
 /// ### Example:
 /// \code
-/// // Using a 3D texture is done through initializing from a pixel buffer
-/// blons::PixelData3D pixels;
+/// // Using a cubemap texture is done through initializing from a pixel buffer
+/// blons::PixelDataCubemap pixels;
 /// pixels.type.format = TextureType::R8G8B8;
 /// pixels.type.compression = TextureType::RAW;
 /// pixels.type.filter = TextureType::LINEAR;
 /// pixels.type.wrap = TextureType::REPEAT;
 /// pixels.width = 1;
 /// pixels.height = 1;
-/// pixels.depth = 1;
-/// pixels.pixels.reset(new unsigned char[pixels.width * pixels.height * pixels.depth * 3]);
-/// pixels.pixels.get()[0] = 255;
-/// pixels.pixels.get()[1] = 255;
-/// pixels.pixels.get()[2] = 255;
-/// blons::Texture3D tex(pixels);
-/// shader->SetInput("white_cube", tex.texture());
+/// // There are 6 pixel buffers, one for each cube face
+/// // Indexed by blons::AxisAlignedNormal
+/// for (auto& buffer : pixels.pixels)
+/// {
+///     buffer.reset(new unsigned char[pixels.width * pixels.height * 3]);
+///     buffer.get()[0] = 255;
+///     buffer.get()[1] = 255;
+///     buffer.get()[2] = 255;
+/// }
+/// blons::TextureCubemap tex(pixels);
+/// shader->SetInput("white_skybox", tex.texture());
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
-#endif // BLONSTECH_GRAPHICS_TEXTURE3D_H_
+#endif // BLONSTECH_GRAPHICS_TEXTURECUBEMAP_H_

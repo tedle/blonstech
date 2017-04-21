@@ -234,6 +234,7 @@
     <ClInclude Include="..\include\blons\graphics\sprite.h" />
     <ClInclude Include="..\include\blons\graphics\texture.h" />
     <ClInclude Include="..\include\blons\graphics\texture3d.h" />
+    <ClInclude Include="..\include\blons\graphics\texturecubemap.h" />
     <ClInclude Include="..\include\blons\input.h" />
     <ClInclude Include="..\include\blons\input\inputtemp.h" />
     <ClInclude Include="..\include\blons\math.h" />
@@ -308,6 +309,7 @@
     <ClCompile Include="graphics\sprite.cpp" />
     <ClCompile Include="graphics\texture.cpp" />
     <ClCompile Include="graphics\texture3d.cpp" />
+    <ClCompile Include="graphics\texturecubemap.cpp" />
     <ClCompile Include="input\inputtemp.cpp" />
     <ClCompile Include="math\animation.cpp" />
     <ClCompile Include="math\math.cpp" />

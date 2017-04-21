@@ -21,22 +21,22 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <blons/graphics/texture3d.h>
+#include <blons/graphics/texturecubemap.h>
 
 // Local Includes
 #include "resource.h"
 
 namespace blons
 {
-Texture3D::Texture3D(const PixelData3D& pixels)
+TextureCubemap::TextureCubemap(const PixelDataCubemap& pixels)
 {
     Init(pixels);
 }
 
-void Texture3D::Init(const PixelData3D& pixels)
+void TextureCubemap::Init(const PixelDataCubemap& pixels)
 {
     auto context = render::context();
-    pixel_data_.reset(new PixelData3D(pixels));
+    pixel_data_.reset(new PixelDataCubemap(pixels));
 
     // Make the actual texture
     texture_.reset(context->MakeTextureResource());
@@ -52,30 +52,29 @@ void Texture3D::Init(const PixelData3D& pixels)
 
     info_.width = pixel_data_->width;
     info_.height = pixel_data_->height;
-    info_.depth = pixel_data_->depth;
     info_.type = pixel_data_->type;
 }
 
-void Texture3D::Reload()
+void TextureCubemap::Reload()
 {
     Init(*pixel_data_);
 }
 
-const Texture3D::Info* Texture3D::info() const
+const TextureCubemap::Info* TextureCubemap::info() const
 {
     return &info_;
 }
 
-const PixelData3D* Texture3D::pixels(bool force_gpu_sync)
+const PixelDataCubemap* TextureCubemap::pixels(bool force_gpu_sync)
 {
     if (force_gpu_sync || pixel_data_ == nullptr)
     {
-        pixel_data_.reset(new PixelData3D(render::context()->GetTextureData3D(texture_.get(), 0)));
+        pixel_data_.reset(new PixelDataCubemap(render::context()->GetTextureDataCubemap(texture_.get(), 0)));
     }
     return pixel_data_.get();
 }
 
-const TextureResource* Texture3D::texture() const
+const TextureResource* TextureCubemap::texture() const
 {
     return texture_.get();
 }

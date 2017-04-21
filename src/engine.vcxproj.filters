@@ -265,6 +265,9 @@
     <ClInclude Include="graphics\pipeline\stage\lightsector\radiancetransferbaker.h">
       <Filter>src\graphics\pipeline\stage\lightsector</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\texturecubemap.h">
+      <Filter>src\graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -443,6 +446,9 @@
     </ClCompile>
     <ClCompile Include="graphics\pipeline\stage\lightsector\radiancetransferbaker.cpp">
       <Filter>src\graphics\pipeline\stage\lightsector</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\texturecubemap.cpp">
+      <Filter>src\graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
