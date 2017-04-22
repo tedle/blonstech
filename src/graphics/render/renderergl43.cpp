@@ -1624,6 +1624,12 @@ void RendererGL43::VideoCardInfo(char* name, int& memory)
     return;
 }
 
+bool RendererGL43::IsDepthBufferRangeZeroToOne() const
+{
+    // OpenGL is [-1,1]
+    return false;
+}
+
 bool RendererGL43::LoadPixelData(std::string filename, PixelData* data)
 {
     std::string filetype(filename);

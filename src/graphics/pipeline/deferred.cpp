@@ -43,7 +43,7 @@ bool Deferred::Init()
 {
     // Projection matrix (3D space->2D screen)
     float screen_aspect = static_cast<float>(perspective_.width) / static_cast<float>(perspective_.height);
-    proj_matrix_ = MatrixPerspective(perspective_.fov, screen_aspect, perspective_.screen_near, perspective_.screen_far);
+    proj_matrix_ = MatrixPerspective(perspective_.fov, screen_aspect, perspective_.screen_near, perspective_.screen_far, render::context()->IsDepthBufferRangeZeroToOne());
 
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(perspective_.width), units::pixel_to_subpixel(perspective_.height), 0,

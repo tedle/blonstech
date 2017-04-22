@@ -37,7 +37,9 @@ namespace stage
 namespace
 {
 // Hard coded distance clipping as graphics option values are tuned for performance
-const Matrix kCubeFaceProjection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 100.0f);
+// Requires a post-init value (depth range of context impl), so we mark the constant args globally
+// And reconstruct during functions. Kinda ugly. sorry
+const std::array<float, 4> kCubeFaceProjectionArgs = { kPi / 2.0f, 1.0f, 0.1f, 1000.0f };
 const std::vector<AxisAlignedNormal> kFaceOrder = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
 const int kProbeNetworkFaces = 4;
 const int kProbeNetworkEdges = 3;
@@ -174,6 +176,9 @@ void RadianceTransferBaker::BakeEnvironmentMaps(const Scene& scene)
     context->SetBlendMode(BlendMode::OVERWRITE);
 
     Camera cube_view;
+    const Matrix cube_projection = MatrixPerspective(kCubeFaceProjectionArgs[0], kCubeFaceProjectionArgs[1],
+                                                     kCubeFaceProjectionArgs[2], kCubeFaceProjectionArgs[3],
+                                                     render::context()->IsDepthBufferRangeZeroToOne());
 
     // Build up a buffer of unique face data used for instanced rendering
     for (const auto& probe : probes_)
@@ -185,7 +190,7 @@ void RadianceTransferBaker::BakeEnvironmentMaps(const Scene& scene)
             PerFaceData face_data;
             Vector3 rot = FaceRotation(face);
             cube_view.set_rot(rot.x, rot.y, rot.z);
-            face_data.vp_matrix = cube_view.view_matrix() * kCubeFaceProjection;
+            face_data.vp_matrix = cube_view.view_matrix() * cube_projection;
             face_data.scissor_x = face_index * kProbeMapSize;
             face_data.scissor_y = static_cast<units::pixel>(probe.id) * kProbeMapSize;
             per_face_data.push_back(face_data);
@@ -226,6 +231,9 @@ void RadianceTransferBaker::GatherProbeSamples(std::vector<SurfelSample>* surfel
     std::size_t albedo_pixel_size = albedo_tex.bits_per_pixel() / 8;
     std::size_t normal_pixel_size = normal_tex.bits_per_pixel() / 8;
     std::size_t depth_pixel_size = depth_tex.bits_per_pixel() / 8;
+    const Matrix cube_projection = MatrixPerspective(kCubeFaceProjectionArgs[0], kCubeFaceProjectionArgs[1],
+                                                     kCubeFaceProjectionArgs[2], kCubeFaceProjectionArgs[3],
+                                                     render::context()->IsDepthBufferRangeZeroToOne());
 
     // Iterate over each face of each probe and generate samples
     for (const auto& probe : probes_)
@@ -244,7 +252,7 @@ void RadianceTransferBaker::GatherProbeSamples(std::vector<SurfelSample>* surfel
             // Reconstruct full camera rotation and position that was used to render scene for this face
             // Used for reconstructing the world space position at a given texel, same as in deferred rendering
             cube_view.set_pos(probe.pos.x, probe.pos.y, probe.pos.z);
-            Matrix inverse_vp_matrix = MatrixInverse(cube_view.view_matrix() * kCubeFaceProjection);
+            Matrix inverse_vp_matrix = MatrixInverse(cube_view.view_matrix() * cube_projection);
 
             // Finally for each texel: generate and store a sample
             for (int x = 0; x < kProbeMapSize; x++)

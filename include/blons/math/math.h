@@ -401,11 +401,13 @@ Matrix MatrixOrthographic(units::world left, units::world right, units::world bo
 /// \param fov The vertical FOV in radians
 /// \param screen_aspect The screen width divided by screen height
 /// \param screen_near The near clipping plane distance from the camera
-/// \param screen_depth The far clipping plane distance from the camera
+/// \param screen_far The far clipping plane distance from the camera
+/// \param zero_to_one Map the near and far values to [0,1] or [-1,1]
 /// \return Perspective projection matrix
 ////////////////////////////////////////////////////////////////////////////////
 Matrix MatrixPerspective(float fov, float screen_aspect,
-                         units::world screen_near, units::world screen_depth);
+                         units::world screen_near, units::world screen_far,
+                         bool zero_to_one);
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
 /// \brief Generates a new matrix scaled by the supplied values

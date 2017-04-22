@@ -115,6 +115,8 @@ public:
 
     void VideoCardInfo(char* buffer, int& len_buffer) override;
 
+    bool IsDepthBufferRangeZeroToOne() const override;
+
     // TODO: merge this without RegisterTexture(which should accept a pixel buffer)
     bool LoadPixelData(std::string filename, PixelData* pixel_data) override;
 

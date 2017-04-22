@@ -234,13 +234,19 @@ Matrix MatrixOrthographic(units::world left, units::world right, units::world bo
 }
 
 Matrix MatrixPerspective(float fov, float screen_aspect,
-                         units::world screen_near, units::world screen_depth)
+                         units::world screen_near, units::world screen_far,
+                         bool zero_to_one)
 {
     Matrix proj_matrix;
     XMFLOAT4X4 xm;
     XMStoreFloat4x4(&xm, XMMatrixPerspectiveFovRH(fov, screen_aspect,
-                                                  screen_near, screen_depth));
+                                                  screen_near, screen_far));
     proj_matrix = xm;
+    // DirectXMath assumes a NDC depth buffer range of [0,1], but OpenGL uses [-1,1]
+    if (!zero_to_one)
+    {
+        proj_matrix = proj_matrix * MatrixScale(1.0f, 1.0f, 2.0f) * MatrixTranslation(0.0f, 0.0f, -1.0f);
+    }
     return proj_matrix;
 }
 
