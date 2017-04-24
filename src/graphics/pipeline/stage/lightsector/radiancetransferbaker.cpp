@@ -43,35 +43,6 @@ const std::array<float, 4> kCubeFaceProjectionArgs = { kPi / 2.0f, 1.0f, 0.1f, 1
 const std::vector<AxisAlignedNormal> kFaceOrder = { NEGATIVE_Z, POSITIVE_X, POSITIVE_Z, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y };
 const int kProbeNetworkFaces = 4;
 const int kProbeNetworkEdges = 3;
-Vector3 FaceRotation(AxisAlignedNormal face)
-{
-    units::world pitch = 0.0f;
-    units::world yaw = 0.0f;
-    switch (face)
-    {
-    case NEGATIVE_Z:
-        break;
-    case POSITIVE_X:
-        yaw = -kPi / 2.0f;
-        break;
-    case POSITIVE_Z:
-        yaw = kPi;
-        break;
-    case NEGATIVE_X:
-        yaw = kPi / 2.0f;
-        break;
-    case POSITIVE_Y:
-        pitch = kPi / 2.0f;
-        break;
-    case NEGATIVE_Y:
-        pitch = -kPi / 2.0f;
-        break;
-    default:
-        throw "Impossible case statment reached during face selection";
-    }
-    return Vector3(pitch, yaw, 0.0f);
-}
-
 // When weighting the function f(theta,phi) = 1 over
 // a sphere with UV-spaced inputs this will result
 // in a final sum of 4*pi*N where N is the number of
@@ -188,7 +159,7 @@ void RadianceTransferBaker::BakeEnvironmentMaps(const Scene& scene)
         for (const auto& face : kFaceOrder)
         {
             PerFaceData face_data;
-            Vector3 rot = FaceRotation(face);
+            Vector3 rot = AxisRotationPitchYawRoll(face);
             cube_view.set_rot(rot.x, rot.y, rot.z);
             face_data.vp_matrix = cube_view.view_matrix() * cube_projection;
             face_data.scissor_x = face_index * kProbeMapSize;
@@ -242,7 +213,7 @@ void RadianceTransferBaker::GatherProbeSamples(std::vector<SurfelSample>* surfel
         for (const auto& face : kFaceOrder)
         {
             // Reconstruct camera rotation that was used to render scene for this face
-            Vector3 rot = FaceRotation(face);
+            Vector3 rot = AxisRotationPitchYawRoll(face);
             Camera cube_view;
             cube_view.set_pos(0, 0, 0);
             cube_view.set_rot(rot.x, rot.y, rot.z);

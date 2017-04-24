@@ -593,6 +593,40 @@ AxisAlignedNormal FindGreatestAxis(Vector3 n)
         return direction;
 }
 
+Vector3 AxisRotationPitchYawRoll(AxisAlignedNormal direction)
+{
+    units::world pitch = 0.0f;
+    units::world yaw = 0.0f;
+    units::world roll = 0.0f;
+    switch (direction)
+    {
+    case NEGATIVE_Z:
+        roll = kPi;
+        break;
+    case POSITIVE_X:
+        yaw = -kPi / 2.0f;
+        roll = kPi;
+        break;
+    case POSITIVE_Z:
+        yaw = kPi;
+        roll = kPi;
+        break;
+    case NEGATIVE_X:
+        yaw = kPi / 2.0f;
+        roll = kPi;
+        break;
+    case POSITIVE_Y:
+        pitch = kPi / 2.0f;
+        break;
+    case NEGATIVE_Y:
+        pitch = -kPi / 2.0f;
+        break;
+    default:
+        throw "Impossible case statment reached during face selection";
+    }
+    return Vector3(pitch, yaw, roll);
+}
+
 unsigned int FastHash(const void* data, std::size_t size)
 {
     static const unsigned int kPrime = 16777619;

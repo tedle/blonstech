@@ -700,9 +700,19 @@ enum AxisAlignedNormal
 /// \ingroup math
 /// \brief Finds the highest magnitude axis of a supplied vector
 ///
+/// \param direction Vector pointing in the direction to be tested
 /// \return Axis of greatest magnitude
 ////////////////////////////////////////////////////////////////////////////////
-AxisAlignedNormal FindGreatestAxis(Vector3 n);
+AxisAlignedNormal FindGreatestAxis(Vector3 direction);
+////////////////////////////////////////////////////////////////////////////////
+/// \ingroup math
+/// \brief Finds the pitch, yaw, and roll for an AxisAlignedNormal assuming a
+/// default rotation pointing towards [0,0,-1]
+///
+/// \param direction AxisAlignedNormal pointing in the desired direction
+/// \return Vector3 containing pitch, yaw, and roll in that order
+////////////////////////////////////////////////////////////////////////////////
+Vector3 AxisRotationPitchYawRoll(AxisAlignedNormal direction);
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \ingroup math
