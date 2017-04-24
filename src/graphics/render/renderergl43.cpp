@@ -1229,7 +1229,7 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels,
 void RendererGL43::SetTextureData(TextureResource* texture, PixelDataCubemap* pixels, unsigned int mip_level)
 {
     auto tex = resource_cast<TextureResourceGL43*>(texture, id());
-    if (tex->options_.compression != TextureType::RAW)
+    if (tex->options_.compression == TextureType::DDS)
     {
         throw "TextureType::DDS is not supported for cubemap textures";
     }
