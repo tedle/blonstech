@@ -1076,7 +1076,8 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData* pixels, u
         GLint input_format;
         GLenum input_type;
         TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
-        glTexImage2D(tex->type_, mip_level, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels.data());
+        auto pixel_buffer = pixels->pixels.size() > 0 ? pixels->pixels.data() : nullptr;
+        glTexImage2D(tex->type_, mip_level, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixel_buffer);
         if (pixels->type.compression == TextureType::AUTO && mip_level == 0)
         {
             glGenerateMipmap(tex->type_);
@@ -1178,7 +1179,8 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelData3D* pixels,
     GLint input_format;
     GLenum input_type;
     TranslateTextureFormat(pixels->type.format, &internal_format, &input_format, &input_type);
-    glTexImage3D(tex->type_, mip_level, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixels->pixels.data());
+    auto pixel_buffer = pixels->pixels.size() > 0 ? pixels->pixels.data() : nullptr;
+    glTexImage3D(tex->type_, mip_level, internal_format, pixels->width, pixels->height, pixels->depth, 0, input_format, input_type, pixel_buffer);
     if (pixels->type.compression == TextureType::AUTO && mip_level == 0)
     {
         glGenerateMipmap(tex->type_);
@@ -1247,7 +1249,8 @@ void RendererGL43::SetTextureData(TextureResource* texture, PixelDataCubemap* pi
     for (const auto& axis : { POSITIVE_X, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y, POSITIVE_Z, NEGATIVE_Z })
     {
         auto cubeface = TranslateAxisFormat(axis);
-        glTexImage2D(cubeface, mip_level, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixels->pixels[axis].data());
+        auto pixel_buffer = pixels->pixels[axis].size() > 0 ? pixels->pixels[axis].data() : nullptr;
+        glTexImage2D(cubeface, mip_level, internal_format, pixels->width, pixels->height, 0, input_format, input_type, pixel_buffer);
     }
     if (pixels->type.compression == TextureType::AUTO && mip_level == 0)
     {
