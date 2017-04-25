@@ -324,6 +324,9 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::pipeline::stage::LightSector
 /// \ingroup pipeline
+///
+/// Uses PRT method implemented in Tom Clancy's: The Division, described in a
+/// GDC 2016 talk: http://mrakobes.com/Nikolay.Stefanov.GDC.2016.pdf
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTSECTOR_LIGHTSECTOR_H_
