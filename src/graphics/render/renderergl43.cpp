@@ -552,6 +552,9 @@ RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+    // Enable texture filtering across cubemap faces
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
     // Set the row padding on textures to be 1 (default 4)
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glPixelStorei(GL_PACK_ALIGNMENT, 1);
