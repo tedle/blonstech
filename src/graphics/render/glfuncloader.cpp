@@ -227,6 +227,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glEnableVertexAttribArray");
     }
 
+    glFramebufferParameteri = (PFNGLFRAMEBUFFERPARAMETERIPROC)glGetProcAddress("glFramebufferParameteri");
+    if (glFramebufferParameteri == nullptr)
+    {
+        failed.push_back("glFramebufferParameteri");
+    }
+
     glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)glGetProcAddress("glFramebufferRenderbuffer");
     if (glFramebufferRenderbuffer == nullptr)
     {
@@ -473,6 +479,7 @@ PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
 PFNGLDRAWBUFFERSPROC glDrawBuffers;
 PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+PFNGLFRAMEBUFFERPARAMETERIPROC glFramebufferParameteri;
 PFNGLFRAMEBUFFERRENDERBUFFERPROC glFramebufferRenderbuffer;
 PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;

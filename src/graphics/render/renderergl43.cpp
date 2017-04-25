@@ -682,6 +682,9 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
 
     // Bind it so we can put stuff in it
     BindFramebuffer(fbo);
+    // Set default width and height for FBOs with no attachments
+    glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_WIDTH, width);
+    glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_HEIGHT, height);
 
     // Creates empty render targets
     auto make_texture = [&](TextureType type)
