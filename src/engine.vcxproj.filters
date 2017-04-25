@@ -268,6 +268,9 @@
     <ClInclude Include="..\include\blons\graphics\texturecubemap.h">
       <Filter>src\graphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\specularlocal.h">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -450,6 +453,9 @@
     <ClCompile Include="graphics\texturecubemap.cpp">
       <Filter>src\graphics</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\pipeline\stage\specularlocal.cpp">
+      <Filter>src\graphics\pipeline\stage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\composite.frag.glsl">
@@ -544,6 +550,12 @@
     </None>
     <None Include="shaders\lib\probes.lib.glsl">
       <Filter>src\shaders\lib</Filter>
+    </None>
+    <None Include="shaders\specular-probe-env-map.vert.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\specular-probe-env-map.geom.glsl">
+      <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

@@ -51,6 +51,7 @@ uniform sampler3D irradiance_volume_py;
 uniform sampler3D irradiance_volume_ny;
 uniform sampler3D irradiance_volume_pz;
 uniform sampler3D irradiance_volume_nz;
+uniform samplerCube local_specular_probe;
 uniform float roughness;
 uniform vec3 metalness;
 
@@ -127,11 +128,13 @@ void main(void)
     // For directional lights
     vec4 eye_pos = inv_vp_matrix * vec4(0.0, 0.0, 0.0, 1.0);
     eye_pos /= eye_pos.w;
-    vec3 view_dir = normalize(eye_pos.xyz - pos.xyz);
+    vec3 view_dir = normalize(pos.xyz - eye_pos.xyz);
 
     if (depth_sample == 1.0)
     {
         frag_colour = vec4(GammaEncode(SkyColour(view_dir)), 1.0);
+        frag_colour *= 0.0001f;
+        frag_colour += vec4(texture(local_specular_probe, view_dir).rgb, 1.0);
         return;
     }
 
@@ -143,12 +146,12 @@ void main(void)
     vec3 surface_normal = normalize(texture(normal, tex_coord).rgb * 2.0 - 1.0);
 
     // Pre-computed and re-used in various lighting calculations
-    vec3 halfway = normalize(-sun.dir + view_dir);
+    vec3 halfway = normalize(-sun.dir - view_dir);
     float NdotH = max(dot(surface_normal, halfway), 0.0);
     float NdotL = max(dot(surface_normal, -sun.dir), 0.0);
-    float NdotV = max(dot(surface_normal, view_dir), 0.0);
+    float NdotV = max(dot(surface_normal, -view_dir), 0.0);
     float LdotH = max(dot(-sun.dir, halfway), 0.0);
-    float LdotV = max(dot(-sun.dir, view_dir), 0.0);
+    float LdotV = max(dot(-sun.dir, -view_dir), 0.0);
 
     vec3 diffuse = Diffuse(pos, albedo, metalness, surface_normal, direct, NdotV, NdotL, LdotH, LdotV, roughness);
     vec3 specular = Specular(metalness, albedo, direct, NdotH, NdotV, NdotL, LdotH, roughness);

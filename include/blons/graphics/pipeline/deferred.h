@@ -30,6 +30,7 @@
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/lightsector/lightsector.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
+#include <blons/graphics/pipeline/stage/specularlocal.h>
 #include <blons/graphics/pipeline/stage/lighting.h>
 #include <blons/graphics/pipeline/stage/composite.h>
 #include <blons/graphics/pipeline/stage/debug/debugoutput.h>
@@ -139,6 +140,7 @@ private:
     std::unique_ptr<stage::Shadow> shadow_;
     std::unique_ptr<stage::LightSector> light_sector_;
     std::unique_ptr<stage::IrradianceVolume> irradiance_volume_;
+    std::unique_ptr<stage::SpecularLocal> specular_local_;
     std::unique_ptr<stage::Lighting> lighting_;
     std::unique_ptr<stage::Composite> composite_;
 

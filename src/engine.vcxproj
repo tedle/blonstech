@@ -224,6 +224,7 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lighting.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\lightsector\lightsector.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\shadow.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\stage\specularlocal.h" />
     <ClInclude Include="..\include\blons\graphics\render\commonshader.h" />
     <ClInclude Include="..\include\blons\graphics\render\computeshader.h" />
     <ClInclude Include="..\include\blons\graphics\render\context.h" />
@@ -296,6 +297,7 @@
     <ClCompile Include="graphics\pipeline\stage\lightsector\lightsector.cpp" />
     <ClCompile Include="graphics\pipeline\stage\lightsector\radiancetransferbaker.cpp" />
     <ClCompile Include="graphics\pipeline\stage\shadow.cpp" />
+    <ClCompile Include="graphics\pipeline\stage\specularlocal.cpp" />
     <ClCompile Include="graphics\render\commonshader.cpp" />
     <ClCompile Include="graphics\render\computeshader.cpp" />
     <ClCompile Include="graphics\render\context.cpp" />
@@ -343,6 +345,8 @@
     <None Include="shaders\shadow-blur.frag.glsl" />
     <None Include="shaders\shadow.frag.glsl" />
     <None Include="shaders\shadow.vert.glsl" />
+    <None Include="shaders\specular-probe-env-map.geom.glsl" />
+    <None Include="shaders\specular-probe-env-map.vert.glsl" />
     <None Include="shaders\sprite.frag.glsl" />
     <None Include="shaders\sprite.vert.glsl" />
     <None Include="shaders\surfelbrick-relight.comp.glsl" />

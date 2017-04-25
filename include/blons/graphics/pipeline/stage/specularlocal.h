@@ -21,15 +21,16 @@
 // THE SOFTWARE.
 ////////////////////////////////////////////////////////////////////////////////
 
-#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
-#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
+#ifndef BLONSTECH_GRAPHICS_PIPELINE_STAGE_SPECULARLOCAL_H_
+#define BLONSTECH_GRAPHICS_PIPELINE_STAGE_SPECULARLOCAL_H_
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
-#include <blons/graphics/pipeline/stage/specularlocal.h>
+#include <blons/graphics/texturecubemap.h>
+#include <blons/graphics/render/computeshader.h>
 
 namespace blons
 {
@@ -38,10 +39,9 @@ namespace pipeline
 namespace stage
 {
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Composites lighting information from previous passes and adds
-/// specular
+/// \brief Bakes and relights a collection of local specular lighting probes
 ////////////////////////////////////////////////////////////////////////////////
-class Lighting
+class SpecularLocal
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
@@ -49,57 +49,79 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        LIGHT ///< Composited lighting information applied to the scene
+        ALBEDO, ///< G-Buffer albedo map
+        NORMAL, ///< G-buffer normal map
+        DEPTH,  ///< G-Buffer depth map
+        LIGHT   ///< Filtered lighting information applied to the environment map
     };
 
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes a new Lighting stage
-    ///
-    /// \param perspective Screen dimensions and perspective information
+    /// \brief Initializes a new SpecularLocal stage
     ////////////////////////////////////////////////////////////////////////////////
-    Lighting(Perspective perspective);
-    ~Lighting() {}
+    SpecularLocal();
+    ~SpecularLocal() {}
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Renders out the composited lighting targets
+    /// \brief Bakes the precomputed radiance transfer data for a given scene
+    ///
+    /// \param scene Contains scene information for baking
+    ////////////////////////////////////////////////////////////////////////////////
+    void BakeRadianceTransfer(const Scene& scene);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Relights and filters environment cubemaps
     ///
     /// \param scene Contains scene information for rendering
-    /// \param geometry Handle to the geometry buffer pass performed earlier in the
-    /// frame
     /// \param shadow Handle to the shadow buffer pass performed earlier in the
     /// frame
     /// \param irradiance Handle to the irradiance volume pass performed earlier in
     /// the frame
-    /// \param specular_local Handle to the specular relight pass performed earlier
-    /// in the frame
-    /// \param view_matrix View matrix of the camera rendering the scene
-    /// \param proj_matrix Perspective matrix for rendering the scene
-    /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
+    /// \param light_vp_matrix View-projection matrix of the direction light
+    /// providing shadow
     ////////////////////////////////////////////////////////////////////////////////
-    bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
-                const IrradianceVolume& irradiance, const SpecularLocal& specular_local,
-                Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
+    bool Relight(const Scene& scene, const Shadow& shadow, const IrradianceVolume& irradiance,
+                 Matrix light_vp_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage
     ///
     /// \param buffer Lighting::Output target to retrieve
+    /// \param probe_id ID of the specular probe to retrieve outputs from
     /// \return Handle to the output target texture
     ////////////////////////////////////////////////////////////////////////////////
-    const TextureResource* output(Output buffer) const;
+    const TextureResource* output(Output buffer, std::size_t probe_id) const;
 
 private:
-    std::unique_ptr<Shader> light_shader_;
-    std::unique_ptr<Framebuffer> light_buffer_;
+    struct SpecularProbe
+    {
+        Vector3 pos;
+        struct
+        {
+            std::unique_ptr<TextureCubemap> albedo;      ///< G-buffer albedo
+            std::unique_ptr<TextureCubemap> normal;      ///< G-buffer normal
+            std::unique_ptr<TextureCubemap> depth;       ///< G-buffer depth
+        } g_buffer;
+        std::unique_ptr<TextureCubemap> environment; ///< Filtered lighting environment
+    };
+
+    std::vector<SpecularProbe> probes_;
+    std::unique_ptr<ComputeShader> relight_shader_;
 };
 } // namespace stage
 } // namespace pipeline
 } // namespace blons
 
+/// \REFACTOR SHADERATTRIBITEINPUT INITS
+/// \SEE_IMPORTANT_SHADER_CHANGE:
+/// In light.frag.glsl make sure ambient diffuse has 1.0 - DFG LUT term applied
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::pipeline::stage::Lighting
+/// \class blons::pipeline::stage::SpecularLocal
 /// \ingroup pipeline
+///
+/// Uses pre-integrated approximation for real-time specular relighting and
+/// application. Described in DICE's Siggraph 2014 course "Moving Frostbite to
+/// PBR": http://www.frostbite.com/2014/11/moving-frostbite-to-pbr/
 ////////////////////////////////////////////////////////////////////////////////
 
-#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_LIGHTING_H_
+#endif // BLONSTECH_GRAPHICS_PIPELINE_STAGE_SPECULARLOCAL_H_

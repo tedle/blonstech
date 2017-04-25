@@ -59,7 +59,8 @@ Lighting::Lighting(Perspective perspective)
     light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false));
 }
 
-bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow, const IrradianceVolume& irradiance,
+bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
+                      const IrradianceVolume& irradiance, const SpecularLocal& specular_local,
                       Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
     auto context = render::context();
@@ -98,7 +99,8 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
         !light_shader_->SetInput("irradiance_volume_py", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PY), 6) ||
         !light_shader_->SetInput("irradiance_volume_ny", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NY), 7) ||
         !light_shader_->SetInput("irradiance_volume_pz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ), 8) ||
-        !light_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 9))
+        !light_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 9) ||
+        !light_shader_->SetInput("local_specular_probe", specular_local.output(SpecularLocal::ALBEDO, 0), 10))
     {
         return false;
     }

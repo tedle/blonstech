@@ -56,6 +56,7 @@ bool Deferred::Init()
     shadow_.reset(new stage::Shadow(perspective_));
     light_sector_.reset(new stage::LightSector());
     irradiance_volume_.reset(new stage::IrradianceVolume());
+    specular_local_.reset(new stage::SpecularLocal());
     lighting_.reset(new stage::Lighting(perspective_));
     debug_output_.reset(new stage::debug::DebugOutput(perspective_));
     composite_.reset(new stage::Composite(perspective_));
@@ -127,7 +128,7 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!lighting_->Render(scene, *geometry_, *shadow_, *irradiance_volume_, view_matrix, proj_matrix_, ortho_matrix_))
+    if (!lighting_->Render(scene, *geometry_, *shadow_, *irradiance_volume_, *specular_local_, view_matrix, proj_matrix_, ortho_matrix_))
     {
         return false;
     }
@@ -170,6 +171,7 @@ void Deferred::set_output(Output output, Output alt_output)
 void Deferred::BakeRadianceTransfer(const Scene& scene)
 {
     light_sector_->BakeRadianceTransfer(scene);
+    specular_local_->BakeRadianceTransfer(scene);
 }
 
 bool Deferred::RenderOutput()
