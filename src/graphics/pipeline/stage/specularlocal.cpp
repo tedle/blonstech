@@ -140,6 +140,8 @@ void SpecularLocal::BakeRadianceTransfer(const Scene& scene)
 bool SpecularLocal::Relight(const Scene& scene, const Shadow& shadow, const IrradianceVolume& irradiance, Matrix light_vp_matrix)
 {
     auto context = render::context();
+    context->SetDepthTesting(false);
+    context->SetBlendMode(BlendMode::OVERWRITE);
     // Can be removed when we support more lights
     assert(scene.lights.size() == 1);
     Light* sun = scene.lights[0];

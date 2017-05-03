@@ -60,6 +60,7 @@ bool Geometry::Render(const Scene& scene, Matrix view_matrix, Matrix proj_matrix
     auto context = render::context();
     // Needed so models dont render over themselves
     context->SetDepthTesting(true);
+    context->SetBlendMode(BlendMode::OVERWRITE);
 
     // Bind the geometry framebuffer to render all models onto
     geometry_buffer_->Bind();

@@ -64,6 +64,8 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
                       Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix)
 {
     auto context = render::context();
+    context->SetDepthTesting(false);
+    context->SetBlendMode(BlendMode::OVERWRITE);
     // Can be removed when we support more lights
     assert(scene.lights.size() == 1);
     Light* sun = scene.lights[0];

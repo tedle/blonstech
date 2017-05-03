@@ -142,6 +142,8 @@ Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, unit
 void Manager::Render(Framebuffer* output_buffer)
 {
     auto context = render::context();
+    context->SetDepthTesting(true);
+    context->SetBlendMode(BlendMode::ALPHA);
     // Rendering UI to a separate buffer is needed for styles
     // Styles are only possible when output_buffer is supplied
     if (output_buffer != nullptr)

@@ -71,6 +71,9 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
     }
 
     auto context = render::context();
+    context->SetDepthTesting(true);
+    context->SetBlendMode(BlendMode::ALPHA);
+
     auto light_probes = sector.probes();
     Matrix vp_matrix = view_matrix * proj_matrix;
     // Grab camera position from its view matrix. Hacky, lazy, sorry, but not that sorry
@@ -79,7 +82,6 @@ bool ProbeView::Render(Framebuffer* target, const TextureResource* depth, const 
     auto probe_weights = sector.FindProbeWeights(camera_pos);
     // Bind the buffer to render the probes on top of
     target->Bind(false);
-    context->SetDepthTesting(true);
     target->BindDepthTexture(depth);
 
     // Set the probe-independent inputs

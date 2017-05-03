@@ -73,9 +73,10 @@ bool IrradianceView::Render(Framebuffer* target, const TextureResource* depth, c
     }
 
     auto context = render::context();
+    context->SetDepthTesting(true);
+    context->SetBlendMode(BlendMode::ALPHA);
     // Bind the buffer to render the volume on top of
     target->Bind(false);
-    context->SetDepthTesting(true);
     target->BindDepthTexture(depth);
 
     Matrix vp_matrix = view_matrix * proj_matrix;

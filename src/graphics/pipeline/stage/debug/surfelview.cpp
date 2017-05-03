@@ -59,6 +59,8 @@ bool SurfelView::Render(Framebuffer* target, const TextureResource* depth, const
     }
 
     auto context = render::context();
+    context->SetDepthTesting(true);
+    context->SetBlendMode(BlendMode::ALPHA);
     // Bind the buffer to render the surfels on top of
     target->Bind(false);
     context->SetDepthTesting(true);

@@ -68,6 +68,9 @@ Shadow::Shadow(Perspective perspective)
 
 bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, Matrix ortho_matrix)
 {
+    auto context = render::context();
+    context->SetDepthTesting(true);
+    context->SetBlendMode(BlendMode::OVERWRITE);
     // Can be removed when we support more lights
     assert(scene.lights.size() == 1);
     Light* sun = scene.lights[0];
@@ -142,7 +145,7 @@ bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_ma
     }
 
     // Needed so sprites can render over themselves
-    render::context()->SetDepthTesting(false);
+    context->SetDepthTesting(false);
 
     // Bind the shadow depth framebuffer to render all models onto
     direct_light_buffer_->Bind();

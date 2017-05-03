@@ -53,6 +53,8 @@ Composite::Composite(Perspective perspective)
 bool Composite::Render(const TextureResource* scene, const TextureResource* debug_output, Matrix ortho_matrix)
 {
     auto context = render::context();
+    context->SetDepthTesting(false);
+    context->SetBlendMode(BlendMode::OVERWRITE);
 
     // Bind the buffer to do all lighting calculations on
     composite_buffer_->Bind();
