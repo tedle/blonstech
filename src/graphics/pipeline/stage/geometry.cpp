@@ -51,7 +51,7 @@ Geometry::Geometry(Perspective perspective)
 
     // Framebuffers
     TextureType albedo_options(TextureType::R8G8B8, TextureType::LINEAR, TextureType::CLAMP);
-    TextureType normal_options(TextureType::R16G16B16, TextureType::LINEAR, TextureType::CLAMP);
+    TextureType normal_options(TextureType::R16G16B16_UNORM, TextureType::LINEAR, TextureType::CLAMP);
     geometry_buffer_.reset(new Framebuffer(perspective.width, perspective.height, { albedo_options, normal_options }));
 }
 

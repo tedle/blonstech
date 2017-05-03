@@ -61,9 +61,9 @@ Shadow::Shadow(Perspective perspective)
         throw "Failed to initialize Shadow shaders";
     }
 
-    blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureType::R16G16, TextureType::LINEAR, TextureType::CLAMP } }));
+    blur_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureType::R16G16_UNORM, TextureType::LINEAR, TextureType::CLAMP } }));
     direct_light_buffer_.reset(new Framebuffer(perspective.width, perspective.height, 1, false));
-    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureType::R16G16, TextureType::LINEAR } }));
+    shadow_buffer_.reset(new Framebuffer(kShadowMapResolution, kShadowMapResolution, { { TextureType::R16G16_UNORM, TextureType::LINEAR } }));
 }
 
 bool Shadow::Render(const Scene& scene, const Geometry& g_buffer, Matrix view_matrix, Matrix proj_matrix, Matrix light_vp_matrix, Matrix ortho_matrix)

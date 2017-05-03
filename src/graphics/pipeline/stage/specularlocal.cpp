@@ -55,13 +55,13 @@ SpecularLocal::SpecularLocal()
         buffer.type = TextureType(TextureType::R8G8B8, TextureType::RAW, TextureType::LINEAR);
         probe.g_buffer.albedo.reset(new TextureCubemap(buffer));
         // G-buffer normal (16-bits needed for accuracy)
-        buffer.type.format = TextureType::R16G16B16;
+        buffer.type.format = TextureType::R16G16B16_UNORM;
         probe.g_buffer.normal.reset(new TextureCubemap(buffer));
         // G-buffer depth
         buffer.type.format = TextureType::DEPTH;
         probe.g_buffer.depth.reset(new TextureCubemap(buffer));
         // HDR Relighting buffer, with mipmaps for roughness
-        buffer.type.format = TextureType::R16G16B16;
+        buffer.type.format = TextureType::R16G16B16A16_FLOAT;
         buffer.type.compression = TextureType::AUTO;
         probe.environment.reset(new TextureCubemap(buffer));
         // Add it to the list

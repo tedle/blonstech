@@ -46,21 +46,24 @@ struct TextureType
     ////////////////////////////////////////////////////////////////////////////////
     enum Format
     {
-        NONE,         ///< Error
-        A8,           ///< 1-channel, 8-bit per channel
-        R8G8_UINT,    ///< 2-channel, 8-bit per channel
-        R8G8B8_UINT,  ///< 3-channel, 8-bit per channel
-        R8G8B8A8_UINT,///< 4-channel, 8-bit per channel
-        R8G8B8,       ///< 3-channel, 8-bit per channel
-        R16G16,       ///< 2-channel, 16-bit per channel
-        R16G16B16,    ///< 3-channel, 16-bit per channel
-        R16G16B16A16, ///< 4-channel, 16-bit per channel
-        R8G8B8A8,     ///< 3-channel, 8-bit per channel
-        A32,          ///< 1-channel, 32-bit per channel
-        R32G32,       ///< 2-channel, 32-bit per channel
-        R32G32B32,    ///< 3-channel, 32-bit per channel
-        R32G32B32A32, ///< 4-channel, 32-bit per channel
-        DEPTH         ///< 24-bit Depth information
+        NONE,               ///< Error
+        A8,                 ///< 1-channel, 8-bit per channel
+        R8G8_UINT,          ///< 2-channel, 8-bit per channel
+        R8G8B8_UINT,        ///< 3-channel, 8-bit per channel
+        R8G8B8A8_UINT,      ///< 4-channel, 8-bit per channel
+        R8G8B8,             ///< 3-channel, 8-bit per channel
+        R16G16_UNORM,       ///< 2-channel, 16-bit per channel
+        R16G16B16_UNORM,    ///< 3-channel, 16-bit per channel
+        R16G16B16A16_UNORM, ///< 4-channel, 16-bit per channel
+        R16G16_FLOAT,       ///< 2-channel, 16-bit per channel
+        R16G16B16_FLOAT,    ///< 3-channel, 16-bit per channel
+        R16G16B16A16_FLOAT, ///< 4-channel, 16-bit per channel
+        R8G8B8A8,           ///< 3-channel, 8-bit per channel
+        A32,                ///< 1-channel, 32-bit per channel
+        R32G32,             ///< 2-channel, 32-bit per channel
+        R32G32B32,          ///< 3-channel, 32-bit per channel
+        R32G32B32A32,       ///< 4-channel, 32-bit per channel
+        DEPTH               ///< 24-bit Depth information
     } format; ///< \copybrief Format
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -269,7 +272,8 @@ struct PixelData
         case TextureType::DEPTH:
             bits = 32;
             break;
-        case TextureType::R16G16:
+        case TextureType::R16G16_FLOAT:
+        case TextureType::R16G16_UNORM:
         case TextureType::R32G32:
             bits = 64;
             break;

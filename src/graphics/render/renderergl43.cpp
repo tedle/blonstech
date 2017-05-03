@@ -107,17 +107,32 @@ void TranslateTextureFormat(TextureType::Format format, GLint* internal_format, 
         *input_format = GL_RGBA;
         *input_type = GL_UNSIGNED_BYTE;
         break;
-    case TextureType::R16G16:
+    case TextureType::R16G16_FLOAT:
+        *internal_format = GL_RG16F;
+        *input_format = GL_RG;
+        *input_type = GL_FLOAT;
+        break;
+    case TextureType::R16G16B16_FLOAT:
+        *internal_format = GL_RGB16F;
+        *input_format = GL_RGB;
+        *input_type = GL_FLOAT;
+        break;
+    case TextureType::R16G16B16A16_FLOAT:
+        *internal_format = GL_RGBA16F;
+        *input_format = GL_RGBA;
+        *input_type = GL_FLOAT;
+        break;
+    case TextureType::R16G16_UNORM:
         *internal_format = GL_RG16;
         *input_format = GL_RG;
         *input_type = GL_FLOAT;
         break;
-    case TextureType::R16G16B16:
+    case TextureType::R16G16B16_UNORM:
         *internal_format = GL_RGB16;
         *input_format = GL_RGB;
         *input_type = GL_FLOAT;
         break;
-    case TextureType::R16G16B16A16:
+    case TextureType::R16G16B16A16_UNORM:
         *internal_format = GL_RGBA16;
         *input_format = GL_RGBA;
         *input_type = GL_FLOAT;
@@ -1521,10 +1536,16 @@ bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, co
     case TextureType::R8G8B8A8:
         format = GL_RGBA8;
         break;
-    case TextureType::R16G16:
+    case TextureType::R16G16_FLOAT:
+        format = GL_RG16F;
+        break;
+    case TextureType::R16G16B16A16_FLOAT:
+        format = GL_RGBA16F;
+        break;
+    case TextureType::R16G16_UNORM:
         format = GL_RG16;
         break;
-    case TextureType::R16G16B16A16:
+    case TextureType::R16G16B16A16_UNORM:
         format = GL_RGBA16;
         break;
     case TextureType::A32:
