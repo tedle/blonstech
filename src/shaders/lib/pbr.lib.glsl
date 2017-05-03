@@ -43,6 +43,7 @@ vec3 DiffuseTermDisney(vec3 albedo, float NdotV, float NdotL, float LdotH, float
 vec3 DiffuseTermGGX(vec3 albedo, float NdotV, float NdotL, float LdotH, float LdotV, float roughness)
 {
     // GGX Diffuse term, derived by Respawn team for Titanfall 2
+    // Details in GDC 2017 talk: http://www.gdcvault.com/play/1024478/PBR-Diffuse-Lighting-for-GGX
     // This is already normalized for energy conservation which means we don't have to multiply by 1.0 - fresnel
     float facing = 0.5 + 0.5 * LdotV;
     float smooth_term = 1.05 * (1.0 - pow(1.0 - NdotL, 5.0)) * (1.0 - pow(1.0 - NdotV, 5.0));
