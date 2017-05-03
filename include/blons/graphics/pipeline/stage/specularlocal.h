@@ -30,7 +30,8 @@
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/texturecubemap.h>
-#include <blons/graphics/render/computeshader.h>
+#include <blons/graphics/render/shader.h>
+#include <blons/graphics/framebuffer.h>
 
 namespace blons
 {
@@ -106,7 +107,8 @@ private:
     };
 
     std::vector<SpecularProbe> probes_;
-    std::unique_ptr<ComputeShader> relight_shader_;
+    std::unique_ptr<Shader> relight_shader_;
+    std::unique_ptr<Framebuffer> relight_buffer_;
 };
 } // namespace stage
 } // namespace pipeline

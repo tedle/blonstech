@@ -482,9 +482,6 @@
     <None Include="shaders\probe-env-map.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\probe-relight.comp.glsl">
-      <Filter>src\shaders</Filter>
-    </None>
     <None Include="shaders\shadow.frag.glsl">
       <Filter>src\shaders</Filter>
     </None>
@@ -557,7 +554,16 @@
     <None Include="shaders\specular-probe-env-map.geom.glsl">
       <Filter>src\shaders</Filter>
     </None>
-    <None Include="shaders\specular-probe-relight.comp.glsl">
+    <None Include="shaders\probe-relight.comp.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\specular-probe-relight.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\specular-probe-relight.geom.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\specular-probe-relight.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>

@@ -347,7 +347,9 @@
     <None Include="shaders\shadow.vert.glsl" />
     <None Include="shaders\specular-probe-env-map.geom.glsl" />
     <None Include="shaders\specular-probe-env-map.vert.glsl" />
-    <None Include="shaders\specular-probe-relight.comp.glsl" />
+    <None Include="shaders\specular-probe-relight.frag.glsl" />
+    <None Include="shaders\specular-probe-relight.geom.glsl" />
+    <None Include="shaders\specular-probe-relight.vert.glsl" />
     <None Include="shaders\sprite.frag.glsl" />
     <None Include="shaders\sprite.vert.glsl" />
     <None Include="shaders\surfelbrick-relight.comp.glsl" />

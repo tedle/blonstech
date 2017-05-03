@@ -28,11 +28,12 @@
 #include <shaders/lib/math.lib.glsl>
 #include <shaders/lib/shadow.lib.glsl>
 
-// Workgroup size
-layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+// Ins n outs
+in vec2 tex_coord;
+
+out vec4 frag_colour;
 
 // Globals
-layout(rgba16f, binding = 0) writeonly uniform imageCube env_map;
 uniform mat4 inv_direction_matrices[6];
 uniform mat4 inv_vp_matrices[6];
 uniform mat4 light_vp_matrix;
@@ -44,13 +45,8 @@ uniform DirectionalLight sun;
 
 void main(void)
 {
-    // Width of the output image
-    vec2 texels = vec2(gl_NumWorkGroups.xy * gl_WorkGroupSize.xy);
-    // Offset by half a texel so our samples represent the same area they are stored at
-    vec2 sample_pos = (vec2(gl_GlobalInvocationID.xy) + vec2(0.5f)) / texels;
-    sample_pos = sample_pos * 2.0f - 1.0f;
-
-    uint cube_face = gl_GlobalInvocationID.z;
+    vec2 sample_pos = tex_coord * 2.0f - 1.0f;
+    uint cube_face = gl_Layer;
 
     // -1.0f because we use right handed coordinates and this faces the same way as the camera
     vec4 sample_dir = inv_direction_matrices[cube_face] * vec4(sample_pos, -1.0f, 1.0f);
@@ -66,7 +62,5 @@ void main(void)
 
     float light_visibility = ShadowTest(world_pos, light_vp_matrix, light_depth);
     float NdotL = max(dot(surface_normal, -sun.dir), 0.0f);
-    vec3 colour = surface_albedo * light_visibility * sun.colour * sun.luminance * NdotL / kPi;
-
-    imageStore(env_map, ivec3(gl_GlobalInvocationID), vec4(colour, 1.0));
+    frag_colour = vec4(surface_albedo * light_visibility * sun.colour * sun.luminance * NdotL / kPi, 1.0f);
 }

@@ -23,10 +23,6 @@
 
 #include <blons/graphics/pipeline/stage/specularlocal.h>
 
-// Public Includes
-#include <blons/graphics/framebuffer.h>
-#include <blons/graphics/render/drawbatcher.h>
-
 namespace blons
 {
 namespace pipeline
@@ -85,7 +81,20 @@ SpecularLocal::SpecularLocal()
         probes_.push_back(std::move(probe));
     }
 
-    relight_shader_.reset(new ComputeShader({ { COMPUTE, "shaders/specular-probe-relight.comp.glsl"} }));
+    // Compile the relighting shader
+    ShaderAttributeList env_map_inputs = { { POS, "input_pos" },
+                                           { TEX, "input_uv" } };
+    ShaderSourceList env_map_source = { { VERTEX, "shaders/specular-probe-relight.vert.glsl" },
+                                        { GEOMETRY, "shaders/specular-probe-relight.geom.glsl" },
+                                        { PIXEL, "shaders/specular-probe-relight.frag.glsl" } };
+    relight_shader_.reset(new Shader(env_map_source, env_map_inputs));
+    relight_buffer_.reset(new Framebuffer(kSpecularProbeMapSize, kSpecularProbeMapSize, 0, false));
+    if (!relight_shader_->SetInput("proj_matrix", MatrixOrthographic(0.0f, static_cast<units::world>(kSpecularProbeMapSize),
+                                                                     static_cast<units::world>(kSpecularProbeMapSize), 0.0f,
+                                                                     kScreenNear, kScreenFar)))
+    {
+        throw "Failed to initialize constant shader settings for specular probe relight";
+    }
 }
 
 void SpecularLocal::BakeRadianceTransfer(const Scene& scene)
@@ -106,7 +115,7 @@ void SpecularLocal::BakeRadianceTransfer(const Scene& scene)
                                         { PIXEL, "shaders/mesh.frag.glsl" } };
     auto env_map_shader = std::make_unique<Shader>(env_map_source, env_map_inputs);
     // Create an empty framebuffer that we'll attach our textures to
-    auto fbo = std::make_unique<Framebuffer>(kSpecularProbeMapSize, kSpecularProbeMapSize, std::vector<TextureType>(), false);
+    auto fbo = std::make_unique<Framebuffer>(kSpecularProbeMapSize, kSpecularProbeMapSize, 0, false);
 
     for (const auto& probe : probes_)
     {
@@ -148,6 +157,8 @@ bool SpecularLocal::Relight(const Scene& scene, const Shadow& shadow, const Irra
     // Inverted view-proj matrices to find UV space positions of cubemaps
     std::array<Matrix, 6> inv_direction_matrices = GenerateViewProjMatrices(Vector3(0.0f), context->IsDepthBufferRangeZeroToOne());
     std::transform(inv_direction_matrices.begin(), inv_direction_matrices.end(), inv_direction_matrices.begin(), [](const auto& mat) { return MatrixInverse(mat); });
+
+    relight_buffer_->Bind();
     for (const auto& probe : probes_)
     {
         // Inverted view-proj matrices to find world space positions from G-buffer
@@ -162,14 +173,15 @@ bool SpecularLocal::Relight(const Scene& scene, const Shadow& shadow, const Irra
             !relight_shader_->SetInput("light_depth", shadow.output(Shadow::LIGHT_DEPTH), 3) ||
             !relight_shader_->SetInput("sun.dir", sun->direction()) ||
             !relight_shader_->SetInput("sun.colour", sun->colour()) ||
-            !relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
-            !relight_shader_->SetOutput("env_map", probe.environment->texture(), 0, 0))
+            !relight_shader_->SetInput("sun.luminance", sun->luminance()))
         {
             return false;
         }
-        // One invocation for each pixel for each cubemap layer
-        relight_shader_->Run(kSpecularProbeMapSize, kSpecularProbeMapSize, 6);
+        relight_buffer_->BindColourTextures({ probe.environment->texture() });
+        relight_buffer_->Render();
+        relight_shader_->Render(relight_buffer_->index_count());
     }
+    relight_buffer_->Unbind();
     return true;
 }
 
