@@ -27,6 +27,7 @@
 #include <shaders/lib/types.lib.glsl>
 #include <shaders/lib/math.lib.glsl>
 #include <shaders/lib/shadow.lib.glsl>
+#include <shaders/lib/sky.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;
@@ -37,11 +38,49 @@ out vec4 frag_colour;
 uniform mat4 inv_direction_matrices[6];
 uniform mat4 inv_vp_matrices[6];
 uniform mat4 light_vp_matrix;
+uniform mat4 inv_irradiance_matrix;
 uniform samplerCube albedo;
 uniform samplerCube normal;
 uniform samplerCube depth;
 uniform sampler2D light_depth;
+uniform sampler3D irradiance_volume_px;
+uniform sampler3D irradiance_volume_nx;
+uniform sampler3D irradiance_volume_py;
+uniform sampler3D irradiance_volume_ny;
+uniform sampler3D irradiance_volume_pz;
+uniform sampler3D irradiance_volume_nz;
 uniform DirectionalLight sun;
+uniform SHColourCoeffs sh_sky_colour;
+uniform float sky_luminance;
+
+// This function is currently straight copied from shaders/light.frag.glsl
+// But we've avoided abstracting this away to a library in case things change
+// in the future with regards to ambient diffuse calculations. Specifically
+// specular lighting which is not considered in this pass, might affect ambient
+// diffuse in the main lighting pass down the road
+vec3 AmbientDiffuse(vec4 pos, vec3 normal)
+{
+    // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
+    vec4 irradiance_sample_pos = inv_irradiance_matrix * pos;
+    irradiance_sample_pos /= irradiance_sample_pos.w;
+    vec3 ambient_cube[6];
+    // We do a lot of ugly busywork to cut texture fetches down in half because these are dependent texture fetches and wow those are expensive!!!
+    // TODO: Shove indirect lighting computation into a half-res bilaterally-upsampled buffer? This currently adds 0.6ms
+    bvec3 is_positive = bvec3(normal.x > 0.0, normal.y > 0.0, normal.z > 0.0);
+    ivec3 cube_indices = ivec3(is_positive.x ? kPositiveX : kNegativeX,
+                               is_positive.y ? kPositiveY : kNegativeY,
+                               is_positive.z ? kPositiveZ : kNegativeZ);
+    ambient_cube[cube_indices.x] = is_positive.x ?
+                                       vec3(texture(irradiance_volume_px, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_nx, irradiance_sample_pos.xyz).rgb);
+    ambient_cube[cube_indices.y] = is_positive.y ?
+                                       vec3(texture(irradiance_volume_py, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_ny, irradiance_sample_pos.xyz).rgb);
+    ambient_cube[cube_indices.z] = is_positive.z ?
+                                       vec3(texture(irradiance_volume_pz, irradiance_sample_pos.xyz).rgb) :
+                                       vec3(texture(irradiance_volume_nz, irradiance_sample_pos.xyz).rgb);
+    return SampleAmbientCube(ambient_cube, normal);
+}
 
 void main(void)
 {
@@ -53,14 +92,27 @@ void main(void)
     sample_dir /= sample_dir.w;
     sample_dir = normalize(sample_dir);
 
+    float depth_sample = texture(depth, sample_dir.xyz).r;
+
+    if (depth_sample == 1.0)
+    {
+        frag_colour = vec4(SkyLight(sample_dir.xyz, sh_sky_colour, sky_luminance), 1.0);
+        return;
+    }
+
     vec3 surface_albedo = texture(albedo, sample_dir.xyz).rgb;
     vec3 surface_normal = texture(normal, sample_dir.xyz).rgb * 2.0f - 1.0f;
-    float surface_depth = texture(depth, sample_dir.xyz).r * 2.0f - 1.0f;
+    float surface_depth = depth_sample * 2.0f - 1.0f;
 
     vec4 world_pos = inv_vp_matrices[cube_face] * vec4(sample_pos, surface_depth, 1.0f);
     world_pos /= world_pos.w;
 
     float light_visibility = ShadowTest(world_pos, light_vp_matrix, light_depth);
     float NdotL = max(dot(surface_normal, -sun.dir), 0.0f);
-    frag_colour = vec4(surface_albedo * light_visibility * sun.colour * sun.luminance * NdotL / kPi, 1.0f);
+
+    vec3 diffuse = surface_albedo * light_visibility * sun.colour * sun.luminance * NdotL;
+    diffuse += surface_albedo * AmbientDiffuse(world_pos, surface_normal);
+    diffuse /= kPi;
+
+    frag_colour = vec4(diffuse, 1.0f);
 }

@@ -173,7 +173,18 @@ bool SpecularLocal::Relight(const Scene& scene, const Shadow& shadow, const Irra
             !relight_shader_->SetInput("light_depth", shadow.output(Shadow::LIGHT_DEPTH), 3) ||
             !relight_shader_->SetInput("sun.dir", sun->direction()) ||
             !relight_shader_->SetInput("sun.colour", sun->colour()) ||
-            !relight_shader_->SetInput("sun.luminance", sun->luminance()))
+            !relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
+            !relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
+            !relight_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
+            !relight_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
+            !relight_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9) ||
+            !relight_shader_->SetInput("inv_irradiance_matrix", MatrixInverse(irradiance.world_matrix())) ||
+            !relight_shader_->SetInput("irradiance_volume_px", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PX), 4) ||
+            !relight_shader_->SetInput("irradiance_volume_nx", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NX), 5) ||
+            !relight_shader_->SetInput("irradiance_volume_py", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PY), 6) ||
+            !relight_shader_->SetInput("irradiance_volume_ny", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NY), 7) ||
+            !relight_shader_->SetInput("irradiance_volume_pz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ), 8) ||
+            !relight_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 9))
         {
             return false;
         }

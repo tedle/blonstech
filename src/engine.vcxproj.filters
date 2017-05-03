@@ -566,5 +566,8 @@
     <None Include="shaders\specular-probe-relight.vert.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\lib\sky.lib.glsl">
+      <Filter>src\shaders\lib</Filter>
+    </None>
   </ItemGroup>
 </Project>

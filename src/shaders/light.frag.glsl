@@ -28,6 +28,7 @@
 #include <shaders/lib/types.lib.glsl>
 #include <shaders/lib/math.lib.glsl>
 #include <shaders/lib/pbr.lib.glsl>
+#include <shaders/lib/sky.lib.glsl>
 
 // Ins n outs
 in vec2 tex_coord;
@@ -55,6 +56,9 @@ uniform samplerCube local_specular_probe;
 uniform float roughness;
 uniform vec3 metalness;
 
+// Note: This function is also used in shaders/specular-probe-relight.frag.glsl
+// Consider the implications of any changes here maybe needing to be included in
+// that shader as well
 vec3 AmbientDiffuse(vec4 pos, vec3 normal)
 {
     // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
@@ -87,6 +91,7 @@ vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 li
     // After all other lights are applied
     vec3 ambient = AmbientDiffuse(pos, surface_normal);
     // Modulate by surface colour
+    // TODO: MODULATE THIS BY FRESNEL TERM ONCE WE HAVE AMBIENT SPECULAR!
     diffuse += ambient * albedo;
     // Metals dont have diffuse light
     diffuse *= 1.0 - metalness;
@@ -101,17 +106,6 @@ vec3 Specular(vec3 metalness, vec3 albedo, vec3 direct, float NdotH, float NdotV
     specular = specular * sun.luminance * sun.colour * direct * NdotL;
     // Division by pi already accounted for in BRDF
     return specular;
-}
-
-vec3 SkyColour(vec3 view_dir)
-{
-    float direction_coeffs[9];
-    SHProjectDirection3(-view_dir, direction_coeffs);
-    vec3 sky_colour = vec3(SHDot3(direction_coeffs, sh_sky_colour.r),
-                           SHDot3(direction_coeffs, sh_sky_colour.g),
-                           SHDot3(direction_coeffs, sh_sky_colour.b));
-    sky_colour *= sky_luminance;
-    return FilmicTonemap(sky_colour * exposure);
 }
 
 void main(void)
@@ -132,9 +126,10 @@ void main(void)
 
     if (depth_sample == 1.0)
     {
-        frag_colour = vec4(GammaEncode(SkyColour(view_dir)), 1.0);
+        vec3 sky_colour = SkyLight(view_dir, sh_sky_colour, sky_luminance);
+        frag_colour = vec4(GammaEncode(FilmicTonemap(sky_colour * exposure)), 1.0);
         frag_colour *= 0.0001f;
-        frag_colour += vec4(GammaEncode(FilmicTonemap(texture(local_specular_probe, view_dir).rgb * exposure)), 1.0);
+        frag_colour += vec4(GammaEncode(FilmicTonemap(textureLod(local_specular_probe, view_dir, 0.0f).rgb * exposure)), 1.0);
         return;
     }
 
