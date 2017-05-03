@@ -76,7 +76,7 @@ Graphics::Graphics(Client::Info screen)
         throw "Failed to initiralize rendering context";
     }
 
-    pipeline_.reset(new pipeline::Deferred(screen, kPi / 4.0f, kScreenNear, kScreenFar));
+    pipeline_.reset(new pipeline::Deferred(screen, kPi / 4.0f, pipeline::kScreenNear, pipeline::kScreenFar));
 
     // Camera
     camera_.reset(new Camera);
@@ -288,7 +288,7 @@ void Graphics::Reload(Client::Info screen)
     Timer timer;
     resource::ClearBufferCache();
     Init(screen);
-    pipeline_->Reload(screen, kPi / 4.0f, kScreenNear, kScreenFar);
+    pipeline_->Reload(screen, kPi / 4.0f, pipeline::kScreenNear, pipeline::kScreenFar);
     for (auto& m : models_)
     {
         m->Reload();
@@ -322,7 +322,7 @@ bool Graphics::Init(Client::Info screen)
 
     // Ortho projection matrix (for 2d stuff, shadow maps, etc)
     ortho_matrix_ = MatrixOrthographic(0, units::pixel_to_subpixel(screen.width), units::pixel_to_subpixel(screen.height), 0,
-                                       kScreenNear, kScreenFar);
+                                       pipeline::kScreenNear, pipeline::kScreenFar);
 
     // Shaders
     ShaderAttributeList sprite_inputs;

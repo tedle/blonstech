@@ -56,9 +56,9 @@ void Manager::Init(units::pixel width, units::pixel height)
 {
     screen_dimensions_ = Box(0, 0, width, height);
     ortho_matrix_ = MatrixOrthographic(0, screen_dimensions_.w, screen_dimensions_.h, 0,
-                                       kScreenNear, kScreenFar);
+                                       pipeline::kScreenNear, pipeline::kScreenFar);
     blur_ortho_matrix_ = MatrixOrthographic(0, screen_dimensions_.w / kBlurFactori, screen_dimensions_.h / kBlurFactori, 0,
-                                            kScreenNear, kScreenFar);
+                                            pipeline::kScreenNear, pipeline::kScreenFar);
 
     ShaderAttributeList ui_inputs;
     ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
