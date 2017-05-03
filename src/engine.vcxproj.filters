@@ -557,5 +557,8 @@
     <None Include="shaders\specular-probe-env-map.geom.glsl">
       <Filter>src\shaders</Filter>
     </None>
+    <None Include="shaders\specular-probe-relight.comp.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

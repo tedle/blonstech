@@ -128,6 +128,11 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
+    if (!specular_local_->Relight(scene, *shadow_, *irradiance_volume_, light_vp_matrix))
+    {
+        return false;
+    }
+
     if (!lighting_->Render(scene, *geometry_, *shadow_, *irradiance_volume_, *specular_local_, view_matrix, proj_matrix_, ortho_matrix_))
     {
         return false;

@@ -100,7 +100,7 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
         !light_shader_->SetInput("irradiance_volume_ny", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NY), 7) ||
         !light_shader_->SetInput("irradiance_volume_pz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ), 8) ||
         !light_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 9) ||
-        !light_shader_->SetInput("local_specular_probe", specular_local.output(SpecularLocal::ALBEDO, 0), 10))
+        !light_shader_->SetInput("local_specular_probe", specular_local.output(SpecularLocal::LIGHT, 0), 10))
     {
         return false;
     }

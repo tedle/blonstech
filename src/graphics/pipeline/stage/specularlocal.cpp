@@ -40,6 +40,23 @@ std::vector<Vector3> GenerateOldSponzaProbePositions()
     return { Vector3(0.0f, 5.0f, 0.0f) };
 }
 } // namespace temp
+namespace
+{
+std::array<Matrix, 6> GenerateViewProjMatrices(Vector3 position, bool depth_buffer_zero_to_one)
+{
+    std::array<Matrix, 6> matrices;
+    Camera view;
+    view.set_pos(position.x, position.y, position.z);
+    Matrix cube_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 1000.0f, depth_buffer_zero_to_one);
+    for (const auto& face : { POSITIVE_X, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y, POSITIVE_Z, NEGATIVE_Z })
+    {
+        Vector3 rot = AxisRotationPitchYawRoll(face);
+        view.set_rot(rot.x, rot.y, rot.z);
+        matrices[face] = view.view_matrix() * cube_projection;
+    }
+    return matrices;
+}
+} // namespace
 
 SpecularLocal::SpecularLocal()
 {
@@ -67,6 +84,8 @@ SpecularLocal::SpecularLocal()
         // Add it to the list
         probes_.push_back(std::move(probe));
     }
+
+    relight_shader_.reset(new ComputeShader({ { COMPUTE, "shaders/specular-probe-relight.comp.glsl"} }));
 }
 
 void SpecularLocal::BakeRadianceTransfer(const Scene& scene)
@@ -86,22 +105,13 @@ void SpecularLocal::BakeRadianceTransfer(const Scene& scene)
                                         { GEOMETRY, "shaders/specular-probe-env-map.geom.glsl" },
                                         { PIXEL, "shaders/mesh.frag.glsl" } };
     auto env_map_shader = std::make_unique<Shader>(env_map_source, env_map_inputs);
-    // Create an empty framebuffer that we'll attach our textures to later
+    // Create an empty framebuffer that we'll attach our textures to
     auto fbo = std::make_unique<Framebuffer>(kSpecularProbeMapSize, kSpecularProbeMapSize, std::vector<TextureType>(), false);
 
     for (const auto& probe : probes_)
     {
         // Create a list of 6 view-proj matrices to render the scene from for the cubemap
-        Camera view;
-        view.set_pos(probe.pos.x, probe.pos.y, probe.pos.z);
-        Matrix cube_projection = MatrixPerspective(kPi / 2.0f, 1.0f, 0.1f, 1000.0f, context->IsDepthBufferRangeZeroToOne());
-        std::array<Matrix, 6> vp_matrices;
-        for (const auto& face : { POSITIVE_X, NEGATIVE_X, POSITIVE_Y, NEGATIVE_Y, POSITIVE_Z, NEGATIVE_Z })
-        {
-            Vector3 rot = AxisRotationPitchYawRoll(face);
-            view.set_rot(rot.x, rot.y, rot.z);
-            vp_matrices[face] = view.view_matrix() * cube_projection;
-        }
+        std::array<Matrix, 6> vp_matrices = GenerateViewProjMatrices(probe.pos, context->IsDepthBufferRangeZeroToOne());
         // Bind the cubemap's G-buffer textures to the framebuffer
         std::vector<const TextureResource*> textures = { probe.g_buffer.albedo->texture(), probe.g_buffer.normal->texture() };
         fbo->BindColourTextures(textures);
@@ -129,8 +139,36 @@ void SpecularLocal::BakeRadianceTransfer(const Scene& scene)
 
 bool SpecularLocal::Relight(const Scene& scene, const Shadow& shadow, const IrradianceVolume& irradiance, Matrix light_vp_matrix)
 {
-    throw "Not yet implemented";
-    return false;
+    auto context = render::context();
+    // Can be removed when we support more lights
+    assert(scene.lights.size() == 1);
+    Light* sun = scene.lights[0];
+    // Inverted view-proj matrices to find UV space positions of cubemaps
+    std::array<Matrix, 6> inv_direction_matrices = GenerateViewProjMatrices(Vector3(0.0f), context->IsDepthBufferRangeZeroToOne());
+    std::transform(inv_direction_matrices.begin(), inv_direction_matrices.end(), inv_direction_matrices.begin(), [](const auto& mat) { return MatrixInverse(mat); });
+    for (const auto& probe : probes_)
+    {
+        // Inverted view-proj matrices to find world space positions from G-buffer
+        std::array<Matrix, 6> inv_vp_matrices = GenerateViewProjMatrices(probe.pos, context->IsDepthBufferRangeZeroToOne());
+        std::transform(inv_vp_matrices.begin(), inv_vp_matrices.end(), inv_vp_matrices.begin(), [](const auto& mat) { return MatrixInverse(mat); });
+        if (!relight_shader_->SetInput("inv_direction_matrices", inv_direction_matrices.data(), 6) ||
+            !relight_shader_->SetInput("inv_vp_matrices", inv_vp_matrices.data(), 6) ||
+            !relight_shader_->SetInput("light_vp_matrix", light_vp_matrix) ||
+            !relight_shader_->SetInput("albedo", probe.g_buffer.albedo->texture(), 0) ||
+            !relight_shader_->SetInput("normal", probe.g_buffer.normal->texture(), 1) ||
+            !relight_shader_->SetInput("depth", probe.g_buffer.depth->texture(), 2) ||
+            !relight_shader_->SetInput("light_depth", shadow.output(Shadow::LIGHT_DEPTH), 3) ||
+            !relight_shader_->SetInput("sun.dir", sun->direction()) ||
+            !relight_shader_->SetInput("sun.colour", sun->colour()) ||
+            !relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
+            !relight_shader_->SetOutput("env_map", probe.environment->texture(), 0, 0))
+        {
+            return false;
+        }
+        // One invocation for each pixel for each cubemap layer
+        relight_shader_->Run(kSpecularProbeMapSize, kSpecularProbeMapSize, 6);
+    }
+    return true;
 }
 
 const TextureResource* SpecularLocal::output(Output buffer, std::size_t probe_id) const

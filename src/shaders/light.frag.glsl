@@ -134,7 +134,7 @@ void main(void)
     {
         frag_colour = vec4(GammaEncode(SkyColour(view_dir)), 1.0);
         frag_colour *= 0.0001f;
-        frag_colour += vec4(texture(local_specular_probe, view_dir).rgb, 1.0);
+        frag_colour += vec4(GammaEncode(FilmicTonemap(texture(local_specular_probe, view_dir).rgb * exposure)), 1.0);
         return;
     }
 
@@ -168,9 +168,13 @@ void main(void)
     //surface_colour *= 0.000001;
     //surface_colour += FilmicTonemap((AmbientDiffuse(pos, surface_normal) / kPi) * exposure);
 
-    // Uncomment to see specular only
+    // Uncomment to see direct specular only
     //surface_colour *= 0.000001;
     //surface_colour += FilmicTonemap(vec3(specular) * exposure);
+
+    // Uncomment to see reflections only
+    //surface_colour *= 0.000001f;
+    //surface_colour += texture(local_specular_probe, reflect(view_dir, surface_normal)).rgb;
 
     // Final composite
     surface_colour = GammaEncode(surface_colour);
