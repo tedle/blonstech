@@ -107,6 +107,12 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     void BindColourTextures(const std::vector<const TextureResource*>& targets);
     ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc BindColourTextures
+    ///
+    /// \param mip_level Mipmap level of the textures to bind. Defaults to 0
+    ////////////////////////////////////////////////////////////////////////////////
+    void BindColourTextures(const std::vector<const TextureResource*>& targets, unsigned int mip_level);
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds a borrowed texture to be used for depth testing and writing.
     /// Will ignore, but not overwrite, internally stored depth texture. Can be
     /// undone with a call such as `fbo->BindDepthTexture(fbo->depth())`
@@ -114,6 +120,12 @@ public:
     /// \param depth Texture to be used for depth testing
     ////////////////////////////////////////////////////////////////////////////////
     void BindDepthTexture(const TextureResource* depth);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc BindDepthTexture
+    ///
+    /// \param mip_level Mipmap level of the texture to bind. Defaults to 0
+    ////////////////////////////////////////////////////////////////////////////////
+    void BindDepthTexture(const TextureResource* depth, unsigned int mip_level);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Number of vertices in the quad used for rendering. Should always be

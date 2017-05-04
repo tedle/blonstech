@@ -143,16 +143,26 @@ void Framebuffer::Unbind()
     context->BindFramebuffer(nullptr);
 }
 
-void Framebuffer::BindColourTextures(const std::vector<const TextureResource*>& targets)
+void Framebuffer::BindColourTextures(const std::vector<const TextureResource*>& targets, unsigned int mip_level)
 {
     auto context = render::context();
-    context->SetFramebufferColourTextures(fbo_.get(), targets, 0);
+    context->SetFramebufferColourTextures(fbo_.get(), targets, mip_level);
+}
+
+void Framebuffer::BindColourTextures(const std::vector<const TextureResource*>& targets)
+{
+    BindColourTextures(targets, 0);
+}
+
+void Framebuffer::BindDepthTexture(const TextureResource* depth, unsigned int mip_level)
+{
+    auto context = render::context();
+    context->SetFramebufferDepthTexture(fbo_.get(), depth, mip_level);
 }
 
 void Framebuffer::BindDepthTexture(const TextureResource* depth)
 {
-    auto context = render::context();
-    context->SetFramebufferDepthTexture(fbo_.get(), depth, 0);
+    BindDepthTexture(depth, 0);
 }
 
 unsigned int Framebuffer::vertex_count() const
