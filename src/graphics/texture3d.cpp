@@ -79,4 +79,9 @@ const TextureResource* Texture3D::texture() const
 {
     return texture_.get();
 }
+
+std::shared_ptr<TextureResource> Texture3D::mutable_texture()
+{
+    return texture_;
+}
 } // namespace blons

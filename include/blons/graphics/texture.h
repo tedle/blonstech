@@ -93,6 +93,15 @@ public:
     /// \return Texture resource reference
     ////////////////////////////////////////////////////////////////////////////////
     const TextureResource* texture() const;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Retrieves a mutable shared pointer to the texture resource. As
+    /// texture resources are often shared by instances of this class and the
+    /// resource manager, use of mutable textures can easily have unintended
+    /// results and it is left to the user to ensure changes are made responsibly.
+    ///
+    /// \return Mutable texture resource pointer
+    ////////////////////////////////////////////////////////////////////////////////
+    std::shared_ptr<TextureResource> mutable_texture();
 
 private:
     void Init(std::string filename, TextureType::Options options);

@@ -78,4 +78,9 @@ const TextureResource* TextureCubemap::texture() const
 {
     return texture_.get();
 }
+
+std::shared_ptr<TextureResource> TextureCubemap::mutable_texture()
+{
+    return texture_;
+}
 } // namespace blons
