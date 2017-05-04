@@ -707,6 +707,20 @@ public:
     /// \copydoc GetTextureData(const TextureResource*, unsigned int)
     ////////////////////////////////////////////////////////////////////////////////
     virtual PixelDataCubemap GetTextureDataCubemap(const TextureResource* texture, unsigned int mip_level)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Makes mipmaps for a texture from the base image layer.
+    ///
+    /// \param texture Texture to make mipmaps for
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void MakeTextureMipmaps(TextureResource* texture)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Sets the range of mipmap levels accessible by the texture.
+    ///
+    /// \param texture Texture to clamp mipmap range of
+    /// \param min_level Upper level of detail, highest being 0
+    /// \param max_level Lower level of detail, highest being 0
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual void SetTextureMipmapRange(TextureResource* texture, int min_level, int max_level)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets arbitrary data of shader memory blocks. Size is immutable and

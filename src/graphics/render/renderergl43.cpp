@@ -1417,6 +1417,37 @@ PixelDataCubemap RendererGL43::GetTextureDataCubemap(const TextureResource* text
     return pixels;
 }
 
+void RendererGL43::MakeTextureMipmaps(TextureResource* texture)
+{
+    auto tex = resource_cast<TextureResourceGL43*>(texture, id());
+    if (tex->options_.compression == TextureType::DDS)
+    {
+        throw "Mipmap generation not supported for compressed textures";
+    }
+    glBindTexture(tex->type_, tex->texture_);
+    glGenerateMipmap(tex->type_);
+    if (!tex->has_mipmaps_)
+    {
+        tex->has_mipmaps_ = true;
+        if (tex->options_.filter == TextureType::NEAREST)
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+        }
+        else
+        {
+            glTexParameteri(tex->type_, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        }
+    }
+}
+
+void RendererGL43::SetTextureMipmapRange(TextureResource* texture, int min_level, int max_level)
+{
+    auto tex = resource_cast<TextureResourceGL43*>(texture, id());
+    glBindTexture(tex->type_, tex->texture_);
+    glTexParameteri(tex->type_, GL_TEXTURE_BASE_LEVEL, min_level);
+    glTexParameteri(tex->type_, GL_TEXTURE_MAX_LEVEL, max_level);
+}
+
 void RendererGL43::SetShaderData(ShaderDataResource* data_handle, std::size_t offset, std::size_t length, const void* data)
 {
     auto data_buffer = resource_cast<ShaderDataResourceGL43*>(data_handle, id());

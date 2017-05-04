@@ -89,6 +89,8 @@ public:
     PixelData GetTextureData(const TextureResource* texture, unsigned int mip_level) override;
     PixelData3D GetTextureData3D(const TextureResource* texture, unsigned int mip_level) override;
     PixelDataCubemap GetTextureDataCubemap(const TextureResource* texture, unsigned int mip_level) override;
+    void MakeTextureMipmaps(TextureResource* texture) override;
+    void SetTextureMipmapRange(TextureResource* texture, int min_level, int max_level) override;
     void SetShaderData(ShaderDataResource* data_handle, std::size_t offset, std::size_t length, const void* data) override;
     void GetShaderData(ShaderDataResource* data_handle, void* data) override;
 
