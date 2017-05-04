@@ -108,7 +108,7 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector2* value, std::size_t elements) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector3* value, std::size_t elements) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector4* value, std::size_t elements) override;
-    bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index, unsigned int mip_level) override;
+    bool SetShaderOutput(ShaderResource* program, const char* name, TextureResource* value, unsigned int texture_index, unsigned int mip_level) override;
 
     bool SetBlendMode(BlendMode mode) override;
     bool SetCullMode(CullMode mode) override;

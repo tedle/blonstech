@@ -65,12 +65,12 @@ bool IrradianceVolume::Relight(const LightSector& sector)
     if (!irradiance_volume_shader_->SetInput("world_matrix", world_matrix_) ||
         !irradiance_volume_shader_->SetInput("probe_buffer", sector.probe_shader_data()) ||
         !irradiance_volume_shader_->SetInput("probe_network_buffer", sector.probe_network_shader_data()) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_px_out", irradiance_volume_[POSITIVE_X]->texture(), 0, 0) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_nx_out", irradiance_volume_[NEGATIVE_X]->texture(), 1, 0) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_py_out", irradiance_volume_[POSITIVE_Y]->texture(), 2, 0) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_ny_out", irradiance_volume_[NEGATIVE_Y]->texture(), 3, 0) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_pz_out", irradiance_volume_[POSITIVE_Z]->texture(), 4, 0) ||
-        !irradiance_volume_shader_->SetOutput("irradiance_volume_nz_out", irradiance_volume_[NEGATIVE_Z]->texture(), 5, 0))
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_px_out", irradiance_volume_[POSITIVE_X]->mutable_texture().get(), 0, 0) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_nx_out", irradiance_volume_[NEGATIVE_X]->mutable_texture().get(), 1, 0) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_py_out", irradiance_volume_[POSITIVE_Y]->mutable_texture().get(), 2, 0) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_ny_out", irradiance_volume_[NEGATIVE_Y]->mutable_texture().get(), 3, 0) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_pz_out", irradiance_volume_[POSITIVE_Z]->mutable_texture().get(), 4, 0) ||
+        !irradiance_volume_shader_->SetOutput("irradiance_volume_nz_out", irradiance_volume_[NEGATIVE_Z]->mutable_texture().get(), 5, 0))
     {
         return false;
     }

@@ -1548,7 +1548,7 @@ bool RendererGL43::SetShaderInput(ShaderResource* program, const char* name, con
     return prog->SetUniform(name, value, static_cast<GLsizei>(elements));
 }
 
-bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index, unsigned int mip_level)
+bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, TextureResource* value, unsigned int texture_index, unsigned int mip_level)
 {
     const TextureResourceGL43* tex = resource_cast<const TextureResourceGL43*>(value, id());
     GLboolean layered = (tex->type_ == GL_TEXTURE_3D || tex->type_ == GL_TEXTURE_CUBE_MAP) ? GL_TRUE : GL_FALSE;

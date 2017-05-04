@@ -69,14 +69,14 @@ public:
     /// \param value Value to bind output variable to
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    bool SetOutput(const char* field, const TextureResource* value);
+    bool SetOutput(const char* field, TextureResource* value);
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc SetOutput
     ///
     /// \param texture_index The slot to bind the texture to. Defaults to 0
     /// \param mip_level Mipmap level of the texture to bind. Defaults to 0
     ////////////////////////////////////////////////////////////////////////////////
-    bool SetOutput(const char* field, const TextureResource* value, unsigned int texture_index, unsigned int mip_level);
+    bool SetOutput(const char* field, TextureResource* value, unsigned int texture_index, unsigned int mip_level);
 };
 } // namespace blons
 

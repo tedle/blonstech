@@ -821,7 +821,7 @@ public:
     /// \param mip_level Mipmap level of the texture to bind
     /// \return True on success
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool SetShaderOutput(ShaderResource* program, const char* name, const TextureResource* value, unsigned int texture_index, unsigned int mip_level)=0;
+    virtual bool SetShaderOutput(ShaderResource* program, const char* name, TextureResource* value, unsigned int texture_index, unsigned int mip_level)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the blending mode for overwritten fragments. Defaults to
