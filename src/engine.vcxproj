@@ -346,6 +346,7 @@
     <None Include="shaders\shadow-blur.frag.glsl" />
     <None Include="shaders\shadow.frag.glsl" />
     <None Include="shaders\shadow.vert.glsl" />
+    <None Include="shaders\specular-probe-distribution.frag.glsl" />
     <None Include="shaders\specular-probe-env-map.geom.glsl" />
     <None Include="shaders\specular-probe-env-map.vert.glsl" />
     <None Include="shaders\specular-probe-relight.frag.glsl" />

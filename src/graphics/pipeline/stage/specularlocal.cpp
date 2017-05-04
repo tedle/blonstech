@@ -73,10 +73,16 @@ SpecularLocal::SpecularLocal()
         // G-buffer depth
         buffer.type.format = TextureType::DEPTH;
         probe.g_buffer.depth.reset(new TextureCubemap(buffer));
-        // HDR Relighting buffer, with mipmaps for roughness
+        // HDR Relighting buffer, with mipmaps for pre-filtered importance sampling
         buffer.type.format = TextureType::R16G16B16A16_FLOAT;
         buffer.type.compression = TextureType::AUTO;
         probe.environment.reset(new TextureCubemap(buffer));
+        // HDR LD term for ambient specular, with mipmaps for varying roughness
+        buffer.type.format = TextureType::R16G16B16A16_FLOAT;
+        buffer.type.compression = TextureType::RAW;
+        probe.ld_term.reset(new TextureCubemap(buffer));
+        render::context()->SetTextureMipmapRange(probe.ld_term->mutable_texture().get(), 0, kSpecularProbeMipLevels);
+        render::context()->MakeTextureMipmaps(probe.ld_term->mutable_texture().get());
         // Add it to the list
         probes_.push_back(std::move(probe));
     }
@@ -87,13 +93,28 @@ SpecularLocal::SpecularLocal()
     ShaderSourceList env_map_source = { { VERTEX, "shaders/specular-probe-relight.vert.glsl" },
                                         { GEOMETRY, "shaders/specular-probe-relight.geom.glsl" },
                                         { PIXEL, "shaders/specular-probe-relight.frag.glsl" } };
+    ShaderSourceList ld_term_source = { { VERTEX, "shaders/specular-probe-relight.vert.glsl" },
+                                        { GEOMETRY, "shaders/specular-probe-relight.geom.glsl" },
+                                        { PIXEL, "shaders/specular-probe-distribution.frag.glsl" } };
     relight_shader_.reset(new Shader(env_map_source, env_map_inputs));
+    relight_distribution_shader_.reset(new Shader(ld_term_source, env_map_inputs));
     relight_buffer_.reset(new Framebuffer(kSpecularProbeMapSize, kSpecularProbeMapSize, 0, false));
-    if (!relight_shader_->SetInput("proj_matrix", MatrixOrthographic(0.0f, static_cast<units::world>(kSpecularProbeMapSize),
+    // Inverted view-proj matrices to find UV space positions of cubemaps
+    std::array<Matrix, 6> inv_direction_matrices = GenerateViewProjMatrices(Vector3(0.0f), render::context()->IsDepthBufferRangeZeroToOne());
+    std::transform(inv_direction_matrices.begin(), inv_direction_matrices.end(), inv_direction_matrices.begin(), [](const auto& mat) { return MatrixInverse(mat); });
+    if (!relight_shader_->SetInput("inv_direction_matrices", inv_direction_matrices.data(), 6) ||
+        !relight_shader_->SetInput("proj_matrix", MatrixOrthographic(0.0f, static_cast<units::world>(kSpecularProbeMapSize),
                                                                      static_cast<units::world>(kSpecularProbeMapSize), 0.0f,
                                                                      kScreenNear, kScreenFar)))
     {
         throw "Failed to initialize constant shader settings for specular probe relight";
+    }
+    if (!relight_distribution_shader_->SetInput("inv_direction_matrices", inv_direction_matrices.data(), 6) ||
+        !relight_distribution_shader_->SetInput("proj_matrix", MatrixOrthographic(0.0f, static_cast<units::world>(kSpecularProbeMapSize),
+                                                                                  static_cast<units::world>(kSpecularProbeMapSize), 0.0f,
+                                                                                  kScreenNear, kScreenFar)))
+    {
+        throw "Failed to initialize constant shader settings for specular probe distribution";
     }
 }
 
@@ -144,6 +165,9 @@ void SpecularLocal::BakeRadianceTransfer(const Scene& scene)
     }
     // Make sure our textures don't get overwritten later
     fbo->Unbind();
+
+    // TODO: WHEN WE'RE BAKING DFG, USE 4-CHANNEL TEXTURE WITH 2 RESERVED FOR SINGLE/MULTI TERMS OF DIFFUSE GGX
+    // or make a separate 2 channel dfg texture owned by light sector might be more sensible. but thats an extra texture fetch wauhg
 }
 
 bool SpecularLocal::Relight(const Scene& scene, const Shadow& shadow, const IrradianceVolume& irradiance, Matrix light_vp_matrix)
@@ -154,43 +178,75 @@ bool SpecularLocal::Relight(const Scene& scene, const Shadow& shadow, const Irra
     // Can be removed when we support more lights
     assert(scene.lights.size() == 1);
     Light* sun = scene.lights[0];
-    // Inverted view-proj matrices to find UV space positions of cubemaps
-    std::array<Matrix, 6> inv_direction_matrices = GenerateViewProjMatrices(Vector3(0.0f), context->IsDepthBufferRangeZeroToOne());
-    std::transform(inv_direction_matrices.begin(), inv_direction_matrices.end(), inv_direction_matrices.begin(), [](const auto& mat) { return MatrixInverse(mat); });
 
+    if (!relight_shader_->SetInput("light_vp_matrix", light_vp_matrix) ||
+        !relight_shader_->SetInput("light_depth", shadow.output(Shadow::LIGHT_DEPTH), 3) ||
+        !relight_shader_->SetInput("sun.dir", sun->direction()) ||
+        !relight_shader_->SetInput("sun.colour", sun->colour()) ||
+        !relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
+        !relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
+        !relight_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
+        !relight_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
+        !relight_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9) ||
+        !relight_shader_->SetInput("inv_irradiance_matrix", MatrixInverse(irradiance.world_matrix())) ||
+        !relight_shader_->SetInput("irradiance_volume_px", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PX), 4) ||
+        !relight_shader_->SetInput("irradiance_volume_nx", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NX), 5) ||
+        !relight_shader_->SetInput("irradiance_volume_py", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PY), 6) ||
+        !relight_shader_->SetInput("irradiance_volume_ny", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NY), 7) ||
+        !relight_shader_->SetInput("irradiance_volume_pz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ), 8) ||
+        !relight_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 9))
+    {
+        return false;
+    }
+
+    // Relight the base mip level of all lit environment maps
     relight_buffer_->Bind();
     for (const auto& probe : probes_)
     {
         // Inverted view-proj matrices to find world space positions from G-buffer
         std::array<Matrix, 6> inv_vp_matrices = GenerateViewProjMatrices(probe.pos, context->IsDepthBufferRangeZeroToOne());
         std::transform(inv_vp_matrices.begin(), inv_vp_matrices.end(), inv_vp_matrices.begin(), [](const auto& mat) { return MatrixInverse(mat); });
-        if (!relight_shader_->SetInput("inv_direction_matrices", inv_direction_matrices.data(), 6) ||
-            !relight_shader_->SetInput("inv_vp_matrices", inv_vp_matrices.data(), 6) ||
-            !relight_shader_->SetInput("light_vp_matrix", light_vp_matrix) ||
+        if (!relight_shader_->SetInput("inv_vp_matrices", inv_vp_matrices.data(), 6) ||
             !relight_shader_->SetInput("albedo", probe.g_buffer.albedo->texture(), 0) ||
             !relight_shader_->SetInput("normal", probe.g_buffer.normal->texture(), 1) ||
-            !relight_shader_->SetInput("depth", probe.g_buffer.depth->texture(), 2) ||
-            !relight_shader_->SetInput("light_depth", shadow.output(Shadow::LIGHT_DEPTH), 3) ||
-            !relight_shader_->SetInput("sun.dir", sun->direction()) ||
-            !relight_shader_->SetInput("sun.colour", sun->colour()) ||
-            !relight_shader_->SetInput("sun.luminance", sun->luminance()) ||
-            !relight_shader_->SetInput("sky_luminance", scene.sky_luminance) ||
-            !relight_shader_->SetInput("sh_sky_colour.r", scene.sky_box.r.coeffs, 9) ||
-            !relight_shader_->SetInput("sh_sky_colour.g", scene.sky_box.g.coeffs, 9) ||
-            !relight_shader_->SetInput("sh_sky_colour.b", scene.sky_box.b.coeffs, 9) ||
-            !relight_shader_->SetInput("inv_irradiance_matrix", MatrixInverse(irradiance.world_matrix())) ||
-            !relight_shader_->SetInput("irradiance_volume_px", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PX), 4) ||
-            !relight_shader_->SetInput("irradiance_volume_nx", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NX), 5) ||
-            !relight_shader_->SetInput("irradiance_volume_py", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PY), 6) ||
-            !relight_shader_->SetInput("irradiance_volume_ny", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NY), 7) ||
-            !relight_shader_->SetInput("irradiance_volume_pz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ), 8) ||
-            !relight_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 9))
+            !relight_shader_->SetInput("depth", probe.g_buffer.depth->texture(), 2))
         {
+            relight_buffer_->Unbind();
             return false;
         }
-        relight_buffer_->BindColourTextures({ probe.environment->texture() });
+        relight_buffer_->BindColourTextures({ probe.environment->texture(), probe.ld_term->texture() });
         relight_buffer_->Render();
         relight_shader_->Render(relight_buffer_->index_count());
+    }
+    // Propogate the relighting to the lower mip levels for pre-filtered importance sampling
+    // Done in a separate loop to mitigate state changes in the rendering context
+    for (const auto& probe : probes_)
+    {
+        context->MakeTextureMipmaps(probe.environment->mutable_texture().get());
+    }
+    // Approximate the specular lighting distribution for each mipmaps roughness level
+    for (const auto& probe : probes_)
+    {
+        if (!relight_distribution_shader_->SetInput("environment_map", probe.environment->texture(), 0))
+        {
+            relight_buffer_->Unbind();
+            return false;
+        }
+        for (int mip_level = 1; mip_level <= kSpecularProbeMipLevels; mip_level++)
+        {
+            // TODO: Consider using an exponential roughness mapping function (see frostbite pbr course fig.57)
+            float roughness = static_cast<float>(mip_level) / static_cast<float>(kSpecularProbeMipLevels);
+            units::pixel resolution = kSpecularProbeMapSize >> mip_level;
+            if (!relight_distribution_shader_->SetInput("roughness", roughness))
+            {
+                relight_buffer_->Unbind();
+                return false;
+            }
+            context->SetViewport(0, 0, resolution, resolution);
+            relight_buffer_->BindColourTextures({ probe.ld_term->texture() }, mip_level);
+            relight_buffer_->Render();
+            relight_distribution_shader_->Render(relight_buffer_->index_count());
+        }
     }
     relight_buffer_->Unbind();
     return true;
@@ -212,6 +268,8 @@ const TextureResource* SpecularLocal::output(Output buffer, std::size_t probe_id
         return probes_[probe_id].g_buffer.depth->texture();
     case LIGHT:
         return probes_[probe_id].environment->texture();
+    case LD_TERM:
+        return probes_[probe_id].ld_term->texture();
     default:
         throw "Non-existant buffer access attempted";
     }

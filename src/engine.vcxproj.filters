@@ -569,5 +569,8 @@
     <None Include="shaders\lib\sky.lib.glsl">
       <Filter>src\shaders\lib</Filter>
     </None>
+    <None Include="shaders\specular-probe-distribution.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

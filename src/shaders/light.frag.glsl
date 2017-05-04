@@ -92,6 +92,8 @@ vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 li
     vec3 ambient = AmbientDiffuse(pos, surface_normal);
     // Modulate by surface colour
     // TODO: MODULATE THIS BY FRESNEL TERM ONCE WE HAVE AMBIENT SPECULAR!
+    // actually we should do a pre-integrated split brdf instead for this
+    // also double check the ambient specular is multiplied by f0 and NOT the fresnel term itself!
     diffuse += ambient * albedo;
     // Metals dont have diffuse light
     diffuse *= 1.0 - metalness;
@@ -129,7 +131,7 @@ void main(void)
         vec3 sky_colour = SkyLight(view_dir, sh_sky_colour, sky_luminance);
         frag_colour = vec4(GammaEncode(FilmicTonemap(sky_colour * exposure)), 1.0);
         frag_colour *= 0.0001f;
-        frag_colour += vec4(GammaEncode(FilmicTonemap(textureLod(local_specular_probe, view_dir, 0.0f).rgb * exposure)), 1.0);
+        frag_colour += vec4(GammaEncode(FilmicTonemap(textureLod(local_specular_probe, view_dir, roughness).rgb * exposure)), 1.0);
         return;
     }
 

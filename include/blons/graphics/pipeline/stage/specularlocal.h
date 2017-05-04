@@ -53,7 +53,8 @@ public:
         ALBEDO, ///< G-Buffer albedo map
         NORMAL, ///< G-buffer normal map
         DEPTH,  ///< G-Buffer depth map
-        LIGHT   ///< Filtered lighting information applied to the environment map
+        LIGHT,  ///< Lighting information applied to the environment map, with generated mipmaps
+        LD_TERM ///< LD term environment map used in ambient specular approximations, with mipmaps for varying roughness
     };
 
 public:
@@ -87,7 +88,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the rendering output from the pipeline stage
     ///
-    /// \param buffer Lighting::Output target to retrieve
+    /// \param buffer SpecularLocal::Output target to retrieve
     /// \param probe_id ID of the specular probe to retrieve outputs from
     /// \return Handle to the output target texture
     ////////////////////////////////////////////////////////////////////////////////
@@ -103,11 +104,13 @@ private:
             std::unique_ptr<TextureCubemap> normal;      ///< G-buffer normal
             std::unique_ptr<TextureCubemap> depth;       ///< G-buffer depth
         } g_buffer;
-        std::unique_ptr<TextureCubemap> environment; ///< Filtered lighting environment
+        std::unique_ptr<TextureCubemap> environment; ///< Lighting environment with mipmaps
+        std::unique_ptr<TextureCubemap> ld_term;     ///< Filtered lighting term with mipmaps for varying roughness
     };
 
     std::vector<SpecularProbe> probes_;
     std::unique_ptr<Shader> relight_shader_;
+    std::unique_ptr<Shader> relight_distribution_shader_;
     std::unique_ptr<Framebuffer> relight_buffer_;
 };
 } // namespace stage

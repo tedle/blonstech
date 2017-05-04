@@ -32,7 +32,8 @@
 // Ins n outs
 in vec2 tex_coord;
 
-out vec4 frag_colour;
+out vec4 env_map_colour;
+out vec4 ld_term_colour;
 
 // Globals
 uniform mat4 inv_direction_matrices[6];
@@ -96,7 +97,8 @@ void main(void)
 
     if (depth_sample == 1.0)
     {
-        frag_colour = vec4(SkyLight(sample_dir.xyz, sh_sky_colour, sky_luminance), 1.0);
+        env_map_colour = vec4(SkyLight(sample_dir.xyz, sh_sky_colour, sky_luminance), 1.0);
+        ld_term_colour = env_map_colour;
         return;
     }
 
@@ -110,9 +112,12 @@ void main(void)
     float light_visibility = ShadowTest(world_pos, light_vp_matrix, light_depth);
     float NdotL = max(dot(surface_normal, -sun.dir), 0.0f);
 
+    // Simple lambert diffuse term since specular is not calculated in probe relighting,
+    // meaning no normalized terms are needed
     vec3 diffuse = surface_albedo * light_visibility * sun.colour * sun.luminance * NdotL;
     diffuse += surface_albedo * AmbientDiffuse(world_pos, surface_normal);
     diffuse /= kPi;
 
-    frag_colour = vec4(diffuse, 1.0f);
+    env_map_colour = vec4(diffuse, 1.0f);
+    ld_term_colour = env_map_colour;
 }
