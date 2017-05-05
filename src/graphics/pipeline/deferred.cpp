@@ -76,6 +76,8 @@ bool Deferred::Init()
     output_sprite_.reset(new Sprite("blons:none"));
     alt_output_sprite_.reset(new Sprite("blons:none"));
 
+    brdf_lookup_.reset(new BRDFLookup());
+
     return true;
 }
 
@@ -175,6 +177,7 @@ void Deferred::set_output(Output output, Output alt_output)
 
 void Deferred::BakeRadianceTransfer(const Scene& scene)
 {
+    brdf_lookup_->BakeLookupTexture();
     light_sector_->BakeRadianceTransfer(scene);
     specular_local_->BakeRadianceTransfer(scene);
 }

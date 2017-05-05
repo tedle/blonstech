@@ -26,6 +26,7 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/scene.h>
+#include <blons/graphics/pipeline/brdflookup.h>
 #include <blons/graphics/pipeline/stage/geometry.h>
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/lightsector/lightsector.h>
@@ -134,6 +135,8 @@ private:
 
     Matrix proj_matrix_, ortho_matrix_;
     Perspective perspective_;
+
+    std::unique_ptr<BRDFLookup> brdf_lookup_;
 
     // TODO: Document the pipeline
     std::unique_ptr<stage::Geometry> geometry_;

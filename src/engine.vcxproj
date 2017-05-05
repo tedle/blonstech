@@ -211,6 +211,7 @@
     <ClInclude Include="..\include\blons\graphics\mesh.h" />
     <ClInclude Include="..\include\blons\graphics\meshimporter.h" />
     <ClInclude Include="..\include\blons\graphics\model.h" />
+    <ClInclude Include="..\include\blons\graphics\pipeline\brdflookup.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\deferred.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\pipeline.h" />
     <ClInclude Include="..\include\blons\graphics\pipeline\scene.h" />
@@ -285,6 +286,7 @@
     <ClCompile Include="graphics\mesh.cpp" />
     <ClCompile Include="graphics\meshimporter.cpp" />
     <ClCompile Include="graphics\model.cpp" />
+    <ClCompile Include="graphics\pipeline\brdflookup.cpp" />
     <ClCompile Include="graphics\pipeline\deferred.cpp" />
     <ClCompile Include="graphics\pipeline\stage\composite.cpp" />
     <ClCompile Include="graphics\pipeline\stage\debug\debugoutput.cpp" />
@@ -321,6 +323,7 @@
     <ClCompile Include="temphelpers.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\brdf-lut-bake.comp.glsl" />
     <None Include="shaders\composite.frag.glsl" />
     <None Include="shaders\debug\line-grid.frag.glsl" />
     <None Include="shaders\debug\irradiance-volume.frag.glsl" />

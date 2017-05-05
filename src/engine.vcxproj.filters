@@ -271,6 +271,9 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\stage\specularlocal.h">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\pipeline\brdflookup.h">
+      <Filter>src\graphics\pipeline</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -456,6 +459,9 @@
     <ClCompile Include="graphics\pipeline\stage\specularlocal.cpp">
       <Filter>src\graphics\pipeline\stage</Filter>
     </ClCompile>
+    <ClCompile Include="graphics\pipeline\brdflookup.cpp">
+      <Filter>src\graphics\pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\composite.frag.glsl">
@@ -570,6 +576,9 @@
       <Filter>src\shaders\lib</Filter>
     </None>
     <None Include="shaders\specular-probe-distribution.frag.glsl">
+      <Filter>src\shaders</Filter>
+    </None>
+    <None Include="shaders\brdf-lut-bake.comp.glsl">
       <Filter>src\shaders</Filter>
     </None>
   </ItemGroup>
