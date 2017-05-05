@@ -922,8 +922,8 @@ void RendererGL43::BindFramebuffer(FramebufferResource* frame_buffer)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
             active_framebuffer_ = fbo->framebuffer_;
-            glViewport(0, 0, fbo->width, fbo->height);
         }
+        glViewport(0, 0, fbo->width, fbo->height);
     }
     else
     {
@@ -931,14 +931,24 @@ void RendererGL43::BindFramebuffer(FramebufferResource* frame_buffer)
         {
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
             active_framebuffer_ = 0;
-            glViewport(0, 0, screen_.width, screen_.height);
         }
+        glViewport(0, 0, screen_.width, screen_.height);
     }
 }
 
 void RendererGL43::SetFramebufferColourTextures(FramebufferResource* frame_buffer, const std::vector<const TextureResource*>& colour_textures, unsigned int mip_level)
 {
-    BindFramebuffer(frame_buffer);
+    if (frame_buffer == nullptr)
+    {
+        throw "Framebuffer cannot be null";
+    }
+    FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
+    if (active_framebuffer_ != fbo->framebuffer_)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
+        active_framebuffer_ = fbo->framebuffer_;
+    }
+
     std::unique_ptr<GLenum[]> drawbuffers(new GLenum[colour_textures.size()]);
     for (unsigned int i = 0; i < colour_textures.size(); i++)
     {
@@ -957,6 +967,11 @@ void RendererGL43::SetFramebufferDepthTexture(FramebufferResource* frame_buffer,
         throw "Framebuffer cannot be null";
     }
     FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
+    if (active_framebuffer_ != fbo->framebuffer_)
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
+        active_framebuffer_ = fbo->framebuffer_;
+    }
 
     // If depth_texture is a nullptr, unbind the depth attachment
     GLuint depth = 0;
@@ -965,7 +980,6 @@ void RendererGL43::SetFramebufferDepthTexture(FramebufferResource* frame_buffer,
         const TextureResourceGL43* tex = resource_cast<const TextureResourceGL43*>(depth_texture, id());
         depth = tex->texture_;
     }
-    BindFramebuffer(frame_buffer);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, depth, mip_level);
 }
 
