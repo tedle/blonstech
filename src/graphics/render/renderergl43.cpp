@@ -918,15 +918,21 @@ void RendererGL43::BindFramebuffer(FramebufferResource* frame_buffer)
     if (frame_buffer != nullptr)
     {
         FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
-        glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
-        active_framebuffer_ = fbo->framebuffer_;
-        glViewport(0, 0, fbo->width, fbo->height);
+        if (active_framebuffer_ != fbo->framebuffer_)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, fbo->framebuffer_);
+            active_framebuffer_ = fbo->framebuffer_;
+            glViewport(0, 0, fbo->width, fbo->height);
+        }
     }
     else
     {
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        active_framebuffer_ = 0;
-        glViewport(0, 0, screen_.width, screen_.height);
+        if (active_framebuffer_ != 0)
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            active_framebuffer_ = 0;
+            glViewport(0, 0, screen_.width, screen_.height);
+        }
     }
 }
 
