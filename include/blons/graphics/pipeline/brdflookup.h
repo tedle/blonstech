@@ -95,7 +95,9 @@ private:
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::pipeline::BRDFLookup
 /// \ingroup pipeline
-/// 
+/// Described in DICE's Siggraph 2014 course "Moving Frostbite to PBR":
+/// http://www.frostbite.com/2014/11/moving-frostbite-to-pbr/
+///
 /// ### Example:
 /// \code
 /// \endcode

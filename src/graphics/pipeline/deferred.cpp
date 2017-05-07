@@ -177,9 +177,9 @@ void Deferred::set_output(Output output, Output alt_output)
 
 void Deferred::BakeRadianceTransfer(const Scene& scene)
 {
-    brdf_lookup_->BakeLookupTexture();
     light_sector_->BakeRadianceTransfer(scene);
     specular_local_->BakeRadianceTransfer(scene);
+    brdf_lookup_->BakeLookupTexture();
 }
 
 bool Deferred::RenderOutput()

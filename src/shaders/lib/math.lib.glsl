@@ -199,3 +199,69 @@ float SHDot3(float coeffs_a[9], float coeffs_b[9])
     sh_dot += coeffs_a[8] * coeffs_b[8];
     return sh_dot;
 }
+
+// The Van der Corput sequence is a low discrepency model that works
+// by reversing the bits of a number and shifting them behind a decimal
+// Such that f(1011b) -> 0.1101b. We do an equivilent means
+// of this by reversing the bits of an n-bit unsigned integer, casting
+// the integer to a float, and then dividing by 2^n
+// Efficient means of bit reversal explained more thoroughly:
+// http://holger.dammertz.org/stuff/notes_HammersleyOnHemisphere.html
+float VanDerCorputSequence(uint i)
+{
+    i = (i << 16) | (i >> 16);
+    i = ((i & 0x55555555) << 1) | ((i & 0xAAAAAAAA) >> 1);
+    i = ((i & 0x33333333) << 2) | ((i & 0xCCCCCCCC) >> 2);
+    i = ((i & 0x0F0F0F0F) << 4) | ((i & 0xF0F0F0F0) >> 4);
+    i = ((i & 0x00FF00FF) << 8) | ((i & 0xFF00FF00) >> 8);
+    // Inverse of 2^32, assuming 32-bit integer
+    return float(i) * 2.3283064365386962890625e-10f;
+}
+
+// Uses a Hammersley point set, which in 2D is simply a Van der Corput sequence paired
+// with a linear progression of [0,1]
+// See: http://mathworld.wolfram.com/HammersleyPointSet.html
+vec2 LowDiscrepancySample2D(uint sample_id, uint sample_count)
+{
+    return vec2(float(sample_id) / float(sample_count), VanDerCorputSequence(sample_id));
+}
+
+// Generates a normal matrix from a basis normal vector
+// For converting tangent-space coordinates to world-space
+mat3 NormalVectorToMatrix(vec3 normal)
+{
+    vec3 up = abs(normal.z) > 0.9999f ? vec3(1.0f, 0.0f, 0.0f) : vec3(0.0f, 0.0f, 1.0f);
+    vec3 tangent = cross(up, normal);
+    vec3 bitangent = cross(normal, tangent);
+    return mat3(tangent, bitangent, normal);
+}
+
+// Importance sampling function for GGX lobe, generates a likely significant
+// halfway vector from a given random sample
+// For derivation see:
+// http://blog.tobias-franke.eu/2014/03/30/notes_on_importance_sampling.html
+vec3 ImportanceSampleGGX(vec2 random_sample, vec3 normal, float roughness)
+{
+    float phi = random_sample.x * 2.0f * kPi;
+    // We skip the calculation of theta since we only need the sine and cosine, anyway
+    float theta_cos = sqrt((1.0f - random_sample.y) / ((roughness * roughness - 1.0f) * random_sample.y + 1.0f));
+    // Pythageorean identity to get the sine of theta
+    float theta_sin = sqrt(1.0f - theta_cos * theta_cos);
+    // Get spherical normal from polar coordinates
+    vec3 halfway = vec3(theta_sin * cos(phi), theta_sin * sin(phi), theta_cos);
+    // Convert from tangent-space to world-space
+    return NormalVectorToMatrix(normal) * halfway;
+}
+
+// Importance sampling function for cosine lobe, generates a likely significant
+// light vector from a given random sample
+vec3 ImportanceSampleCosineLobe(vec2 random_sample, vec3 normal)
+{
+    // Use the random sample to pick a point on the unit circle
+    float phi = random_sample.y * kPi * 2.0f;
+    // Radius of the slice of the hemisphere we are sampling (coplanar with the XY plane)
+    float radius = sqrt(random_sample.x);
+    vec3 light = vec3(radius * sin(phi), radius * cos(phi), sqrt(1.0f - random_sample.x));
+    // Convert from tangent-space to world-space
+    return NormalVectorToMatrix(normal) * light;
+}

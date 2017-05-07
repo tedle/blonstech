@@ -120,3 +120,37 @@ vec3 SpecularTerm(float roughness, vec3 metalness, vec3 albedo, float NdotH, flo
     vec3 specular_term = D * F * G / (4.0 * NdotL * NdotV + 1e-5);
     return specular_term;
 }
+
+// Splits the specular GGX term in two, solved for f0, allowing
+// later reconstruction as:
+// vec3 specular = light * (f0 * split.x + split.y);
+// Derived and explained on page 63:
+// http://www.frostbite.com/2014/11/moving-frostbite-to-pbr/
+vec2 SpecularTermGGXSplit(float roughness, float NdotH, float NdotL, float NdotV, float LdotH)
+{
+    vec2 split_dfg = vec2(0.0f);
+    float geometry_term = SpecularGeometryTerm(NdotL, NdotV, roughness);
+    if (geometry_term > 0.0f)
+    {
+        // LdotH == VdotH
+        float split_term_base = geometry_term / (NdotV * NdotH) * LdotH;
+        float fresnel_base = pow(1.0f - LdotH, 5.0f);
+        split_dfg.x = (1.0f - fresnel_base) * split_term_base;
+        split_dfg.y = fresnel_base * split_term_base;
+    }
+    return split_dfg;
+}
+
+// Splits the diffuse GGX term in two, allowing later reconstruction as:
+// vec3 diffuse = light * albedo * (brdf.x + albedo * brdf.y);
+// Not really derived or explained anywhere, but I'm kind of assuming this works
+vec2 DiffuseTermGGXSplit(float NdotV, float NdotL, float LdotH, float LdotV, float roughness)
+{
+    float facing = 0.5 + 0.5 * LdotV;
+    float smooth_term = 1.05 * (1.0 - pow(1.0 - NdotL, 5.0)) * (1.0 - pow(1.0 - NdotV, 5.0));
+    float rough_term = facing * (0.9 - 0.4 * facing) * ((0.5 + LdotH) / LdotH);
+    float single = 1.0 / 3.141592653589793238 * mix(smooth_term, rough_term, roughness);
+    float multi = 0.1159 * roughness;
+
+    return vec2(single, multi) * kPi;
+}
