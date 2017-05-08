@@ -54,11 +54,10 @@ uniform DirectionalLight sun;
 uniform SHColourCoeffs sh_sky_colour;
 uniform float sky_luminance;
 
-// This function is currently straight copied from shaders/light.frag.glsl
-// But we've avoided abstracting this away to a library in case things change
-// in the future with regards to ambient diffuse calculations. Specifically
-// specular lighting which is not considered in this pass, might affect ambient
-// diffuse in the main lighting pass down the road
+// This function is mostly copied from shaders/light.frag.glsl
+// We've avoided abstracting this away to a library because of some minor changes
+// in the way this function accounts for specular normalization. Here it has been
+// removed because this pass does not calculate specular lighting in any capacity
 vec3 AmbientDiffuse(vec4 pos, vec3 normal)
 {
     // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
@@ -66,7 +65,6 @@ vec3 AmbientDiffuse(vec4 pos, vec3 normal)
     irradiance_sample_pos /= irradiance_sample_pos.w;
     vec3 ambient_cube[6];
     // We do a lot of ugly busywork to cut texture fetches down in half because these are dependent texture fetches and wow those are expensive!!!
-    // TODO: Shove indirect lighting computation into a half-res bilaterally-upsampled buffer? This currently adds 0.6ms
     bvec3 is_positive = bvec3(normal.x > 0.0, normal.y > 0.0, normal.z > 0.0);
     ivec3 cube_indices = ivec3(is_positive.x ? kPositiveX : kNegativeX,
                                is_positive.y ? kPositiveY : kNegativeY,

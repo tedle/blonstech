@@ -30,6 +30,7 @@
 #include <blons/graphics/pipeline/stage/shadow.h>
 #include <blons/graphics/pipeline/stage/irradiancevolume.h>
 #include <blons/graphics/pipeline/stage/specularlocal.h>
+#include <blons/graphics/pipeline/brdflookup.h>
 
 namespace blons
 {
@@ -73,12 +74,14 @@ public:
     /// the frame
     /// \param specular_local Handle to the specular relight pass performed earlier
     /// in the frame
+    /// \param brdf_lookup Handle to a BRDF lookup texture
     /// \param view_matrix View matrix of the camera rendering the scene
     /// \param proj_matrix Perspective matrix for rendering the scene
     /// \param ortho_matrix Orthographic matrix bound to the screen dimensions
     ////////////////////////////////////////////////////////////////////////////////
     bool Render(const Scene& scene, const Geometry& geometry, const Shadow& shadow,
                 const IrradianceVolume& irradiance, const SpecularLocal& specular_local,
+                const BRDFLookup& brdf_lookup,
                 Matrix view_matrix, Matrix proj_matrix, Matrix ortho_matrix);
 
     ////////////////////////////////////////////////////////////////////////////////

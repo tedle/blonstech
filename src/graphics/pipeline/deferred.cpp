@@ -135,7 +135,7 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
         return false;
     }
 
-    if (!lighting_->Render(scene, *geometry_, *shadow_, *irradiance_volume_, *specular_local_, view_matrix, proj_matrix_, ortho_matrix_))
+    if (!lighting_->Render(scene, *geometry_, *shadow_, *irradiance_volume_, *specular_local_, *brdf_lookup_, view_matrix, proj_matrix_, ortho_matrix_))
     {
         return false;
     }

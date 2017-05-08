@@ -52,6 +52,7 @@ uniform sampler3D irradiance_volume_py;
 uniform sampler3D irradiance_volume_ny;
 uniform sampler3D irradiance_volume_pz;
 uniform sampler3D irradiance_volume_nz;
+uniform sampler2D brdf_lut;
 uniform samplerCube local_specular_probe;
 uniform float roughness;
 uniform vec3 metalness;
@@ -59,7 +60,7 @@ uniform vec3 metalness;
 // Note: This function is also used in shaders/specular-probe-relight.frag.glsl
 // Consider the implications of any changes here maybe needing to be included in
 // that shader as well
-vec3 AmbientDiffuse(vec4 pos, vec3 normal)
+vec3 AmbientDiffuse(vec4 pos, vec3 normal, vec3 albedo, vec2 diffuse_brdf)
 {
     // Irradiance volume stored as ambient cube, reconstruct indirect lighting from data
     vec4 irradiance_sample_pos = inv_irradiance_matrix * pos;
@@ -80,32 +81,32 @@ vec3 AmbientDiffuse(vec4 pos, vec3 normal)
     ambient_cube[cube_indices.z] = is_positive.z ?
                                        vec3(texture(irradiance_volume_pz, irradiance_sample_pos.xyz).rgb) :
                                        vec3(texture(irradiance_volume_nz, irradiance_sample_pos.xyz).rgb);
-    return SampleAmbientCube(ambient_cube, normal);
+    vec3 ambient = SampleAmbientCube(ambient_cube, normal);
+    // Modulate by surface colour and diffuse term
+    return ambient * albedo * (diffuse_brdf.x + albedo * diffuse_brdf.y);
 }
 
-vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 light_visibility, float NdotV, float NdotL, float LdotH, float LdotV, float roughness)
+vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 light_visibility, vec2 diffuse_brdf,
+             float NdotV, float NdotL, float LdotH, float LdotV, float roughness)
 {
     // For the one light we currently have
     vec3 diffuse = DiffuseTermGGX(albedo, NdotV, NdotL, LdotH, LdotV, roughness);
     diffuse = diffuse * light_visibility * sun.luminance * sun.colour * NdotL;
     // After all other lights are applied
-    vec3 ambient = AmbientDiffuse(pos, surface_normal);
-    // Modulate by surface colour
-    // TODO: MODULATE THIS BY FRESNEL TERM ONCE WE HAVE AMBIENT SPECULAR!
-    // actually we should do a pre-integrated split brdf instead for this
-    // also double check the ambient specular is multiplied by f0 and NOT the fresnel term itself!
-    diffuse += ambient * albedo;
+    diffuse += AmbientDiffuse(pos, surface_normal, albedo, diffuse_brdf);
     // Metals dont have diffuse light
     diffuse *= 1.0 - metalness;
     // Account for conversion from irradiance to radiance
     return diffuse / kPi;
 }
 
-vec3 Specular(vec3 metalness, vec3 albedo, vec3 direct, float NdotH, float NdotV, float NdotL, float LdotH, float roughness)
+vec3 Specular(vec3 metalness, vec3 albedo, vec3 direct, vec2 specular_brdf,
+              float NdotH, float NdotV, float NdotL, float LdotH, float roughness)
 {
     // Determine specular term
     vec3 specular = SpecularTerm(roughness, metalness, albedo, NdotH, NdotL, NdotV, LdotH);
     specular = specular * sun.luminance * sun.colour * direct * NdotL;
+    // TODO: double check the ambient specular is multiplied by f0 and NOT the fresnel term itself!
     // Division by pi already accounted for in BRDF
     return specular;
 }
@@ -150,8 +151,9 @@ void main(void)
     float LdotH = max(dot(-sun.dir, halfway), 0.0);
     float LdotV = max(dot(-sun.dir, -view_dir), 0.0);
 
-    vec3 diffuse = Diffuse(pos, albedo, metalness, surface_normal, direct, NdotV, NdotL, LdotH, LdotV, roughness);
-    vec3 specular = Specular(metalness, albedo, direct, NdotH, NdotV, NdotL, LdotH, roughness);
+    vec4 preintegrated_brdf = texture(brdf_lut, vec2(NdotV, roughness));
+    vec3 diffuse = Diffuse(pos, albedo, metalness, surface_normal, direct, preintegrated_brdf.ba, NdotV, NdotL, LdotH, LdotV, roughness);
+    vec3 specular = Specular(metalness, albedo, direct, preintegrated_brdf.rg, NdotH, NdotV, NdotL, LdotH, roughness);
 
     vec3 surface_colour = diffuse + specular;
 
