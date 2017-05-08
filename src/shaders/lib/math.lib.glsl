@@ -231,7 +231,7 @@ vec2 LowDiscrepancySample2D(uint sample_id, uint sample_count)
 mat3 NormalVectorToMatrix(vec3 normal)
 {
     vec3 up = abs(normal.z) > 0.9999f ? vec3(1.0f, 0.0f, 0.0f) : vec3(0.0f, 0.0f, 1.0f);
-    vec3 tangent = cross(up, normal);
+    vec3 tangent = normalize(cross(up, normal));
     vec3 bitangent = cross(normal, tangent);
     return mat3(tangent, bitangent, normal);
 }
