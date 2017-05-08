@@ -154,3 +154,21 @@ vec2 DiffuseTermGGXSplit(float NdotV, float NdotL, float LdotH, float LdotV, flo
 
     return vec2(single, multi) * kPi;
 }
+
+// Used for sampling specular LD environment maps
+// Note: This is currently a^4, which feels needed as we use unmapped
+// roughness for our shading, however if we change the roughness
+// mapping down the road we should adjust this to compensate
+float RoughnessToMipLevel(float roughness, uint max_mip_level)
+{
+    float r2 = roughness * roughness;
+    return r2 * r2 * float(max_mip_level);
+}
+
+// Used for generating specular LD environment maps
+float MipLevelToRoughness(float mip_level, uint max_mip_level)
+{
+    float roughness = mip_level / float(max_mip_level);
+    float r2 = roughness * roughness;
+    return r2 * r2;
+}

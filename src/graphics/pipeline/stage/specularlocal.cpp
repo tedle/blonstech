@@ -227,17 +227,17 @@ bool SpecularLocal::Relight(const Scene& scene, const Shadow& shadow, const Irra
     // Approximate the specular lighting distribution for each mipmaps roughness level
     for (const auto& probe : probes_)
     {
-        if (!relight_distribution_shader_->SetInput("environment_map", probe.environment->texture(), 0))
+        if (!relight_distribution_shader_->SetInput("environment_map", probe.environment->texture(), 0) ||
+            !relight_distribution_shader_->SetInput("max_mip_level", kSpecularProbeMipLevels) ||
+            !relight_distribution_shader_->SetInput("base_texture_size", kSpecularProbeMapSize))
         {
             relight_buffer_->Unbind();
             return false;
         }
         for (int mip_level = 1; mip_level <= kSpecularProbeMipLevels; mip_level++)
         {
-            // TODO: Consider using an exponential roughness mapping function (see frostbite pbr course fig.57)
-            float roughness = static_cast<float>(mip_level) / static_cast<float>(kSpecularProbeMipLevels);
             units::pixel resolution = kSpecularProbeMapSize >> mip_level;
-            if (!relight_distribution_shader_->SetInput("roughness", roughness))
+            if (!relight_distribution_shader_->SetInput("mip_level", mip_level))
             {
                 relight_buffer_->Unbind();
                 return false;
