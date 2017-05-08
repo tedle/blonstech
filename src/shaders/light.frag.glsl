@@ -54,6 +54,7 @@ uniform sampler3D irradiance_volume_pz;
 uniform sampler3D irradiance_volume_nz;
 uniform sampler2D brdf_lut;
 uniform samplerCube local_specular_probe;
+uniform int max_mip_level;
 uniform float roughness;
 uniform vec3 metalness;
 
@@ -67,7 +68,8 @@ vec3 AmbientDiffuse(vec4 pos, vec3 normal, vec3 albedo, vec2 diffuse_brdf)
     irradiance_sample_pos /= irradiance_sample_pos.w;
     vec3 ambient_cube[6];
     // We do a lot of ugly busywork to cut texture fetches down in half because these are dependent texture fetches and wow those are expensive!!!
-    // TODO: Shove indirect lighting computation into a half-res bilaterally-upsampled buffer? This currently adds 0.6ms
+    // TODO: Shove indirect lighting computation into a half-res bilaterally-upsampled buffer? Or possibly
+    // do this step during G-buffer creation as that would make for independent fetches. This currently adds 0.6ms
     bvec3 is_positive = bvec3(normal.x > 0.0, normal.y > 0.0, normal.z > 0.0);
     ivec3 cube_indices = ivec3(is_positive.x ? kPositiveX : kNegativeX,
                                is_positive.y ? kPositiveY : kNegativeY,
@@ -100,12 +102,23 @@ vec3 Diffuse(vec4 pos, vec3 albedo, vec3 metalness, vec3 surface_normal, vec3 li
     return diffuse / kPi;
 }
 
-vec3 Specular(vec3 metalness, vec3 albedo, vec3 direct, vec2 specular_brdf,
+vec3 AmbientSpecular(vec3 metalness, vec3 albedo, vec3 surface_normal, vec3 view, vec2 brdf, float roughness)
+{
+    vec3 sample_dir = SpecularDominantDirectionGGX(surface_normal, reflect(view, surface_normal), roughness);
+    float lod = RoughnessToMipLevel(roughness, max_mip_level);
+    vec3 light = textureLod(local_specular_probe, sample_dir, lod).rgb;
+    vec3 f0 = Fresnel0Term(metalness, albedo);
+    return light * (f0 * brdf.x + brdf.y);
+}
+
+vec3 Specular(vec3 metalness, vec3 albedo, vec3 direct, vec3 surface_normal, vec3 view, vec2 specular_brdf,
               float NdotH, float NdotV, float NdotL, float LdotH, float roughness)
 {
+    // TODO: Modulate by specular occlusion (see Frostbite PBR paper) once we have an accessible AO term
     // Determine specular term
     vec3 specular = SpecularTerm(roughness, metalness, albedo, NdotH, NdotL, NdotV, LdotH);
     specular = specular * sun.luminance * sun.colour * direct * NdotL;
+    specular += AmbientSpecular(metalness, albedo, surface_normal, view, specular_brdf, roughness);
     // TODO: double check the ambient specular is multiplied by f0 and NOT the fresnel term itself!
     // Division by pi already accounted for in BRDF
     return specular;
@@ -131,8 +144,6 @@ void main(void)
     {
         vec3 sky_colour = SkyLight(view_dir, sh_sky_colour, sky_luminance);
         frag_colour = vec4(GammaEncode(FilmicTonemap(sky_colour * exposure)), 1.0);
-        frag_colour *= 0.0001f;
-        frag_colour += vec4(GammaEncode(FilmicTonemap(textureLod(local_specular_probe, view_dir, roughness).rgb * exposure)), 1.0);
         return;
     }
 
@@ -153,7 +164,7 @@ void main(void)
 
     vec4 preintegrated_brdf = texture(brdf_lut, vec2(NdotV, roughness));
     vec3 diffuse = Diffuse(pos, albedo, metalness, surface_normal, direct, preintegrated_brdf.ba, NdotV, NdotL, LdotH, LdotV, roughness);
-    vec3 specular = Specular(metalness, albedo, direct, preintegrated_brdf.rg, NdotH, NdotV, NdotL, LdotH, roughness);
+    vec3 specular = Specular(metalness, albedo, direct, surface_normal, view_dir, preintegrated_brdf.rg, NdotH, NdotV, NdotL, LdotH, roughness);
 
     vec3 surface_colour = diffuse + specular;
 

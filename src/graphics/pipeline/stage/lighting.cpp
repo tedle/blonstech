@@ -104,6 +104,7 @@ bool Lighting::Render(const Scene& scene, const Geometry& geometry, const Shadow
         !light_shader_->SetInput("irradiance_volume_pz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_PZ), 8) ||
         !light_shader_->SetInput("irradiance_volume_nz", irradiance.output(IrradianceVolume::IRRADIANCE_VOLUME_NZ), 9) ||
         !light_shader_->SetInput("brdf_lut", brdf_lookup.output(BRDFLookup::BRDF_LUT), 10) ||
+        !light_shader_->SetInput("max_mip_level", kSpecularProbeMipLevels) ||
         !light_shader_->SetInput("local_specular_probe", specular_local.output(SpecularLocal::LD_TERM, 0), 11))
     {
         return false;

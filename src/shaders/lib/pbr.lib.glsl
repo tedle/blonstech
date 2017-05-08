@@ -98,12 +98,17 @@ float SpecularNormalDistributionFunction(float NdotH, float roughness)
     return ndf_term;
 }
 
+// Determines the Fresnel coefficient at a 0 degree incident angle
+vec3 Fresnel0Term(vec3 metalness, vec3 albedo)
+{
+    // Dielectrics range from 0.02-0.05
+    return mix(vec3(0.035), albedo, metalness);
+}
 // Determines the ratio of reflected light vs absorbed light for a material
 vec3 FresnelTerm(vec3 metalness, vec3 albedo, float LdotH)
 {
     // Fresnel Schlick apprxoimation
-    // Dielectrics range from 0.02-0.05
-    vec3 f0 = mix(vec3(0.035), albedo, metalness);
+    vec3 f0 = Fresnel0Term(metalness, albedo);
     vec3 fresnel = f0 + (1.0 - f0) * pow(1.0 - LdotH, 5.0);
     return fresnel;
 }
@@ -161,8 +166,8 @@ vec2 DiffuseTermGGXSplit(float NdotV, float NdotL, float LdotH, float LdotV, flo
 // mapping down the road we should adjust this to compensate
 float RoughnessToMipLevel(float roughness, uint max_mip_level)
 {
-    float r2 = roughness * roughness;
-    return r2 * r2 * float(max_mip_level);
+    float rsq = sqrt(roughness);
+    return sqrt(rsq) * float(max_mip_level);
 }
 
 // Used for generating specular LD environment maps
@@ -171,4 +176,13 @@ float MipLevelToRoughness(float mip_level, uint max_mip_level)
     float roughness = mip_level / float(max_mip_level);
     float r2 = roughness * roughness;
     return r2 * r2;
+}
+
+// For higher roughness, the reflection vector is usually not the best to sample from
+// See: http://www.frostbite.com/2014/11/moving-frostbite-to-pbr/ (ch. 4.9.3)
+vec3 SpecularDominantDirectionGGX(vec3 normal, vec3 reflect_dir, float roughness)
+{
+    float smoothness = 1.0f - roughness;
+    float lerp_factor = smoothness * (sqrt(smoothness) + roughness);
+    return mix(normal, reflect_dir, lerp_factor);
 }
