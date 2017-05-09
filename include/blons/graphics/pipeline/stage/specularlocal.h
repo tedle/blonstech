@@ -117,9 +117,6 @@ private:
 } // namespace pipeline
 } // namespace blons
 
-/// \REFACTOR SHADERATTRIBITEINPUT INITS
-/// \SEE_IMPORTANT_SHADER_CHANGE:
-/// In light.frag.glsl make sure ambient diffuse has 1.0 - DFG LUT term applied
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::pipeline::stage::SpecularLocal
 /// \ingroup pipeline

@@ -45,7 +45,6 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     enum Output
     {
-        /// \VERIFY_THAT_THIS_IS_RIGHT
         ////////////////////////////////////////////////////////////////////////////////
         /// \brief Bidirectional reflectance distribution function lookup texture,
         /// used to pre-integrate complex lighting terms needed for ambient diffuse and
@@ -91,16 +90,11 @@ private:
 } // namespace pipeline
 } // namespace blons
 
-/// \NEEDS_CODE_SAMPLE
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::pipeline::BRDFLookup
 /// \ingroup pipeline
 /// Described in DICE's Siggraph 2014 course "Moving Frostbite to PBR":
 /// http://www.frostbite.com/2014/11/moving-frostbite-to-pbr/
-///
-/// ### Example:
-/// \code
-/// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_PIPELINE_BRDFLOOKUP_H_
