@@ -31,18 +31,16 @@ namespace blons
 {
 namespace pipeline
 {
-BRDFLookup::BRDFLookup()
+BRDFLookup::BRDFLookup() {}
+
+void BRDFLookup::BakeLookupTexture()
 {
+    log::Debug("Baking BRDF lookup texture... ");
     PixelData lut;
     lut.type = TextureType(TextureType::R16G16B16A16_UNORM, TextureType::RAW, TextureType::LINEAR, TextureType::CLAMP);
     lut.width = kBRDFLookupSize;
     lut.height = kBRDFLookupSize;
     brdf_lut_.reset(new Texture(lut));
-}
-
-void BRDFLookup::BakeLookupTexture()
-{
-    log::Debug("Baking BRDF lookup texture... ");
     Timer brdf_bake_stats;
     ComputeShader bake_shader({ { COMPUTE, "shaders/brdf-lut-bake.comp.glsl" } });
     bake_shader.SetOutput("brdf_lut", brdf_lut_->mutable_texture().get());
@@ -55,6 +53,10 @@ const TextureResource* BRDFLookup::output(Output buffer) const
     switch (buffer)
     {
     case BRDF_LUT:
+        if (brdf_lut_ == nullptr)
+        {
+            throw "Attempt to access BRDF LUT before baking";
+        }
         return brdf_lut_->texture();
     default:
         throw "Unknown output requested from BRDFLookup";
