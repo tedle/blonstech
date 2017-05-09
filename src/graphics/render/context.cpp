@@ -42,7 +42,7 @@ Renderer* context()
 void MakeContext(const Client::Info& info)
 {
     g_context.reset();
-    g_context = std::make_unique<blons::RendererGL43>(info, false, kMode == Mode::FULLSCREEN);
+    g_context = std::make_unique<blons::RendererGL43>(info, kEnableVsync, kMode == Mode::FULLSCREEN);
 }
 } // namespace render
 } // namespace blons
