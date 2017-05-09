@@ -36,9 +36,8 @@ namespace stage
 Composite::Composite(Perspective perspective)
 {
     // Shaders
-    ShaderAttributeList composite_inputs;
-    composite_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    composite_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    ShaderAttributeList composite_inputs = { { POS, "input_pos" },
+                                             { TEX, "input_uv" } };
     composite_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/composite.frag.glsl" } }, composite_inputs));
 
     if (composite_shader_ == nullptr)

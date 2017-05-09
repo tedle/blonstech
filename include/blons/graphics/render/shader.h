@@ -86,10 +86,11 @@ private:
 /// ### Example:
 /// \code
 /// // Creating a new shader
-/// blons::ShaderAttributeList inputs;
-/// inputs.push_back(blons::ShaderAttribute(0, "input_pos"));
-/// inputs.push_back(blons::ShaderAttribute(1, "input_uv"));
-/// inputs.push_back(blons::ShaderAttribute(2, "input_norm"));
+/// blons::ShaderAttributeList inputs = {
+///     { blons::ShaderAttribute::POS, "input_pos" },
+///     { blons::ShaderAttribute::TEX, "input_uv" },
+///     { blons::ShaderAttribute::NORMAL, "input_norm" }
+/// };
 /// auto shader = std::make_unique<blons::Shader>({ { blons::ShaderPipelineStage::VERTEX, "vertex.glsl" },
 ///                                                 { blons::ShaderPipelineStage::PIXEL, "pixel.glsl" } },
 ///                                                   inputs));

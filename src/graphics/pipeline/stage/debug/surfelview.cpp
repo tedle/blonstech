@@ -40,8 +40,7 @@ SurfelView::SurfelView()
     : quad_mesh_("blons:quad")
 {
     // Shaders
-    ShaderAttributeList surfel_shader_inputs;
-    surfel_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    ShaderAttributeList surfel_shader_inputs = { { POS, "input_pos" } };
     surfel_shader_.reset(new Shader({ { VERTEX, "shaders/debug/surfel.vert.glsl" }, { PIXEL, "shaders/debug/surfel.frag.glsl" } }, surfel_shader_inputs));
 
     if (surfel_shader_ == nullptr)

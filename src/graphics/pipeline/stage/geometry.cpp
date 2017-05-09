@@ -36,12 +36,11 @@ namespace stage
 Geometry::Geometry(Perspective perspective)
 {
     // Shaders
-    ShaderAttributeList geometry_inputs;
-    geometry_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    geometry_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    geometry_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
-    geometry_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
-    geometry_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
+    ShaderAttributeList geometry_inputs = { { POS, "input_pos" },
+                                            { TEX, "input_uv" },
+                                            { ShaderAttributeIndex::NORMAL, "input_norm" },
+                                            { TANGENT, "input_tan" },
+                                            { BITANGENT, "input_bitan" } };
     geometry_shader_.reset(new Shader({ { VERTEX, "shaders/mesh.vert.glsl" }, { PIXEL, "shaders/mesh.frag.glsl" } }, geometry_inputs));
 
     if (geometry_shader_ == nullptr)

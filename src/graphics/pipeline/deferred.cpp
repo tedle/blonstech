@@ -63,9 +63,8 @@ bool Deferred::Init()
     log::Debug(" [%ims]\n", pipeline_setup.ms());
 
     // Shaders
-    ShaderAttributeList output_inputs; // dont worry about it
-    output_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    output_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    ShaderAttributeList output_inputs = { { POS, "input_pos" },
+                                          { TEX, "input_uv" } };
     output_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/sprite.frag.glsl" } }, output_inputs));
 
     if (output_shader_ == nullptr)

@@ -40,18 +40,15 @@ Shadow::Shadow(Perspective perspective)
                                                   units::pixel_to_subpixel(kShadowMapResolution), 0,
                                                   perspective.screen_near, perspective.screen_far);
 
-    ShaderAttributeList blur_inputs;
-    blur_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    blur_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    ShaderAttributeList blur_inputs = { { POS, "input_pos" },
+                                        { TEX, "input_uv" } };
     blur_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/shadow-blur.frag.glsl" } }, blur_inputs));
 
-    ShaderAttributeList direct_light_inputs;
-    direct_light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    direct_light_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    ShaderAttributeList direct_light_inputs = { { POS, "input_pos" },
+                                                { TEX, "input_uv" } };
     direct_light_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/direct-light.frag.glsl" } }, direct_light_inputs));
 
-    ShaderAttributeList shadow_inputs;
-    shadow_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    ShaderAttributeList shadow_inputs = { { POS, "input_pos" } };
     shadow_shader_.reset(new Shader({ { VERTEX, "shaders/shadow.vert.glsl" }, { PIXEL, "shaders/shadow.frag.glsl" } }, shadow_inputs));
 
     if (blur_shader_ == nullptr ||

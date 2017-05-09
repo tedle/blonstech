@@ -43,14 +43,14 @@ auto const cvar_debug_mode = console::RegisterVariable("dbg:irradiance-view", 0)
 IrradianceView::IrradianceView()
 {
     // Shaders
-    ShaderAttributeList grid_shader_inputs;
-    grid_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    grid_shader_.reset(new Shader({ { VERTEX, "shaders/mesh.vert.glsl" }, { PIXEL, "shaders/debug/line-grid.frag.glsl" } }, grid_shader_inputs));
-    ShaderAttributeList volume_shader_inputs;
-    volume_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    volume_shader_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
-    volume_shader_inputs.push_back(ShaderAttribute(TANGENT, "input_grid_pos"));
-    volume_shader_.reset(new Shader({ { VERTEX, "shaders/debug/irradiance-volume.vert.glsl" }, { PIXEL, "shaders/debug/irradiance-volume.frag.glsl" } }, volume_shader_inputs));
+    ShaderAttributeList grid_shader_inputs = { { POS, "input_pos" } };
+    grid_shader_.reset(new Shader({ { VERTEX, "shaders/mesh.vert.glsl" },
+                                    { PIXEL, "shaders/debug/line-grid.frag.glsl" } }, grid_shader_inputs));
+    ShaderAttributeList volume_shader_inputs = { { POS, "input_pos" },
+                                                 { ShaderAttributeIndex::NORMAL, "input_norm" },
+                                                 { TANGENT, "input_grid_pos" } };
+    volume_shader_.reset(new Shader({ { VERTEX, "shaders/debug/irradiance-volume.vert.glsl" },
+                                      { PIXEL, "shaders/debug/irradiance-volume.frag.glsl" } }, volume_shader_inputs));
 
     if (volume_shader_ == nullptr || grid_shader_ == nullptr)
     {

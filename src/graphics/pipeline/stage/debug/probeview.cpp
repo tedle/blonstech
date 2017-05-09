@@ -39,15 +39,13 @@ auto const cvar_debug_mode = console::RegisterVariable("dbg:probe-view", 0);
 ProbeView::ProbeView()
 {
     // Shaders
-    ShaderAttributeList probe_inputs;
-    probe_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    probe_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
-    probe_inputs.push_back(ShaderAttribute(ShaderAttributeIndex::NORMAL, "input_norm"));
-    probe_inputs.push_back(ShaderAttribute(TANGENT, "input_tan"));
-    probe_inputs.push_back(ShaderAttribute(BITANGENT, "input_bitan"));
+    ShaderAttributeList probe_inputs = { { POS, "input_pos" },
+                                         { TEX, "input_uv" },
+                                         { ShaderAttributeIndex::NORMAL, "input_norm" },
+                                         { TANGENT, "input_tan" },
+                                         { BITANGENT, "input_bitan" } };
     probe_shader_.reset(new Shader({ { VERTEX, "shaders/mesh.vert.glsl" }, { PIXEL, "shaders/debug/probe.frag.glsl" } }, probe_inputs));
-    ShaderAttributeList grid_shader_inputs;
-    grid_shader_inputs.push_back(ShaderAttribute(POS, "input_pos"));
+    ShaderAttributeList grid_shader_inputs = { { POS, "input_pos" } };
     grid_shader_.reset(new Shader({ { VERTEX, "shaders/mesh.vert.glsl" }, { PIXEL, "shaders/debug/line-grid.frag.glsl" } }, grid_shader_inputs));
 
     if (probe_shader_ == nullptr || grid_shader_ == nullptr)

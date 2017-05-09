@@ -45,9 +45,8 @@ auto cvar_metalness = console::RegisterVariable("mtl:metalness", 0.0f);
 Lighting::Lighting(Perspective perspective)
 {
     // Shaders
-    ShaderAttributeList light_inputs;
-    light_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    light_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    ShaderAttributeList light_inputs = { { POS, "input_pos" },
+                                         { TEX, "input_uv" } };
     light_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/light.frag.glsl" } }, light_inputs));
 
     if (light_shader_ == nullptr)

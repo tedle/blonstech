@@ -60,9 +60,8 @@ void Manager::Init(units::pixel width, units::pixel height)
     blur_ortho_matrix_ = MatrixOrthographic(0, screen_dimensions_.w / kBlurFactori, screen_dimensions_.h / kBlurFactori, 0,
                                             pipeline::kScreenNear, pipeline::kScreenFar);
 
-    ShaderAttributeList ui_inputs;
-    ui_inputs.push_back(ShaderAttribute(POS, "input_pos"));
-    ui_inputs.push_back(ShaderAttribute(TEX, "input_uv"));
+    ShaderAttributeList ui_inputs = { { POS, "input_pos" },
+                                      { TEX, "input_uv" } };
     ui_shader_.reset(new Shader({ { VERTEX, "shaders/ui.vert.glsl" }, { PIXEL, "shaders/ui.frag.glsl" } }, ui_inputs));
     blur_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/ui-blur.frag.glsl" } }, ui_inputs));
     composite_shader_.reset(new Shader({ { VERTEX, "shaders/sprite.vert.glsl" }, { PIXEL, "shaders/ui-composite.frag.glsl" } }, ui_inputs));
