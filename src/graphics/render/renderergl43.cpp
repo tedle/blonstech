@@ -674,11 +674,10 @@ BufferResource* RendererGL43::RegisterMesh(Vertex* vertices, unsigned int vert_c
     return buffer;
 }
 
-bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
-                                     units::pixel width, units::pixel height,
-                                     std::vector<TextureType> formats, bool store_depth)
+FramebufferResource* RendererGL43::RegisterFramebuffer(units::pixel width, units::pixel height,
+                                                       std::vector<TextureType> formats, bool store_depth)
 {
-    FramebufferResourceGL43* fbo = resource_cast<FramebufferResourceGL43*>(frame_buffer, id());
+    auto fbo = std::make_unique<FramebufferResourceGL43>(id());
 
     fbo->width = width;
     fbo->height = height;
@@ -687,7 +686,7 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
     glGenFramebuffers(1, &fbo->framebuffer_);
 
     // Bind it so we can put stuff in it
-    BindFramebuffer(fbo);
+    BindFramebuffer(fbo.get());
     // Set default width and height for FBOs with no attachments
     glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_WIDTH, width);
     glFramebufferParameteri(GL_FRAMEBUFFER, GL_FRAMEBUFFER_DEFAULT_HEIGHT, height);
@@ -695,14 +694,12 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
     // Creates empty render targets
     auto make_texture = [&](TextureType type)
     {
-        auto tex = std::make_unique<TextureResourceGL43>(id());
         PixelData pixels;
         pixels.type = type;
         pixels.width = width;
         pixels.height = height;
-        RegisterTexture(tex.get(), &pixels);
-
-        return tex;
+        auto tex = resource_cast<TextureResourceGL43*>(RegisterTexture(&pixels), id());
+        return std::unique_ptr<TextureResourceGL43>(tex);
     };
 
     // Create and bind all of our render targets
@@ -715,26 +712,30 @@ bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
             colour_targets.push_back(fbo->targets_.back().get());
         }
     }
-    SetFramebufferColourTextures(fbo, colour_targets, 0);
+    SetFramebufferColourTextures(fbo.get(), colour_targets, 0);
 
     if (store_depth)
     {
         // Create and bind the depth target
         fbo->depth_ = make_texture({ TextureType::DEPTH, TextureType::LINEAR, TextureType::CLAMP });
-        SetFramebufferDepthTexture(fbo, fbo->depth_.get(), 0);
+        SetFramebufferDepthTexture(fbo.get(), fbo->depth_.get(), 0);
     }
 
-    return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+    {
+        return nullptr;
+    }
+    return fbo.release();
 }
 
 namespace
 {
 template <typename T, GLenum texture_type = TranslatePixelDataType<T>()>
-bool RegisterTextureTemplate(TextureResource* texture, T* pixel_data, RendererGL43* context)
+TextureResource* RegisterTextureTemplate(T* pixel_data, RendererGL43* context)
 {
     static_assert(texture_type != GL_FALSE, "Unsupported PixelData type for texture registration");
 
-    TextureResourceGL43* tex = resource_cast<TextureResourceGL43*>(texture, context->id());
+    auto tex = std::make_unique<TextureResourceGL43>(context->id());
     tex->type_ = texture_type;
     tex->options_ = pixel_data->type;
     tex->has_mipmaps_ = false;
@@ -746,29 +747,29 @@ bool RegisterTextureTemplate(TextureResource* texture, T* pixel_data, RendererGL
     glBindTexture(tex->type_, tex->texture_);
 
     // Upload image data to the GPU
-    context->SetTextureData(tex, pixel_data, 0);
-    return true;
+    context->SetTextureData(tex.get(), pixel_data, 0);
+    return tex.release();
 }
 } // namespace
 
-bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData* pixel_data)
+TextureResource* RendererGL43::RegisterTexture(PixelData* pixel_data)
 {
-    return RegisterTextureTemplate(texture, pixel_data, this);
+    return RegisterTextureTemplate(pixel_data, this);
 }
 
-bool RendererGL43::RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)
+TextureResource* RendererGL43::RegisterTexture(PixelData3D* pixel_data)
 {
-    return RegisterTextureTemplate(texture, pixel_data, this);
+    return RegisterTextureTemplate(pixel_data, this);
 }
 
-bool RendererGL43::RegisterTexture(TextureResource* texture, PixelDataCubemap* pixel_data)
+TextureResource* RendererGL43::RegisterTexture(PixelDataCubemap* pixel_data)
 {
-    return RegisterTextureTemplate(texture, pixel_data, this);
+    return RegisterTextureTemplate(pixel_data, this);
 }
 
-bool RendererGL43::RegisterShader(ShaderResource* program, ShaderSourceList source, ShaderAttributeList inputs)
+ShaderResource* RendererGL43::RegisterShader(ShaderSourceList source, ShaderAttributeList inputs)
 {
-    ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
+    auto shader = std::make_unique<ShaderResourceGL43>(id());
 
     // Compile shaders will be linked to this program
     shader->program_ = glCreateProgram();
@@ -798,7 +799,7 @@ bool RendererGL43::RegisterShader(ShaderResource* program, ShaderSourceList sour
         if (compile_result != GL_TRUE)
         {
             LogCompileErrors(stage_handle, true);
-            return false;
+            return nullptr;
         }
 
         // Queue it to be linked
@@ -820,32 +821,34 @@ bool RendererGL43::RegisterShader(ShaderResource* program, ShaderSourceList sour
     if (link_result != GL_TRUE)
     {
         LogCompileErrors(shader->program_, false);
-        return false;
+        return nullptr;
     }
 
     shader->type_ = ShaderResourceGL43::PIPELINE;
-    return true;
+    return shader.release();
 }
 
-bool RendererGL43::RegisterComputeShader(ShaderResource* program, ShaderSourceList source)
+ShaderResource* RendererGL43::RegisterComputeShader(ShaderSourceList source)
 {
-    if (!RegisterShader(program, source, {}))
+    auto shader = std::unique_ptr<ShaderResource>(RegisterShader(source, {}));
+    if (shader == nullptr)
     {
-        return false;
+        return nullptr;
     }
     // Hackily correct RegisterShader marking our type as ShaderResourceGL43::PIPELINE
-    ShaderResourceGL43* shader = resource_cast<ShaderResourceGL43*>(program, id());
-    shader->type_ = ShaderResourceGL43::COMPUTE;
-    return true;
+    ShaderResourceGL43* compute_shader = resource_cast<ShaderResourceGL43*>(shader.get(), id());
+    compute_shader->type_ = ShaderResourceGL43::COMPUTE;
+    return shader.release();
 }
 
-void RendererGL43::RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size)
+ShaderDataResource* RendererGL43::RegisterShaderData(const void* data, std::size_t size)
 {
-    auto data_buffer = resource_cast<ShaderDataResourceGL43*>(data_handle, id());
+    auto data_buffer = std::make_unique<ShaderDataResourceGL43>(id());
     glGenBuffers(1, &data_buffer->buffer_);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, data_buffer->buffer_);
     glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_COPY);
     data_buffer->size_ = size;
+    return data_buffer.release();
 }
 
 void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_count)

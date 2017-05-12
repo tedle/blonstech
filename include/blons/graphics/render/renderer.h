@@ -476,69 +476,61 @@ public:
                                          unsigned int* indices, unsigned int index_count,
                                          DrawMode draw_mode)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a FramebufferResource and binds it to the graphics API
-    /// permitting its use for rendering calls. Expects an output to the supplied
-    /// number of render targets.
+    /// \brief Generates a FramebufferResource bound to the graphics API permitting
+    /// its use for rendering calls. Expects an output to the supplied number of
+    /// render targets.
     ///
-    /// \param frame_buffer Framebuffer for to bind
     /// \param width Width of the textures to render to in pixels
     /// \param height Height of the textures to render to in pixels
     /// \param formats List of formatted textures to output to
     /// \param store_depth Store the depth buffer from each render to a texture
-    /// \return True on success
+    /// \return FramebufferResource on success, nullptr on failure
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterFramebuffer(FramebufferResource* frame_buffer,
-                                     units::pixel width, units::pixel height,
-                                     std::vector<TextureType> formats, bool store_depth)=0;
+    virtual FramebufferResource* RegisterFramebuffer(units::pixel width, units::pixel height,
+                                                     std::vector<TextureType> formats, bool store_depth)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a TextureResource and binds it, combined with the supplied
-    /// PixelData, to the graphics API permitting their use for rendering calls.
+    /// \brief Takes a provided pixel buffer and generates a TextureResource bound
+    /// to the graphics API permitting their use for rendering calls.
     ///
-    /// \param texture TextureResource for identifying PixelData in future calls
     /// \param pixel_data Raw bitmap and format settings of the texture
-    /// \return True on success
+    /// \return TextureResource on success, nullptr on failure
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterTexture(TextureResource* texture, PixelData* pixel_data)=0;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc RegisterTexture(TextureResource*, PixelData*)
-    ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterTexture(TextureResource* texture, PixelData3D* pixel_data)=0;
+    virtual TextureResource* RegisterTexture(PixelData* pixel_data)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc RegisterTexture(TextureResource*, PixelData*)
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterTexture(TextureResource* texture, PixelDataCubemap* pixel_data)=0;
+    virtual TextureResource* RegisterTexture(PixelData3D* pixel_data)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a ShaderResource, shader source files, and list of attributes,
-    /// compiling them all into a single shader program to be used for rendering
-    /// meshes each frame.
+    /// \copydoc RegisterTexture(TextureResource*, PixelData*)
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual TextureResource* RegisterTexture(PixelDataCubemap* pixel_data)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Takes a list of shader source files and of attributes, compiling them
+    /// all into a single shader program to be used for rendering meshes each frame.
     ///
-    /// \param program ShaderResource for identifying shader code in future calls
     /// \param source Source code for the shaders
     /// \param inputs List of attributes to be passed into the shader on each draw
     /// call. Allows for translation of vertex data to shader data
-    /// \return True on success
+    /// \return ShaderResource on success, nullptr on failure
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterShader(ShaderResource* program, ShaderSourceList source, ShaderAttributeList inputs)=0;
+    virtual ShaderResource* RegisterShader(ShaderSourceList source, ShaderAttributeList inputs)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a ShaderResource and source file, compiling them into a compute
-    /// shader that can be run at any time.
+    /// \brief Takes a list of source files, compiling it into a compute shader that
+    /// can be run at any time.
     ///
-    /// \param program ShaderResource for identifying shader code in future calls
     /// \param source Source code for the compute shader
-    /// \return True on success
+    /// \return ShaderResource on success, nullptr on failure
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterComputeShader(ShaderResource* program, ShaderSourceList source)=0;
+    virtual ShaderResource* RegisterComputeShader(ShaderSourceList source)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a ShaderDataResource and arbitrary memory creating a bindable
-    /// block allowing easy communication between CPU & GPU memory.
+    /// \brief Generates a ShaderDataResource from arbitrary memory, creating a
+    /// bindable block allowing easy communication between CPU & GPU memory.
     ///
-    /// \param data_handle ShaderDataResource for identifying memory block in future
-    /// calls
     /// \param data Memory to be copied. May be nullptr for unitialized memory
     /// \param size Size of memory block to allocate. Immutable
-    /// \return True on success
+    /// \return ShaderDataResource on success, nullptr on failure
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size)=0;
+    virtual ShaderDataResource* RegisterShaderData(const void* data, std::size_t size)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds the supplied ShaderResource and renders a number of vertices

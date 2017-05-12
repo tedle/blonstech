@@ -30,10 +30,7 @@
 
 namespace blons
 {
-CommonShader::CommonShader()
-{
-    program_.reset(render::context()->MakeShaderResource());
-}
+CommonShader::CommonShader() {}
 
 bool CommonShader::SetInput(const char* field, const float value)
 {

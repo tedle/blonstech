@@ -43,7 +43,7 @@ class ShaderData
 
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Initializes an internal ShaderDataResource
+    /// \brief Initializes an internal ShaderDataResource. Will throw on failure
     ///
     /// \param val Value to initialize shader memory with
     /// \param length Number of elements to store
@@ -51,9 +51,12 @@ public:
     ShaderData(const T* val, std::size_t length)
     {
         auto context = render::context();
-        data_.reset(context->MakeShaderDataResource());
         length_ = length;
-        context->RegisterShaderData(data_.get(), val, length_ * sizeof(T));
+        data_.reset(context->RegisterShaderData(val, length_ * sizeof(T)));
+        if (data_ == nullptr)
+        {
+            throw "Failed to register ShaderData";
+        }
     }
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves handle to data resource used for GPU bindings

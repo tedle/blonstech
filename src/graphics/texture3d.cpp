@@ -39,13 +39,8 @@ void Texture3D::Init(const PixelData3D& pixels)
     pixel_data_.reset(new PixelData3D(pixels));
 
     // Make the actual texture
-    texture_.reset(context->MakeTextureResource());
+    texture_.reset(context->RegisterTexture(pixel_data_.get()));
     if (texture_ == nullptr)
-    {
-        throw "Failed to allocate texture resource";
-    }
-
-    if (!context->RegisterTexture(texture_.get(), pixel_data_.get()))
     {
         throw "Failed to register texture resource";
     }

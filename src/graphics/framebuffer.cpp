@@ -58,10 +58,9 @@ Framebuffer::Framebuffer(units::pixel width, units::pixel height, unsigned int t
 void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<TextureType> texture_formats, bool store_depth)
 {
     auto context = render::context();
-    fbo_.reset(context->MakeFramebufferResource());
-    if (!context->RegisterFramebuffer(fbo_.get(), width, height, texture_formats, store_depth))
+    fbo_.reset(context->RegisterFramebuffer(width, height, texture_formats, store_depth));
+    if (fbo_ == nullptr)
     {
-        fbo_.reset();
         throw "Failed to initialize framebuffer";
     }
 

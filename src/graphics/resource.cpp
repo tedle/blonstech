@@ -150,14 +150,8 @@ TextureBuffer LoadTexture(const std::string& filename, TextureType::Options opti
     // Have we made a resource for this context?
     if (tex.texture == nullptr)
     {
-        std::shared_ptr<TextureResource> texture(context->MakeTextureResource());
-
+        std::shared_ptr<TextureResource> texture(context->RegisterTexture(tex.pixels.get()));
         if (texture == nullptr)
-        {
-            return TextureBuffer();
-        }
-
-        if (!context->RegisterTexture(texture.get(), tex.pixels.get()))
         {
             return TextureBuffer();
         }

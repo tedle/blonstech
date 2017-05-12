@@ -53,15 +53,14 @@ public:
     BufferResource* RegisterMesh(Vertex* vertices, unsigned int vert_count,
                                  unsigned int* indices, unsigned int index_count,
                                  DrawMode draw_mode) override;
-    bool RegisterFramebuffer(FramebufferResource* frame_buffer,
-                             units::pixel width, units::pixel height,
-                             std::vector<TextureType> formats, bool store_depth) override;
-    bool RegisterTexture(TextureResource* texture, PixelData* pixel_data) override;
-    bool RegisterTexture(TextureResource* texture, PixelData3D* pixel_data) override;
-    bool RegisterTexture(TextureResource* texture, PixelDataCubemap* pixel_data) override;
-    bool RegisterShader(ShaderResource* program, ShaderSourceList source, ShaderAttributeList inputs) override;
-    bool RegisterComputeShader(ShaderResource* program, ShaderSourceList source) override;
-    void RegisterShaderData(ShaderDataResource* data_handle, const void* data, std::size_t size) override;
+    FramebufferResource* RegisterFramebuffer(units::pixel width, units::pixel height,
+                                             std::vector<TextureType> formats, bool store_depth) override;
+    TextureResource* RegisterTexture(PixelData* pixel_data) override;
+    TextureResource* RegisterTexture(PixelData3D* pixel_data) override;
+    TextureResource* RegisterTexture(PixelDataCubemap* pixel_data) override;
+    ShaderResource* RegisterShader(ShaderSourceList source, ShaderAttributeList inputs) override;
+    ShaderResource* RegisterComputeShader(ShaderSourceList source) override;
+    ShaderDataResource* RegisterShaderData(const void* data, std::size_t size) override;
 
     void RenderShader(ShaderResource* program, unsigned int index_count) override;
     void RenderShaderInstanced(ShaderResource* program, unsigned int index_count, unsigned int instance_count) override;

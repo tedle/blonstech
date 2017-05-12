@@ -51,7 +51,8 @@ void Shader::Reload()
         return ShaderSource{ type, source };
     });
 
-    if (!render::context()->RegisterShader(program_.get(), parsed_source_list, inputs_))
+    program_.reset(render::context()->RegisterShader(parsed_source_list, inputs_));
+    if (program_ == nullptr)
     {
         log::Fatal("Shaders failed to compile\n");
         throw "Shaders failed to compile";
