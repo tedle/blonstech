@@ -385,6 +385,7 @@ class FramebufferResource;
 class ShaderResource;
 class ShaderDataResource;
 class TextureResource;
+class TimerResource;
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Class for interfacing with a graphics API
 ////////////////////////////////////////////////////////////////////////////////
@@ -495,6 +496,14 @@ public:
     /// \return ShaderDataResource on success, nullptr on failure
     ////////////////////////////////////////////////////////////////////////////////
     virtual ShaderDataResource* RegisterShaderData(const void* data, std::size_t size)=0;
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Marks a point in the GPU command buffer to query the current internal
+    /// clock. Returns a TimerResource handle to later retrieve the timestamp once
+    /// the preceding commands have finished running.
+    ///
+    /// \return TimerResource on success, nullptr on failure
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual TimerResource* RegisterTimestamp()=0;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Binds the supplied ShaderResource and renders a number of vertices
@@ -773,6 +782,17 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     virtual bool SetShaderOutput(ShaderResource* program, const char* name, TextureResource* value, unsigned int texture_index, unsigned int mip_level)=0;
 
+    // TODO: Replace with std::optional when we have vs2017
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Queries the GPU to see if the provided TimerResource is valid, and if
+    /// so will return the marked time in microseconds. Returns 0 if the GPU command
+    /// buffer has not yet reached the point where the timestamp should be generated
+    ///
+    /// \param timestamp TimerResource containing timestamp marker
+    /// \return Marked time in microseconds on success, 0 on failure
+    ////////////////////////////////////////////////////////////////////////////////
+    virtual units::time::us GetTimestamp(TimerResource* timestamp)=0;
+
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the blending mode for overwritten fragments. Defaults to
     /// BlendMode::ALPHA
@@ -949,6 +969,24 @@ protected:
     /// \copydoc BufferResource::BufferResource(Renderer::ContextID)
     ////////////////////////////////////////////////////////////////////////////////
     TextureResource(Renderer::ContextID parent_id) : context_id(parent_id) {}
+};
+////////////////////////////////////////////////////////////////////////////////
+/// \brief Contains identifying data to query the GPU clock
+////////////////////////////////////////////////////////////////////////////////
+class TimerResource
+{
+public:
+    virtual ~TimerResource() {};
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc BufferResource::context_id
+    ////////////////////////////////////////////////////////////////////////////////
+    const Renderer::ContextID context_id;
+
+protected:
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copydoc BufferResource::BufferResource(Renderer::ContextID)
+    ////////////////////////////////////////////////////////////////////////////////
+    TimerResource(Renderer::ContextID parent_id) : context_id(parent_id) {}
 };
 } // namespace blons
 

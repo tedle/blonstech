@@ -55,6 +55,7 @@ public:
     ShaderResource* RegisterShader(ShaderSourceList source, ShaderAttributeList inputs) override;
     ShaderResource* RegisterComputeShader(ShaderSourceList source) override;
     ShaderDataResource* RegisterShaderData(const void* data, std::size_t size) override;
+    TimerResource* RegisterTimestamp() override;
 
     void RenderShader(ShaderResource* program, unsigned int index_count) override;
     void RenderShaderInstanced(ShaderResource* program, unsigned int index_count, unsigned int instance_count) override;
@@ -101,6 +102,8 @@ public:
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector3* value, std::size_t elements) override;
     bool SetShaderInput(ShaderResource* program, const char* name, const Vector4* value, std::size_t elements) override;
     bool SetShaderOutput(ShaderResource* program, const char* name, TextureResource* value, unsigned int texture_index, unsigned int mip_level) override;
+
+    units::time::us GetTimestamp(TimerResource* timestamp) override;
 
     bool SetBlendMode(BlendMode mode) override;
     bool SetCullMode(CullMode mode) override;

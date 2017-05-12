@@ -173,6 +173,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glDeleteProgram");
     }
 
+    glDeleteQueries = (PFNGLDELETEQUERIESPROC)glGetProcAddress("glDeleteQueries");
+    if (glDeleteQueries == nullptr)
+    {
+        failed.push_back("glDeleteQueries");
+    }
+
     glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)glGetProcAddress("glDeleteRenderbuffers");
     if (glDeleteRenderbuffers == nullptr)
     {
@@ -269,6 +275,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glGenerateMipmap");
     }
 
+    glGenQueries = (PFNGLGENQUERIESPROC)glGetProcAddress("glGenQueries");
+    if (glGenQueries == nullptr)
+    {
+        failed.push_back("glGenQueries");
+    }
+
     glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)glGetProcAddress("glGenRenderbuffers");
     if (glGenRenderbuffers == nullptr)
     {
@@ -311,6 +323,12 @@ std::vector<std::string> LoadGLFunctions()
         failed.push_back("glGetProgramResourceIndex");
     }
 
+    glGetQueryObjectui64v = (PFNGLGETQUERYOBJECTUI64VPROC)glGetProcAddress("glGetQueryObjectui64v");
+    if (glGetQueryObjectui64v == nullptr)
+    {
+        failed.push_back("glGetQueryObjectui64v");
+    }
+
     glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)glGetProcAddress("glGetShaderInfoLog");
     if (glGetShaderInfoLog == nullptr)
     {
@@ -339,6 +357,12 @@ std::vector<std::string> LoadGLFunctions()
     if (glMemoryBarrier == nullptr)
     {
         failed.push_back("glMemoryBarrier");
+    }
+
+    glQueryCounter = (PFNGLQUERYCOUNTERPROC)glGetProcAddress("glQueryCounter");
+    if (glQueryCounter == nullptr)
+    {
+        failed.push_back("glQueryCounter");
     }
 
     glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)glGetProcAddress("glRenderbufferStorage");
@@ -470,6 +494,7 @@ PFNGLDEBUGMESSAGECONTROLPROC glDebugMessageControl;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 PFNGLDELETEPROGRAMPROC glDeleteProgram;
+PFNGLDELETEQUERIESPROC glDeleteQueries;
 PFNGLDELETERENDERBUFFERSPROC glDeleteRenderbuffers;
 PFNGLDELETESHADERPROC glDeleteShader;
 PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
@@ -486,6 +511,7 @@ PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 PFNGLGENBUFFERSPROC glGenBuffers;
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
+PFNGLGENQUERIESPROC glGenQueries;
 PFNGLGENRENDERBUFFERSPROC glGenRenderbuffers;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLGETBUFFERPARAMETERIVPROC glGetBufferParameteriv;
@@ -493,11 +519,13 @@ PFNGLGETBUFFERSUBDATAPROC glGetBufferSubData;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETPROGRAMRESOURCEINDEXPROC glGetProgramResourceIndex;
+PFNGLGETQUERYOBJECTUI64VPROC glGetQueryObjectui64v;
 PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLGETSHADERIVPROC glGetShaderiv;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 PFNGLLINKPROGRAMPROC glLinkProgram;
 PFNGLMEMORYBARRIERPROC glMemoryBarrier;
+PFNGLQUERYCOUNTERPROC glQueryCounter;
 PFNGLRENDERBUFFERSTORAGEPROC glRenderbufferStorage;
 PFNGLSHADERSOURCEPROC glShaderSource;
 PFNGLSHADERSTORAGEBLOCKBINDINGPROC glShaderStorageBlockBinding;

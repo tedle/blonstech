@@ -268,6 +268,17 @@ private:
     // std::unordered_map<std::string, GLint> uniform_location_cache_;
 };
 
+class TimerResourceGL43 : public TimerResource
+{
+public:
+    TimerResourceGL43(Renderer::ContextID parent_id) : TimerResource(parent_id) {}
+    ~TimerResourceGL43() override;
+
+    GLuint query_;
+    bool completed_;
+    GLuint64 timestamp_;
+};
+
 BufferResourceGL43::~BufferResourceGL43()
 {
     auto active_context = render::context();
@@ -347,6 +358,16 @@ ShaderDataResourceGL43::~ShaderDataResourceGL43()
     glDeleteBuffers(1, &buffer_);
 }
 
+TimerResourceGL43::~TimerResourceGL43()
+{
+    auto active_context = render::context();
+    if (context_id != active_context->id())
+    {
+        return;
+    }
+
+    glDeleteQueries(1, &query_);
+}
 
 GLint ShaderResourceGL43::UniformLocation(const char* name)
 {
@@ -824,6 +845,16 @@ ShaderDataResource* RendererGL43::RegisterShaderData(const void* data, std::size
     glBufferData(GL_SHADER_STORAGE_BUFFER, size, data, GL_DYNAMIC_COPY);
     data_buffer->size_ = size;
     return data_buffer.release();
+}
+
+TimerResource* RendererGL43::RegisterTimestamp()
+{
+    auto time_query = std::make_unique<TimerResourceGL43>(id());
+    glGenQueries(1, &time_query->query_);
+    glQueryCounter(time_query->query_, GL_TIMESTAMP);
+    time_query->completed_ = false;
+    time_query->timestamp_ = 0;
+    return time_query.release();
 }
 
 void RendererGL43::RenderShader(ShaderResource* program, unsigned int index_count)
@@ -1582,6 +1613,29 @@ bool RendererGL43::SetShaderOutput(ShaderResource* program, const char* name, Te
     }
     glBindImageTexture(texture_index, tex->texture_, mip_level, layered, 0, GL_WRITE_ONLY, format);
     return SetShaderInput(program, name, static_cast<int>(texture_index));
+}
+
+units::time::us RendererGL43::GetTimestamp(TimerResource* timestamp)
+{
+    auto time_query = resource_cast<TimerResourceGL43*>(timestamp, id());
+    if (!time_query->completed_)
+    {
+        GLuint64 result_available;
+        glGetQueryObjectui64v(time_query->query_, GL_QUERY_RESULT_AVAILABLE, &result_available);
+        if (result_available == GL_TRUE)
+        {
+            glGetQueryObjectui64v(time_query->query_, GL_QUERY_RESULT, &time_query->timestamp_);
+            // Convert from nanoseconds (GL standard) to microseconds
+            time_query->timestamp_ /= 1000;
+            time_query->completed_ = true;
+        }
+        else
+        {
+            // Not yet available, 0 is the error return value
+            return 0;
+        }
+    }
+    return time_query->timestamp_;
 }
 
 bool RendererGL43::SetBlendMode(BlendMode mode)
