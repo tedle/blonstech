@@ -135,7 +135,7 @@ void Model::Render()
 {
     // TODO: Clean this up with operator overloads
     world_matrix_ = MatrixScale(scale_.x, scale_.y, scale_.z) * MatrixTranslation(pos_.x, pos_.y, pos_.z);
-    render::context()->BindMeshBuffer(mesh_->vertex_buffer(), mesh_->index_buffer());
+    render::context()->BindMeshBuffer(mesh_->buffer());
 }
 
 void Model::Reload()

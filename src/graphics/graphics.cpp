@@ -379,8 +379,7 @@ void ManagedSprite::Finish()
         deleter_ = nullptr;
     }
 
-    vertex_buffer_.reset();
-    index_buffer_.reset();
+    buffer_.reset();
     texture_.reset();
 }
 

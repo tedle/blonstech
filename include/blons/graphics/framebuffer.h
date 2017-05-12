@@ -166,8 +166,7 @@ private:
     const TextureResource* depth_texture_;
 
     // Used for rendering the targets to screen conveniently
-    std::unique_ptr<BufferResource> vertex_buffer_;
-    std::unique_ptr<BufferResource> index_buffer_;
+    std::unique_ptr<BufferResource> buffer_;
     MeshData render_quad_;
 };
 } // namespace blons

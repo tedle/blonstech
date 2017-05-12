@@ -72,9 +72,6 @@ void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<Text
     }
     depth_texture_ = context->FramebufferDepthTexture(fbo_.get());
 
-    vertex_buffer_.reset(context->MakeBufferResource());
-    index_buffer_.reset(context->MakeBufferResource());
-
     // Build a simple quad that can render the outputs to screen
     render_quad_.vertices.resize(4);
     render_quad_.indices.resize(6);
@@ -97,10 +94,10 @@ void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<Text
 
     render_quad_.draw_mode = DrawMode::TRIANGLES;
 
-    if (!context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(),
-        render_quad_.vertices.data(), vertex_count(),
-        render_quad_.indices.data(), index_count(),
-        render_quad_.draw_mode))
+    buffer_.reset(context->RegisterMesh(render_quad_.vertices.data(), vertex_count(),
+                                        render_quad_.indices.data(), index_count(),
+                                        render_quad_.draw_mode));
+    if (buffer_ == nullptr)
     {
         throw "Failed to register rendering quad";
     }
@@ -109,7 +106,7 @@ void Framebuffer::Init(units::pixel width, units::pixel height, std::vector<Text
 void Framebuffer::Render()
 {
     auto context = render::context();
-    context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
+    context->BindMeshBuffer(buffer_.get());
 }
 
 void Framebuffer::Bind(Vector4 clear_colour)

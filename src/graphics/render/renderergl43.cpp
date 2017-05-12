@@ -204,8 +204,7 @@ public:
     BufferResourceGL43(Renderer::ContextID parent_id) : BufferResource(parent_id) {}
     ~BufferResourceGL43() override;
 
-    GLuint buffer_, vertex_array_id_;
-    enum BufferType { VERTEX_BUFFER, INDEX_BUFFER } type_;
+    GLuint vertex_buffer_, index_buffer_, vertex_array_id_;
     DrawMode draw_mode_;
 };
 
@@ -282,15 +281,11 @@ BufferResourceGL43::~BufferResourceGL43()
     auto context = static_cast<RendererGL43*>(active_context);
     context->UnmapBuffers();
 
-    if (type_ == BufferResourceGL43::VERTEX_BUFFER)
-    {
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    else if (type_ == BufferResourceGL43::INDEX_BUFFER)
-    {
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    }
-    glDeleteBuffers(1, &buffer_);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDeleteBuffers(1, &vertex_buffer_);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glDeleteBuffers(1, &index_buffer_);
 
     glBindVertexArray(0);
     glDeleteVertexArrays(1, &vertex_array_id_);
@@ -626,31 +621,24 @@ ShaderDataResource* RendererGL43::MakeShaderDataResource()
     return new ShaderDataResourceGL43(id());
 }
 
-bool RendererGL43::RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                                Vertex* vertices, unsigned int vert_count,
-                                unsigned int* indices, unsigned int index_count,
-                                DrawMode draw_mode)
+BufferResource* RendererGL43::RegisterMesh(Vertex* vertices, unsigned int vert_count,
+                                           unsigned int* indices, unsigned int index_count,
+                                           DrawMode draw_mode)
 {
-    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
-    BufferResourceGL43* index_buf = resource_cast<BufferResourceGL43*>(index_buffer, id());
-
-    // Set the buffer types
-    vertex_buf->type_ = BufferResourceGL43::VERTEX_BUFFER;
-    index_buf->type_ = BufferResourceGL43::INDEX_BUFFER;
+    BufferResourceGL43* buffer = resource_cast<BufferResourceGL43*>(MakeBufferResource(), id());
 
     // Set the draw mode
-    vertex_buf->draw_mode_ = draw_mode;
-    index_buf->draw_mode_ = draw_mode;
+    buffer->draw_mode_ = draw_mode;
 
     // Generate a vertex array and set it
     GLuint vertex_array_id;
     glGenVertexArrays(1, &vertex_array_id);
-    vertex_buf->vertex_array_id_ = index_buf->vertex_array_id_ = vertex_array_id;
+    buffer->vertex_array_id_ = vertex_array_id;
     glBindVertexArray(vertex_array_id);
 
     // Attach vertex buffer data to VAO
-    glGenBuffers(1, &vertex_buf->buffer_);
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glGenBuffers(1, &buffer->vertex_buffer_);
+    glBindBuffer(GL_ARRAY_BUFFER, buffer->vertex_buffer_);
     glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
     // Enable vertex inputs
@@ -676,14 +664,14 @@ bool RendererGL43::RegisterMesh(BufferResource* vertex_buffer, BufferResource* i
     glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(13*sizeof(float)));
 
     // Setup the index buffer
-    glGenBuffers(1, &index_buf->buffer_);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
+    glGenBuffers(1, &buffer->index_buffer_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->index_buffer_);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_STATIC_DRAW);
 
     // nvogl32.dll loves it when i clean up my VAOs!
     glBindVertexArray(0);
 
-    return true;
+    return buffer;
 }
 
 bool RendererGL43::RegisterFramebuffer(FramebufferResource* frame_buffer,
@@ -1004,14 +992,14 @@ const TextureResource* RendererGL43::FramebufferDepthTexture(FramebufferResource
 }
 
 // TODO: Change this to take VAO or some representation thereof instead? Or at least remove need for index buffer
-void RendererGL43::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)
+void RendererGL43::BindMeshBuffer(BufferResource* buffer)
 {
     UnmapBuffers();
 
-    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
-    glBindVertexArray(vertex_buf->vertex_array_id_);
+    BufferResourceGL43* buf = resource_cast<BufferResourceGL43*>(buffer, id());
+    glBindVertexArray(buf->vertex_array_id_);
 
-    switch (vertex_buf->draw_mode_)
+    switch (buf->draw_mode_)
     {
     case LINES:
         draw_mode_ = GL_LINES;
@@ -1025,49 +1013,46 @@ void RendererGL43::BindMeshBuffer(BufferResource* vertex_buffer, BufferResource*
     }
 }
 
-void RendererGL43::SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                             const Vertex* vertices, unsigned int vert_count,
-                             const unsigned int* indices, unsigned int index_count)
+void RendererGL43::SetMeshData(BufferResource* buffer,
+                               const Vertex* vertices, unsigned int vert_count,
+                               const unsigned int* indices, unsigned int index_count)
 {
-    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
-    BufferResourceGL43* index_buf = resource_cast<BufferResourceGL43*>(index_buffer, id());
+    BufferResourceGL43* buf = resource_cast<BufferResourceGL43*>(buffer, id());
 
-    glBindVertexArray(vertex_buf->vertex_array_id_);
+    glBindVertexArray(buf->vertex_array_id_);
     // Attach vertex buffer data to VAO
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glBindBuffer(GL_ARRAY_BUFFER, buf->vertex_buffer_);
     // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
     glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_DYNAMIC_DRAW);
 
     // Attach index buffer data to VAO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf->index_buffer_);
     // Use GL_DYNAMIC_DRAW as these vertex buffers are updated often to allow sprite movement
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof(unsigned int), indices, GL_DYNAMIC_DRAW);
 }
 
-void RendererGL43::UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                                const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
-                                const unsigned int* indices, unsigned int index_offset, unsigned int index_count)
+void RendererGL43::UpdateMeshData(BufferResource* buffer,
+                                  const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
+                                  const unsigned int* indices, unsigned int index_offset, unsigned int index_count)
 {
-    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
-    BufferResourceGL43* index_buf  = resource_cast<BufferResourceGL43*>(index_buffer, id());
+    BufferResourceGL43* buf = resource_cast<BufferResourceGL43*>(buffer, id());
 
-    glBindVertexArray(vertex_buf->vertex_array_id_);
+    glBindVertexArray(buf->vertex_array_id_);
     // Attach vertex buffer data to VAO
-    glBindBuffer(GL_ARRAY_BUFFER, vertex_buf->buffer_);
+    glBindBuffer(GL_ARRAY_BUFFER, buf->vertex_buffer_);
     glBufferSubData(GL_ARRAY_BUFFER, vert_offset * sizeof(Vertex), vert_count * sizeof(Vertex), vertices);
 
     // Attach index buffer data to VAO
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buf->buffer_);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf->index_buffer_);
     glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, index_offset * sizeof(unsigned int), index_count * sizeof(unsigned int), indices);
 }
 
-void RendererGL43::MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                                   Vertex** vertex_data, unsigned int** index_data)
+void RendererGL43::MapMeshData(BufferResource* buffer,
+                               Vertex** vertex_data, unsigned int** index_data)
 {
-    BufferResourceGL43* vertex_buf = resource_cast<BufferResourceGL43*>(vertex_buffer, id());
-    BufferResourceGL43* index_buf  = resource_cast<BufferResourceGL43*>(index_buffer, id());
+    BufferResourceGL43* buf = resource_cast<BufferResourceGL43*>(buffer, id());
 
-    if (vertex_buf->buffer_ != mapped_buffers_.vertex || index_buf->buffer_ != mapped_buffers_.index)
+    if (buf->vertex_buffer_ != mapped_buffers_.vertex || buf->index_buffer_ != mapped_buffers_.index)
     {
         if (mapped_buffers_.vertex != 0 || mapped_buffers_.index != 0)
         {
@@ -1080,10 +1065,10 @@ void RendererGL43::MapMeshData(BufferResource* vertex_buffer, BufferResource* in
         *index_data = mapped_buffers_.index_data;
         return;
     }
-    mapped_buffers_.vertex = vertex_buf->buffer_;
-    mapped_buffers_.index = index_buf->buffer_;
+    mapped_buffers_.vertex = buf->vertex_buffer_;
+    mapped_buffers_.index = buf->index_buffer_;
 
-    glBindVertexArray(vertex_buf->vertex_array_id_);
+    glBindVertexArray(buf->vertex_array_id_);
 
     glBindBuffer(GL_ARRAY_BUFFER, mapped_buffers_.vertex);
     *vertex_data = static_cast<Vertex*>(glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE));

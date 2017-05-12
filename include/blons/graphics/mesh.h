@@ -74,17 +74,11 @@ public:
     void Reload();
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves a handle to the mesh's vertex buffer resource
+    /// \brief Retrieves a handle to the mesh's BufferResource
     ///
-    /// \return Vertex buffer
+    /// \return Mesh buffer
     ////////////////////////////////////////////////////////////////////////////////
-    BufferResource* vertex_buffer() const;
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves a handle to the mesh's index buffer resource
-    ///
-    /// \return Index buffer
-    ////////////////////////////////////////////////////////////////////////////////
-    BufferResource* index_buffer() const;
+    BufferResource* buffer() const;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the number of vertices in this mesh
     ///
@@ -114,7 +108,7 @@ public:
 private:
     std::string filename_;
 
-    std::shared_ptr<BufferResource> vertex_buffer_, index_buffer_;
+    std::shared_ptr<BufferResource> buffer_;
     unsigned int vertex_count_, index_count_;
     MeshData data_;
 

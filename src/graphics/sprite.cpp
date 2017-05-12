@@ -45,8 +45,6 @@ Sprite::Sprite(const PixelData& texture_data)
 void Sprite::Init()
 {
     auto context = render::context();
-    vertex_buffer_.reset(context->MakeBufferResource());
-    index_buffer_.reset(context->MakeBufferResource());
     auto dimensions = texture_->info();
     set_pos(0, 0, dimensions->width, dimensions->height);
     set_subtexture(0, 0, dimensions->width, dimensions->height);
@@ -60,10 +58,10 @@ void Sprite::Init()
 
     mesh_.draw_mode = DrawMode::TRIANGLES;
 
-    if (!context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(),
-                               mesh_.vertices.data(), vertex_count(),
-                               mesh_.indices.data(), index_count(),
-                               mesh_.draw_mode))
+    buffer_.reset(context->RegisterMesh(mesh_.vertices.data(), vertex_count(),
+                                        mesh_.indices.data(), index_count(),
+                                        mesh_.draw_mode));
+    if (buffer_ == nullptr)
     {
         throw "Failed to register sprite";
     }
@@ -73,10 +71,10 @@ void Sprite::Render()
 {
     BuildQuad();
     auto context = render::context();
-    context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
+    context->UpdateMeshData(buffer_.get(),
                             mesh_.vertices.data(), 0, vertex_count(),
                             mesh_.indices.data(), 0, index_count());
-    context->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
+    context->BindMeshBuffer(buffer_.get());
 }
 
 void Sprite::Reload()
@@ -93,7 +91,7 @@ void Sprite::Reload()
     pos_ = temp_pos;
     tex_map_ = temp_tex;
     BuildQuad();
-    render::context()->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
+    render::context()->UpdateMeshData(buffer_.get(),
                                       mesh_.vertices.data(), 0, vertex_count(),
                                       mesh_.indices.data(), 0, index_count());
 }

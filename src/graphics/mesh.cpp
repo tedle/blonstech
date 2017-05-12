@@ -40,27 +40,21 @@ void Mesh::Reload()
 {
     auto mesh = resource::LoadMesh(filename_);
 
-    if (mesh.vertex == nullptr || mesh.index == nullptr)
+    if (mesh.buffer == nullptr)
     {
         throw "Failed to initialize mesh";
     }
 
-    vertex_buffer_ = std::move(mesh.vertex);
-    index_buffer_ = std::move(mesh.index);
+    buffer_ = std::move(mesh.buffer);
     vertex_count_ = mesh.vertex_count;
     index_count_ = mesh.index_count;
     data_ = std::move(mesh.data);
     texture_list_ = mesh.texture_list;
 }
 
-BufferResource* Mesh::vertex_buffer() const
+BufferResource* Mesh::buffer() const
 {
-    return vertex_buffer_.get();
-}
-
-BufferResource* Mesh::index_buffer() const
-{
-    return index_buffer_.get();
+    return buffer_.get();
 }
 
 unsigned int Mesh::vertex_count() const

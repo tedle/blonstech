@@ -94,8 +94,7 @@ public:
 private:
     DrawMode draw_mode_;
 
-    std::unique_ptr<BufferResource> vertex_buffer_;
-    std::unique_ptr<BufferResource> index_buffer_;
+    std::unique_ptr<BufferResource> buffer_;
 
     // Total number of vertices/indices being used by memory
     unsigned int vertex_idx_, index_idx_;

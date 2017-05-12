@@ -71,7 +71,7 @@ bool SurfelView::Render(Framebuffer* target, const TextureResource* depth, const
     Matrix vp_matrix = view_matrix * proj_matrix;
 
     // Bind the quad mesh for instanced rendering
-    render::context()->BindMeshBuffer(quad_mesh_.vertex_buffer(), quad_mesh_.index_buffer());
+    render::context()->BindMeshBuffer(quad_mesh_.buffer());
     // Set the inputs
     if (!surfel_shader_->SetInput("world_matrix", world_matrix) ||
         !surfel_shader_->SetInput("vp_matrix", vp_matrix) ||

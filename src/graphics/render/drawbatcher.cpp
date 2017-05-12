@@ -31,12 +31,8 @@ namespace blons
 DrawBatcher::DrawBatcher(DrawMode draw_mode)
 {
     auto context = render::context();
-    vertex_buffer_.reset(context->MakeBufferResource());
-    index_buffer_.reset(context->MakeBufferResource());
+    buffer_.reset(context->RegisterMesh(nullptr, 0, nullptr, 0, draw_mode_));
     draw_mode_ = draw_mode;
-
-    context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, 0, nullptr, 0, draw_mode_);
-
     buffer_size_ = 0;
     vertex_count_ = 0;
     index_count_ = 0;
@@ -72,9 +68,7 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
         // Defined as a lambda since it's used from 2 competing branches
         auto resize_buffers = [&]()
         {
-            vertex_buffer_.reset(context->MakeBufferResource());
-            index_buffer_.reset(context->MakeBufferResource());
-            context->RegisterMesh(vertex_buffer_.get(), index_buffer_.get(), nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_);
+            buffer_.reset(context->RegisterMesh(nullptr, buffer_size_, nullptr, buffer_size_, draw_mode_));
         };
 
         // Make a backup copy of mesh data we've already pushed to render API
@@ -82,7 +76,7 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
         {
             Vertex* vptr = nullptr;
             unsigned int* iptr = nullptr;
-            context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vptr, &iptr);
+            context->MapMeshData(buffer_.get(), &vptr, &iptr);
             auto old_vertices = std::unique_ptr<Vertex>(new Vertex[vertex_idx_]);
             auto old_indices = std::unique_ptr<unsigned int>(new unsigned int[index_idx_]);
             memcpy(old_vertices.get(), vptr, vertex_idx_ * sizeof(Vertex));
@@ -92,7 +86,7 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
             resize_buffers();
 
             // Move our backup copy of mesh data into the new buffer
-            context->UpdateMeshData(vertex_buffer_.get(), index_buffer_.get(),
+            context->UpdateMeshData(buffer_.get(),
                                     old_vertices.get(), 0, vertex_idx_,
                                     old_indices.get(), 0, index_idx_);
         }
@@ -104,7 +98,7 @@ void DrawBatcher::Append(const MeshData& mesh_data, Matrix world_matrix)
     }
     Vertex* vertices;
     unsigned int* indices;
-    context->MapMeshData(vertex_buffer_.get(), index_buffer_.get(), &vertices, &indices);
+    context->MapMeshData(buffer_.get(), &vertices, &indices);
 
     // Append vertex data to the buffer
     memcpy(vertices + vertex_idx_, mesh_data.vertices.data(), sizeof(Vertex) * vert_size);
@@ -136,7 +130,7 @@ void DrawBatcher::Render(bool clear_buffers)
 {
     vertex_count_ = vertex_idx_;
     index_count_ = index_idx_;
-    render::context()->BindMeshBuffer(vertex_buffer_.get(), index_buffer_.get());
+    render::context()->BindMeshBuffer(buffer_.get());
 
     if (clear_buffers)
     {

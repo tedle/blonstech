@@ -170,7 +170,7 @@ void Manager::Render(Framebuffer* output_buffer)
         batch_shader_data_->set_value(draw_batches_.data(), 0, batch_index_);
 
         // Bind the quad mesh for instanced rendering
-        context->BindMeshBuffer(quad_mesh_->vertex_buffer(), quad_mesh_->index_buffer());
+        context->BindMeshBuffer(quad_mesh_->buffer());
 
         // Draw pass
         if (!ui_shader_->SetInput("proj_matrix", ortho_matrix_) ||

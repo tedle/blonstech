@@ -456,12 +456,11 @@ public:
     virtual ShaderDataResource* MakeShaderDataResource()=0;
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a pair of BufferResource%s and binds them to the graphics API
-    /// permitting their use for rendering calls. Sets up shader inputs using the
-    /// entirety of supplied vertex data
+    /// \brief Takes a list of vertices and indices, binding them to the graphics
+    /// API and permitting their use for rendering calls. Sets up shader inputs
+    /// using the entirety of supplied vertex data. Returns a BufferResource with
+    /// the bound data
     ///
-    /// \param vertex_buffer Buffer for vertices to bind to
-    /// \param index_buffer Buffer for indices to bind to
     /// \param vertices Vertices to be bound to buffer, may be nullptr if vert_count
     /// and index_count are 0
     /// \param vert_count Number of vertices to be bound to buffer, may be 0 for an
@@ -471,12 +470,11 @@ public:
     /// \param index_count Number of indices to be bound to buffer, may be 0 for an
     /// empty mesh
     /// \param draw_mode Describes how to form primitives from vertices
-    /// \return True on success
+    /// \return BufferResource containing mesh data, or nullptr on failure
     ////////////////////////////////////////////////////////////////////////////////
-    virtual bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                              Vertex* vertices, unsigned int vert_count,
-                              unsigned int* indices, unsigned int index_count,
-                              DrawMode draw_mode)=0;
+    virtual BufferResource* RegisterMesh(Vertex* vertices, unsigned int vert_count,
+                                         unsigned int* indices, unsigned int index_count,
+                                         DrawMode draw_mode)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Takes a FramebufferResource and binds it to the graphics API
     /// permitting its use for rendering calls. Expects an output to the supplied
@@ -614,35 +612,32 @@ public:
     virtual const TextureResource* FramebufferDepthTexture(FramebufferResource* frame_buffer)=0;
 
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a supplied vertex and index buffer resource and binds them
-    /// to the graphics API, prepping them for a draw call
+    /// \brief Takes a supplied BufferResource and binds it to the graphics API,
+    /// prepping it for a draw call
     ///
-    /// \param vertex_buffer Buffer pointing to renderable vertex data
-    /// \param index_buffer Buffer pointing to the indices of vertex data
+    /// \param buffer Buffer pointing to renderable data
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer)=0;
+    virtual void BindMeshBuffer(BufferResource* buffer)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Sets the mesh data of the supplied vertex and index buffer to match
-    /// that of the provided vertices and indices. Resizes the buffers if needed
+    /// \brief Sets the mesh data of the supplied BufferResource to match that of
+    /// the provided vertices and indices. Resizes the buffers if needed
     ///
-    /// \param vertex_buffer Buffer pointing to renderable vertex data
-    /// \param index_buffer Buffer pointing to the indices of vertex data
+    /// \param buffer Buffer pointing to renderable data
     /// \param vertices %Vertex data to be bound to the buffer
     /// \param vert_count Number of vertices to bind to the buffer
     /// \param indices Index data to be bound to the buffer
     /// \param index_count Number of indices to bind to the buffer
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+    virtual void SetMeshData(BufferResource* buffer,
                              const Vertex* vertices, unsigned int vert_count,
                              const unsigned int* indices, unsigned int index_count)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Updates a subset of the mesh data bound to the supplied vertex and
-    /// index buffer to match that of the provided vertices and indices. The offsets
-    /// point to the beginning of the region to modify and are counted in number of
+    /// \brief Updates a subset of the mesh data bound to the supplied buffer to
+    /// match that of the provided vertices and indices. The offsets point to the
+    /// beginning of the region to modify and are counted in number of
     /// vertices/indices. The end of the region is determined by offset + count
     ///
-    /// \param vertex_buffer Buffer pointing to renderable vertex data
-    /// \param index_buffer Buffer pointing to the indices of vertex data
+    /// \param buffer Buffer pointing to renderable data
     /// \param vertices %Vertex data to be bound to the buffer
     /// \param vert_offset Offset, in vertices, pointing to the beginning of the
     /// subregion to modify
@@ -652,24 +647,23 @@ public:
     /// the subregion to modify
     /// \param index_count Number of indices to update in the buffer
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+    virtual void UpdateMeshData(BufferResource* buffer,
                                 const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
                                 const unsigned int* indices, unsigned int index_offset, unsigned int index_count)=0;
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Takes a vertex and index buffer and returns, through the input
-    /// arguments, pointers to the mesh data stored internally in the rendering API
-    /// allowing for free modification of the data. **Note that the pointers
-    /// returned by this function are only valid until the next call to this
-    /// class.** I wanted to make this more explicit through API usage somehow, but
-    /// safe guards like std::weak_ptr%s and lambda callbacks gave too much of a
-    /// performance hit. Sorry!
+    /// \brief Takes a buffer and returns, through the input arguments, pointers to
+    /// the mesh data stored internally in the rendering API allowing for free
+    /// modification of the data. **Note that the pointers returned by this function
+    /// are only valid until the next call to this class.** I wanted to make this
+    /// more explicit through API usage somehow, but safe guards like
+    /// std::weak_ptr%s and lambda callbacks gave too much of a performance hit.
+    /// Sorry!
     ///
-    /// \param vertex_buffer Buffer pointing to vertex data to modify
-    /// \param index_buffer Buffer pointing to the indices to modify
+    /// \param buffer Buffer pointing to data to modify
     /// \param[out] vertex_data Pointer to the internally stored vertices
     /// \param[out] index_data Pointer to the internally stored indices
     ////////////////////////////////////////////////////////////////////////////////
-    virtual void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+    virtual void MapMeshData(BufferResource* buffer,
                              Vertex** vertex_data, unsigned int** index_data)=0;
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Sets the pixel data and formatting of the supplied texture resource.

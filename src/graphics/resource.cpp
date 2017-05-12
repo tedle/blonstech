@@ -39,8 +39,7 @@ namespace
 struct MeshCache
 {
     std::unique_ptr<MeshData> data;
-    std::shared_ptr<BufferResource> vertex;
-    std::shared_ptr<BufferResource> index;
+    std::shared_ptr<BufferResource> buffer;
     std::vector<Mesh::TextureInfo> texture_list;
 };
 struct TextureCache
@@ -90,28 +89,24 @@ MeshBuffer LoadMesh(const std::string& filename)
         }
     }
     // Have we made a resource for this context?
-    if (mesh.vertex == nullptr || mesh.index == nullptr)
+    if (mesh.buffer == nullptr)
     {
         auto context = render::context();
-        std::shared_ptr<BufferResource> vertex(context->MakeBufferResource());
-        std::shared_ptr<BufferResource> index(context->MakeBufferResource());
-        if (!context->RegisterMesh(vertex.get(), index.get(),
-                                   mesh.data->vertices.data(),
-                                   static_cast<unsigned int>(mesh.data->vertices.size()),
-                                   mesh.data->indices.data(),
-                                   static_cast<unsigned int>(mesh.data->indices.size()),
-                                   mesh.data->draw_mode))
+        std::shared_ptr<BufferResource> buffer(context->RegisterMesh(mesh.data->vertices.data(),
+                                                                     static_cast<unsigned int>(mesh.data->vertices.size()),
+                                                                     mesh.data->indices.data(),
+                                                                     static_cast<unsigned int>(mesh.data->indices.size()),
+                                                                     mesh.data->draw_mode));
+        if (buffer == nullptr)
         {
             return MeshBuffer();
         }
-        mesh.vertex = std::move(vertex);
-        mesh.index = std::move(index);
+        mesh.buffer = std::move(buffer);
     }
 
     // Write the output info
     MeshBuffer buffer;
-    buffer.vertex = mesh.vertex;
-    buffer.index = mesh.index;
+    buffer.buffer = mesh.buffer;
     buffer.vertex_count = static_cast<unsigned int>(mesh.data->vertices.size());
     buffer.index_count = static_cast<unsigned int>(mesh.data->indices.size());
     buffer.data = *mesh.data;
@@ -185,8 +180,7 @@ void ClearBufferCache()
 {
     for (auto& m : g_mesh_cache)
     {
-        m.second.vertex.reset();
-        m.second.index.reset();
+        m.second.buffer.reset();
     }
     for (auto& t : g_texture_cache)
     {

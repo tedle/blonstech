@@ -38,8 +38,7 @@ namespace resource
 {
 struct MeshBuffer
 {
-    std::shared_ptr<BufferResource> vertex;
-    std::shared_ptr<BufferResource> index;
+    std::shared_ptr<BufferResource> buffer;
     unsigned int vertex_count;
     unsigned int index_count;
     MeshData data;

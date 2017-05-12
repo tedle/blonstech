@@ -50,10 +50,9 @@ public:
     ShaderResource* MakeShaderResource() override;
     ShaderDataResource* MakeShaderDataResource() override;
 
-    bool RegisterMesh(BufferResource* vertex_buffer, BufferResource* index_buffer,
-                      Vertex* vertices, unsigned int vert_count,
-                      unsigned int* indices, unsigned int index_count,
-                      DrawMode draw_mode) override;
+    BufferResource* RegisterMesh(Vertex* vertices, unsigned int vert_count,
+                                 unsigned int* indices, unsigned int index_count,
+                                 DrawMode draw_mode) override;
     bool RegisterFramebuffer(FramebufferResource* frame_buffer,
                              units::pixel width, units::pixel height,
                              std::vector<TextureType> formats, bool store_depth) override;
@@ -74,14 +73,14 @@ public:
     void SetFramebufferDepthTexture(FramebufferResource* frame_buffer, const TextureResource* depth_texture, unsigned int mip_level) override;
     std::vector<const TextureResource*> FramebufferTextures(FramebufferResource* frame_buffer) override;
     const TextureResource* FramebufferDepthTexture(FramebufferResource* frame_buffer) override;
-    void BindMeshBuffer(BufferResource* vertex_buffer, BufferResource* index_buffer) override;
-    void SetMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+    void BindMeshBuffer(BufferResource* buffer) override;
+    void SetMeshData(BufferResource* buffer,
                      const Vertex* vertices, unsigned int vert_count,
                      const unsigned int* indices, unsigned int index_count);
-    void UpdateMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+    void UpdateMeshData(BufferResource* buffer,
                         const Vertex* vertices, unsigned int vert_offset, unsigned int vert_count,
                         const unsigned int* indices, unsigned int index_offset, unsigned int index_count) override;
-    void MapMeshData(BufferResource* vertex_buffer, BufferResource* index_buffer,
+    void MapMeshData(BufferResource* buffer,
                      Vertex** vertex_data, unsigned int** index_data) override;
     void SetTextureData(TextureResource* texture, PixelData* pixels, unsigned int mip_level) override;
     void SetTextureData(TextureResource* texture, PixelData3D* pixels, unsigned int mip_level) override;
