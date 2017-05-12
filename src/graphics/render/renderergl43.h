@@ -44,12 +44,6 @@ public:
     void BeginScene(Vector4 clear_colour) override;
     void EndScene() override;
 
-    BufferResource* MakeBufferResource() override;
-    FramebufferResource* MakeFramebufferResource() override;
-    TextureResource* MakeTextureResource() override;
-    ShaderResource* MakeShaderResource() override;
-    ShaderDataResource* MakeShaderDataResource() override;
-
     BufferResource* RegisterMesh(Vertex* vertices, unsigned int vert_count,
                                  unsigned int* indices, unsigned int index_count,
                                  DrawMode draw_mode) override;

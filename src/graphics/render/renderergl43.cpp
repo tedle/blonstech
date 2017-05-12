@@ -596,36 +596,11 @@ void RendererGL43::EndScene()
     SwapBuffers(device_context_);
 }
 
-BufferResource* RendererGL43::MakeBufferResource()
-{
-    return new BufferResourceGL43(id());
-}
-
-FramebufferResource* RendererGL43::MakeFramebufferResource()
-{
-    return new FramebufferResourceGL43(id());
-}
-
-TextureResource* RendererGL43::MakeTextureResource()
-{
-    return new TextureResourceGL43(id());
-}
-
-ShaderResource* RendererGL43::MakeShaderResource()
-{
-    return new ShaderResourceGL43(id());
-}
-
-ShaderDataResource* RendererGL43::MakeShaderDataResource()
-{
-    return new ShaderDataResourceGL43(id());
-}
-
 BufferResource* RendererGL43::RegisterMesh(Vertex* vertices, unsigned int vert_count,
                                            unsigned int* indices, unsigned int index_count,
                                            DrawMode draw_mode)
 {
-    BufferResourceGL43* buffer = resource_cast<BufferResourceGL43*>(MakeBufferResource(), id());
+    auto buffer = std::make_unique<BufferResourceGL43>(id());
 
     // Set the draw mode
     buffer->draw_mode_ = draw_mode;
@@ -671,7 +646,7 @@ BufferResource* RendererGL43::RegisterMesh(Vertex* vertices, unsigned int vert_c
     // nvogl32.dll loves it when i clean up my VAOs!
     glBindVertexArray(0);
 
-    return buffer;
+    return buffer.release();
 }
 
 FramebufferResource* RendererGL43::RegisterFramebuffer(units::pixel width, units::pixel height,
