@@ -188,6 +188,7 @@
     <ClInclude Include="..\include\blons\debug\consoleinternal.inl.h" />
     <ClInclude Include="..\include\blons\debug\consolevariable.h" />
     <ClInclude Include="..\include\blons\debug\log.h" />
+    <ClInclude Include="..\include\blons\debug\performance.h" />
     <ClInclude Include="..\include\blons\graphics.h" />
     <ClInclude Include="..\include\blons\graphics\camera.h" />
     <ClInclude Include="..\include\blons\graphics\framebuffer.h" />
@@ -262,6 +263,7 @@
     <ClCompile Include="debug\console.cpp" />
     <ClCompile Include="debug\consoleparser.cpp" />
     <ClCompile Include="debug\log.cpp" />
+    <ClCompile Include="debug\performance.cpp" />
     <ClCompile Include="graphics\camera.cpp" />
     <ClCompile Include="graphics\framebuffer.cpp" />
     <ClCompile Include="graphics\graphics.cpp" />

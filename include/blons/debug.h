@@ -27,10 +27,12 @@
 // Public Includes
 #include <blons/debug/console.h>
 #include <blons/debug/log.h>
+#include <blons/debug/performance.h>
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \defgroup debug Debug
-/// \brief Utilities including an extensible console and logger.
+/// \brief Utilities including an extensible console, logger, and CPU/GPU
+/// performance timer.
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_DEBUG_H_

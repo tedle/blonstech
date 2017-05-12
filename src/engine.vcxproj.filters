@@ -274,6 +274,9 @@
     <ClInclude Include="..\include\blons\graphics\pipeline\brdflookup.h">
       <Filter>src\graphics\pipeline</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\debug\performance.h">
+      <Filter>src\debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -461,6 +464,9 @@
     </ClCompile>
     <ClCompile Include="graphics\pipeline\brdflookup.cpp">
       <Filter>src\graphics\pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="debug\performance.cpp">
+      <Filter>src\debug</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
