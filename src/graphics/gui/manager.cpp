@@ -424,13 +424,17 @@ Window* Manager::active_window() const
 
 void Manager::set_active_window(Window* window)
 {
-    // Finds function param in window vector, then swaps its place with last element
+    // Finds function param in vector, then moves it to the end while
+    // preserving the order of other elements
     // Uses v.end()-1 bcus no point switchin last element with itself
     for (auto w = windows_.begin(); w < windows_.end() - 1; w++)
     {
         if (w->get() == window)
         {
-            std::iter_swap(w, windows_.end() - 1);
+            auto window_ptr = std::unique_ptr<Window>(w->release());
+            windows_.erase(w);
+            windows_.push_back(std::move(window_ptr));
+            return;
         }
     }
 }
