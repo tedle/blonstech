@@ -58,8 +58,11 @@ void Timer::start()
 
 void Timer::pause()
 {
+    if (!paused_)
+    {
+        microseconds_ += GetMicroseconds() - time_offset_;
+    }
     paused_ = true;
-    microseconds_ += GetMicroseconds() - time_offset_;
 }
 
 void Timer::stop()
