@@ -110,7 +110,7 @@ public:
     bool SetDepthTesting(bool enable) override;
     bool SetViewport(units::pixel x, units::pixel y, units::pixel width, units::pixel height) override;
 
-    void VideoCardInfo(char* buffer, int& len_buffer) override;
+    VideoCardInfo video_card_info() override;
 
     bool IsDepthBufferRangeZeroToOne() const override;
 
@@ -125,9 +125,6 @@ private:
     Client::Info screen_;
     void LogCompileErrors(GLuint resource, bool is_shader);
     void InitializeDebugOutput();
-    bool vsync_;
-    int video_card_memory_;
-    std::string video_card_desc_;
 
     // API specific
     HDC device_context_;

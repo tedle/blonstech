@@ -566,11 +566,11 @@ RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen
     InitializeDebugOutput();
 
     // Grab video card info
-    video_card_desc_ = (char*)glGetString(GL_VENDOR);
-    video_card_desc_ += " ";
-    video_card_desc_ += (char*)glGetString(GL_RENDERER);
+    video_card_info_.name = (char*)glGetString(GL_VENDOR);
+    video_card_info_.name += " ";
+    video_card_info_.name += (char*)glGetString(GL_RENDERER);
     // This isn't supported in OpenGL
-    video_card_memory_ = 0;
+    video_card_info_.memory = 0;
 
     // Enable depth testing, with a default of 1.0
     glClearDepth(1.0);
@@ -1715,11 +1715,9 @@ bool RendererGL43::SetViewport(units::pixel x, units::pixel y, units::pixel widt
     return true;
 }
 
-void RendererGL43::VideoCardInfo(char* name, int& memory)
+Renderer::VideoCardInfo RendererGL43::video_card_info()
 {
-    strcpy_s(name, 128, video_card_desc_.c_str());
-    memory = video_card_memory_;
-    return;
+    return video_card_info_;
 }
 
 bool RendererGL43::IsDepthBufferRangeZeroToOne() const
