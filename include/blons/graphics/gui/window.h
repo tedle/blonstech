@@ -28,6 +28,7 @@
 #include <blons/graphics/gui/control.h>
 #include <blons/graphics/gui/button.h>
 #include <blons/graphics/gui/debugslider.h>
+#include <blons/graphics/gui/image.h>
 #include <blons/graphics/gui/label.h>
 #include <blons/graphics/gui/textarea.h>
 #include <blons/graphics/gui/textbox.h>
@@ -105,6 +106,32 @@ public:
     /// gui::Window and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
     Button* MakeButton(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string label);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates a new blons::gui::Image inside the window
+    ///
+    /// \param x Where to place the image horizontally in pixels
+    /// \param y Where to place the image vertically in pixels
+    /// \param width How wide the image should be in pixels
+    /// \param height How tall the image should be in pixels
+    /// \param filename Filename on disk of the image to be loaded
+    /// \return Pointer to the created image. This memory is owned by the
+    /// gui::Window and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
+    Image* MakeImage(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string filename);
+
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \copybrief MakeImage(units::pixel,units::pixel,units::pixel,units::pixel,std::string)
+    ///
+    /// \param x Where to place the image horizontally in pixels
+    /// \param y Where to place the image vertically in pixels
+    /// \param width How wide the image should be in pixels
+    /// \param height How tall the image should be in pixels
+    /// \param pixel_data PixelData containing image
+    /// \return Pointer to the created image. This memory is owned by the
+    /// gui::Window and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
+    Image* MakeImage(units::pixel x, units::pixel y, units::pixel width, units::pixel height, const PixelData& pixel_data);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new blons::gui::DebugSlider inside the window

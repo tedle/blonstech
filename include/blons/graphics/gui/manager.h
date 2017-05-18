@@ -25,7 +25,7 @@
 #define BLONSTECH_GRAPHICS_GUI_MANAGER_H_
 
 // Includes
-#include <array>
+#include <set>
 // Public Includes
 #include <blons/math/animation.h>
 #include <blons/input/inputtemp.h>
@@ -190,6 +190,7 @@ private:
     friend Control;
     friend Button;
     friend DebugSliderButton;
+    friend Image;
     friend Label;
     friend Textarea;
     friend ConsoleTextarea;
@@ -198,11 +199,17 @@ private:
     friend DebugSliderTextbox;
     friend Window;
     friend ConsoleWindow;
+
     void Init(units::pixel width, units::pixel height);
 
     void SubmitBatch(const Box& pos, const Box& uv, const DrawCallInputs& inputs);
     void SubmitControlBatch(const Box& pos, const Box& uv, const Box& crop, const units::pixel& feather);
+    void SubmitImageBatch(const Box& pos, const Box& uv, const Box& crop, const units::pixel& feather, const Image::InternalHandle& image);
     void SubmitFontBatch(const Box& pos, const Box& uv, const Skin::FontStyle& style, const Vector4& colour, const Box& crop, const units::pixel& feather);
+
+    std::unique_ptr<Image::InternalHandle> RegisterInternalImage(const std::string& filename);
+    std::unique_ptr<Image::InternalHandle> RegisterInternalImage(const PixelData& pixel_data);
+    void FreeInternalImage(Image::InternalHandle* image);
 
     Skin* skin() const;
     Window* active_window() const;
@@ -220,22 +227,37 @@ private:
         units::pixel crop_feather;
         int texture_id;
     };
+
     // Batches are indexed by texture id and avoid costly lookups like with hash tables
+    static const int kReservedTextureSlots = 5;
     int TranslateToTextureID(const Skin::FontStyle& style, bool is_text);
     const TextureResource* TextureFromID(int texture_id);
-    // Vector + batch index stored to recycle as much memory as we can
-    // Stores draw batches, indexed by texture id
-    std::vector<InternalDrawCallInputs> draw_batches_;
-    // Stores number of draw batches for each texture id
-    std::size_t batch_index_ = 0;
-    // Stores batches on GPU for instanced rendering
-    std::unique_ptr<ShaderData<InternalDrawCallInputs>> batch_shader_data_;
+    struct
+    {
+        // Vector + batch index stored to recycle as much memory as we can
+        // Stores draw batches, indexed by texture id
+        std::vector<InternalDrawCallInputs> inputs;
+        // Stores the queue of images to be rendered
+        std::vector<Texture*> image_list;
+        // Stores number of draw batches
+        std::size_t index = 0;
+        // Stores the number of different images to be rendered
+        std::size_t image_index = 0;
+        // Stores batches on GPU for instanced rendering
+        std::unique_ptr<ShaderData<InternalDrawCallInputs>> shader_data;
+        // Since we have a limited nubmer of texture slots, we may need to split the
+        // draw calls into multiple batches. This stores how many instances there are per draw call
+        std::vector<unsigned int> split_markers;
+    } batches_;
+    // Stores textures used for image controls
+    std::set<Texture*> image_handles_;
     // The prim of the hour, gets instance rendered a billion times
     std::unique_ptr<Mesh> quad_mesh_;
 
     Box screen_dimensions_;
     Matrix ortho_matrix_;
     Matrix blur_ortho_matrix_;
+    int max_texture_slots_;
 
     std::unique_ptr<Shader> ui_shader_;
     std::unique_ptr<Framebuffer> ui_buffer_;

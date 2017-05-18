@@ -70,7 +70,7 @@ void Manager::Init(units::pixel width, units::pixel height)
     blur_buffer_a_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));
     blur_buffer_b_.reset(new Framebuffer(width / kBlurFactori, height / kBlurFactori, { { TextureType::R8G8B8A8, TextureType::LINEAR, TextureType::CLAMP } }, false));
 
-    batch_shader_data_ = nullptr;
+    batches_.shader_data = nullptr;
 
     skin_.reset(new Skin());
 
@@ -84,8 +84,20 @@ void Manager::Init(units::pixel width, units::pixel height)
     quad_mesh_.reset(new Mesh("blons:quad"));
 
     // Reset batches
-    draw_batches_.clear();
-    batch_index_ = 0;
+    batches_.inputs.clear();
+    batches_.image_list.clear();
+    batches_.index = 0;
+    batches_.image_index = 0;
+    batches_.split_markers.clear();
+
+    // Reload all stored Images
+    for (auto& tex : image_handles_)
+    {
+        tex->Reload();
+    }
+    // TODO: Add injectable shader #defines to clean up things like this
+    const int kMaxShaderTextures = 32; // This is the hard-coded size of the texture array in the shaders/ui.frag.glsl
+    max_texture_slots_ = std::min(render::context()->max_texture_slots(), kMaxShaderTextures);
 }
 
 Manager::~Manager()
@@ -157,24 +169,21 @@ void Manager::Render(Framebuffer* output_buffer)
     // Generate draw calls if not already done so
     BuildDrawCalls();
 
-    // Only bother drawing if there's things to draw
-    if (batch_index_ > 0)
+    // Draw pass
+    if (batches_.index > 0)
     {
+        // Initialize the pipeline state
         context->SetDepthTesting(false);
         // Resize shader data if necessary
-        if (batch_shader_data_ == nullptr || batch_shader_data_->length() < batch_index_)
+        if (batches_.shader_data == nullptr || batches_.shader_data->length() < batches_.index)
         {
-            batch_shader_data_.reset(new ShaderData<InternalDrawCallInputs>(nullptr, batch_index_));
+            batches_.shader_data.reset(new ShaderData<InternalDrawCallInputs>(nullptr, batches_.index));
         }
         // Upload to GPU
-        batch_shader_data_->set_value(draw_batches_.data(), 0, batch_index_);
-
-        // Bind the quad mesh for instanced rendering
-        context->BindMeshBuffer(quad_mesh_->buffer());
-
-        // Draw pass
+        batches_.shader_data->set_value(batches_.inputs.data(), 0, batches_.index);
+        // Constant uniforms
         if (!ui_shader_->SetInput("proj_matrix", ortho_matrix_) ||
-            !ui_shader_->SetInput("drawcall_buffer", batch_shader_data_->data()) ||
+            !ui_shader_->SetInput("drawcall_buffer", batches_.shader_data->data()) ||
             !ui_shader_->SetInput("skin[0]", TextureFromID(0), 0) ||
             !ui_shader_->SetInput("skin[1]", TextureFromID(1), 1) ||
             !ui_shader_->SetInput("skin[2]", TextureFromID(2), 2) ||
@@ -183,14 +192,53 @@ void Manager::Render(Framebuffer* output_buffer)
         {
             throw "Failed to set UI shader inputs";
         }
-        // Run the shader
-        if (!ui_shader_->RenderInstanced(quad_mesh_->index_count(), static_cast<unsigned int>(batch_index_)))
+
+        // Loop thru every batch instance and render it
+        int image_iterator = 0;
+        int completed_instances = 0;
+        for (const auto& marker : batches_.split_markers)
         {
-            throw "UI shader failed to render";
+            if (!ui_shader_->SetInput("batch_offset", completed_instances))
+            {
+                throw "Failed to set UI shader inputs";
+            }
+            // This works by building a complete list of images needed to render during the frame by
+            // making an insertion to batches_.image_list on each SubmitImageBatch() call. Split
+            // markers are inserted to batches_.split_markers each time the image list size hits a multiple
+            // of (max_texture_slots_ - kReservedTextureSlots), marking a point where a new rendering batch is
+            // needed. Now we iterate over the entire list, marking our place to continue where we left off
+            // after each batch is completed. Really ugly control flow, but it's efficient. Could do with some
+            // abstractions to make it safer to work with.
+            int texture_slots = max_texture_slots_ - kReservedTextureSlots;
+            while (image_iterator < batches_.image_index)
+            {
+                int tex_id = image_iterator % texture_slots;
+                tex_id += kReservedTextureSlots;
+                std::string uniform = "skin[" + std::to_string(tex_id) + "]";
+                if (!ui_shader_->SetInput(uniform.c_str(), batches_.image_list[image_iterator]->texture(), tex_id))
+                {
+                    throw "Failed to set UI shader inputs";
+                }
+                image_iterator++;
+                if (image_iterator % texture_slots == 0)
+                {
+                    break;
+                }
+            }
+            // Bind the quad mesh for instanced rendering
+            context->BindMeshBuffer(quad_mesh_->buffer());
+            // Run the shader
+            if (!ui_shader_->RenderInstanced(quad_mesh_->index_count(), marker - completed_instances))
+            {
+                throw "UI shader failed to render";
+            }
+            completed_instances = marker;
         }
     }
     // Reset batch marker to 0
-    batch_index_ = 0;
+    batches_.index = 0;
+    batches_.image_index = 0;
+    batches_.split_markers.clear();
 
     // Cannot apply UI styles when rendering to backbuffer
     if (output_buffer == nullptr)
@@ -246,7 +294,7 @@ void Manager::Render()
 void Manager::BuildDrawCalls()
 {
     // Draw calls have already been made
-    if (batch_index_ > 0)
+    if (batches_.index > 0)
     {
         return;
     }
@@ -267,6 +315,9 @@ void Manager::BuildDrawCalls()
     {
         console_window_->Render();
     }
+
+    // Make a split marker to denote the end of the batch range
+    batches_.split_markers.push_back(static_cast<unsigned int>(batches_.index));
 }
 
 void Manager::Reload(units::pixel screen_width, units::pixel screen_height)
@@ -344,22 +395,64 @@ void Manager::SubmitBatch(const Box& pos, const Box& uv, const DrawCallInputs& i
     gpu_inputs.uv.w /= texture_dimensions.x;
     gpu_inputs.uv.h /= texture_dimensions.y;
 
-    if (batch_index_ < draw_batches_.size())
+    if (batches_.index < batches_.inputs.size())
     {
-        draw_batches_[batch_index_] = gpu_inputs;
+        batches_.inputs[batches_.index] = gpu_inputs;
     }
     else
     {
-        draw_batches_.push_back(gpu_inputs);
+        batches_.inputs.push_back(gpu_inputs);
     }
 
-    batch_index_++;
+    batches_.index++;
 }
 
 void Manager::SubmitControlBatch(const Box& pos, const Box& uv, const Box& crop, const units::pixel& feather)
 {
     DrawCallInputs inputs = { false, Skin::FontStyle::DEFAULT, Vector4(), crop, feather };
     SubmitBatch(pos, uv, inputs);
+}
+
+void Manager::SubmitImageBatch(const Box& pos, const Box& uv, const Box& crop, const units::pixel& feather, const Image::InternalHandle& image)
+{
+    // Image specific batch bits
+    int tex_id = batches_.image_index % (max_texture_slots_ - kReservedTextureSlots);
+    tex_id += kReservedTextureSlots;
+    if (batches_.image_index < batches_.image_list.size())
+    {
+        batches_.image_list[batches_.image_index] = image.tex_.get();
+    }
+    else
+    {
+        batches_.image_list.push_back(image.tex_.get());
+    }
+    batches_.image_index++;
+
+    // GPU specific batch bits
+    InternalDrawCallInputs gpu_inputs;
+    gpu_inputs.is_text = false;
+    gpu_inputs.crop_feather = feather;
+    gpu_inputs.colour = Vector4();
+    gpu_inputs.pos = pos;
+    gpu_inputs.uv = uv;
+    gpu_inputs.crop = crop;
+    gpu_inputs.texture_id = tex_id;
+
+    if (batches_.index < batches_.inputs.size())
+    {
+        batches_.inputs[batches_.index] = gpu_inputs;
+    }
+    else
+    {
+        batches_.inputs.push_back(gpu_inputs);
+    }
+    batches_.index++;
+
+    // Insert a split marker if the next image will loop over the max texture slots
+    if ((tex_id + 1) % max_texture_slots_ == 0)
+    {
+        batches_.split_markers.push_back(static_cast<unsigned int>(batches_.index));
+    }
 }
 
 void Manager::SubmitFontBatch(const Box& pos, const Box& uv, const Skin::FontStyle& style, const Vector4& colour, const Box& crop, const units::pixel& feather)
@@ -406,6 +499,30 @@ const TextureResource* Manager::TextureFromID(int texture_id)
     default:
         throw "Unknown batch id in UI rendering";
     }
+}
+
+std::unique_ptr<Image::InternalHandle> Manager::RegisterInternalImage(const std::string& filename)
+{
+    TextureType::Options opts;
+    opts.compression = TextureType::RAW;
+    opts.filter = TextureType::LINEAR;
+    opts.wrap = TextureType::CLAMP;
+
+    auto tex = std::make_unique<Texture>(filename, opts);
+    image_handles_.insert(tex.get());
+    return std::make_unique<Image::InternalHandle>(std::move(tex), this);
+}
+
+std::unique_ptr<Image::InternalHandle> Manager::RegisterInternalImage(const PixelData& pixel_data)
+{
+    auto tex = std::make_unique<Texture>(pixel_data);
+    image_handles_.insert(tex.get());
+    return std::make_unique<Image::InternalHandle>(std::move(tex), this);
+}
+
+void Manager::FreeInternalImage(Image::InternalHandle* image)
+{
+    image_handles_.erase(image->tex_.get());
 }
 
 Skin* Manager::skin() const

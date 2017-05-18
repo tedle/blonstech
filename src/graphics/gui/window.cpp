@@ -267,6 +267,22 @@ Button* Window::MakeButton(units::pixel x, units::pixel y, units::pixel width, u
     return static_cast<Button*>(controls_.back().get());
 }
 
+Image* Window::MakeImage(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string filename)
+{
+    Box pos(x, y, width, height);
+    std::unique_ptr<Image> image(new Image(pos, filename, gui_, this));
+    controls_.push_back(std::move(image));
+    return static_cast<Image*>(controls_.back().get());
+}
+
+Image* Window::MakeImage(units::pixel x, units::pixel y, units::pixel width, units::pixel height, const PixelData& pixel_data)
+{
+    Box pos(x, y, width, height);
+    std::unique_ptr<Image> image(new Image(pos, pixel_data, gui_, this));
+    controls_.push_back(std::move(image));
+    return static_cast<Image*>(controls_.back().get());
+}
+
 DebugSlider* Window::MakeDebugSlider(units::pixel x, units::pixel y, units::pixel width, units::pixel height, float min, float max, float step)
 {
     Box pos(x, y, width, height);

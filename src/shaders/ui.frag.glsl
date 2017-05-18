@@ -35,7 +35,7 @@ layout(origin_upper_left) in vec4 gl_FragCoord;
 out vec4 frag_colour;
 
 // Globals
-uniform sampler2D skin[5];
+uniform sampler2D skin[32]; // The 32 is also hardcoded into gui/manager.cpp atm
 
 void main(void)
 {

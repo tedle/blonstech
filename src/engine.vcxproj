@@ -202,6 +202,7 @@
     <ClInclude Include="..\include\blons\graphics\gui\debugslider.h" />
     <ClInclude Include="..\include\blons\graphics\gui\font.h" />
     <ClInclude Include="..\include\blons\graphics\gui\gui.h" />
+    <ClInclude Include="..\include\blons\graphics\gui\image.h" />
     <ClInclude Include="..\include\blons\graphics\gui\label.h" />
     <ClInclude Include="..\include\blons\graphics\gui\manager.h" />
     <ClInclude Include="..\include\blons\graphics\gui\skin.h" />
@@ -277,6 +278,7 @@
     <ClCompile Include="graphics\gui\debugsliderbutton.cpp" />
     <ClCompile Include="graphics\gui\debugslidertextbox.cpp" />
     <ClCompile Include="graphics\gui\font.cpp" />
+    <ClCompile Include="graphics\gui\image.cpp" />
     <ClCompile Include="graphics\gui\label.cpp" />
     <ClCompile Include="graphics\gui\manager.cpp" />
     <ClCompile Include="graphics\gui\skin.cpp" />
