@@ -565,6 +565,8 @@ RendererGL43::RendererGL43(Client::Info screen_info, bool vsync, bool fullscreen
     // Initialize debug output
     InitializeDebugOutput();
 
+    // Get the maximum number of texture slots available
+    glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &max_texture_slots_);
     // Grab video card info
     video_card_info_.name = (char*)glGetString(GL_VENDOR);
     video_card_info_.name += " ";
@@ -1713,6 +1715,11 @@ bool RendererGL43::SetViewport(units::pixel x, units::pixel y, units::pixel widt
 {
     glViewport(x, y, width, height);
     return true;
+}
+
+int RendererGL43::max_texture_slots()
+{
+    return max_texture_slots_;
 }
 
 Renderer::VideoCardInfo RendererGL43::video_card_info()

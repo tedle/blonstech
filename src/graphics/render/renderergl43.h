@@ -110,6 +110,7 @@ public:
     bool SetDepthTesting(bool enable) override;
     bool SetViewport(units::pixel x, units::pixel y, units::pixel width, units::pixel height) override;
 
+    int max_texture_slots() override;
     VideoCardInfo video_card_info() override;
 
     bool IsDepthBufferRangeZeroToOne() const override;
