@@ -117,7 +117,6 @@ Client::Info Client::screen_info() const
 void Client::InitWindow(units::pixel* screen_width, units::pixel* screen_height)
 {
     WNDCLASSEX wc = {};
-    DEVMODE screen_settings;
     units::pixel pos_x, pos_y;
     units::pixel r_width, r_height;
     DWORD style = WS_CLIPSIBLINGS | WS_CLIPCHILDREN;
@@ -148,20 +147,20 @@ void Client::InitWindow(units::pixel* screen_width, units::pixel* screen_height)
     // TODO: Do it in Graphics later
     if (render::kMode == render::Mode::FULLSCREEN)
     {
-        r_width  = GetSystemMetrics(SM_CXSCREEN);
-        r_height = GetSystemMetrics(SM_CYSCREEN);
-
-        // Init screen settings
-        memset(&screen_settings, 0, sizeof(screen_settings));
-        screen_settings.dmSize       = sizeof(screen_settings);
-        screen_settings.dmPelsWidth  = static_cast<unsigned long>(*screen_width);
-        screen_settings.dmPelsHeight = static_cast<unsigned long>(*screen_height);
-        screen_settings.dmBitsPerPel = 32;
-        screen_settings.dmFields     = DM_BITSPERPEL | DM_PELSWIDTH | DM_PELSHEIGHT;
+        // Fill Device Mode with native screen settings
+        DEVMODE screen_settings;
+        EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &screen_settings);
 
         // Change screen settings
-        ChangeDisplaySettings(&screen_settings, CDS_FULLSCREEN);
+        auto result = ChangeDisplaySettings(&screen_settings, CDS_FULLSCREEN);
+        if (result != DISP_CHANGE_SUCCESSFUL)
+        {
+            throw "Failed to initialize fullscreen context";
+        }
+        style |= WS_POPUP;
 
+        r_width = screen_settings.dmPelsWidth;
+        r_height = screen_settings.dmPelsHeight;
         pos_x = pos_y = 0;
     }
     else if (render::kMode == render::Mode::WINDOW)
