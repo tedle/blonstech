@@ -142,6 +142,24 @@ public:
     Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type);
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Adds a user created overlay. Overlays are Window%s that render on top
+    /// of the rest of the UI, are invisible, take no input, and cover the entire
+    /// screen. Memory is owned by the gui::Manager class
+    ///
+    /// \param overlay Unique pointer to a overlay Window to be added
+    /// \return Raw pointer to the overlay just added
+    ////////////////////////////////////////////////////////////////////////////////
+    Window* AddOverlay(std::unique_ptr<Window> overlay);
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Creates a new overlay for containing Control%s to be rendered on the
+    /// top layer of the UI.
+    ///
+    /// \return Pointer to the created overlay. This memory is owned by the
+    /// gui::Manager and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
+    Window* MakeOverlay();
+
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the supplied framebuffer.
     /// Generally issue by Graphics class and not by user. If no framebuffer is
     /// supplied the backbuffer is used instead. Drop shadows and blurs can only
@@ -275,6 +293,7 @@ private:
 
     std::unique_ptr<Skin> skin_;
     std::vector<std::unique_ptr<Window>> windows_;
+    std::vector<std::unique_ptr<Window>> overlays_;
     std::unique_ptr<Window> main_window_;
     std::unique_ptr<Window> console_window_;
 };

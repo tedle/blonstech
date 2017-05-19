@@ -47,9 +47,9 @@ namespace
 Manager::Manager(units::pixel width, units::pixel height)
 {
     Init(width, height);
-    // TODO: Make the windows resize on reload
+    // TODO: Make the windows and overlays resize on reload
     main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
-    console_window_.reset(new ConsoleWindow("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
+    console_window_.reset(new ConsoleWindow("blons:console", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
 }
 
 void Manager::Init(units::pixel width, units::pixel height)
@@ -150,6 +150,18 @@ Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, unit
 Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type)
 {
     return MakeWindow(id, x, y, width, height, "", type);
+}
+
+Window* Manager::AddOverlay(std::unique_ptr<Window> overlay)
+{
+    overlays_.push_back(std::move(overlay));
+    return overlays_.back().get();
+}
+
+Window* Manager::MakeOverlay()
+{
+    Box win_pos(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h);
+    return AddOverlay(std::make_unique<Window>("", win_pos, Window::INVISIBLE, this));
 }
 
 void Manager::Render(Framebuffer* output_buffer)
@@ -312,6 +324,14 @@ void Manager::BuildDrawCalls()
             w->Render();
         }
     }
+    // Overlays render above the rest of the UI
+    for (const auto& w : overlays_)
+    {
+        if (!w->hidden())
+        {
+            w->Render();
+        }
+    }
     // Console window always renders on top
     if (!console_window_->hidden())
     {
@@ -351,6 +371,13 @@ bool Manager::Update(const Input& input)
     if (!console_window_->hidden() && console_window_->Update(input))
     {
         return true;
+    }
+    for (auto w = overlays_.rbegin(); w != overlays_.rend(); w++)
+    {
+        if (!w->get()->hidden() && w->get()->Update(input))
+        {
+            return true;
+        }
     }
     for (auto w = windows_.rbegin(); w != windows_.rend(); w++)
     {
