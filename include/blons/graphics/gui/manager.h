@@ -105,6 +105,13 @@ public:
     bool LoadFont(std::string filename, units::pixel pixel_size);
 
     ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Adds a user created Window. Memory is owned by the gui::Manager class
+    ///
+    /// \param window Unique pointer to a Window to be added
+    /// \return Raw pointer to the Window just added
+    ////////////////////////////////////////////////////////////////////////////////
+    Window* AddWindow(std::unique_ptr<Window> window);
+    ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new Window for containing Control%s.
     ///
     /// \param id Unique ID to refer to the window by. Used for retrieving the

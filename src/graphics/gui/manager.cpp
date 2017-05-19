@@ -114,30 +114,32 @@ bool Manager::LoadFont(std::string filename, units::pixel pixel_size)
     return LoadFont(filename, pixel_size, Skin::FontStyle::DEFAULT);
 }
 
-Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
+Window* Manager::AddWindow(std::unique_ptr<Window> window)
 {
-    Box win_pos(x, y, width, height);
-    Window* temp_win;
-    if (type == Window::DRAGGABLE)
-    {
-        temp_win = new Window(id, win_pos, caption, this);
-    }
-    else
-    {
-        temp_win = new Window(id, win_pos, type, this);
-    }
-    auto new_window = std::unique_ptr<Window>(temp_win);
-
     for (auto& w : windows_)
     {
-        if (w->id() == id)
+        if (w->id() == window->id())
         {
-            w = std::move(new_window);
+            w = std::move(window);
             return w.get();
         }
     }
-    windows_.push_back(std::move(new_window));
+    windows_.push_back(std::move(window));
     return windows_.back().get();
+}
+
+Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
+{
+    Box win_pos(x, y, width, height);
+    if (type == Window::DRAGGABLE)
+    {
+        return AddWindow(std::make_unique<Window>(id, win_pos, caption, this));
+    }
+    else
+    {
+        return AddWindow(std::make_unique<Window>(id, win_pos, type, this));
+    }
+    throw "Impossible statement reached";
 }
 
 Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
