@@ -60,7 +60,7 @@ Font::Glyph::Glyph(unsigned char letter, FT_Face font_face, units::pixel texture
         throw "Couldn't locate character";
     }
 
-    if (FT_Load_Glyph(font_face, glyph_index, FT_LOAD_DEFAULT) != 0)
+    if (FT_Load_Glyph(font_face, glyph_index, FT_LOAD_TARGET_NORMAL | FT_LOAD_FORCE_AUTOHINT) != 0)
     {
         throw "Couldn't load character";
     }
