@@ -40,7 +40,7 @@ void main(void)
     if (ui_frag.a > 0)
     {
         frag_colour.a = 1.0;
-        frag_colour.rgb = mix(blurred_composite_frag.rgb, ui_frag.rgb, ui_frag.a);
+        frag_colour.rgb = mix(blurred_composite_frag.rgb, ui_frag.rgb / ui_frag.a, ui_frag.a);
     }
     // Apply drop shadow. We should theoretically do this in both paths,
     // however this requires weakening the shadows effect to make it look nice
