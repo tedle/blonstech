@@ -25,6 +25,7 @@
 
 // Public Includes
 #include <blons/graphics/pipeline/pipeline.h>
+#include <blons/debug/performance.h>
 
 namespace blons
 {
@@ -107,47 +108,71 @@ bool Deferred::Render(const Scene& scene, Framebuffer* output_buffer)
     Matrix light_vp_matrix = sun->ViewFrustum(view_matrix * proj_matrix_, perspective_.screen_far);
 
     // Render all of the geometry and accompanying info (normal, depth, etc)
+    performance::PushMarker("Geometry buffer");
     if (!geometry_->Render(scene, view_matrix, proj_matrix_))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
     // Render all of the geometry and get their depth from the light's point of view
     // Then render a shadow map from the depth information
+    performance::PushMarker("Shadow maps");
     if (!shadow_->Render(scene, *geometry_, view_matrix, proj_matrix_, light_vp_matrix, ortho_matrix_))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
+    performance::PushMarker("Diffuse probe relight");
     if (!light_sector_->Relight(scene, *shadow_, light_vp_matrix))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
+    performance::PushMarker("Irradiance volume relight");
     if (!irradiance_volume_->Relight(*light_sector_))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
+    performance::PushMarker("Specular probe relight");
     if (!specular_local_->Relight(scene, *shadow_, *irradiance_volume_, light_vp_matrix))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
+    performance::PushMarker("Deferred lighting");
     if (!lighting_->Render(scene, *geometry_, *shadow_, *irradiance_volume_, *specular_local_, *brdf_lookup_, view_matrix, proj_matrix_, ortho_matrix_))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
+    performance::PushMarker("Debug output");
     if (!debug_output_->Render(geometry_->output(stage::Geometry::DEPTH), scene, *light_sector_, *irradiance_volume_, view_matrix, proj_matrix_))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
+    performance::PushMarker("Compositing");
     if (!composite_->Render(lighting_->output(stage::Lighting::LIGHT), debug_output_->output(stage::debug::DebugOutput::DEBUG), ortho_matrix_))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
     // Bind the output buffer
     if (output_buffer != nullptr)

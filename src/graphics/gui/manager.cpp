@@ -41,7 +41,7 @@ namespace
     // Saves cycles & strengthens blur
     static const float kBlurFactor = 3.0f;
     static const int kBlurFactori = static_cast<int>(kBlurFactor);
-    static const int kBlurIterations = 2;
+    static const int kBlurIterations = 3;
 }
 
 Manager::Manager(units::pixel width, units::pixel height)
@@ -79,6 +79,7 @@ void Manager::Init(units::pixel width, units::pixel height)
     LoadFont("font stuff/test-heading.ttf", 20, Skin::FontStyle::HEADING);
     LoadFont("font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL);
     LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE);
+    LoadFont("font stuff/test-console.ttf", 12, Skin::FontStyle::DEBUG);
 
     // For batch rendering
     quad_mesh_.reset(new Mesh("blons:quad"));
@@ -202,7 +203,8 @@ void Manager::Render(Framebuffer* output_buffer)
             !ui_shader_->SetInput("skin[1]", TextureFromID(1), 1) ||
             !ui_shader_->SetInput("skin[2]", TextureFromID(2), 2) ||
             !ui_shader_->SetInput("skin[3]", TextureFromID(3), 3) ||
-            !ui_shader_->SetInput("skin[4]", TextureFromID(4), 4))
+            !ui_shader_->SetInput("skin[4]", TextureFromID(4), 4) ||
+            !ui_shader_->SetInput("skin[5]", TextureFromID(5), 5))
         {
             throw "Failed to set UI shader inputs";
         }
@@ -506,6 +508,8 @@ int Manager::TranslateToTextureID(const Skin::FontStyle& style, bool is_text)
         return 3;
     case Skin::FontStyle::CONSOLE:
         return 4;
+    case Skin::FontStyle::DEBUG:
+        return 5;
     default:
         throw "Unknown font style in UI batch id";
     }
@@ -525,6 +529,8 @@ const TextureResource* Manager::TextureFromID(int texture_id)
         return skin_->font(Skin::FontStyle::LABEL)->texture();
     case 4:
         return skin_->font(Skin::FontStyle::CONSOLE)->texture();
+    case 5:
+        return skin_->font(Skin::FontStyle::DEBUG)->texture();
     default:
         throw "Unknown batch id in UI rendering";
     }

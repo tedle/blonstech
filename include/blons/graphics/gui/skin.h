@@ -51,12 +51,13 @@ public:
         DEFAULT = 0, ///< Used when style is unspecified or if a specific style is not loaded in the Skin
         HEADING = 1, ///< Used for title text and Window captions
         LABEL   = 2, ///< Used for general text, Button captions, Textbox text, etc
-        CONSOLE = 3  ///< Used by the game console
+        CONSOLE = 3, ///< Used by the game console
+        DEBUG   = 4  ///< Used by the debug overlay
     };
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Used to allow storage of fonts in contiguous memory
     ////////////////////////////////////////////////////////////////////////////////
-    static const int kMaxFonts = FontStyle::CONSOLE + 1;
+    static const int kMaxFonts = FontStyle::DEBUG + 1;
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Maps the GUI's skin texture pixel coordinates to conveniently named
@@ -340,6 +341,18 @@ public:
             Vector4 completion_colour = Vector4(0.9f, 0.9f, 1.0f, 0.6f); ///< Colour for tab completion hinting text
             Box cursor = Box(105, 55, 1, 1); ///< Texture coordinates for the text cursor region
         } console; ///< Layout for console controls
+
+        ////////////////////////////////////////////////////////////////////////////////
+        /// \brief Contains all the types of elements skinned specifically for the debug
+        /// overlay
+        ////////////////////////////////////////////////////////////////////////////////
+        struct DebugOverlay
+        {
+            Vector4 default_colour = Vector4(1.0f); ///< Default colour for overlaid text
+            Vector4 cpu_colour = Vector4(0.5f, 0.8f, 1.0f, 1.0f); ///< Colour for CPU timing text
+            Vector4 gpu_colour = Vector4(1.0f, 0.7f, 1.0f, 1.0f); ///< Colour for GPU timing text
+            Vector4 backdrop_colour = Vector4(0.0f, 0.0f, 0.0f, 0.5f); ///< Colour for backdrop behind text
+        } debug_overlay; ///< Layout for debug overlay
     };
 
 public:

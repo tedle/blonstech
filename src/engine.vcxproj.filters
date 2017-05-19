@@ -280,6 +280,9 @@
     <ClInclude Include="..\include\blons\graphics\gui\image.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\debugoverlay.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">
@@ -472,6 +475,9 @@
       <Filter>src\debug</Filter>
     </ClCompile>
     <ClCompile Include="graphics\gui\image.cpp">
+      <Filter>src\graphics\gui</Filter>
+    </ClCompile>
+    <ClCompile Include="graphics\gui\debugoverlay.cpp">
       <Filter>src\graphics\gui</Filter>
     </ClCompile>
   </ItemGroup>

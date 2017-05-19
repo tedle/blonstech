@@ -40,12 +40,14 @@
 #include <blons/graphics/render/drawbatcher.h>
 #include <blons/graphics/pipeline/deferred.h>
 #include <blons/system/client.h>
+#include <blons/debug/performance.h>
 
 namespace blons
 {
 // Forward declarations
 class Light;
 namespace gui { class Manager; }
+namespace gui { class DebugOverlay; }
 
 // TODO: Custom shader pipelines like
 //           graphics->SetPipeline(enum GFX_PIPELINE_2D_SPRITES, vector<string> shader_files, func shader_inputs_callback)
@@ -157,6 +159,7 @@ private:
     std::unique_ptr<Camera> camera_;
     std::unique_ptr<pipeline::Deferred> pipeline_;
     std::unique_ptr<gui::Manager> gui_;
+    gui::DebugOverlay* debug_overlay_; // memory owned by gui::Manager
     std::unique_ptr<Shader> sprite_shader_;
     std::unique_ptr<Framebuffer> output_buffer_;
     Matrix ortho_matrix_;
@@ -168,6 +171,10 @@ private:
 
     std::set<class ManagedModel*> models_;
     std::set<class ManagedSprite*> sprites_;
+
+    static const int kPerfTimerBuffer = 4;
+    std::array<performance::Frame, kPerfTimerBuffer> perf_timers_;
+    unsigned int perf_timers_index_;
 };
 } // namespace blons
 

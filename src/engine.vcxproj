@@ -199,6 +199,7 @@
     <ClInclude Include="..\include\blons\graphics\gui\consoletextbox.h" />
     <ClInclude Include="..\include\blons\graphics\gui\consolewindow.h" />
     <ClInclude Include="..\include\blons\graphics\gui\control.h" />
+    <ClInclude Include="..\include\blons\graphics\gui\debugoverlay.h" />
     <ClInclude Include="..\include\blons\graphics\gui\debugslider.h" />
     <ClInclude Include="..\include\blons\graphics\gui\font.h" />
     <ClInclude Include="..\include\blons\graphics\gui\gui.h" />
@@ -274,6 +275,7 @@
     <ClCompile Include="graphics\gui\consoletextbox.cpp" />
     <ClCompile Include="graphics\gui\consolewindow.cpp" />
     <ClCompile Include="graphics\gui\control.cpp" />
+    <ClCompile Include="graphics\gui\debugoverlay.cpp" />
     <ClCompile Include="graphics\gui\debugslider.cpp" />
     <ClCompile Include="graphics\gui\debugsliderbutton.cpp" />
     <ClCompile Include="graphics\gui\debugslidertextbox.cpp" />

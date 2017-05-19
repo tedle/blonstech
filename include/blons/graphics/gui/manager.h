@@ -34,6 +34,7 @@
 #include <blons/graphics/gui/font.h>
 #include <blons/graphics/gui/window.h>
 #include <blons/graphics/gui/consolewindow.h>
+#include <blons/graphics/gui/debugoverlay.h>
 
 namespace blons
 {
@@ -224,6 +225,7 @@ private:
     friend DebugSliderTextbox;
     friend Window;
     friend ConsoleWindow;
+    friend DebugOverlay;
 
     void Init(units::pixel width, units::pixel height);
 
@@ -254,7 +256,7 @@ private:
     };
 
     // Batches are indexed by texture id and avoid costly lookups like with hash tables
-    static const int kReservedTextureSlots = 5;
+    static const int kReservedTextureSlots = 6;
     int TranslateToTextureID(const Skin::FontStyle& style, bool is_text);
     const TextureResource* TextureFromID(int texture_id);
     struct

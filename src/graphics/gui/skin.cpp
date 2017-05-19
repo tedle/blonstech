@@ -37,10 +37,10 @@ Skin::Skin()
 
     font_list_.resize(kMaxFonts);
     // TODO: Ensure DEFAULT font is somehow not nullptr before being handed over to user
-    font_list_[DEFAULT] = nullptr;
-    font_list_[HEADING] = nullptr;
-    font_list_[LABEL] = nullptr;
-    font_list_[CONSOLE] = nullptr;
+    for (auto& f : font_list_)
+    {
+        f = nullptr;
+    }
 }
 
 bool Skin::LoadFont(std::string filename, units::pixel pixel_size, FontStyle style)

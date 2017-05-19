@@ -195,6 +195,9 @@ std::unique_ptr<Sprite> Graphics::MakeSprite(const PixelData& pixel_data)
 
 bool Graphics::Render()
 {
+    // Start performance profiling frame
+    perf_timers_[perf_timers_index_].Start();
+
     // Update graphics settings from cvars
     camera_->set_exposure(cvar_exposure->to<float>());
     sun_->set_luminance(cvar_sun_luminance->to<float>());
@@ -208,18 +211,28 @@ bool Graphics::Render()
     scene.sky_luminance = sky_luminance_;
     scene.view = *camera_;
 
+    // Update performance metrics
+    auto oldest_frame_index = (perf_timers_index_ + 1) % kPerfTimerBuffer;
+    const auto& root = perf_timers_[oldest_frame_index].root();
     // Buld up the UI's draw batches while we do all of the scene rendering
-    Job gui_batch_job([&](){ gui_->BuildDrawCalls(); });
+    Job gui_batch_job([&]()
+    {
+        debug_overlay_->UpdateMetrics(root);
+        gui_->BuildDrawCalls();
+    });
     gui_batch_job.Enqueue();
 
     // Clear buffers
     context->BeginScene(Vector4(0, 0, 0, 1));
 
     // Render the scene
+    performance::PushMarker("Deferred pipeline");
     if (!pipeline_->Render(scene, output_buffer_.get()))
     {
+        performance::PopMarker();
         return false;
     }
+    performance::PopMarker();
 
     output_buffer_->Bind(false);
 
@@ -230,8 +243,10 @@ bool Graphics::Render()
     }
 
     // Render the GUI
+    performance::PushMarker("User Interface");
     gui_batch_job.Wait();
     gui_->Render(output_buffer_.get());
+    performance::PopMarker();
 
     // Output the main FBO to the backbuffer
     context->BindFramebuffer(nullptr);
@@ -249,6 +264,10 @@ bool Graphics::Render()
         return false;
     }
 
+    // End performance profiling frame before buffer
+    // swap since that idles the CPU on GPU bound pipelines
+    perf_timers_[perf_timers_index_].End();
+    perf_timers_index_ = (perf_timers_index_ + 1) % kPerfTimerBuffer;
     // Swap buffers
     context->EndScene();
 
@@ -338,6 +357,8 @@ bool Graphics::Init(Client::Info screen)
     if (gui_ == nullptr)
     {
         gui_.reset(new gui::Manager(screen.width, screen.height));
+        debug_overlay_ = new gui::DebugOverlay("", Box(0, 0, screen.width, screen.height), gui::Window::INVISIBLE, gui_.get());
+        gui_->AddOverlay(std::unique_ptr<gui::DebugOverlay>(debug_overlay_));
     }
     else
     {
@@ -345,6 +366,13 @@ bool Graphics::Init(Client::Info screen)
     }
 
     output_buffer_.reset(new Framebuffer(screen.width, screen.height, 1, false));
+
+    for (auto& frame : perf_timers_)
+    {
+        frame.Start();
+        frame.End();
+    }
+    perf_timers_index_ = 0;
 
     return true;
 }
