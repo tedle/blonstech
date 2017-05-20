@@ -652,4 +652,47 @@ unsigned int FastHash(const char* str)
     }
     return hash;
 }
+
+float VanDerCorputSequence(unsigned int index)
+{
+    index = (index << 16) | (index >> 16);
+    index = ((index & 0x55555555) << 1) | ((index & 0xAAAAAAAA) >> 1);
+    index = ((index & 0x33333333) << 2) | ((index & 0xCCCCCCCC) >> 2);
+    index = ((index & 0x0F0F0F0F) << 4) | ((index & 0xF0F0F0F0) >> 4);
+    index = ((index & 0x00FF00FF) << 8) | ((index & 0xFF00FF00) >> 8);
+    // Inverse of 2^32, assuming 32-bit integer
+    return static_cast<float>(index) * 2.3283064365386962890625e-10f;
+}
+
+Vector3 HsvToRgb(const Vector3& hsv)
+{
+    float hue = hsv.r * 6.0f;
+    float sat = hsv.g;
+    float val = hsv.b;
+
+    int sector = std::min(static_cast<int>(hue), 5);
+    float frac = std::fmodf(hue, 1.0f);
+
+    float p = val * (1.0f - sat);
+    float q = val * (1.0f - sat * frac);
+    float t = val * (1.0f - sat * (1.0f - frac));
+
+    switch (sector)
+    {
+    case 0:
+        return Vector3(val, t, p);
+    case 1:
+        return Vector3(q, val, p);
+    case 2:
+        return Vector3(p, val, t);
+    case 3:
+        return Vector3(p, q, val);
+    case 4:
+        return Vector3(t, p, val);
+    case 5:
+        return Vector3(val, p, q);
+    default:
+        throw "Impossible case statement reached";
+    }
+}
 } // namespace blons
