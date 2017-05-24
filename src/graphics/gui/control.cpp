@@ -51,6 +51,11 @@ void Control::set_pos(units::subpixel x, units::subpixel y)
     pos_.y = y;
 }
 
+void Control::set_pos(Box pos)
+{
+    pos_ = pos;
+}
+
 Box Control::pos() const
 {
     return pos_;
