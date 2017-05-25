@@ -29,11 +29,16 @@ namespace gui
 {
 namespace
 {
+bool IsHexCode(const char& letter)
+{
+    return (letter >= 'a' && letter <= 'f') ||
+           (letter >= 'A' && letter <= 'F') ||
+           (letter >= '0' && letter <= '9');
+}
 // Simple parser to find '$fff' hex colour codes in strings
 // Returns std::string::npos when none are found
 std::size_t FindColourCode(const char* text)
 {
-    static const std::string kFormatChars = "abcdefABCDEF0123456789";
     std::size_t code_pos = std::string::npos;
     int format_matches = 0;
     for (std::size_t i = 0; text[i] != '\0'; i++)
@@ -43,7 +48,7 @@ std::size_t FindColourCode(const char* text)
             code_pos = i;
             format_matches = 1;
         }
-        else if (kFormatChars.find(text[i]) != std::string::npos && format_matches >= 1)
+        else if (IsHexCode(text[i]) && format_matches >= 1)
         {
             format_matches++;
         }
