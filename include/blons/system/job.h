@@ -25,9 +25,8 @@
 #define BLONSTECH_SYSTEM_JOB_H_
 
 // Includes
-#include <condition_variable>
+#include <atomic>
 #include <functional>
-#include <mutex>
 
 namespace blons
 {
@@ -74,10 +73,7 @@ private:
     void Run();
 
     Function func_;
-    int async_queued_;
-    int running_;
-    std::mutex mutex_;
-    std::condition_variable condition_variable_;
+    std::atomic<int> running_;
 };
 } // namespace blons
 

@@ -25,8 +25,10 @@
 
 // Includes
 #include <array>
-#include <atomic>
+#include <condition_variable>
+#include <mutex>
 #include <queue>
+#include <thread>
 // Public Includes
 #include <blons/debug/log.h>
 #include <blons/system/timer.h>
@@ -70,6 +72,19 @@ public:
         return job;
     }
 
+    // pop immediately returns a Job or nullptr if none are available
+    Job* pop()
+    {
+        std::unique_lock<std::mutex> lock(mutex_);
+        if (jobs_.empty())
+        {
+            return nullptr;
+        }
+        auto job = jobs_.front();
+        jobs_.pop();
+        return job;
+    }
+
 private:
     std::queue<Job*> jobs_;
     std::mutex mutex_;
@@ -96,7 +111,7 @@ public:
                 while (run_.load())
                 {
                     // Use a timeout so we can query run_ every once in a while
-                    auto job = g_JobQueue.pop(300);
+                    auto job = g_JobQueue.pop(100);
                     if (job != nullptr)
                     {
                         job->Run();
@@ -125,8 +140,7 @@ static ThreadPool g_ThreadPool;
 Job::Job(Function func)
 {
     func_ = func;
-    async_queued_ = 0;
-    running_ = 0;
+    running_.store(0);
 }
 
 Job::~Job()
@@ -136,35 +150,25 @@ Job::~Job()
 
 void Job::Enqueue()
 {
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        async_queued_++;
-    }
+    running_++;
     internal::g_JobQueue.push(this);
 }
 
 void Job::Wait()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    while(async_queued_ || running_)
+    while(running_.load() > 0)
     {
-        condition_variable_.wait(lock);
+        auto job = internal::g_JobQueue.pop();
+        if (job != nullptr)
+        {
+            job->Run();
+        }
     }
 }
 
 void Job::Run()
 {
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        async_queued_ = std::max(async_queued_ - 1, 0);
-        running_++;
-    }
     func_();
-    {
-        std::unique_lock<std::mutex> lock(mutex_);
-        running_--;
-        lock.unlock();
-        condition_variable_.notify_one();
-    }
+    running_--;
 }
 } // namespace blons
