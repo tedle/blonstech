@@ -174,6 +174,7 @@ private:
 
     static const int kPerfTimerBuffer = 4;
     std::array<performance::Frame, kPerfTimerBuffer> perf_timers_;
+    Timer frame_timer_;
     unsigned int perf_timers_index_;
 };
 } // namespace blons

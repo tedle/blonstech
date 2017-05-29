@@ -83,8 +83,9 @@ public:
     /// \brief Updates displayed performance timings, can be run asynchronously
     ///
     /// \param root_marker Detailed frame timing information
+    /// \param frame_time Total frame time in microseconds
     ////////////////////////////////////////////////////////////////////////////////
-    void UpdateMetrics(const performance::Marker& root_marker);
+    void UpdateMetrics(const performance::Marker& root_marker, units::time::us frame_time);
 
 private:
     struct PerfTime
@@ -106,12 +107,18 @@ private:
     };
 
     void UpdateMaxPerfTimes(const performance::Marker& root_marker);
+    void UpdateFpsText(units::time::us frame_time);
+    void UpdatePerfText(const performance::Marker& root_marker);
+
+    static constexpr int kAverageFrames = 50; // number of frames to average performance values over
+    static constexpr double kFrameWeight = 1.0 / kAverageFrames;
+
+    LabeledBackdrop fps_ui_;
+    double total_frame_time_;
 
     LabeledBackdrop perf_ui_;
     std::unordered_map<std::string, PerfTime> average_perf_times_;
     MaxPerfTime max_perf_times_;
-    static constexpr int kAverageFrames = 50; // number of frames to average performance values over
-    static constexpr double kFrameWeight = 1.0 / kAverageFrames;
 };
 } // namepsace GUI
 } // namespace blons

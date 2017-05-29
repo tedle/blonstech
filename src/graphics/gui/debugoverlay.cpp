@@ -36,6 +36,7 @@ namespace gui
 {
 namespace
 {
+const Skin::FontStyle kFpsFont = Skin::FontStyle::DEBUG;
 const Skin::FontStyle kPerfBreakdownFont = Skin::FontStyle::DEBUG;
 
 Vector3 LowDiscrepancyColour(int index)
@@ -67,24 +68,92 @@ std::unique_ptr<Image> BuildColourImage(Vector4 colour, Manager* gui, Window* wi
 DebugOverlay::DebugOverlay(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager)
     : Window(id, pos, caption, type, parent_manager)
 {
+    total_frame_time_ = 0;
+
     auto layout = gui_->skin()->layout();
+    fps_ui_.label.reset(new Label(Vector2(), ColourString("", layout->debug_overlay.default_colour), kFpsFont, parent_manager, this));
+    fps_ui_.backdrop = BuildColourImage(layout->debug_overlay.backdrop_colour, gui_, this);
     perf_ui_.label.reset(new Label(Vector2(), ColourString("", layout->debug_overlay.default_colour), kPerfBreakdownFont, parent_manager, this));
     perf_ui_.backdrop = BuildColourImage(layout->debug_overlay.backdrop_colour, gui_, this);
+
     hidden_ = false;
 }
 
 void DebugOverlay::Render()
 {
+    fps_ui_.backdrop->Render();
+    fps_ui_.label->Render();
     perf_ui_.backdrop->Render();
     perf_ui_.label->Render();
     Window::Render();
 }
 
-void DebugOverlay::UpdateMetrics(const performance::Marker& root_marker)
+void DebugOverlay::UpdateMetrics(const performance::Marker& root_marker, units::time::us frame_time)
 {
     // For max() frame times of the previous kAverageFrames
     UpdateMaxPerfTimes(root_marker);
+    // FPS overlay
+    UpdateFpsText(frame_time);
+    // Sub-frame performance overlay text
+    UpdatePerfText(root_marker);
+}
 
+bool DebugOverlay::Update(const Input& input)
+{
+    return false;
+}
+
+void DebugOverlay::UpdateMaxPerfTimes(const performance::Marker& root_marker)
+{
+    if (max_perf_times_.cpu_frame_age >= kAverageFrames)
+    {
+        max_perf_times_.cpu_frame_age = 0;
+        max_perf_times_.cpu_time = 0;
+    }
+    if (root_marker.cpu_duration > max_perf_times_.cpu_time)
+    {
+        max_perf_times_.cpu_time = static_cast<double>(root_marker.cpu_duration);
+        max_perf_times_.cpu_frame_age = 0;
+    }
+    else
+    {
+        max_perf_times_.cpu_frame_age++;
+    }
+    if (max_perf_times_.gpu_frame_age >= kAverageFrames)
+    {
+        max_perf_times_.gpu_frame_age = 0;
+        max_perf_times_.gpu_time = 0;
+    }
+    if (root_marker.gpu_duration > max_perf_times_.gpu_time)
+    {
+        max_perf_times_.gpu_time = static_cast<double>(root_marker.gpu_duration);
+        max_perf_times_.gpu_frame_age = 0;
+    }
+    else
+    {
+        max_perf_times_.gpu_frame_age++;
+    }
+}
+
+void DebugOverlay::UpdateFpsText(units::time::us frame_time)
+{
+    total_frame_time_ = total_frame_time_ * (1.0 - kFrameWeight) + frame_time * kFrameWeight;
+
+    const auto& layout = gui_->skin()->layout();
+    const auto& font = gui_->skin()->font(kFpsFont);
+    const std::string kBaseColourCode = ColourString::MakeColourCode(layout->debug_overlay.default_colour);
+
+    // microseconds to seconds
+    int fps = static_cast<int>(1000.0 * 1000.0 / total_frame_time_);
+    units::pixel label_width = font->string_width(fps_ui_.label->text().str(), false);
+    units::pixel label_height = font->letter_height();
+    fps_ui_.label->set_text(kBaseColourCode + std::to_string(fps));
+    fps_ui_.label->set_pos(0.0, units::pixel_to_subpixel(label_height));
+    fps_ui_.backdrop->set_pos(Box(0, 0, label_width, label_height));
+}
+
+void DebugOverlay::UpdatePerfText(const performance::Marker& root_marker)
+{
     // Precalculate some constants for small efficiency gain
     const auto& layout = gui_->skin()->layout();
     const std::string kBaseColourCode = ColourString::MakeColourCode(layout->debug_overlay.default_colour);
@@ -163,43 +232,6 @@ void DebugOverlay::UpdateMetrics(const performance::Marker& root_marker)
                                    backdrop_height));
     perf_ui_.label->set_pos(units::pixel_to_subpixel(kBackdropPadding),
                             dims.h - units::pixel_to_subpixel(backdrop_height) + kBackdropPadding + letter_height);
-}
-
-bool DebugOverlay::Update(const Input& input)
-{
-    return false;
-}
-
-void DebugOverlay::UpdateMaxPerfTimes(const performance::Marker& root_marker)
-{
-    if (max_perf_times_.cpu_frame_age >= kAverageFrames)
-    {
-        max_perf_times_.cpu_frame_age = 0;
-        max_perf_times_.cpu_time = 0;
-    }
-    if (root_marker.cpu_duration > max_perf_times_.cpu_time)
-    {
-        max_perf_times_.cpu_time = static_cast<double>(root_marker.cpu_duration);
-        max_perf_times_.cpu_frame_age = 0;
-    }
-    else
-    {
-        max_perf_times_.cpu_frame_age++;
-    }
-    if (max_perf_times_.gpu_frame_age >= kAverageFrames)
-    {
-        max_perf_times_.gpu_frame_age = 0;
-        max_perf_times_.gpu_time = 0;
-    }
-    if (root_marker.gpu_duration > max_perf_times_.gpu_time)
-    {
-        max_perf_times_.gpu_time = static_cast<double>(root_marker.gpu_duration);
-        max_perf_times_.gpu_frame_age = 0;
-    }
-    else
-    {
-        max_perf_times_.gpu_frame_age++;
-    }
 }
 } // namespace gui
 } // namespace blons

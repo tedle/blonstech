@@ -197,6 +197,8 @@ bool Graphics::Render()
 {
     // Start performance profiling frame
     perf_timers_[perf_timers_index_].Start();
+    units::time::us frame_time = frame_timer_.us();
+    frame_timer_.start();
 
     // Update graphics settings from cvars
     camera_->set_exposure(cvar_exposure->to<float>());
@@ -215,9 +217,9 @@ bool Graphics::Render()
     auto oldest_frame_index = (perf_timers_index_ + 1) % kPerfTimerBuffer;
     const auto& root = perf_timers_[oldest_frame_index].root();
     // Buld up the UI's draw batches while we do all of the scene rendering
-    Job gui_batch_job([&]()
+    Job gui_batch_job([&,frame_time]()
     {
-        debug_overlay_->UpdateMetrics(root);
+        debug_overlay_->UpdateMetrics(root, frame_time);
         gui_->BuildDrawCalls();
     });
     gui_batch_job.Enqueue();
