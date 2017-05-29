@@ -69,7 +69,6 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     while (!quit)
     {
         quit = client->Frame();
-        blons::temp::FPS();
         bool gui_used_input = gui->Update(*client->input());
         // Handles mouselook and wasd movement
         if (!gui_used_input)

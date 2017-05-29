@@ -41,8 +41,6 @@ namespace blons
 {
 namespace temp
 {
-Vector3 cur_pos(0.0, 0.0, 0.0);
-
 void noclip(Input* input, Camera* camera)
 {
     // Always handle mouse look before wasd movement!
@@ -121,7 +119,6 @@ void noclip(Input* input, Camera* camera)
         }
 
         camera->set_pos(pos.x + new_x, pos.y + new_y, pos.z + new_z);
-        cur_pos = camera->pos();
     }
 }
 
@@ -146,30 +143,6 @@ void move_camera_around_origin(float delta, Camera* camera)
         camera->LookAt(0.0f, 2.0f, 0.0f);
     }
 }
-
-void FPS()
-{
-    static DWORD64 last_frame = 0;
-    static DWORD64 max_frame = 0;
-    static int fps_count = 0;
-    static Timer st;
-
-    max_frame = max(max_frame, st.ms() - last_frame);
-
-    if (st.ms() > 1000 && max_frame > 0)
-    {
-        log::Debug("FPS: %i(min:%llu), (x=%.2f,y=%.2f,z=%.2f)\n", fps_count, 1000 / max_frame, cur_pos.x, cur_pos.y, cur_pos.z);
-        max_frame = 0;
-        fps_count = 0;
-        st.rewind(1000);
-    }
-    else
-    {
-        fps_count++;
-    }
-    last_frame = st.ms();
-}
-
 
 std::vector<std::unique_ptr<Model>> load_codmap(std::string folder, std::vector<std::unique_ptr<Model>> models, Graphics* graphics)
 {
@@ -205,17 +178,6 @@ std::vector<std::unique_ptr<Model>> load_codmap(std::string folder, std::vector<
         }
         models.back()->set_pos(0.0, 0.0, 0.0);
     }
-    /*models.push_back(std::unique_ptr<Model>(new Model(L"codmap.mesh", L"me.dds")));
-    if (models[1] == nullptr)
-    {
-        throw "model problem";
-    }
-
-    if (!models[1]->Init(L"codmap.mesh", L"me.dds"))
-    {
-        throw "other model problem";
-    }
-    models[1]->set_pos(0.0, 0.0, 0.0);*/
     log::Debug("Loaded map [%ims]\n", timer.ms());
     return models;
 }
