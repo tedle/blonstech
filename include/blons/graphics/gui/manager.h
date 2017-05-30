@@ -270,7 +270,6 @@ private:
     std::unique_ptr<Skin> skin_;
     std::vector<std::unique_ptr<Window>> windows_;
     std::vector<std::unique_ptr<Overlay>> overlays_;
-    std::unique_ptr<Window> main_window_;
     std::unique_ptr<Window> console_window_;
 };
 } // namespace gui

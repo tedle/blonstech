@@ -48,7 +48,6 @@ Manager::Manager(units::pixel width, units::pixel height)
 {
     Init(width, height);
     // TODO: Make the windows and overlays resize on reload
-    main_window_.reset(new Window(Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), "", Window::INVISIBLE, this));
     console_window_.reset(new ConsoleWindow(Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
 }
 
@@ -265,9 +264,6 @@ void Manager::BuildDrawCalls()
         return;
     }
 
-    // TODO: Remove concept of a main window. That's dumb!
-    // Main window always renders at the bottom
-    main_window_->Render();
     // User made windows
     for (const auto& w : windows_)
     {
@@ -509,7 +505,7 @@ Window* Manager::active_window() const
     {
         return windows_.back().get();
     }
-    return main_window_.get();
+    return nullptr;
 }
 
 void Manager::set_active_window(Window* window)
