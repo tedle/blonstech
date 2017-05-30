@@ -106,10 +106,10 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     bool LoadFont(std::string filename, units::pixel pixel_size);
 
-    /// \NEEDS_TEMPLATE_PARAM_DOCS
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new Window for containing Control%s.
     ///
+    /// \tparam T Window class, or subclass, to use. Defaults to gui::Window
     /// \param x Where to place the window horizontally in pixels
     /// \param y Where to place the window vertically in pixels
     /// \param width How wide the window should be in pixels
@@ -132,6 +132,7 @@ public:
     /// \brief Creates a new Overlay for containing Control%s to be rendered on the
     /// top layer of the UI.
     ///
+    /// \tparam T Overlay class, or subclass, to use. Defaults to gui::Overlay
     /// \return Pointer to the created overlay. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////

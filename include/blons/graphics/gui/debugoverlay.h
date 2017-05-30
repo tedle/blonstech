@@ -39,14 +39,12 @@ namespace gui
 ////////////////////////////////////////////////////////////////////////////////
 /// \brief Screen overlay that provides debug information. Currently includes
 /// detailed frame timing and a framerate counter
-///
-/// \copydoc gui::Overlay
 ////////////////////////////////////////////////////////////////////////////////
 class DebugOverlay : public Overlay
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc Window(Box, Manager*)
+    /// \copydoc Overlay(Manager*)
     ////////////////////////////////////////////////////////////////////////////////
     DebugOverlay(Manager* parent_manager);
     ~DebugOverlay() {}
@@ -109,10 +107,36 @@ private:
 } // namepsace GUI
 } // namespace blons
 
-/// \NEEDS_CODE_SAMPLE
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::gui::DebugOverlay
 /// \ingroup gui
+///
+/// ### Example:
+/// \code
+/// blons::performance::Frame frame;
+/// auto debug_overlay = gui->MakeOverlay<blons::gui::DebugOverlay>();
+/// while (true)
+/// {
+///     // Start performance profiling frame
+///     frame.Start();
+///
+///     // Render the scene
+///     blons::performance::PushMarker("Scene Rendering");
+///     // RenderScene() ...
+///     blons::performance::PopMarker();
+///
+///     // Render the GUI
+///     blons::performance::PushMarker("User Interface");
+///     gui->Render();
+///     blons::performance::PopMarker();
+///
+///     // End performance profiling frame
+///     frame.End();
+///
+///     // Update the debug overlay metrics
+///     debug_overlay->UpdateMetrics(frame.root(), frame.root().cpu_duration);
+/// }
+/// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
 #endif // BLONSTECH_GRAPHICS_GUI_DEBUGOVERLAY_H_

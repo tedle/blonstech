@@ -50,9 +50,8 @@ public:
 } // namepsace GUI
 } // namespace blons
 
-/// \FIX_THIS_UP
 ////////////////////////////////////////////////////////////////////////////////
-/// \class blons::gui::Window
+/// \class blons::gui::Overlay
 /// \ingroup gui
 ///
 /// ### Example:
@@ -60,11 +59,11 @@ public:
 /// // Retrieving the gui::Manager
 /// auto gui = graphics->gui();
 ///
-/// // Creating a Window
-/// auto window = gui->MakeWindow(0, 0, 200, 200, "Window title", blons::gui::Window::Type::DRAGGABLE);
+/// // Creating a Overlay
+/// auto overlay = gui->MakeOverlay();
 ///
-/// // Adding a button to the window
-/// window->MakeButton(10, 150, 120, 40, "Hey!");
+/// // Adding a button to the overlay
+/// overlay->MakeButton(10, 150, 120, 40, "Hey!");
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////
 
