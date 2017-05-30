@@ -45,23 +45,23 @@ class ConsoleWindow : public Window
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc Window(std::string, Box, std::string, Window::Type, Manager*)
+    /// \copydoc Window(Box, std::string, Window::Type, Manager*)
     ////////////////////////////////////////////////////////////////////////////////
-    ConsoleWindow(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager);
+    ConsoleWindow(Box pos, std::string caption, Type type, Manager* parent_manager);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
-    /// ConsoleWindow(std::string, Box, std::string, Window::Type, Manager*)
+    /// ConsoleWindow(Box, std::string, Window::Type, Manager*)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
-    ConsoleWindow(std::string id, Box pos, Type type, Manager* parent_manager)
-        : ConsoleWindow(id, pos, "", type, parent_manager) {}
+    ConsoleWindow(Box pos, Type type, Manager* parent_manager)
+        : ConsoleWindow(pos, "", type, parent_manager) {}
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
-    /// ConsoleWindow(std::string, Box, std::string, Window::Type, Manager*)
+    /// ConsoleWindow(Box, std::string, Window::Type, Manager*)
     /// with a style of Window::Type::INVISIBLE
     ////////////////////////////////////////////////////////////////////////////////
-    ConsoleWindow(std::string id, Box pos, std::string caption, Manager* parent_manager)
-        : ConsoleWindow(id, pos, caption, Type::INVISIBLE, parent_manager) {}
+    ConsoleWindow(Box pos, std::string caption, Manager* parent_manager)
+        : ConsoleWindow(pos, caption, Type::INVISIBLE, parent_manager) {}
     ~ConsoleWindow() {}
 
     ////////////////////////////////////////////////////////////////////////////////

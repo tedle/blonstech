@@ -48,8 +48,8 @@ Manager::Manager(units::pixel width, units::pixel height)
 {
     Init(width, height);
     // TODO: Make the windows and overlays resize on reload
-    main_window_.reset(new Window("main", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
-    console_window_.reset(new ConsoleWindow("blons:console", Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
+    main_window_.reset(new Window(Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
+    console_window_.reset(new ConsoleWindow(Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
 }
 
 void Manager::Init(units::pixel width, units::pixel height)
@@ -119,7 +119,7 @@ Window* Manager::AddWindow(std::unique_ptr<Window> window)
 {
     for (auto& w : windows_)
     {
-        if (w->id() == window->id())
+        if (w == window)
         {
             w = std::move(window);
             return w.get();
@@ -129,28 +129,28 @@ Window* Manager::AddWindow(std::unique_ptr<Window> window)
     return windows_.back().get();
 }
 
-Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
+Window* Manager::MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
 {
     Box win_pos(x, y, width, height);
     if (type == Window::DRAGGABLE)
     {
-        return AddWindow(std::make_unique<Window>(id, win_pos, caption, this));
+        return AddWindow(std::make_unique<Window>(win_pos, caption, this));
     }
     else
     {
-        return AddWindow(std::make_unique<Window>(id, win_pos, type, this));
+        return AddWindow(std::make_unique<Window>(win_pos, type, this));
     }
     throw "Impossible statement reached";
 }
 
-Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
+Window* Manager::MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
 {
-    return MakeWindow(id, x, y, width, height, caption, Window::DRAGGABLE);
+    return MakeWindow(x, y, width, height, caption, Window::DRAGGABLE);
 }
 
-Window* Manager::MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type)
+Window* Manager::MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type)
 {
-    return MakeWindow(id, x, y, width, height, "", type);
+    return MakeWindow(x, y, width, height, "", type);
 }
 
 Window* Manager::AddOverlay(std::unique_ptr<Window> overlay)
@@ -162,7 +162,7 @@ Window* Manager::AddOverlay(std::unique_ptr<Window> overlay)
 Window* Manager::MakeOverlay()
 {
     Box win_pos(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h);
-    return AddOverlay(std::make_unique<Window>("", win_pos, Window::INVISIBLE, this));
+    return AddOverlay(std::make_unique<Window>(win_pos, Window::INVISIBLE, this));
 }
 
 void Manager::Render(Framebuffer* output_buffer)
@@ -389,18 +389,6 @@ bool Manager::Update(const Input& input)
         }
     }
     return false;
-}
-
-Window* Manager::window(std::string id)
-{
-    for (const auto& w : windows_)
-    {
-        if (w->id() == id)
-        {
-            return w.get();
-        }
-    }
-    return nullptr;
 }
 
 // This is setup to recycle memory as much as we can. Used like a C array

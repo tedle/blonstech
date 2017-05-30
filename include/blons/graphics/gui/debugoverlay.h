@@ -46,23 +46,9 @@ class DebugOverlay : public Window
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
-    /// \copydoc Window(std::string, Box, std::string, Window::Type, Manager*)
+    /// \copydoc Window(Box, Manager*)
     ////////////////////////////////////////////////////////////////////////////////
-    DebugOverlay(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls
-    /// DebugOverlay(std::string, Box, std::string, Window::Type, Manager*)
-    /// with an empty caption
-    ////////////////////////////////////////////////////////////////////////////////
-    DebugOverlay(std::string id, Box pos, Type type, Manager* parent_manager)
-        : DebugOverlay(id, pos, "", type, parent_manager) {}
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls
-    /// DebugOverlay(std::string, Box, std::string, Window::Type, Manager*)
-    /// with a style of Window::Type::INVISIBLE
-    ////////////////////////////////////////////////////////////////////////////////
-    DebugOverlay(std::string id, Box pos, std::string caption, Manager* parent_manager)
-        : DebugOverlay(id, pos, caption, Type::INVISIBLE, parent_manager) {}
+    DebugOverlay(Box pos, Manager* parent_manager);
     ~DebugOverlay() {}
 
     ////////////////////////////////////////////////////////////////////////////////

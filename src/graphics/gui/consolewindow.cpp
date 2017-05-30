@@ -30,8 +30,8 @@ namespace blons
 {
 namespace gui
 {
-ConsoleWindow::ConsoleWindow(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager)
-    : Window(id, pos, caption, type, parent_manager)
+ConsoleWindow::ConsoleWindow(Box pos, std::string caption, Type type, Manager* parent_manager)
+    : Window(pos, caption, type, parent_manager)
 {
     auto font_style = Skin::FontStyle::CONSOLE;
     float textbox_height = 40.0f;

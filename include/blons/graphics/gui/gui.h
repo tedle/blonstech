@@ -45,10 +45,7 @@
 /// auto gui = graphics->gui();
 ///
 /// // Creating a Window
-/// auto window = gui->MakeWindow("some id", 0, 0, 300, 300, "Window title!");
-///
-/// // Retrieving the Window later
-/// window = gui->window("some id");
+/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title!");
 ///
 /// // Adding a button to the window
 /// window->MakeButton(10, 150, 120, 40, "Hey!");

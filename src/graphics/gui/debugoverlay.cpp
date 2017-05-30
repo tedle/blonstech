@@ -65,8 +65,8 @@ std::unique_ptr<Image> BuildColourImage(Vector4 colour, Manager* gui, Window* wi
 }
 } // namespace
 
-DebugOverlay::DebugOverlay(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager)
-    : Window(id, pos, caption, type, parent_manager)
+DebugOverlay::DebugOverlay(Box pos, Manager* parent_manager)
+    : Window(pos, "", Type::INVISIBLE, parent_manager)
 {
     total_frame_time_ = 0;
 

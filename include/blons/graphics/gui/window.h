@@ -58,26 +58,25 @@ public:
     /// \brief Initializes members with supplied values. Meant to be used by
     /// gui::Manager::MakeWindow
     ///
-    /// \param id Unique string to identify and retrieve window by
     /// \param pos Position and dimensions of the window
     /// \param caption String to be displayed in titlebar, only used if type is
     /// `Window::Type::DRAGGABLE`
     /// \param type How the window should behave. See gui::Window::Type
     /// \param parent_manager gui::Manager containing this window
     ////////////////////////////////////////////////////////////////////////////////
-    Window(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager);
+    Window(Box pos, std::string caption, Type type, Manager* parent_manager);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Window(std::string, Box, std::string, Window::Type, Manager*)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
-    Window(std::string id, Box pos, Type type, Manager* parent_manager)
-        : Window(id, pos, "", type, parent_manager) {}
+    Window(Box pos, Type type, Manager* parent_manager)
+        : Window(pos, "", type, parent_manager) {}
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls Window(std::string, Box, std::string, Window::Type, Manager*)
     /// with a type of `Window::Type::DRAGGABLE`
     ////////////////////////////////////////////////////////////////////////////////
-    Window(std::string id, Box pos, std::string caption, Manager* parent_manager)
-        : Window(id, pos, caption, Type::DRAGGABLE, parent_manager) {}
+    Window(Box pos, std::string caption, Manager* parent_manager)
+        : Window(pos, caption, Type::DRAGGABLE, parent_manager) {}
     ~Window() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -182,13 +181,6 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Textbox* MakeTextbox(units::pixel x, units::pixel y, units::pixel width, units::pixel height);
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves the unique string used to identify this window
-    ///
-    /// \return Unique string ID
-    ////////////////////////////////////////////////////////////////////////////////
-    const std::string id() const;
-
 protected:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief A list containing every child Control to be rendered by the window
@@ -201,8 +193,7 @@ protected:
     void RenderBody();
 
 private:
-    const std::string id_;
-    Type type_;
+    const Type type_;
 
     // For draggable windows
     bool dragging_;
@@ -222,10 +213,7 @@ private:
 /// auto gui = graphics->gui();
 ///
 /// // Creating a Window
-/// auto window = gui->MakeWindow("some id", 0, 0, 300, 300, "Window title!");
-///
-/// // Retrieving the Window later
-/// window = gui->window("some id");
+/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title!");
 ///
 /// // Adding a button to the window
 /// window->MakeButton(10, 150, 120, 40, "Hey!");

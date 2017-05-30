@@ -359,7 +359,7 @@ bool Graphics::Init(Client::Info screen)
     if (gui_ == nullptr)
     {
         gui_.reset(new gui::Manager(screen.width, screen.height));
-        debug_overlay_ = new gui::DebugOverlay("", Box(0, 0, screen.width, screen.height), gui::Window::INVISIBLE, gui_.get());
+        debug_overlay_ = new gui::DebugOverlay(Box(0, 0, screen.width, screen.height), gui_.get());
         gui_->AddOverlay(std::unique_ptr<gui::DebugOverlay>(debug_overlay_));
     }
     else

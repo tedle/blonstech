@@ -115,9 +115,6 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new Window for containing Control%s.
     ///
-    /// \param id Unique ID to refer to the window by. Used for retrieving the
-    /// window at a later time. If the ID is already in use the old window is
-    /// deleted and replaced
     /// \param x Where to place the window horizontally in pixels
     /// \param y Where to place the window vertically in pixels
     /// \param width How wide the window should be in pixels
@@ -128,19 +125,19 @@ public:
     /// \return Pointer to the created window. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type);
+    Window* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
-    /// MakeWindow(std::string, units::pixel, units::pixel, units::pixel, units::pixel, std::string, Window::Type)
+    /// MakeWindow(units::pixel, units::pixel, units::pixel, units::pixel, std::string, Window::Type)
     /// with a type of `Window::Type::DRAGGABLE`
     ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption);
+    Window* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Calls
-    /// MakeWindow(std::string, units::pixel, units::pixel, units::pixel, units::pixel, std::string, Window::Type)
+    /// MakeWindow(units::pixel, units::pixel, units::pixel, units::pixel, std::string, Window::Type)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeWindow(std::string id, units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type);
+    Window* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Adds a user created overlay. Overlays are Window%s that render on top
@@ -200,15 +197,6 @@ public:
     /// \return True if input was consumed by the GUI
     ////////////////////////////////////////////////////////////////////////////////
     bool Update(const Input& input);
-
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Retrieves a registered Window
-    ///
-    /// \param id Unique ID of the Window to retrieve,
-    /// determined during MakeWindow()
-    /// \return Pointer to the requested Window, nullptr on failure
-    ////////////////////////////////////////////////////////////////////////////////
-    Window* window(std::string id);
 
 private:
     // Since we want this class to be accessed by user, we hide these functions
@@ -313,10 +301,7 @@ private:
 /// auto gui = graphics->gui();
 ///
 /// // Creating a Window
-/// auto window = gui->MakeWindow("some id", 0, 0, 300, 300, "Window title!");
-///
-/// // Retrieving the Window later
-/// window = gui->window("some id");
+/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title!");
 ///
 /// // Adding a button to the window
 /// window->MakeButton(10, 150, 120, 40, "Hey!");

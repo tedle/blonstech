@@ -30,10 +30,9 @@ namespace blons
 {
 namespace gui
 {
-Window::Window(std::string id, Box pos, std::string caption, Type type, Manager* parent_manager)
-    : Control(pos, parent_manager, nullptr), id_(id)
+Window::Window(Box pos, std::string caption, Type type, Manager* parent_manager)
+    : Control(pos, parent_manager, nullptr), type_(type)
 {
-    type_ = type;
     dragging_ = false;
     drag_offset_ = Vector2(0, 0);
 
@@ -315,11 +314,6 @@ Textbox* Window::MakeTextbox(units::pixel x, units::pixel y, units::pixel width,
     std::unique_ptr<Textbox> textbox(new Textbox(pos, gui_, this));
     controls_.push_back(std::move(textbox));
     return static_cast<Textbox*>(controls_.back().get());
-}
-
-const std::string Window::id() const
-{
-    return id_;
 }
 } // namespace gui
 } // namespace blons
