@@ -131,7 +131,7 @@ private:
 /// \code
 /// // Adding a label to a window
 /// auto gui = graphics->gui();
-/// auto window = gui->MakeWindow("window_id", 0, 0, 200, 200, "Window title");
+/// auto window = gui->MakeWindow(0, 0, 200, 200, "Window title", blons::gui::Window::Type::DRAGGABLE);
 /// window->MakeLabel(50, 50, "Welcome, gamer! $0f0 Green text here!");
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////

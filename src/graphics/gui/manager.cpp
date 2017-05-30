@@ -48,7 +48,7 @@ Manager::Manager(units::pixel width, units::pixel height)
 {
     Init(width, height);
     // TODO: Make the windows and overlays resize on reload
-    main_window_.reset(new Window(Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), Window::INVISIBLE, this));
+    main_window_.reset(new Window(Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h), "", Window::INVISIBLE, this));
     console_window_.reset(new ConsoleWindow(Box(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h / 3), Window::INVISIBLE, this));
 }
 
@@ -113,55 +113,6 @@ bool Manager::LoadFont(std::string filename, units::pixel pixel_size, Skin::Font
 bool Manager::LoadFont(std::string filename, units::pixel pixel_size)
 {
     return LoadFont(filename, pixel_size, Skin::FontStyle::DEFAULT);
-}
-
-Window* Manager::AddWindow(std::unique_ptr<Window> window)
-{
-    for (auto& w : windows_)
-    {
-        if (w == window)
-        {
-            w = std::move(window);
-            return w.get();
-        }
-    }
-    windows_.push_back(std::move(window));
-    return windows_.back().get();
-}
-
-Window* Manager::MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
-{
-    Box win_pos(x, y, width, height);
-    if (type == Window::DRAGGABLE)
-    {
-        return AddWindow(std::make_unique<Window>(win_pos, caption, this));
-    }
-    else
-    {
-        return AddWindow(std::make_unique<Window>(win_pos, type, this));
-    }
-    throw "Impossible statement reached";
-}
-
-Window* Manager::MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption)
-{
-    return MakeWindow(x, y, width, height, caption, Window::DRAGGABLE);
-}
-
-Window* Manager::MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type)
-{
-    return MakeWindow(x, y, width, height, "", type);
-}
-
-Overlay* Manager::AddOverlay(std::unique_ptr<Overlay> overlay)
-{
-    overlays_.push_back(std::move(overlay));
-    return overlays_.back().get();
-}
-
-Overlay* Manager::MakeOverlay()
-{
-    return AddOverlay(std::make_unique<Overlay>(this));
 }
 
 void Manager::Render(Framebuffer* output_buffer)

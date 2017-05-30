@@ -135,7 +135,7 @@ private:
 /// \code
 /// // Adding a debug slider to a window
 /// auto gui = graphics->gui();
-/// auto window = gui->MakeWindow("window_id", 0, 0, 300, 300, "Window title");
+/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title", blons::gui::Window::Type::DRAGGABLE);
 /// auto slider = window->MakeDebugSlider(10, 40, 250, 40, 0.0f, 100.0f, 1.0f);
 ///
 /// // Setting a callback that logs whatever is set

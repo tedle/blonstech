@@ -45,7 +45,7 @@
 /// auto gui = graphics->gui();
 ///
 /// // Creating a Window
-/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title!");
+/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title", blons::gui::Window::Type::DRAGGABLE);
 ///
 /// // Adding a button to the window
 /// window->MakeButton(10, 150, 120, 40, "Hey!");

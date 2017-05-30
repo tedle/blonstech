@@ -97,7 +97,7 @@ private:
 /// \code
 /// // Adding a button to a window
 /// auto gui = graphics->gui();
-/// auto window = gui->MakeWindow("window_id", 0, 0, 200, 200, "Window title");
+/// auto window = gui->MakeWindow(0, 0, 200, 200, "Window title", blons::gui::Window::Type::DRAGGABLE);
 /// auto button = window->MakeButton(0, 0, 120, 40, "Button!")
 ///
 /// // Setting a click handler

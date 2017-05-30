@@ -65,18 +65,6 @@ public:
     /// \param parent_manager gui::Manager containing this window
     ////////////////////////////////////////////////////////////////////////////////
     Window(Box pos, std::string caption, Type type, Manager* parent_manager);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Window(Box, std::string, Window::Type, Manager*)
-    /// with an empty caption
-    ////////////////////////////////////////////////////////////////////////////////
-    Window(Box pos, Type type, Manager* parent_manager)
-        : Window(pos, "", type, parent_manager) {}
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Window(Box, std::string, Window::Type, Manager*)
-    /// with a type of `Window::Type::DRAGGABLE`
-    ////////////////////////////////////////////////////////////////////////////////
-    Window(Box pos, std::string caption, Manager* parent_manager)
-        : Window(pos, caption, Type::DRAGGABLE, parent_manager) {}
     ~Window() {}
 
     ////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +201,7 @@ private:
 /// auto gui = graphics->gui();
 ///
 /// // Creating a Window
-/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title!");
+/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title", blons::gui::Window::Type::DRAGGABLE);
 ///
 /// // Adding a button to the window
 /// window->MakeButton(10, 150, 120, 40, "Hey!");

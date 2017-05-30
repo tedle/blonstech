@@ -84,8 +84,8 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
 
 void InitTestUI(blons::gui::Manager* gui)
 {
-    auto win1 = gui->MakeWindow(450, 250, 300, 370, "Amicable window");
-    auto win2 = gui->MakeWindow(20, 80, 400, 270, "Friendly window");
+    auto win1 = gui->MakeWindow(450, 250, 300, 370, "Amicable window", blons::gui::Window::Type::DRAGGABLE);
+    auto win2 = gui->MakeWindow(20, 80, 400, 270, "Friendly window", blons::gui::Window::Type::DRAGGABLE);
 
     auto textarea = win1->MakeTextarea(10, 110, 280, 205);
     for (int i = 0; i < 5; i++)

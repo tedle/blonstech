@@ -204,7 +204,7 @@ private:
 ///
 /// // Working with the GUI
 /// auto gui = graphics->gui();
-/// gui->MakeWindow("window_id", 450, 250, 300, 300, "Great window!");
+/// gui->MakeWindow(450, 250, 300, 300, "Great window!", blons::gui::Window::Type::DRAGGABLE);
 ///
 /// // Render loop
 /// bool quit = false;

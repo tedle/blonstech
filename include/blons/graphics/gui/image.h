@@ -99,7 +99,7 @@ private:
 /// \code
 /// // Adding an image to a window
 /// auto gui = graphics->gui();
-/// auto window = gui->MakeWindow("window_id", 0, 0, 200, 200, "Window title");
+/// auto window = gui->MakeWindow(0, 0, 200, 200, "Window title", blons::gui::Window::Type::DRAGGABLE);
 /// auto image = window->MakeImage(0, 0, 128, 128, "image.png");
 /// \endcode
 ////////////////////////////////////////////////////////////////////////////////

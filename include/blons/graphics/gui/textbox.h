@@ -261,7 +261,7 @@ private:
 /// \code
 /// // Adding a textbox to a window
 /// auto gui = graphics->gui();
-/// auto window = gui->MakeWindow("window_id", 0, 0, 300, 300, "Window title");
+/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title", blons::gui::Window::Type::DRAGGABLE);
 /// auto textbox = window->MakeTextbox(10, 40, 250, 40);
 ///
 /// // Setting a callback that logs whatever is typed

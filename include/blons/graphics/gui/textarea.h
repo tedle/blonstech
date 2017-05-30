@@ -141,7 +141,7 @@ private:
 /// \code
 /// // Adding a textarea to a window
 /// auto gui = graphics->gui();
-/// auto window = gui->MakeWindow("window_id", 0, 0, 300, 300, "Window title");
+/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title", blons::gui::Window::Type::DRAGGABLE);
 /// auto textarea = window->MakeTextarea(10, 40, 200, 200);
 ///
 /// // Outputting a line of text

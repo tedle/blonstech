@@ -106,13 +106,7 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     bool LoadFont(std::string filename, units::pixel pixel_size);
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Adds a user created Window. Memory is owned by the gui::Manager class
-    ///
-    /// \param window Unique pointer to a Window to be added
-    /// \return Raw pointer to the Window just added
-    ////////////////////////////////////////////////////////////////////////////////
-    Window* AddWindow(std::unique_ptr<Window> window);
+    /// \NEEDS_TEMPLATE_PARAM_DOCS
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new Window for containing Control%s.
     ///
@@ -126,29 +120,14 @@ public:
     /// \return Pointer to the created window. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls
-    /// MakeWindow(units::pixel, units::pixel, units::pixel, units::pixel, std::string, Window::Type)
-    /// with a type of `Window::Type::DRAGGABLE`
-    ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption);
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls
-    /// MakeWindow(units::pixel, units::pixel, units::pixel, units::pixel, std::string, Window::Type)
-    /// with an empty caption
-    ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, Window::Type type);
+    template <typename T = Window>
+    T* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
+    {
+        Box win_pos(x, y, width, height);
+        windows_.push_back(std::make_unique<T>(win_pos, caption, type, this));
+        return static_cast<T*>(windows_.back().get());
+    }
 
-    ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Adds a user created overlay. Overlays are Window%s that render on top
-    /// of the rest of the UI, are invisible, take no input, and cover the entire
-    /// screen. Memory is owned by the gui::Manager class
-    ///
-    /// \param overlay Unique pointer to a overlay Window to be added
-    /// \return Raw pointer to the overlay just added
-    ////////////////////////////////////////////////////////////////////////////////
-    Overlay* AddOverlay(std::unique_ptr<Overlay> overlay);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new Overlay for containing Control%s to be rendered on the
     /// top layer of the UI.
@@ -156,7 +135,12 @@ public:
     /// \return Pointer to the created overlay. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
-    Overlay* MakeOverlay();
+    template <typename T = Overlay>
+    T* MakeOverlay()
+    {
+        overlays_.push_back(std::make_unique<T>(this));
+        return static_cast<T*>(overlays_.back().get());
+    }
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the supplied framebuffer.
@@ -303,7 +287,7 @@ private:
 /// auto gui = graphics->gui();
 ///
 /// // Creating a Window
-/// auto window = gui->MakeWindow(0, 0, 300, 300, "Window title!");
+/// auto window = gui->MakeWindow(0, 0, 200, 200, "Window title", blons::gui::Window::Type::DRAGGABLE);
 ///
 /// // Adding a button to the window
 /// window->MakeButton(10, 150, 120, 40, "Hey!");
