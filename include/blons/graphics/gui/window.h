@@ -66,13 +66,13 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Window(Box pos, std::string caption, Type type, Manager* parent_manager);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Window(std::string, Box, std::string, Window::Type, Manager*)
+    /// \brief Calls Window(Box, std::string, Window::Type, Manager*)
     /// with an empty caption
     ////////////////////////////////////////////////////////////////////////////////
     Window(Box pos, Type type, Manager* parent_manager)
         : Window(pos, "", type, parent_manager) {}
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Calls Window(std::string, Box, std::string, Window::Type, Manager*)
+    /// \brief Calls Window(Box, std::string, Window::Type, Manager*)
     /// with a type of `Window::Type::DRAGGABLE`
     ////////////////////////////////////////////////////////////////////////////////
     Window(Box pos, std::string caption, Manager* parent_manager)

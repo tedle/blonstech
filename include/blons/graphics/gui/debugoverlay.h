@@ -28,7 +28,7 @@
 #include <unordered_map>
 // Public Includes
 #include <blons/graphics/gui/control.h>
-#include <blons/graphics/gui/window.h>
+#include <blons/graphics/gui/overlay.h>
 #include <blons/graphics/gui/label.h>
 #include <blons/debug/performance.h>
 
@@ -36,19 +36,19 @@ namespace blons
 {
 namespace gui
 {
-/// \WRITE_A_BRIEF
 ////////////////////////////////////////////////////////////////////////////////
-/// \brief Screen overlay that provides debug information.
+/// \brief Screen overlay that provides debug information. Currently includes
+/// detailed frame timing and a framerate counter
 ///
-/// \copydoc gui::Window
+/// \copydoc gui::Overlay
 ////////////////////////////////////////////////////////////////////////////////
-class DebugOverlay : public Window
+class DebugOverlay : public Overlay
 {
 public:
     ////////////////////////////////////////////////////////////////////////////////
     /// \copydoc Window(Box, Manager*)
     ////////////////////////////////////////////////////////////////////////////////
-    DebugOverlay(Box pos, Manager* parent_manager);
+    DebugOverlay(Manager* parent_manager);
     ~DebugOverlay() {}
 
     ////////////////////////////////////////////////////////////////////////////////

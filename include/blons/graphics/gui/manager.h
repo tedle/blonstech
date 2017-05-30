@@ -33,6 +33,7 @@
 #include <blons/graphics/gui/skin.h>
 #include <blons/graphics/gui/font.h>
 #include <blons/graphics/gui/window.h>
+#include <blons/graphics/gui/overlay.h>
 #include <blons/graphics/gui/consolewindow.h>
 #include <blons/graphics/gui/debugoverlay.h>
 
@@ -147,15 +148,15 @@ public:
     /// \param overlay Unique pointer to a overlay Window to be added
     /// \return Raw pointer to the overlay just added
     ////////////////////////////////////////////////////////////////////////////////
-    Window* AddOverlay(std::unique_ptr<Window> overlay);
+    Overlay* AddOverlay(std::unique_ptr<Overlay> overlay);
     ////////////////////////////////////////////////////////////////////////////////
-    /// \brief Creates a new overlay for containing Control%s to be rendered on the
+    /// \brief Creates a new Overlay for containing Control%s to be rendered on the
     /// top layer of the UI.
     ///
     /// \return Pointer to the created overlay. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
-    Window* MakeOverlay();
+    Overlay* MakeOverlay();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the supplied framebuffer.
@@ -211,6 +212,7 @@ private:
     friend Textbox;
     friend ConsoleTextbox;
     friend DebugSliderTextbox;
+    friend Overlay;
     friend Window;
     friend ConsoleWindow;
     friend DebugOverlay;
@@ -283,7 +285,7 @@ private:
 
     std::unique_ptr<Skin> skin_;
     std::vector<std::unique_ptr<Window>> windows_;
-    std::vector<std::unique_ptr<Window>> overlays_;
+    std::vector<std::unique_ptr<Overlay>> overlays_;
     std::unique_ptr<Window> main_window_;
     std::unique_ptr<Window> console_window_;
 };

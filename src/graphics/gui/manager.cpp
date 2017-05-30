@@ -153,16 +153,15 @@ Window* Manager::MakeWindow(units::pixel x, units::pixel y, units::pixel width, 
     return MakeWindow(x, y, width, height, "", type);
 }
 
-Window* Manager::AddOverlay(std::unique_ptr<Window> overlay)
+Overlay* Manager::AddOverlay(std::unique_ptr<Overlay> overlay)
 {
     overlays_.push_back(std::move(overlay));
     return overlays_.back().get();
 }
 
-Window* Manager::MakeOverlay()
+Overlay* Manager::MakeOverlay()
 {
-    Box win_pos(0.0f, 0.0f, screen_dimensions_.w, screen_dimensions_.h);
-    return AddOverlay(std::make_unique<Window>(win_pos, Window::INVISIBLE, this));
+    return AddOverlay(std::make_unique<Overlay>(this));
 }
 
 void Manager::Render(Framebuffer* output_buffer)
