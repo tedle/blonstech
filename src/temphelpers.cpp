@@ -56,7 +56,7 @@ void noclip(Input* input, Camera* camera)
     // Welcome to the hackiest no clip wasd movement u ever see
     while (last_move.ms() > 2)
     {
-        last_move.rewind(2);
+        last_move.Rewind(2);
 
         float velocity = 0.04f;
         if (input->IsKeyDown(Input::SHIFT))
@@ -129,7 +129,7 @@ void move_camera_around_origin(float delta, Camera* camera)
 
     if (last_call.ms() > 10)
     {
-        last_call.rewind(10);
+        last_call.Rewind(10);
 
         float r = 20.0f;
         float orient_delta = 0.03f * delta;

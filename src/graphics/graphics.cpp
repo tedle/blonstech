@@ -198,7 +198,7 @@ bool Graphics::Render()
     // Start performance profiling frame
     perf_timers_[perf_timers_index_].Start();
     units::time::us frame_time = frame_timer_.us();
-    frame_timer_.start();
+    frame_timer_.Start();
 
     // Update graphics settings from cvars
     camera_->set_exposure(cvar_exposure->to<float>());

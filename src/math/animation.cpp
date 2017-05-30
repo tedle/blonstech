@@ -125,7 +125,7 @@ Animation::Animation(units::time::ms duration, Callback callback, TweenType twee
 void Animation::Reset()
 {
     completed_ = false;
-    timer_.start();
+    timer_.Start();
 }
 
 void Animation::Stop()

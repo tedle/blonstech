@@ -273,13 +273,13 @@ void Textbox::set_focus(bool focus)
     if (focus)
     {
         active_ = true;
-        cursor_blink_.start();
+        cursor_blink_.Start();
     }
     else
     {
         active_ = false;
-        cursor_blink_.stop();
-        key_repeat_.timer.stop();
+        cursor_blink_.Stop();
+        key_repeat_.timer.Stop();
         key_repeat_.code = Input::BAD;
     }
 }
@@ -367,7 +367,7 @@ std::vector<Input::Event> Textbox::GetEventsWithRepeats(const Input& input)
                 Input::Event repeat(Input::Event::KEY_DOWN, code);
                 events.push_back(repeat);
                 // How long before next repeated key press
-                key_repeat_.timer.rewind(40);
+                key_repeat_.timer.Rewind(40);
             }
         }
     }
@@ -421,11 +421,11 @@ void Textbox::OnMouseMove(const Input& input)
 void Textbox::OnKeyDown(const Input& input, const Input::KeyCode key, Input::Modifiers mods)
 {
     // Easier to follow when it's moving around
-    cursor_blink_.start();
+    cursor_blink_.Start();
 
     if (key != key_repeat_.code)
     {
-        key_repeat_.timer.start();
+        key_repeat_.timer.Start();
         key_repeat_.code = key;
     }
 
@@ -510,13 +510,13 @@ void Textbox::OnKeyUp(const Input& input, const Input::KeyCode key, Input::Modif
 {
     if (key == key_repeat_.code)
     {
-        key_repeat_.timer.stop();
+        key_repeat_.timer.Stop();
         key_repeat_.code = Input::BAD;
     }
     // Restart timer if we let up a key that's not being repeated
     else
     {
-        key_repeat_.timer.start();
+        key_repeat_.timer.Start();
     }
 }
 
@@ -631,7 +631,7 @@ void Textbox::UpdateHighlightScroll(const Input& input)
         {
             SetCursorPos(cursor_ + 1);
         }
-        drag_highlight_scrolling_.start();
+        drag_highlight_scrolling_.Start();
     }
 }
 } // namespace gui

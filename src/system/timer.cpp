@@ -41,11 +41,11 @@ blons::units::time::us GetMicroseconds()
 
 Timer::Timer()
 {
-    stop();
-    start();
+    Stop();
+    Start();
 }
 
-void Timer::start()
+void Timer::Start()
 {
     // Restart if not paused
     if (!paused_)
@@ -56,7 +56,7 @@ void Timer::start()
     time_offset_ = GetMicroseconds();
 }
 
-void Timer::pause()
+void Timer::Pause()
 {
     if (!paused_)
     {
@@ -65,14 +65,14 @@ void Timer::pause()
     paused_ = true;
 }
 
-void Timer::stop()
+void Timer::Stop()
 {
     paused_ = true;
     microseconds_ = 0;
     time_offset_ = 0;
 }
 
-void Timer::rewind(units::time::ms ms)
+void Timer::Rewind(units::time::ms ms)
 {
     // Overflow check
     if (units::time::ms_to_us(ms) < microseconds_)

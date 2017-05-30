@@ -55,11 +55,11 @@ Model::Model(std::string mesh_filename)
     log::Debug("Loading %s... ", mesh_filename.c_str());
     Timer timer;
 
-    timer.start();
+    timer.Start();
     static Timer total_timer;
-    total_timer.start();
+    total_timer.Start();
     mesh_.reset(new Mesh(mesh_filename));
-    total_timer.pause();
+    total_timer.Pause();
     log::Debug("[%ims(%ims)]\n", timer.ms(), total_timer.ms());
 
 
@@ -69,7 +69,7 @@ Model::Model(std::string mesh_filename)
     }
 
     log::Debug("Loading textures... ");
-    timer.start();
+    timer.Start();
     // TODO: replace this with proper filesystem class
     std::string tex_folder(mesh_filename);
     // Go from folder/mesh/ to folder/

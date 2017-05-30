@@ -51,7 +51,7 @@ void PushMarker(const std::string& label)
     marker.label = label;
     marker.ready = false;
     marker.gpu_start.reset(render::context()->RegisterTimestamp());
-    marker.cpu_timer.start();
+    marker.cpu_timer.Start();
 
     // Push the new Marker to all currently subscribed Frames
     for (auto& frame : g_active_frames)
@@ -82,7 +82,7 @@ void PopMarker()
             throw "PopMarker called when an active frame is at 0 tree depth";
         }
         auto& node = frame->active_stack_;
-        node->cpu_timer.pause();
+        node->cpu_timer.Pause();
         node->gpu_end = gpu_end;
         frame->active_stack_ = node->parent_;
     }
@@ -130,7 +130,7 @@ void Frame::End()
             throw "Frame::end() called with an unbalanced Marker tree";
         }
         root_.gpu_end.reset(render::context()->RegisterTimestamp());
-        root_.cpu_timer.pause();
+        root_.cpu_timer.Pause();
     }
     active_ = false;
 }

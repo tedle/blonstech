@@ -46,22 +46,22 @@ public:
     /// reset to zero before running. If it is paused the timer picks up where it
     /// left off
     ////////////////////////////////////////////////////////////////////////////////
-    void start();
+    void Start();
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Pauses the timer and retains the current clock value
     ////////////////////////////////////////////////////////////////////////////////
-    void pause();
+    void Pause();
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Stops the timer and resets the clock value
     ////////////////////////////////////////////////////////////////////////////////
-    void stop();
+    void Stop();
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Rewinds the timer's clock value by the specified number of
     /// milliseconds
     ///
     /// \param ms Number of milliseconds to rewind by
     ////////////////////////////////////////////////////////////////////////////////
-    void rewind(units::time::ms ms);
+    void Rewind(units::time::ms ms);
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Retrieves the amount of time elapsed since starting in milliseconds
@@ -93,12 +93,12 @@ private:
 /// blons::Timer timer;
 ///
 /// // Performance test
-/// timer.start();
+/// timer.Start();
 /// SlowFunctionCall();
 /// blons::log::Debug("Slow function took %ims!\n", timer.ms());
 ///
 /// // Restart timer
-/// timer.start();
+/// timer.Start();
 ///
 /// // Endless loop that logs a message every second
 /// while (true)
@@ -106,7 +106,7 @@ private:
 ///     if (timer.ms() > 1000)
 ///     {
 ///         blons::log::Debug("Tick!\n");
-///         timer.rewind(1000);
+///         timer.Rewind(1000);
 ///     }
 /// }
 /// \endcode
