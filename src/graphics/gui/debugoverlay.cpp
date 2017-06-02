@@ -75,8 +75,6 @@ DebugOverlay::DebugOverlay(Manager* parent_manager)
     fps_ui_.backdrop = BuildColourImage(layout->debug_overlay.backdrop_colour, gui_, this);
     perf_ui_.label.reset(new Label(Vector2(), ColourString("", layout->debug_overlay.default_colour), kPerfBreakdownFont, parent_manager, this));
     perf_ui_.backdrop = BuildColourImage(layout->debug_overlay.backdrop_colour, gui_, this);
-
-    hidden_ = false;
 }
 
 void DebugOverlay::Render()
