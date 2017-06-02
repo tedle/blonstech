@@ -286,6 +286,12 @@
     <ClInclude Include="..\include\blons\graphics\gui\overlay.h">
       <Filter>src\graphics\gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\manager.inl.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\blons\graphics\gui\window.inl.h">
+      <Filter>src\graphics\gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="graphics\gui\button.cpp">

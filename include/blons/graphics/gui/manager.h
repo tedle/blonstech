@@ -106,10 +106,11 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     bool LoadFont(std::string filename, units::pixel pixel_size);
 
+    // TODO: Add constructor argument forwarding to MakeWindow and MakeOverlay
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new Window for containing Control%s.
     ///
-    /// \tparam T Window class, or subclass, to use. Defaults to gui::Window
+    /// \tparam WindowType Window class, or subclass, to use. Defaults to gui::Window
     /// \param x Where to place the window horizontally in pixels
     /// \param y Where to place the window vertically in pixels
     /// \param width How wide the window should be in pixels
@@ -120,28 +121,19 @@ public:
     /// \return Pointer to the created window. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
-    template <typename T = Window>
-    T* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type)
-    {
-        Box win_pos(x, y, width, height);
-        windows_.push_back(std::make_unique<T>(win_pos, caption, type, this));
-        return static_cast<T*>(windows_.back().get());
-    }
-
+    template <typename WindowType = Window>
+    WindowType* MakeWindow(units::pixel x, units::pixel y, units::pixel width, units::pixel height, std::string caption, Window::Type type);
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Creates a new Overlay for containing Control%s to be rendered on the
     /// top layer of the UI.
     ///
-    /// \tparam T Overlay class, or subclass, to use. Defaults to gui::Overlay
+    /// \tparam OverlayType Overlay class, or subclass, to use. Defaults to
+    /// gui::Overlay
     /// \return Pointer to the created overlay. This memory is owned by the
     /// gui::Manager and should **not** be deleted.
     ////////////////////////////////////////////////////////////////////////////////
-    template <typename T = Overlay>
-    T* MakeOverlay()
-    {
-        overlays_.push_back(std::make_unique<T>(this));
-        return static_cast<T*>(overlays_.back().get());
-    }
+    template <typename OverlayType = Overlay>
+    OverlayType* MakeOverlay();
 
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief Renders all Window%s and Control%s to the supplied framebuffer.
@@ -275,6 +267,9 @@ private:
 };
 } // namespace gui
 } // namespace blons
+
+// Template implementations
+#include "manager.inl.h"
 
 // TODO: Add LoadFont to the usage example once publically usable
 ////////////////////////////////////////////////////////////////////////////////

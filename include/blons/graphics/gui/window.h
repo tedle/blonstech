@@ -169,6 +169,22 @@ public:
     ////////////////////////////////////////////////////////////////////////////////
     Textbox* MakeTextbox(units::pixel x, units::pixel y, units::pixel width, units::pixel height);
 
+    // TODO: Add a code example that clearly shows how the forwarded args are transformed into Control(args...,gui_,this)
+    ////////////////////////////////////////////////////////////////////////////////
+    /// \brief Generic function for creating new subclassed Control%s inside the
+    /// window
+    ///
+    /// \tparam ControlType Control subclass to use
+    /// \tparam Args Arguments to forward to Control constructor. Automatically
+    /// appends gui::Manager and gui::Window parent classes to the end, meaning
+    /// constructors must accept parameters of the form
+    /// `CustomControl(Args..., gui::Manager*, gui::Window*)`
+    /// \return Pointer to the created Control. This memory is owned by the
+    /// gui::Manager and should **not** be deleted.
+    ////////////////////////////////////////////////////////////////////////////////
+    template <typename ControlType = Control, typename... Args>
+    ControlType* MakeControl(Args... args);
+
 protected:
     ////////////////////////////////////////////////////////////////////////////////
     /// \brief A list containing every child Control to be rendered by the window
@@ -190,6 +206,9 @@ private:
 };
 } // namepsace GUI
 } // namespace blons
+
+// Template implementations
+#include "window.inl.h"
 
 ////////////////////////////////////////////////////////////////////////////////
 /// \class blons::gui::Window
