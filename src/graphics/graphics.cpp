@@ -43,6 +43,7 @@ namespace
 auto const cvar_exposure = console::RegisterVariable("light:exposure", -15.0f);
 auto const cvar_sun_luminance = console::RegisterVariable("light:sun-luminance", 1e5f);
 auto const cvar_sky_luminance = console::RegisterVariable("light:sky-luminance", 2e4f);
+auto const cvar_perf_overlay = console::RegisterVariable("dbg:perf-overlay", 1);
 } // namespace
 
 // Managed assets that allows the blons::Graphics class to track and render anything it creates
@@ -204,6 +205,14 @@ bool Graphics::Render()
     camera_->set_exposure(cvar_exposure->to<float>());
     sun_->set_luminance(cvar_sun_luminance->to<float>());
     sky_luminance_ = cvar_sky_luminance->to<float>();
+    if (cvar_perf_overlay->to<int>() == 0)
+    {
+        debug_overlay_->hide();
+    }
+    else
+    {
+        debug_overlay_->show();
+    }
 
     auto context = render::context();
     pipeline::Scene scene;
