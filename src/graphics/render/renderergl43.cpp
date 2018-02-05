@@ -640,12 +640,12 @@ BufferResource* RendererGL43::RegisterMesh(Vertex* vertices, unsigned int vert_c
     glBufferData(GL_ARRAY_BUFFER, vert_count * sizeof(Vertex), vertices, GL_STATIC_DRAW);
 
     // Enable vertex inputs
-    glEnableVertexAttribArray(0);
-    glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
-    glEnableVertexAttribArray(3);
-    glEnableVertexAttribArray(4);
-    glEnableVertexAttribArray(5);
+    glEnableVertexAttribArray(POS);
+    glEnableVertexAttribArray(TEX);
+    glEnableVertexAttribArray(LIGHT_TEX);
+    glEnableVertexAttribArray(NORMAL);
+    glEnableVertexAttribArray(TANGENT);
+    glEnableVertexAttribArray(BITANGENT);
 
     // Layout the Vertex struct type to gpu vertex attributes
     // Position declaration
