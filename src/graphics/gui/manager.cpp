@@ -74,11 +74,11 @@ void Manager::Init(units::pixel width, units::pixel height)
     skin_.reset(new Skin());
 
     // TODO: move this out of constructor! font load included!
-    LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::DEFAULT);
-    LoadFont("font stuff/test-heading.ttf", 20, Skin::FontStyle::HEADING);
-    LoadFont("font stuff/test-label.ttf", 20, Skin::FontStyle::LABEL);
-    LoadFont("font stuff/test-console.ttf", 28, Skin::FontStyle::CONSOLE);
-    LoadFont("font stuff/test-console.ttf", 12, Skin::FontStyle::DEBUG);
+    LoadFont("fonts/test-console.ttf", 28, Skin::FontStyle::DEFAULT);
+    LoadFont("fonts/test-heading.ttf", 20, Skin::FontStyle::HEADING);
+    LoadFont("fonts/test-label.ttf", 20, Skin::FontStyle::LABEL);
+    LoadFont("fonts/test-console.ttf", 28, Skin::FontStyle::CONSOLE);
+    LoadFont("fonts/test-console.ttf", 12, Skin::FontStyle::DEBUG);
 
     // For batch rendering
     quad_mesh_.reset(new Mesh("blons:quad"));

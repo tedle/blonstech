@@ -144,7 +144,7 @@ void move_camera_around_origin(float delta, Camera* camera)
     }
 }
 
-std::vector<std::unique_ptr<Model>> load_codmap(std::string folder, std::vector<std::unique_ptr<Model>> models, Graphics* graphics)
+std::vector<std::unique_ptr<Model>> load_batch_models(std::string folder, std::vector<std::unique_ptr<Model>> models, Graphics* graphics)
 {
     Timer timer;
     std::string csv_file = folder;

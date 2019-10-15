@@ -184,7 +184,7 @@ void Client::InitWindow(units::pixel* screen_width, units::pixel* screen_height)
         style |= WS_POPUP;
     }
 
-    // Finally make the window, fuck win32
+    // Finally make the window
     screen_info_.hwnd = CreateWindowEx(WS_EX_APPWINDOW, app_name_, app_name_, style,
                                        pos_x, pos_y, r_width, r_height, nullptr, nullptr, hinstance_, nullptr);
 

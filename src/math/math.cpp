@@ -308,15 +308,15 @@ Matrix MatrixView(Vector3 pos, Vector3 rot)
     yaw   = rot.y; // * 0.0174532925f;
     roll  = rot.z; // * 0.0174532925f;
 
-    // WTF????
+    // Maybe this is mislabeled to intentionally confuse people?
     rot_matrix = XMMatrixRotationRollPitchYaw(pitch, yaw, roll);
 
-    // holey crap ms
+    // Not a fan of this API
     look_vector = XMVector3TransformCoord(XMLoadFloat3(&view_look), rot_matrix);
     up_vector   = XMVector3TransformCoord(XMLoadFloat3(&view_up),   rot_matrix);
     pos_vector  = XMLoadFloat3(&view_pos);
 
-    // Translate look_vector back to possey
+    // Translate look_vector back to pos
     look_vector = pos_vector + look_vector;
 
     XMStoreFloat4x4(&xm, XMMatrixLookAtRH(pos_vector, look_vector, up_vector));

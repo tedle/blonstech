@@ -229,10 +229,9 @@ RendererD3D11::RendererD3D11(int screen_width, int screen_height, bool vsync,
 
     swapchain_desc.Flags = 0;
 
-    // 11.1 can fuck right off
     feature_level = D3D_FEATURE_LEVEL_11_0;
 
-    // FINALLY initialize directx holey shit
+    // FINALLY initialize directx
     result = D3D11CreateDeviceAndSwapChain(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, &feature_level, 1, D3D11_SDK_VERSION,
                                            &swapchain_desc, &swapchain_, &device_, nullptr, &device_context_);
     if (FAILED(result))

@@ -38,7 +38,7 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     std::vector<std::unique_ptr<blons::Model>> models;
 
     // Big scene
-    models = blons::temp::load_codmap("old_sponza_2uv", std::move(models), graphics.get());
+    models = blons::temp::load_batch_models("old_sponza_2uv", std::move(models), graphics.get());
 
     // Model 1
     models.push_back(graphics->MakeModel("teapot_highpoly.bms"));
@@ -58,10 +58,6 @@ int WINAPI WinMain(HINSTANCE instance, HINSTANCE prev_instance, LPSTR cmd_line, 
     models.back()->set_scale(0.5, 0.5, 0.5);
 
     graphics->BakeRadianceTransfer();
-
-    // Sprite 1
-    auto sprite = graphics->MakeSprite("me.dds");
-    sprite->set_pos(0, 0, 32, 32);
 
     InitTestConsole(graphics.get(), info);
 
@@ -93,7 +89,7 @@ void InitTestUI(blons::gui::Manager* gui)
         textarea->AddLine("Simple test line that isn't too short,\nmaybe even a little long, thanks for the friendly test!");
     }
 
-    textarea->AddLine("HAello! blonsUI in action!");
+    textarea->AddLine("Hello! blonstech UI in action!");
 
     auto textbox = win2->MakeTextbox(135, 220, 255, 40);
     auto print = [textbox]()
@@ -117,26 +113,26 @@ void InitTestUI(blons::gui::Manager* gui)
     win2->MakeButton(10, 220, 120, 40, "Print!")->set_callback(print);
     win2->MakeButton(10, 175, 380, 40, "Clear!")->set_callback(textareaclear);
 
-    win1->MakeButton(10, 320, 280, 40, "New stuff maybe!");
+    win1->MakeButton(10, 320, 280, 40, "Button Without Purpose");
 
     win2->MakeDebugSlider(10, 110, 380, 40, -5, 20, 0.01f);
 }
 
 void InitTestConsole(blons::Graphics* graphics, blons::Client::Info info)
 {
-    blons::console::out("Welcome, gamer -- to the blonstech universe!\n");
+    blons::console::out("blonstech console initialized\n");
 
-    blons::console::RegisterFunction("main:testo", [](int i){ blons::console::out("%i gamers in the house!\n", i); });
-    blons::console::RegisterFunction("main:testo", [](const char* i){ blons::console::out("%s stringers in the house!\n", i); });
-    blons::console::RegisterFunction("main:testo", [](int i, int j){ blons::console::out("%i, %i double inters in the house!\n", i, j); });
+    blons::console::RegisterFunction("main:test", [](int i){ blons::console::out("%i (int callback)\n", i); });
+    blons::console::RegisterFunction("main:test", [](const char* i){ blons::console::out("%s (string callback)\n", i); });
+    blons::console::RegisterFunction("main:test", [](int i, int j){ blons::console::out("%i, %i (int, int callback)\n", i, j); });
 
-    blons::console::RegisterVariable("sv:cool", 5);
+    blons::console::RegisterVariable("sv:test", 5);
     blons::console::RegisterVariable("math:pi", 3.14f);
-    blons::console::RegisterVariable("sv:greeting", "heyo heyo heyo heyo");
+    blons::console::RegisterVariable("sv:greeting", "Greetings!");
 
-    blons::console::set_var("sv:cool", 10);
+    blons::console::set_var("sv:test", 10);
 
-    auto v_a = blons::console::var<int>("sv:cool");
+    auto v_a = blons::console::var<int>("sv:test");
     auto v_b = blons::console::var<float>("math:pi");
     auto v_c = blons::console::var<std::string>("sv:greeting");
 
